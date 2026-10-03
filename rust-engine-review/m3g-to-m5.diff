@@ -1,0 +1,471 @@
+diff --git a/crates/mtg-core/src/combat.rs b/crates/mtg-core/src/combat.rs
+index 02f59f8..dd5a58e 100644
+--- a/crates/mtg-core/src/combat.rs
++++ b/crates/mtg-core/src/combat.rs
+@@ -224,7 +224,7 @@ pub fn run(cx: &mut Cx, f: &mut CombatFrame) -> Next {
+             for &a in atk.iter() {
+                 cx.emit(Event::Attacks { obj: a });
+             }
+-            cx.emit(Event::AttackersDeclared { count: atk.len() as u8 });
++            cx.emit(Event::AttackersDeclared { count: atk.len().min(255) as u8 });
+             Next::Done
+         }
+         CombatStage::Blockers { cands, i } => {
+@@ -256,7 +256,7 @@ pub fn run(cx: &mut Cx, f: &mut CombatFrame) -> Next {
+                 a.blocked = !a.blockers.is_empty();
+             }
+             let pairs: Vec<(ObjRef, ObjRef)> = cx.s.combat.as_ref().unwrap().attackers.iter().flat_map(|a| a.blockers.iter().map(move |&b| (a.obj, b))).collect();
+-            cx.emit(Event::BlockersDeclared { count: n as u8 });
++            cx.emit(Event::BlockersDeclared { count: n.min(255) as u8 });
+             for (attacker, blocker) in pairs {
+                 cx.emit(Event::Blocked { attacker, blocker });
+             }
+@@ -408,7 +408,7 @@ fn run_damage(cx: &mut Cx, f: &mut CombatFrame) -> Next {
+             plan.clear();
+         }
+         // Sequential assignment among several blockers.
+-        let nb = blockers.len() as u8;
++        let nb = blockers.len() as u16;
+         if blocker_idx >= nb || (!trample && blocker_idx == nb - 1) {
+             // Finalize this attacker.
+             if !trample && blocker_idx == nb - 1 {
+diff --git a/crates/mtg-core/src/cost.rs b/crates/mtg-core/src/cost.rs
+index b2a92c8..d12963e 100644
+--- a/crates/mtg-core/src/cost.rs
++++ b/crates/mtg-core/src/cost.rs
+@@ -374,7 +374,10 @@ impl<'a> Cx<'a> {
+                 }
+             }
+             restricted = pay.restricted.iter().any(|&n| n > 0);
+-            self.apply_payment(seat, &pay, &srcs);
++            // The spell or ability being paid for is on top of the stack with its targets chosen;
++            // an automatic sacrifice must not take one of them.
++            let avoid: SmallVec<[ObjRef; 4]> = self.s.stack.last().map(|e| e.targets.iter().filter_map(|t| if let crate::decision::Target::Obj(r) = t { Some(*r) } else { None }).collect()).unwrap_or_default();
++            self.apply_payment(seat, &pay, &srcs, &avoid);
+         }
+         if plan.life > 0 {
+             self.lose_life(seat, plan.life);
+diff --git a/crates/mtg-core/src/eval.rs b/crates/mtg-core/src/eval.rs
+index 294c313..7fb8a32 100644
+--- a/crates/mtg-core/src/eval.rs
++++ b/crates/mtg-core/src/eval.rs
+@@ -297,6 +297,12 @@ impl<'a> Cx<'a> {
+ 
+     /// Filter match against last-known information (only the characteristics LKI carries).
+     pub fn lki_matches(&self, f: &ObjFilter, l: &Lki, ctrl: Seat, is_self: bool) -> bool {
++        self.lki_match_one(f, l, ctrl, is_self) || f.alt.iter().any(|a| self.lki_match_one(a, l, ctrl, is_self))
++    }
++
++    /// Every characteristic test of `filter_match_one` that a last-known-information snapshot can
++    /// answer (the snapshot has no tapped/attacking/counter state of a live object).
++    fn lki_match_one(&self, f: &ObjFilter, l: &Lki, ctrl: Seat, is_self: bool) -> bool {
+         if (f.not_self && is_self) || (f.self_only && !is_self) {
+             return false;
+         }
+@@ -306,9 +312,47 @@ impl<'a> Cx<'a> {
+         if l.types.intersects(f.types_not) {
+             return false;
+         }
++        if !f.supertypes_any.is_empty() && !l.supertypes.intersects(f.supertypes_any) {
++            return false;
++        }
++        if l.supertypes.intersects(f.supertypes_not) {
++            return false;
++        }
++        if f.subtypes_any != SubtypeSet::EMPTY && !l.subtypes.intersects(f.subtypes_any) {
++            return false;
++        }
++        if l.subtypes.intersects(f.subtypes_not) {
++            return false;
++        }
+         if !f.colors_any.is_empty() && !l.colors.intersects(f.colors_any) {
+             return false;
+         }
++        if l.colors.intersects(f.colors_not) {
++            return false;
++        }
++        if let Some(cl) = f.colorless {
++            if l.colors.is_empty() != cl {
++                return false;
++            }
++        }
++        if !f.keywords_any.is_empty() && !l.keywords.intersects(f.keywords_any) {
++            return false;
++        }
++        if let Some((cmp, n)) = f.cmc {
++            if !cmp.test(self.db.def(l.def).mana_value() as i32, n) {
++                return false;
++            }
++        }
++        if let Some((cmp, n)) = f.power {
++            if !cmp.test(l.power, n) {
++                return false;
++            }
++        }
++        if let Some((cmp, n)) = f.toughness {
++            if !cmp.test(l.toughness, n) {
++                return false;
++            }
++        }
+         match f.controller {
+             Rel::Any => {}
+             Rel::You => {
+diff --git a/crates/mtg-core/src/event.rs b/crates/mtg-core/src/event.rs
+index 13eaddb..5e1eb8f 100644
+--- a/crates/mtg-core/src/event.rs
++++ b/crates/mtg-core/src/event.rs
+@@ -12,6 +12,8 @@ pub struct Lki {
+     pub owner: Seat,
+     pub controller: Seat,
+     pub types: Types,
++    pub supertypes: Supertypes,
++    pub subtypes: SubtypeSet,
+     pub colors: Colors,
+     pub power: i32,
+     pub toughness: i32,
+diff --git a/crates/mtg-core/src/frame.rs b/crates/mtg-core/src/frame.rs
+index 6445edd..51c954a 100644
+--- a/crates/mtg-core/src/frame.rs
++++ b/crates/mtg-core/src/frame.rs
+@@ -125,7 +125,9 @@ pub enum ResolveStage {
+ #[derive(Clone, Debug, PartialEq, Eq, Hash, Default)]
+ pub struct LoopSt {
+     pub list: SmallVec<[ObjRef; 6]>,
+-    pub idx: u8,
++    /// Position in `list`. Wider than a byte: a list can exceed 255 objects (a token-copy loop),
++    /// and a wrapped index made the loop run forever (RFC 0003).
++    pub idx: u32,
+     /// Remaining iterations of a `Repeat`.
+     pub count: i32,
+ }
+@@ -160,10 +162,10 @@ impl ResolveFrame {
+ 
+ #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+ pub enum CombatStage {
+-    Attackers { cands: SmallVec<[ObjRef; 8]>, i: u8, declined_sig: Option<u64> },
+-    Blockers { cands: SmallVec<[ObjRef; 8]>, i: u8 },
++    Attackers { cands: SmallVec<[ObjRef; 8]>, i: u16, declined_sig: Option<u64> },
++    Blockers { cands: SmallVec<[ObjRef; 8]>, i: u16 },
+     /// Combat damage assignment and dealing. `first_strike` selects which step.
+-    Damage { first_strike: bool, attacker_idx: u8, started: bool, blocker_idx: u8, remaining: u16, plan: SmallVec<[(crate::decision::Target, u16); 6]> },
++    Damage { first_strike: bool, attacker_idx: u16, started: bool, blocker_idx: u16, remaining: u16, plan: SmallVec<[(crate::decision::Target, u16); 6]> },
+ }
+ 
+ #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+diff --git a/crates/mtg-core/src/legal.rs b/crates/mtg-core/src/legal.rs
+index 63f907f..fdf332b 100644
+--- a/crates/mtg-core/src/legal.rs
++++ b/crates/mtg-core/src/legal.rs
+@@ -8,6 +8,7 @@ use crate::hash::Fx64;
+ use crate::ids::*;
+ use crate::mana::*;
+ use crate::ops::MoveOpts;
++use crate::state::ObjKind;
+ use crate::types::*;
+ use smallvec::SmallVec;
+ use std::hash::{Hash, Hasher};
+@@ -21,6 +22,9 @@ pub struct SrcInfo {
+     pub n: u8,
+     /// Index of the mana ability used (255 = the intrinsic ability of a basic land type).
+     pub ability: u8,
++    /// The ability also sacrifices a permanent (Lazotep Quarry); automatic payment picks the
++    /// cheapest one that is not itself a mana source of this payment (see `sac_pick`).
++    pub sac: bool,
+ }
+ 
+ impl<'a> Cx<'a> {
+@@ -35,7 +39,15 @@ impl<'a> Cx<'a> {
+     /// Permanents `seat` could tap for mana right now (excluding `except`), as sources for the
+     /// automatic payment: basic-type lands and simple mana abilities (tap, optionally sacrifice).
+     pub fn mana_sources(&mut self, seat: Seat, except: Option<ObjRef>) -> SmallVec<[SrcInfo; 16]> {
++        self.mana_sources_ex(seat, except, 0)
++    }
++
++    /// The first `sac_count` permanents with a sacrifice mana ability (Lazotep Quarry) offer it
++    /// (any color, one tap, costs a creature) instead of their other modes; `plan_cost` raises
++    /// the count only when fewer sacrifices cannot pay.
++    pub fn mana_sources_ex(&mut self, seat: Seat, except: Option<ObjRef>, sac_count: usize) -> SmallVec<[SrcInfo; 16]> {
+         self.refresh();
++        let mut sac_left = sac_count;
+         let mut out: SmallVec<[SrcInfo; 16]> = SmallVec::new();
+         let bf: SmallVec<[ObjRef; 24]> = self.s.battlefield.iter().copied().collect();
+         for r in bf {
+@@ -57,6 +69,8 @@ impl<'a> Cx<'a> {
+             let mut n = 1u8;
+             let mut ability = 255u8;
+             let mut consumes = false;
++            let mut sac = false;
++            let mut sac_ab: Option<u8> = None;
+             if c.types.contains(Types::LAND) {
+                 for (st, mc) in [(SUB_PLAINS, ManaColor::W), (SUB_ISLAND, ManaColor::U), (SUB_SWAMP, ManaColor::B), (SUB_MOUNTAIN, ManaColor::R), (SUB_FOREST, ManaColor::G)] {
+                     if c.subtypes.has(st) {
+@@ -76,12 +90,24 @@ impl<'a> Cx<'a> {
+                                 ability = i as u8;
+                             }
+                             consumes |= m.consumes;
++                        } else if sac_left > 0 && sac_mana_ability(ad) {
++                            sac_ab = Some(i as u8);
+                         }
+                     } else {
+                         extra += 1;
+                     }
+                 }
+             }
++            if let Some(i) = sac_ab {
++                sac_left -= 1;
++                // The sacrifice mode replaces the permanent's other modes in this variant (one
++                // tap per permanent); it makes any color but costs a creature.
++                mask = 0b11111;
++                n = 1;
++                ability = i;
++                sac = true;
++                consumes = true;
++            }
+             if mask == 0 {
+                 continue;
+             }
+@@ -92,14 +118,91 @@ impl<'a> Cx<'a> {
+             if !self.s.pay_hint.is_empty() {
+                 pref = if self.s.pay_hint.contains(&r) { 0 } else { 100 + pref };
+             }
+-            out.push(SrcInfo { obj: r, colors: mask, pref, n, ability });
++            out.push(SrcInfo { obj: r, colors: mask, pref, n, ability, sac });
++        }
++        // A sacrifice source needs its own victim: a permanent that is not itself providing mana
++        // to this payment. Keep as many such sources as there are victims.
++        if out.iter().any(|s| s.sac) {
++            let mut free = self.sac_victims(seat, &out);
++            let mut kept: SmallVec<[SrcInfo; 16]> = SmallVec::new();
++            for s in out {
++                if s.sac {
++                    if free == 0 {
++                        continue;
++                    }
++                    free -= 1;
++                }
++                kept.push(s);
++            }
++            return kept;
+         }
+         out
+     }
+ 
++    /// Creatures `seat` could sacrifice to a mana ability without losing a mana source of the
++    /// payment `srcs` (a creature that is itself a source is not a victim).
++    fn sac_victims(&mut self, seat: Seat, srcs: &[SrcInfo]) -> usize {
++        self.sac_candidates(seat, srcs).len()
++    }
++
++    fn sac_candidates(&mut self, seat: Seat, srcs: &[SrcInfo]) -> Vec<ObjRef> {
++        let Some(src) = srcs.iter().find(|s| s.sac) else { return Vec::new() };
++        let def = self.db.def(self.s.obj(src.obj).def);
++        let Some(item) = def.activated(src.ability).and_then(|ad| ad.cost.iter().find(|x| matches!(x, CostItem::Sacrifice(_)))) else { return Vec::new() };
++        let f = match item {
++            CostItem::Sacrifice(f) => f.clone(),
++            _ => return Vec::new(),
++        };
++        let all: Vec<ObjRef> = self.s.battlefield.iter().copied().filter(|&r| self.s.obj(r).controller == seat).collect();
++        all.into_iter()
++            .filter(|&r| {
++                let c = self.chars(r);
++                self.filter_match(&f, r, &c, false, seat)
++            })
++            .filter(|&r| !srcs.iter().any(|s| s.obj == r))
++            .collect()
++    }
++
++    /// The canonical victim for an automatic sacrifice payment: never a target of the spell or
++    /// ability being paid for unless nothing else can be sacrificed (`avoid`), then tokens first, then the lowest
++    /// mana value, then the usual option order. A player who wants a different one activates the
++    /// mana ability explicitly before casting.
++    fn sac_pick(&mut self, seat: Seat, srcs: &[SrcInfo], avoid: &[ObjRef]) -> Option<ObjRef> {
++        let mut v = self.sac_candidates(seat, srcs);
++        v.sort_by_key(|&r| {
++            let o = self.s.obj(r);
++            let mv = if o.kind == ObjKind::Token { 0 } else { self.db.def(o.def).cost.as_ref().map_or(0, |c| c.mana_value()) };
++            (avoid.contains(&r), o.kind != ObjKind::Token, mv, self.obj_key(seat, r))
++        });
++        v.first().copied()
++    }
++
+     /// Plans the canonical payment for a cost, or None if it cannot be paid.
+     pub fn plan_cost(&mut self, seat: Seat, cost: &ManaCost, x: u8, except: Option<ObjRef>, spell: Option<ObjRef>) -> Option<(Payment, SmallVec<[SrcInfo; 16]>)> {
+-        let srcs = self.mana_sources(seat, except);
++        if let Some(r) = self.plan_cost_with(seat, cost, x, except, spell, 0) {
++            return Some(r);
++        }
++        for k in 1..=self.sac_mana_count(seat) {
++            if let Some(r) = self.plan_cost_with(seat, cost, x, except, spell, k) {
++                return Some(r);
++            }
++        }
++        None
++    }
++
++    fn sac_mana_count(&self, seat: Seat) -> usize {
++        self.s
++            .battlefield
++            .iter()
++            .filter(|&&r| {
++                let o = self.s.obj(r);
++                o.controller == seat && !o.tapped && self.db.def(o.def).abilities.iter().any(|a| matches!(a, AbilityDef::Activated(ad) if ad.is_mana && sac_mana_ability(ad)))
++            })
++            .count()
++    }
++
++    fn plan_cost_with(&mut self, seat: Seat, cost: &ManaCost, x: u8, except: Option<ObjRef>, spell: Option<ObjRef>, sac_count: usize) -> Option<(Payment, SmallVec<[SrcInfo; 16]>)> {
++        let srcs = self.mana_sources_ex(seat, except, sac_count);
+         let mut ms: SmallVec<[ManaSource; 16]> = SmallVec::new();
+         for (i, s) in srcs.iter().enumerate() {
+             for _ in 0..s.n {
+@@ -150,7 +253,7 @@ impl<'a> Cx<'a> {
+ 
+     /// Executes a planned payment: spends pool mana and taps the chosen sources. A source that
+     /// makes more mana than the payment used puts the rest in the pool.
+-    pub fn apply_payment(&mut self, seat: Seat, pay: &Payment, srcs: &[SrcInfo]) {
++    pub fn apply_payment(&mut self, seat: Seat, pay: &Payment, srcs: &[SrcInfo], avoid: &[ObjRef]) {
+         for c in 0..6 {
+             let r = pay.restricted[c];
+             let n = pay.pool_used[c] - r;
+@@ -173,13 +276,13 @@ impl<'a> Cx<'a> {
+                 used += 1;
+                 i += 1;
+             }
+-            self.tap_for_mana(seat, &srcs[tag as usize], used);
++            self.tap_for_mana(seat, &srcs[tag as usize], used, srcs, avoid);
+         }
+     }
+ 
+     /// Pays the cost of a source's mana ability when it is used by automatic payment, and does
+     /// its non-mana effects. `used` of its `n` mana went to the payment; the rest floats.
+-    fn tap_for_mana(&mut self, seat: Seat, s: &SrcInfo, used: u8) {
++    fn tap_for_mana(&mut self, seat: Seat, s: &SrcInfo, used: u8, srcs: &[SrcInfo], avoid: &[ObjRef]) {
+         let r = s.obj;
+         if s.ability == 255 {
+             self.tap(r);
+@@ -193,6 +296,11 @@ impl<'a> Cx<'a> {
+             match item {
+                 CostItem::TapSelf => self.tap(r),
+                 CostItem::SacrificeSelf => sac = true,
++                CostItem::Sacrifice(_) => {
++                    if let Some(v) = self.sac_pick(seat, srcs, avoid) {
++                        self.move_zone(v, ZoneKind::Graveyard, MoveOpts::default());
++                    }
++                }
+                 _ => {}
+             }
+         }
+@@ -540,6 +648,21 @@ pub fn simple_mana_ability(ad: &ActivatedDef) -> Option<SimpleMana> {
+     Some(SimpleMana { colors, n, consumes })
+ }
+ 
++/// "{T}, Sacrifice a <permanent>: Add one mana of any color" (Lazotep Quarry): usable by automatic
++/// payment with a canonical victim. Always also an explicit option (it is not `simple`).
++pub fn sac_mana_ability(ad: &ActivatedDef) -> bool {
++    let mut tap = false;
++    let mut sac = false;
++    for c in &ad.cost {
++        match c {
++            CostItem::TapSelf => tap = true,
++            CostItem::Sacrifice(_) if !sac => sac = true,
++            _ => return false,
++        }
++    }
++    tap && sac && matches!(ad.effect, Some(Effect::AddManaAny { n: Expr::Const(1) }))
++}
++
+ /// (color mask, amount) of the mana-producing leaf of a mana ability's effect.
+ pub fn mana_leaf(e: &Effect) -> Option<(u8, u8)> {
+     match e {
+diff --git a/crates/mtg-core/src/lib.rs b/crates/mtg-core/src/lib.rs
+index 73cf55c..916057e 100644
+--- a/crates/mtg-core/src/lib.rs
++++ b/crates/mtg-core/src/lib.rs
+@@ -41,8 +41,8 @@ pub mod turn;
+ pub mod types;
+ 
+ /// Bumped by any reviewed core change (doc 01 section 14.2). Stored in every game record.
+-pub const ENGINE_CORE_VERSION: u32 = 3;
++pub const ENGINE_CORE_VERSION: u32 = 5;
+ 
+ /// Bumped when the definition of the state hash changes (fields added, hashing order changed)
+ /// without a rules change, so a stale record can be told from a corrupt one.
+-pub const HASH_SCHEMA: u32 = 2;
++pub const HASH_SCHEMA: u32 = 4;
+diff --git a/crates/mtg-core/src/ops.rs b/crates/mtg-core/src/ops.rs
+index fb04d08..5a13b14 100644
+--- a/crates/mtg-core/src/ops.rs
++++ b/crates/mtg-core/src/ops.rs
+@@ -123,6 +123,8 @@ impl<'a> Cx<'a> {
+             owner: o.owner,
+             controller: o.controller,
+             types: c.types,
++            supertypes: c.supertypes,
++            subtypes: c.subtypes,
+             colors: c.colors,
+             power: c.power,
+             toughness: c.toughness,
+diff --git a/crates/mtg-core/src/resolve.rs b/crates/mtg-core/src/resolve.rs
+index f594cdf..276bd5c 100644
+--- a/crates/mtg-core/src/resolve.rs
++++ b/crates/mtg-core/src/resolve.rs
+@@ -76,6 +76,10 @@ pub fn mode_slot_counts(db: &CardDb, e: &StackEntry) -> SmallVec<[u8; 4]> {
+     }
+ }
+ 
++/// Instructions one resolution may execute before the game is declared a draw (a legal script
++/// loops at most over the 60,000 objects `RUNAWAY_OBJECTS` allows, a few instructions each).
++pub const RESOLVE_STEP_CAP: u32 = 4_000_000;
++
+ pub fn run(cx: &mut Cx, f: &mut ResolveFrame) -> Next {
+     let db = cx.db;
+     loop {
+@@ -136,7 +140,17 @@ pub fn run(cx: &mut Cx, f: &mut ResolveFrame) -> Next {
+             }
+             ResolveStage::Ops => {
+                 let code = entry_code(db, &f.entry);
++                let mut steps = 0u32;
+                 while (f.pc as usize) < code.len() {
++                    // A resolution is bounded by the objects in the game; far past that it is a
++                    // runaway (a loop that cannot end), so the game is declared a draw instead of
++                    // looping or exhausting memory (RFC 0003). Counted per run, so a decision
++                    // inside the script restarts the count: the cap guards loops, not scripts.
++                    steps += 1;
++                    if steps > RESOLVE_STEP_CAP {
++                        cx.s.result.get_or_insert(crate::decision::GameResult::Draw);
++                        return Next::Done;
++                    }
+                     match step(cx, f, &code[f.pc as usize]) {
+                         Flow::Next => {
+                             f.pc += 1;
+@@ -245,7 +259,7 @@ fn step(cx: &mut Cx, f: &mut ResolveFrame, ins: &Instr) -> Flow {
+                 }
+                 1 => {
+                     let (pay, srcs) = cx.plan_cost(p, pays, 0, None, None).expect("payment was offered, so it is possible");
+-                    cx.apply_payment(p, &pay, &srcs);
++                    cx.apply_payment(p, &pay, &srcs, &[]);
+                     Flow::Next
+                 }
+                 _ => Flow::Jump(*skip),
+@@ -1923,7 +1937,7 @@ fn counter_unless(cx: &mut Cx, victim: ObjRef, pays: &crate::mana::ManaCost, aux
+         }
+         1 => {
+             let (pay, srcs) = cx.plan_cost(payer, pays, 0, None, None).expect("payment was offered, so it is possible");
+-            cx.apply_payment(payer, &pay, &srcs);
++            cx.apply_payment(payer, &pay, &srcs, &[]);
+             Flow::Next
+         }
+         _ => {
+diff --git a/crates/mtg-core/src/sba.rs b/crates/mtg-core/src/sba.rs
+index 8722f90..15116c3 100644
+--- a/crates/mtg-core/src/sba.rs
++++ b/crates/mtg-core/src/sba.rs
+@@ -189,6 +189,8 @@ impl Lki {
+             owner: Seat::P0,
+             controller: Seat::P0,
+             types: Types::empty(),
++            supertypes: Supertypes::empty(),
++            subtypes: SubtypeSet::default(),
+             colors: Colors::empty(),
+             power: 0,
+             toughness: 0,

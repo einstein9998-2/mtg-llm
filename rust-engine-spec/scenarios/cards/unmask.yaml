@@ -1,0 +1,70 @@
+id: unmask-alt-cost-needs-another-black-card
+title: Unmask's alternative cost cannot exile a nonblack card or Unmask itself, but can exile another black card
+area: card
+cards: [Unmask, Brainstorm, Dark Ritual, Island]
+tags: [unmask, alternative-cost, mask-validity, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Unmask, text: "You may exile a black card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Unmask @u", "Brainstorm @bs", "Dark Ritual @dr"]
+    library_pad: 10
+  p1:
+    hand: [Island]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@u", alt_cost: {exile_black_card: "@bs"}, targets: [{player: p1}]}}
+  - expect_illegal: {p0: {t: cast, card: "@u", alt_cost: {exile_black_card: "@u"}, targets: [{player: p1}]}}
+  - p0: {t: cast, card: "@u", alt_cost: {exile_black_card: "@dr"}, targets: [{player: p1}]}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@u", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Brainstorm], exile: [Dark Ritual]}
+notes: >
+  Brainstorm is blue, not black. Unmask itself is moved to the stack as the casting begins (601.2a), so it is no longer in the hand and cannot pay its own cost; it is also the card being cast. Dark Ritual is
+  black and pays it. p0 has no lands, so no hard cast is possible: every listed probe is decided by the alternative
+  cost alone.
+---
+id: unmask-hand-of-only-lands-discards-nothing
+title: Unmask against a hand of only lands reveals it, offers no choice, and discards nothing
+area: card
+cards: [Unmask, Griselbrand, Island, Swamp]
+tags: [unmask, reveal, no-legal-choice, negative, hidden-info]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Unmask, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card.", verified: true}
+  - {kind: cr, ref: "609.3", text: "If an effect attempts to do something impossible, it does only as much as possible.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Unmask @u", "Griselbrand @g"]
+    library_pad: 10
+  p1:
+    hand: [Island, Swamp]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@u", alt_cost: {exile_black_card: "@g"}, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Unmask], exile: [Griselbrand]}
+    p1: {hand: [Island, Swamp], graveyard: []}
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 2, revealed_hand: [Island, Swamp]}
+notes: >
+  There is no nonland card to choose, so no choice decision is raised and nothing is discarded; the hand was still
+  revealed, so p0 knows it. Wrong engines: discard a land, raise an empty choice that blocks the game, or skip the
+  reveal. Pairs with the positive Unmask scenario.

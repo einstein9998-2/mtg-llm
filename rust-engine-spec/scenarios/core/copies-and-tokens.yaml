@@ -1,0 +1,182 @@
+id: lazotep-token-copy-of-thassas-oracle-keeps-the-copied-mana-cost-for-devotion
+title: A Lazotep Quarry token copy of Thassa's Oracle is black but keeps the mana cost {U}{U}, so its enters trigger counts devotion 2 and wins with two cards in library
+area: core
+cards: [Lazotep Quarry, "Thassa's Oracle", Island, Ponder, Consider]
+tags: [lazotep-quarry, token-copy, copiable-values, devotion, thassas-oracle, win-the-game]
+derived_from: cr
+source:
+  - {kind: oracle, card: Lazotep Quarry, text: "{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery.", verified: true}
+  - {kind: oracle, card: "Thassa's Oracle", text: "When this creature enters, look at the top X cards of your library, where X is your devotion to blue.", verified: true}
+  - {kind: oracle, card: "Thassa's Oracle", text: "If X is greater than or equal to the number of cards in your library, you win the game.", verified: true}
+  - {kind: cr, ref: "707.9b", text: "Some copy effects modify a characteristic as part of the copying process. The final set of values for that characteristic becomes part of the copiable values of the copy.", verified: true}
+  - {kind: cr, ref: "700.5", text: "A player’s devotion to [color] is equal to the number of mana symbols of that color among the mana costs of permanents that player controls.", verified: true}
+  - {kind: cr, ref: "700.5a", text: "is calculated after considering any copy, control, or text-changing effects but before any other effects that modify the characteristics of permanents.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    graveyard: ["Thassa's Oracle @to"]
+    battlefield: ["Lazotep Quarry @q", "Island @i1", "Island @i2", "Island @i3", "Island @i4"]
+    library: ["Ponder @a", "Consider @b"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@q", ability: 2, x: 2, sacrifice: ["@q"], targets: ["@to"], pay: auto}
+  - check:
+      stack: [{kind: activated, source: "@q", controller: p0, targets: ["@to"]}]
+      p0: {graveyard: ["Thassa's Oracle", Lazotep Quarry]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        exile: ["Thassa's Oracle"]
+        graveyard: [Lazotep Quarry]
+        battlefield_contains: [{card: "Thassa's Oracle", token: true, pt: [4, 4]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_on_top, answer: ["@b"], expect_options: {include: ["@a", "@b"]}}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+notes: >
+  X = 2 (the Oracle's mana value); {2}{2} is paid with the four Islands and the Quarry is tapped and sacrificed as the
+  Desert. The token copies the Oracle's copiable values, including its mana cost {U}{U}, with the exception changing
+  only P/T, color and creature type (707.9b); it is black, but devotion counts mana symbols in mana costs (700.5), so
+  devotion to blue is 2 (Islands and the token's color do not matter). The token's enters ability triggers; on
+  resolution X = 2 and the library holds 2 cards, so p0 wins. Wrong engines: a token with no mana cost (devotion 0, no
+  win), devotion counted by color, or the token lacking the copied enters ability.
+---
+id: lazotep-token-copy-of-barrowgoyf-is-a-fixed-four-four
+title: A Lazotep Quarry token copy of Barrowgoyf is 4/4 no matter how many card types are in graveyards, because the exception means its P/T-defining ability is not copied
+area: core
+cards: [Lazotep Quarry, Barrowgoyf, Swamp, Lightning Bolt, Ponder, Cori-Steel Cutter, "Dragon's Rage Channeler"]
+tags: [lazotep-quarry, token-copy, characteristic-defining-ability, layers, barrowgoyf, copy-exception]
+derived_from: cr
+source:
+  - {kind: oracle, card: Lazotep Quarry, text: "Create a token that's a copy of it, except it's a 4/4 black Zombie.", verified: true}
+  - {kind: oracle, card: Barrowgoyf, text: "Barrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "707.9d", text: "When applying a copy effect that doesn’t copy a certain characteristic, retains one or more original values for a certain characteristic, or provides a specific set of values for a certain characteristic, any characteristic-defining ability (see rule 604.3) of the object being copied that defines that characteristic is not copied.", verified: true}
+  - {kind: cr, ref: "613.4a", text: "Layer 7a: Effects from characteristic-defining abilities that define power and/or toughness are applied.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    graveyard: ["Barrowgoyf @bg"]
+    battlefield: ["Lazotep Quarry @q", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5"]
+    library_pad: 10
+  p1:
+    graveyard: ["Lightning Bolt @gb", "Ponder @gp", "Cori-Steel Cutter @gc", "Dragon's Rage Channeler @gd"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@q", ability: 2, x: 3, sacrifice: ["@q"], targets: ["@bg"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: [Barrowgoyf]
+      graveyard: [Lazotep Quarry]
+      battlefield:
+        - {card: Barrowgoyf, token: true, pt: [4, 4], keywords: [deathtouch, lifelink], sick: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+notes: >
+  X = 3 (Barrowgoyf's mana value); {3}{2} is paid with five Swamps. After resolution the graveyards hold instant,
+  sorcery, artifact, creature (p1) and land (the Quarry): five card types, so a copied CDA would make the token 5/6.
+  Lazotep's exception provides specific P/T values, so the CDA that defines P/T is not copied (707.9d) and the token is
+  a plain 4/4. Deathtouch and lifelink are still copied. No enters trigger exists, so the stack is empty right after
+  the ability resolves. Wrong engines: the copied CDA overriding the exception (5/6), or the exception treated as a
+  later layer-7b effect over a 7a CDA (also 4/4 here, but by a wrong route; not distinguishable in this scenario).
+---
+id: flusterstorm-storm-copy-is-not-cast-and-does-not-trigger-drc
+title: Flusterstorm cast on the opponent's turn triggers Dragon's Rage Channeler once; its storm copy is not cast, so it adds no surveil and no spell count
+area: core
+cards: [Flusterstorm, "Dragon's Rage Channeler", Lightning Bolt, Mountain, Island, Ponder]
+tags: [storm, copy, not-cast, flusterstorm, dragons-rage-channeler, trigger-ordering, opponent-turn]
+derived_from: cr
+source:
+  - {kind: cr, ref: "707.10", text: "To copy a spell, activated ability, or triggered ability means to put a copy of it onto the stack; a copy of a spell isn’t cast and a copy of an activated ability isn’t activated.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "Storm is a triggered ability that functions on the stack. “Storm” means “When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: oracle, card: "Dragon's Rage Channeler", text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: oracle, card: Flusterstorm, text: "Counter target instant or sorcery spell unless its controller pays {1}.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Flusterstorm @flu"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Island @i1"]
+    library: ["Ponder @top"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm1", "Mountain @pm2", "Mountain @pm3"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: ["@drc"], pay: {tap: ["@pm1"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@flu", targets: ["@bolt"], pay: {tap: ["@i1"]}}
+  - p0: {decision: order_triggers, answer: [{source: "@flu", text_contains: "copy"}, {source: "@drc", text_contains: "surveil"}]}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@flu", controller: p0}
+        - {kind: triggered, source: "@flu", controller: p0}
+        - {kind: triggered, source: "@drc", controller: p0}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@top"]}
+  - check:
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@flu", controller: p0}
+        - {kind: spell, card: Flusterstorm, copy: true, controller: p0, targets: ["@bolt"]}
+      pending: {actor: p1, kind: priority}
+      p0: {spells_cast_this_turn: 1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_for_flusterstorm, answer: true}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_for_flusterstorm, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      spells_cast_this_turn: 1
+      library_top: [Ponder]
+      graveyard: [Flusterstorm]
+      battlefield:
+        - {card: "Dragon's Rage Channeler", pt: [1, 1]}
+        - {card: Island, tapped: true}
+    p1:
+      spells_cast_this_turn: 1
+      life: 20
+      graveyard: [Lightning Bolt]
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: false}
+notes: >
+  Casting Flusterstorm triggers both storm and DRC; p0 controls both and orders them (storm first, so DRC's surveil
+  resolves first). After that resolution the ACTIVE player p1 receives priority. Storm counts every spell cast before
+  it this turn, including the opponent's Bolt, so it makes one copy. The copy is put on the stack, not cast (707.10):
+  DRC does not trigger again (exactly one surveil decision in the script) and p0's cast count stays 1. p1 pays {1} for
+  the copy, then declines to pay for the original, so Bolt is countered and DRC lives. Wrong engines: the copy
+  counting as cast (a second surveil, cast count 2), or storm ignoring the opponent's spells (no copy).

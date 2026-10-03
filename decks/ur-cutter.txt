@@ -1,0 +1,32 @@
+# UR Cutter (Murktide / Cori-Steel Cutter tempo) | Tempo (non-combo)
+# Source: hejljud, 4th, MTGO League, 2026-09-22
+# https://mtgtop8.com/event?e=91149&d=892306&f=LE
+# Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.
+
+2 Flooded Strand
+1 Island
+2 Misty Rainforest
+2 Polluted Delta
+2 Scalding Tarn
+1 Thundering Falls
+4 Volcanic Island
+4 Wasteland
+4 Dragon's Rage Channeler
+4 Murktide Regent
+4 Brainstorm
+4 Daze
+4 Force of Will
+4 Lightning Bolt
+4 Ponder
+3 Preordain
+1 Prismari Charm
+2 Unholy Heat
+4 Cori-Steel Cutter
+4 Mishra's Bauble
+
+2 Hydroblast
+2 Meltdown
+2 Null Rod
+4 Pyroblast
+2 Pyroclasm
+3 Surgical Extraction

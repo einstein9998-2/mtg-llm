@@ -1,0 +1,93 @@
+id: sba-dungeon-completed-after-bottom-room-ability-resolves
+title: A dungeon whose venture marker is on its bottom room is removed and completed only after that room's ability has left the stack
+area: core
+cards: [Ponder]
+tags: [state-based-actions, dungeon, venture, command-zone]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5t", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game.", verified: true}
+  - {kind: cr, ref: "309.6", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game. (This is a state-based action. See rule 704.)", verified: true}
+  - {kind: cr, ref: "309.7", text: "A player completes a dungeon as that dungeon card is removed from the game.", verified: true}
+  - {kind: cr, ref: "309.4c", text: "Each room ability is controlled by the player who owns the dungeon card that is that ability's source.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  priority: p0
+  p0:
+    command: [{dungeon: Lost Mine of Phandelver, room: Temple of Dumathoin}]
+    completed_dungeons: []
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+  stack:
+    - {kind: triggered, source: "p0:Lost Mine of Phandelver#1", controller: p0, text_contains: "Draw a card"}
+script:
+  - check:
+      p0: {command: [{dungeon: Lost Mine of Phandelver, room: Temple of Dumathoin}], completed_dungeons: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      command: []
+      completed_dungeons: [Lost Mine of Phandelver]
+notes: >
+  Setup places the Temple of Dumathoin room ability on the stack directly (marker already on the bottom room), so no
+  venture movement rules are involved (those belong to the dungeon batch). While the room ability is on the stack the
+  dungeon stays (the opening check). After it resolves (p0 draws Ponder), the SBA check before p0 gets priority removes
+  the dungeon and p0 has completed Lost Mine of Phandelver. A wrong engine removes the dungeon as soon as the marker
+  reaches the bottom room (before the draw), or never completes it without a further venture. The stack entry in setup
+  is a format question noted in the report. The dungeon is named by its doc 04 handle p0:Lost Mine of Phandelver#1 because the validator does not register aliases on command-zone dungeon entries.
+---
+id: sba-dungeon-completed-when-bottom-room-ability-is-stifled
+title: Countering the bottom room's ability with Stifle still lets the dungeon be completed, without the room's effect
+area: core
+cards: [Ponder, Stifle, Island]
+tags: [state-based-actions, dungeon, stifle, triggered-ability]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5t", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game.", verified: true}
+  - {kind: cr, ref: "309.7", text: "A player completes a dungeon as that dungeon card is removed from the game.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  priority: p0
+  p0:
+    command: [{dungeon: Lost Mine of Phandelver, room: Temple of Dumathoin}]
+    completed_dungeons: []
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @st"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+  stack:
+    - {kind: triggered, source: "p0:Lost Mine of Phandelver#1", controller: p0, text_contains: "Draw a card"}
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@st", targets: [{trigger_of: "p0:Lost Mine of Phandelver#1", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      library_top: [Ponder]
+      command: []
+      completed_dungeons: [Lost Mine of Phandelver]
+    p1: {graveyard: [Stifle]}
+notes: >
+  Stifle removes the room ability from the stack, so the condition "isn't the source of a room ability that has
+  triggered but not yet left the stack" is now met; the SBA check after Stifle resolves removes the dungeon and p0
+  completes it. p0 does not draw. A wrong engine leaves the dungeon in the command zone forever after a Stifle, or
+  treats a countered room as not completing.

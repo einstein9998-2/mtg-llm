@@ -1,0 +1,181 @@
+id: deafening-silence-second-noncreature-spell-not-offered
+title: Under an opponent's Deafening Silence a player who already cast one noncreature spell this turn is not offered a second
+area: card
+symmetric: true
+cards: [Deafening Silence, Lightning Bolt, Mountain]
+tags: [deafening-silence, casting-restriction, legal-action-mask, negative-case, symmetric]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Deafening Silence @ds"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@b1"}, {t: cast, card: "@b2"}]}}
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - expect_illegal: {p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: {tap: ["@m2"]}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: {tap: ["@m2"]}}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@b2"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Lightning Bolt]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: false}]
+    p1:
+      life: 17
+notes: >
+  Deafening Silence is controlled by p1 but says "Each player", so it restricts p0 too. Before any spell both Bolts
+  are offered; after the first Bolt is cast the second is excluded, both while the first is on the stack and after it
+  resolves, although an untapped Mountain could pay for it. symmetric: the runner repeats with seats swapped.
+---
+id: deafening-silence-creature-spell-still-allowed
+title: Deafening Silence does not restrict creature spells; after a noncreature spell a creature can still be cast
+area: card
+cards: [Deafening Silence, Lightning Bolt, Ocelot Pride, Mountain, Plains]
+tags: [deafening-silence, casting-restriction, creature-spell, control-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Ocelot Pride @op"]
+    battlefield: ["Mountain @m", "Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Deafening Silence @ds"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: {tap: ["@m"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@op"}]}}
+  - p0: {t: cast, card: "@op", pay: {tap: ["@pl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      spells_cast_this_turn: 2
+      hand: []
+      battlefield_contains: [{card: Ocelot Pride, controller: p0}]
+    p1:
+      life: 17
+notes: >
+  The restriction counts and limits only noncreature spells. Ocelot Pride is a creature spell, so it is offered and
+  resolves after the Bolt. A wrong engine counts every spell. Control case for
+  deafening-silence-second-noncreature-spell-not-offered.
+---
+id: deafening-silence-countered-spell-still-counts
+title: Under Deafening Silence a noncreature spell that was countered still counts as the one spell cast this turn
+area: card
+symmetric: true
+cards: [Deafening Silence, Lightning Bolt, Mountain, Force of Will, Brainstorm]
+tags: [deafening-silence, casting-restriction, counterspell, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Deafening Silence @ds"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@b1"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Lightning Bolt]}
+  - expect_illegal: {p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: {tap: ["@m2"]}}}
+  - check:
+      legal: {p0: {exclude: [{t: cast, card: "@b2"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Lightning Bolt]
+      spells_cast_this_turn: 1
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  The restriction is about casting. p0's first Bolt was cast (then countered), so a second noncreature spell would be
+  the second cast this turn and is excluded even with an untapped Mountain. p1 paid 1 life and exiled Brainstorm for
+  Force of Will (its own first noncreature spell). A wrong engine counts only spells that resolved.
+---
+id: deafening-silence-counts-spell-cast-before-it-entered
+title: Casting Deafening Silence uses up its caster's noncreature spell for that turn
+area: card
+cards: [Deafening Silence, Lightning Bolt, Mountain, Plains]
+tags: [deafening-silence, casting-restriction, spells-cast-this-turn, ruling-dependent]
+derived_from: ruling
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+  - {kind: ruling, card: Deafening Silence, text: "Deafening Silence looks at spells cast earlier in the turn, including itself, so a player who already cast a noncreature spell this turn can't cast another one after it enters.", verified: false, note: "recalled, not retrieved; the expectation also follows from a literal reading of the Oracle text (a second noncreature spell this turn would be more than one)"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Deafening Silence @ds", "Lightning Bolt @bolt"]
+    battlefield: ["Plains @pl", "Mountain @m"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ds", pay: {tap: ["@pl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@m"]}}}
+  - check:
+      legal: {p0: {exclude: [{t: cast, card: "@bolt"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      battlefield_contains: [{card: Deafening Silence}, {card: Mountain, tapped: false}]
+      spells_cast_this_turn: 1
+    p1: {life: 20}
+notes: >
+  Deafening Silence is itself a noncreature spell that p0 cast this turn. Once it is on the battlefield, Bolt would be
+  p0's second noncreature spell this turn, so it is excluded. A wrong engine starts counting only when the enchantment
+  enters. Listed under needs-verification (recalled ruling).

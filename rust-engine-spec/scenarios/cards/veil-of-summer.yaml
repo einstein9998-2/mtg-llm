@@ -1,0 +1,262 @@
+id: veil-of-summer-draws-after-opponent-casts-blue-spell
+title: Veil of Summer draws a card when an opponent has cast a blue spell this turn, even if that spell is still on the stack
+area: card
+cards: [Veil of Summer, Brainstorm, Island, Forest, Lightning Bolt]
+tags: [veil-of-summer, draw-condition, spell-color, response, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @vs"]
+    battlefield: ["Forest @fo"]
+    library: ["Lightning Bolt @top"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @pbs"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pbs", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@vs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@pbs", controller: p1}]
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Veil of Summer]
+      library_count: 10
+notes: >
+  Brainstorm ({U}) is a blue spell cast by an opponent this turn, which is all the condition requires (it need not have
+  resolved). Veil resolves first (it is on top), p0 draws the top card (Lightning Bolt) and p1, the active player,
+  receives priority with Brainstorm still on the stack.
+---
+id: veil-of-summer-no-draw-for-red-spell-and-red-bolt-still-hits
+title: A red spell does not enable Veil's draw and the hexproof from blue and black does not stop a red Lightning Bolt
+area: card
+cards: [Veil of Summer, Lightning Bolt, Forest, Mountain]
+tags: [veil-of-summer, draw-condition, spell-color, hexproof-from-quality, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Veil of Summer, text: "You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: cr, ref: "702.11d", text: "\"Hexproof from [quality]\" on a permanent means \"This permanent can't be the target of [quality] spells your opponents control or abilities your opponents control from [quality] sources.\"", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "You and they can't be the targets of blue or black spells or abilities your opponents control.", verified: true, note: "Oracle reminder text; CR 702.11d defines hexproof from [quality] only for permanents"}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @vs"]
+    battlefield: ["Forest @fo"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mt"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@vs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      p0: {hand_count: 0, library_count: 10}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 17
+      hand_count: 0
+      library_count: 10
+      graveyard: [Veil of Summer]
+    p1:
+      graveyard: [Lightning Bolt]
+notes: >
+  Lightning Bolt is red only, so Veil draws nothing (p0's hand and library are unchanged after Veil resolves), and
+  hexproof from blue and from black does not make p0 an illegal target for a red spell: Bolt resolves and p0 goes to 17.
+  A wrong engine would give full hexproof, or draw anyway.
+---
+id: veil-of-summer-makes-spell-uncounterable-in-response-to-force-of-will
+title: Veil cast in response to Force of Will draws a card and makes the targeted spell uncounterable
+area: card
+cards: [Veil of Summer, Lotus Petal, Force of Will, Brainstorm, Forest, Lightning Bolt]
+tags: [veil-of-summer, force-of-will, cant-be-countered, response, alternative-cost, draw-condition]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lotus Petal @lp", "Veil of Summer @vs"]
+    battlefield: ["Forest @fo"]
+    library: ["Lightning Bolt @top"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @pbs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lp", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pbs", pay_life: 1}, targets: ["@lp"]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@vs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@lp"}, {kind: spell, card: "@fow"}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [Lightning Bolt], graveyard: [Veil of Summer]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@lp"}]
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Veil of Summer]}
+      p1: {graveyard: [Force of Will]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Veil of Summer]
+      battlefield: [{card: Lotus Petal}, {card: Forest, tapped: true}]
+    p1:
+      life: 19
+      hand: []
+      exile: [Brainstorm]
+      graveyard: [Force of Will]
+notes: >
+  Force of Will (blue) was cast by an opponent this turn, so Veil draws (Lightning Bolt) and makes p0's spells
+  uncounterable. Veil resolves before Force of Will; when Force of Will resolves, Lotus Petal can't be countered, so
+  Force of Will does nothing and goes to its owner's graveyard, and Lotus Petal resolves onto the battlefield. The
+  pitched Brainstorm stays exiled and p1's life stays 19.
+---
+id: veil-of-summer-response-to-prismari-charm-bounce-fizzles-it
+title: Veil in response to Prismari Charm's bounce gives hexproof from blue so the Charm fizzles, and Veil draws
+area: card
+cards: [Veil of Summer, Prismari Charm, "Atraxa, Grand Unifier", Forest, Volcanic Island, Island, Lightning Bolt]
+tags: [veil-of-summer, prismari-charm, hexproof-from-quality, fizzle, response, draw-condition]
+derived_from: cr
+source:
+  - {kind: oracle, card: Veil of Summer, text: "You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+  - {kind: cr, ref: "702.11d", text: "\"Hexproof from [quality]\" on a permanent means \"This permanent can't be the target of [quality] spells your opponents control or abilities your opponents control from [quality] sources.\"", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve. It's removed from the stack and, if it's a spell, put into its owner's graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @vs"]
+    battlefield: ["Atraxa, Grand Unifier @atx", "Forest @fo"]
+    library: ["Lightning Bolt @top"]
+    library_pad: 10
+  p1:
+    hand: ["Prismari Charm @pc"]
+    battlefield: ["Volcanic Island @vi", "Island @pi"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pc", modes: [3], targets: ["@atx"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@vs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@pc", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p0: {hand: [Lightning Bolt], battlefield_contains: [{card: "Atraxa, Grand Unifier"}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Veil of Summer]
+      battlefield: [{card: "Atraxa, Grand Unifier"}, {card: Forest, tapped: true}]
+    p1:
+      graveyard: [Prismari Charm]
+      hand: []
+notes: >
+  Prismari Charm's mana cost {U}{R} makes it blue (and red). Veil resolves first: p0 draws (an opponent cast a blue
+  spell) and Atraxa gains hexproof from blue, so on resolution the Charm's only target is illegal; it does not resolve
+  (608.2b) and goes to the graveyard, and Atraxa stays on the battlefield. A wrong engine would still bounce Atraxa
+  (target legality not rechecked) or fail to count Charm as blue.
+---
+id: veil-of-summer-hexproof-blocks-later-blue-and-black-spells-but-no-draw
+title: Veil cast with nothing to draw for still gives hexproof from blue and black to the player and permanents against later spells
+area: card
+cards: [Veil of Summer, Prismari Charm, Dismember, Lightning Bolt, "Atraxa, Grand Unifier", Forest, Volcanic Island, Island]
+tags: [veil-of-summer, hexproof-from-quality, mask-validity, draw-condition, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: Veil of Summer, text: "You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: cr, ref: "702.11d", text: "\"Hexproof from [quality]\" on a permanent means \"This permanent can't be the target of [quality] spells your opponents control or abilities your opponents control from [quality] sources.\"", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "You and they can't be the targets of blue or black spells or abilities your opponents control.", verified: true, note: "Oracle reminder text; CR 702.11d defines hexproof from [quality] only for permanents"}
+  - {kind: cr, ref: "202.2d", text: "An object with one or more hybrid mana symbols and/or Phyrexian mana symbols in its mana cost is all of the colors of those mana symbols, in addition to any other colors the object might be.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @vs"]
+    battlefield: ["Forest @fo", "Atraxa, Grand Unifier @atx"]
+    library_pad: 10
+  p1:
+    hand: ["Prismari Charm @pc", "Dismember @dm", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @vi", "Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@vs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {hand_count: 0, library_count: 10}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@pc", modes: [3], targets: ["@atx"]}}
+  - expect_illegal: {p1: {t: cast, card: "@pc", modes: [2], targets: [{player: p0}]}}
+  - expect_illegal: {p1: {t: cast, card: "@dm", phyrexian: [life, life], targets: ["@atx"]}}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      hand_count: 0
+      library_count: 10
+    p1:
+      hand: [Prismari Charm, Dismember]
+      graveyard: [Lightning Bolt]
+notes: >
+  p1 has cast no spell this turn when Veil resolves, so there is no draw (hand 0, library 10). After Veil resolves p0
+  passes with an empty stack and p1 gets priority. Blue Prismari Charm (bounce on Atraxa, or damage to p0) and black
+  Dismember (on Atraxa) cannot be cast with those targets, since hexproof from blue/black applies to p0 and p0's permanents
+  (the Charm's untargeted first mode would still be castable, so the probes name their targets);
+  the red Lightning Bolt targeting p0 is legal and resolves (life 17). Each illegal probe changes no state.

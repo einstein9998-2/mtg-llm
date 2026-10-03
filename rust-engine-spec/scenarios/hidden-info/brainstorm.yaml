@@ -1,0 +1,171 @@
+id: hi-brainstorm-owner-knows-put-back-order
+title: After Brainstorm the caster knows the two cards put back and their order; the opponent sees only counts
+area: hidden-info
+cards: [Brainstorm, Lightning Bolt, Ponder, Daze, Murktide Regent, Volcanic Island, Aluren, Show and Tell, Tropical Island]
+tags: [hidden-info, brainstorm, library-knowledge, put-back, redaction]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "401.4", text: "If an effect puts two or more cards in a specific position in a library at the same time, the owner of those cards may arrange them in any order. That library's owner doesn't reveal the order in which the cards go into the library.", verified: true}
+  - {kind: cr, ref: "402.3", text: "A player can't look at the cards in another player's hand but may count those cards at any time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @v"]
+    library: ["Ponder @pd", "Daze @dz", "Murktide Regent @mk"]
+    library_pad: 10
+  p1:
+    hand: [Aluren, Show and Tell]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@bolt", "@mk"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@mk", "@bolt"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder, Daze]
+      graveyard: [Brainstorm]
+      library_top: [Murktide Regent, Lightning Bolt]
+      library_count: 12
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: [Murktide Regent, Lightning Bolt]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 2, revealed_hand: [], library_count: 12}
+      option_labels_exclude_names: [Ponder, Daze, Murktide Regent, Lightning Bolt]
+      events_text_exclude: [Ponder, Daze, Murktide Regent, Lightning Bolt]
+notes: >
+  Library 13 -> 10 after drawing three -> 12 after putting two back. The owner keeps identity and position knowledge of the
+  two put-back cards in the chosen order (top first). The opponent learns only "drew 3" and "put 2 on top": hand count
+  2 -> 1 (cast) -> 4 -> 2, library count 13 -> 10 -> 12. None of the four hidden names may reach p1 (the Lightning Bolt
+  that started in p0's hand was never public either). A wrong engine leaks the put-back cards in a Brainstorm event or
+  forgets to record the owner's position knowledge.
+---
+id: hi-brainstorm-known-top-shifts-after-draw
+title: Brainstorm knowledge updates when the next draw takes the known top card
+area: hidden-info
+cards: [Brainstorm, Lightning Bolt, Ponder, Daze, Preordain, Volcanic Island, Aluren, Tropical Island]
+tags: [hidden-info, brainstorm, library-knowledge, draw, position-update]
+derived_from: cr
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "121.1", text: "A player draws a card by putting the top card of their library into their hand.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  priority: p1
+  p0:
+    hand: ["Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @v"]
+    library: ["Ponder @pd", "Daze @dz", "Preordain @pre"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@pd", "@bolt"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@pd", "@bolt"]}
+    label: put_back
+  - advance: {to: draw, of: p0}
+expect:
+  - at: put_back
+    pending: {actor: p1, kind: priority}
+    p0: {hand: [Daze, Preordain], library_top: [Ponder, Lightning Bolt]}
+  - at: put_back
+    observer: p0
+    obs:
+      me: {library_known_top: [Ponder, Lightning Bolt]}
+  - at: after_script
+    turn: 5
+    active: p0
+    phase: draw
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Daze, Preordain, Ponder], library_top: [Lightning Bolt], library_count: 11}
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: [Lightning Bolt]}
+notes: >
+  p0 Brainstorms in p1's end step (instant), putting Ponder on top of Lightning Bolt. After Brainstorm resolves the active
+  player p1 gets priority (117.3b). In p0's next draw step the known top card (Ponder) is drawn, so the known prefix of the
+  library shrinks to [Lightning Bolt], which is now position 0. A wrong engine keeps stale positions (claims Ponder is
+  still on top or that Bolt is second) or drops all knowledge on any draw. Library 13 -> 10 -> 12 -> 11.
+---
+id: hi-brainstorm-then-fetch-shuffle-clears-positions
+title: A fetchland shuffle after Brainstorm clears the caster's position knowledge of the put-back cards
+area: hidden-info
+cards: [Brainstorm, Lightning Bolt, Ponder, Daze, Preordain, Island, Volcanic Island, Scalding Tarn, Aluren, Tropical Island]
+tags: [hidden-info, brainstorm, fetchland, shuffle, library-knowledge]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+  - {kind: oracle, card: Scalding Tarn, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @v", "Scalding Tarn @tarn"]
+    library: ["Ponder @pd", "Daze @dz", "Preordain @pre", "Island @isl"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bs", pay: {tap: ["@v"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@pd", "@bolt"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@pd", "@bolt"]}
+  - check:
+      observer: p0
+      obs:
+        me: {library_known_top: [Ponder, Lightning Bolt]}
+  - p0: {t: activate, source: "@tarn", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@isl"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Daze, Preordain]
+      graveyard: [Brainstorm, Scalding Tarn]
+      battlefield:
+        - {card: Volcanic Island, tapped: true}
+        - {card: Island, tapped: false}
+      library_count: 12
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: []}
+notes: >
+  Before the fetch p0 knows Ponder then Lightning Bolt are on top. The fetch's shuffle randomizes the library so no player
+  knows its order (701.24a): p0 still knows Ponder and Bolt are somewhere in the library, but no position, so the known top
+  is empty. Library 14 -> 11 -> 13 -> 12; life 20 -> 19 for the fetch. A wrong engine keeps the stale top-two knowledge
+  after the shuffle (which would also make the determinizer pin those cards to the top).

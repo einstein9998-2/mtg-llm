@@ -1,0 +1,89 @@
+id: force-of-will-can-pitch-atraxa-a-multicolor-card-with-blue
+title: Force of Will may exile Atraxa from hand as its blue card because Atraxa's mana cost includes {U}
+area: card
+cards: [Force of Will, "Atraxa, Grand Unifier", Brainstorm, Island]
+tags: [force-of-will, alternative-cost, card-color, multicolor, atraxa, life-payment]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "Flying, vigilance, deathtouch, lifelink", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text ... that its controller may pay rather than paying the spell's mana cost.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Atraxa, Grand Unifier @atx"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @pbs"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pbs", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@atx", pay_life: 1}, targets: ["@pbs"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 19
+      hand: []
+      exile: ["Atraxa, Grand Unifier"]
+      graveyard: [Force of Will]
+    p1:
+      graveyard: [Brainstorm]
+notes: >
+  Atraxa ({3}{G}{W}{U}{B}) is green, white, blue and black, so it is a blue card and a legal pitch. p0 has no lands: the
+  alternative cost costs only 1 life and the exiled card. A wrong engine could treat only mono-blue cards as blue.
+---
+id: force-of-will-pitch-must-be-a-blue-card-other-than-itself
+title: Force of Will cannot exile non-blue cards (Veil, Acererak, Lotus Petal, Dismember) or itself; Brainstorm works
+area: card
+cards: [Force of Will, Veil of Summer, Acererak the Archlich, Lotus Petal, Dismember, Brainstorm, Island]
+tags: [force-of-will, alternative-cost, card-color, mask-validity, life-payment]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+  - {kind: cr, ref: "202.2b", text: "Objects with no colored mana symbols in their mana costs are colorless.", verified: true}
+  - {kind: cr, ref: "202.2d", text: "An object with one or more hybrid mana symbols and/or Phyrexian mana symbols in its mana cost is all of the colors of those mana symbols, in addition to any other colors the object might be.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true, note: "the spell is on the stack, not in hand, when the cost is paid"}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Veil of Summer @vs", "Acererak the Archlich @ac", "Lotus Petal @lp", "Dismember @dm", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @pbs"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pbs", pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@vs", pay_life: 1}, targets: ["@pbs"]}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@ac", pay_life: 1}, targets: ["@pbs"]}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@lp", pay_life: 1}, targets: ["@pbs"]}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@dm", pay_life: 1}, targets: ["@pbs"]}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@fow", pay_life: 1}, targets: ["@pbs"]}}
+  - p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@pbs"]}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@pbs", controller: p1}, {kind: spell, card: "@fow", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Veil of Summer, Acererak the Archlich, Lotus Petal, Dismember]
+      exile: [Brainstorm]
+notes: >
+  Colors come from mana costs: Veil of Summer {G} is green, Acererak {2}{B} black, Lotus Petal {0} colorless (202.2b),
+  Dismember {1}{B/P}{B/P} black (Phyrexian symbols give their color, 202.2d). None is a blue card. Force of Will itself
+  is not in hand while it is being cast (601.2a), so it can't pay for itself. Each illegal probe must leave the state
+  untouched (life 20 until the real cast). The last cast pitches Brainstorm (blue): life 19, Brainstorm exiled, the stack
+  holds p1's Brainstorm with Force of Will on top and p0 keeps priority.

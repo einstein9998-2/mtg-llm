@@ -1,0 +1,149 @@
+id: city-of-traitors-tap-in-response-to-own-trigger
+title: City of Traitors can be tapped for {C}{C} in response to its own sacrifice trigger and the mana is kept
+area: card
+cards: [City of Traitors, Island]
+tags: [city-of-traitors, trigger, mana-ability, response, mana-pool]
+derived_from: cr
+source:
+  - {kind: oracle, card: City of Traitors, text: "{T}: Add {C}{C}.", verified: true}
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+  - {kind: cr, ref: "605.3a", text: "A player may activate an activated mana ability whenever they have priority ...", verified: true}
+  - {kind: cr, ref: "500.5", text: "As a step or phase ends, ... any unspent mana left in a player's mana pool empties.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Island @isl2"]
+    battlefield: ["City of Traitors @city"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@isl2"}
+  - p0: {t: activate, source: "@city", ability: 0}
+  - check:
+      stack: [{kind: triggered, source: "@city"}]
+      p0: {life: 20, mana_pool: {C: 2}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      mana_pool: {C: 2}
+      battlefield: [{card: Island}]
+      graveyard: [City of Traitors]
+notes: >
+  The sacrifice happens only when the trigger resolves, so the land still taps for mana first. No damage (unlike Ancient
+  Tomb). The pool keeps {C}{C} after City is sacrificed because it is still the same main phase. Ability index 0 is the
+  mana ability (the trigger is not an activated ability).
+---
+id: city-of-traitors-own-entry-does-not-trigger
+title: Playing City of Traitors itself does not trigger it; the word is "another"
+area: card
+cards: [City of Traitors, Island]
+tags: [city-of-traitors, trigger, land-play]
+derived_from: oracle
+source:
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["City of Traitors @city"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@city"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      battlefield: [{card: Island}, {card: City of Traitors}]
+      graveyard: []
+notes: >
+  City must not trigger on its own entering (nor on a land played earlier in the turn that is already on the
+  battlefield). The stack stays empty and City stays.
+---
+id: city-of-traitors-opponent-land-play-does-not-trigger
+title: An opponent playing a land does not trigger City of Traitors ("you play")
+area: card
+cards: [City of Traitors, Island]
+tags: [city-of-traitors, trigger, land-play, controller-scope]
+derived_from: oracle
+source:
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["City of Traitors @city"]
+    library_pad: 10
+  p1:
+    hand: ["Island @pisl"]
+    library_pad: 10
+script:
+  - p1: {t: play_land, card: "@pisl"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: [{card: City of Traitors}]
+    p1:
+      lands_played: 1
+      battlefield: [{card: Island}]
+notes: >
+  "When you play another land" refers to City's controller. p1's land play is not a trigger event for p0's City.
+---
+id: city-of-traitors-trigger-stifled-keeps-city
+title: Stifle on City of Traitors' trigger leaves City on the battlefield
+area: card
+cards: [City of Traitors, Island, Stifle]
+tags: [city-of-traitors, trigger, stifle, counter-ability, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Island @isl2"]
+    battlefield: ["City of Traitors @city"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @pisl"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@isl2"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@city", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: City of Traitors}, {card: Island}]
+      graveyard: []
+    p1:
+      graveyard: [Stifle]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  Stifle targets the triggered ability (not the land). Countering it means City is never sacrificed. Priority flow: p0
+  passes with the trigger on top, p1 casts Stifle and receives priority back (117.3c), p1 passes, p0 passes, Stifle
+  resolves and the active player gets priority.

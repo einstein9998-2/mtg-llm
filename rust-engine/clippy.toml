@@ -1,0 +1,10 @@
+# Determinism contract (doc 01 section 12): no hash-ordered collections or float math in the core.
+disallowed-types = [
+  { path = "std::collections::HashMap", reason = "iteration order is not deterministic; use BTreeMap or a Vec" },
+  { path = "std::collections::HashSet", reason = "iteration order is not deterministic; use BTreeSet or a Vec" },
+]
+disallowed-methods = [
+  { path = "slice::sort_unstable", reason = "use the stable sort with a total key" },
+  { path = "slice::sort_unstable_by", reason = "use the stable sort with a total key" },
+  { path = "slice::sort_unstable_by_key", reason = "use the stable sort with a total key" },
+]

@@ -1,0 +1,3 @@
+windows with menu differences 66; differing keys 74; suppressed {'kd-0005': 38, 'kd-0011': 2, 'kd-0002': 22, 'history-activated': 4, 'kd-0006': 4, 'kd-0003': 1}; unexplained 3
+    2 FORGE_ONLY cast|Hand|Amped Raptor|                                 seat0 ['quarry-on-bf', 'voice-of-victory-on-bf']  e.g. rnd:boros-aggro-reanimator-s700529-d367 w3
+    1 FORGE_ONLY cast|Hand|Ajani, Nacatl Pariah|                         seat0 ['quarry-on-bf', 'voice-of-victory-on-bf']  e.g. rnd:boros-aggro-reanimator-s700529-d367 w3

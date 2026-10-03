@@ -1,0 +1,104 @@
+id: snuff-out-pay-four-life-controlling-tapped-underground-sea
+title: Snuff Out is cast for 4 life while its caster controls a tapped Underground Sea (a Swamp) and destroys a nonblack creature
+area: card
+cards: [Snuff Out, Underground Sea, Loran of the Third Path]
+tags: [snuff-out, alternative-cost, life-payment, land-subtypes, removal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Snuff Out, text: "If you control a Swamp, you may pay 4 life rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Snuff Out, text: "Destroy target nonblack creature. It can't be regenerated.", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Snuff Out @so"]
+    battlefield: [{card: Underground Sea, as: sea, tapped: true}]
+    library_pad: 10
+  p1:
+    battlefield: ["Loran of the Third Path @lo"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@so", alt_cost: {pay_life: 4}, targets: ["@lo"]}
+  - check: {p0: {life: 16}, stack: [{kind: spell, card: "@so", controller: p0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 16
+      graveyard: [Snuff Out]
+      battlefield: [{card: Underground Sea, tapped: true}]
+    p1: {battlefield: [], graveyard: [Loran of the Third Path]}
+notes: >
+  Underground Sea has the Swamp subtype, so the condition "you control a Swamp" holds; controlling it is enough, it need
+  not be untapped. The 4 life is paid on casting (p0 at 16 while Snuff Out is on the stack). Loran is white, a legal
+  target, and is destroyed. A wrong engine checks only basic Swamps or requires an untapped one.
+---
+id: snuff-out-no-swamp-no-life-alternative
+title: Without a Swamp, Snuff Out's pay-4-life alternative cost is not offered
+area: card
+cards: [Snuff Out, Island, Polluted Delta, Loran of the Third Path]
+tags: [snuff-out, alternative-cost, mask-validity, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Snuff Out, text: "If you control a Swamp, you may pay 4 life rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Snuff Out @so"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Polluted Delta @pd"]
+    library_pad: 10
+  p1:
+    battlefield: ["Loran of the Third Path @lo"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@so", alt_cost: {pay_life: 4}, targets: ["@lo"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    legal: {p0: {exclude: [{t: cast, card: "@so"}]}}
+    p0: {life: 20, hand: [Snuff Out]}
+notes: >
+  Islands and a fetchland that could find a Swamp are not Swamps. The alternative cost is not available and the mana cost
+  needs {B}, which these lands cannot make, so Snuff Out is not castable at all. Paired with the Underground Sea scenario.
+---
+id: snuff-out-cannot-target-black-creature
+title: Snuff Out cannot target a black creature but can target a nonblack one
+area: card
+cards: [Snuff Out, Swamp, Orcish Bowmasters, Loran of the Third Path]
+tags: [snuff-out, targeting, color, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Snuff Out, text: "Destroy target nonblack creature.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Snuff Out @so"]
+    battlefield: ["Swamp @s1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Orcish Bowmasters @ob", "Loran of the Third Path @lo"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@so", alt_cost: {pay_life: 4}, targets: ["@ob"]}}
+  - p0: {t: cast, card: "@so", alt_cost: {pay_life: 4}, targets: ["@lo"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 16, graveyard: [Snuff Out], battlefield: [{card: Swamp, tapped: false}]}
+    p1: {battlefield: [{card: Orcish Bowmasters}], graveyard: [Loran of the Third Path]}
+notes: >
+  Bowmasters ({1}{B}) is black and cannot be chosen. Loran is white and can. The Swamp only enables the life payment;
+  it is not tapped.

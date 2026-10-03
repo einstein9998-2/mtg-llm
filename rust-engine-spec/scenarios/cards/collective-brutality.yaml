@@ -1,0 +1,82 @@
+id: collective-brutality-escalate-discard-for-two-modes
+title: Collective Brutality with two modes costs one extra discard; it takes an instant or sorcery and drains 2
+area: card
+cards: [Collective Brutality, Brainstorm, "Thassa's Oracle", Island, Swamp]
+tags: [collective-brutality, escalate, additional-cost, modal, hand-disruption, drain]
+derived_from: cr
+source:
+  - {kind: oracle, card: Collective Brutality, text: "Escalate—Discard a card. (Pay this cost for each mode chosen beyond the first.)", verified: true}
+  - {kind: oracle, card: Collective Brutality, text: "Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.", verified: true}
+  - {kind: oracle, card: Collective Brutality, text: "Target opponent loses 2 life and you gain 2 life.", verified: true}
+  - {kind: cr, ref: "702.120a", text: "“Escalate [cost]” means “For each mode you choose beyond the first as you cast this spell, you pay an additional [cost].”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Collective Brutality @cb", "Island @hi"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    life: 20
+    hand: ["Brainstorm @bs", "Thassa's Oracle @o", "Island @i"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@cb", modes: [1, 3], targets: [{player: p1}, {player: p1}], discard: ["@hi"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@cb", controller: p0, modes: [1, 3]}]
+      p0: {hand: [], graveyard: [Island]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@bs"], expect_options: {include: ["@bs"], exclude: ["@o", "@i"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 22, graveyard: [Island, Collective Brutality]}
+    p1: {life: 18, hand: ["Thassa's Oracle", Island], graveyard: [Brainstorm]}
+notes: >
+  Two modes = one mode beyond the first = one escalate payment (discard Island), paid while casting, so the Island is in
+  the graveyard while the spell is on the stack. Mode 1 lets p0 pick only an instant or sorcery (Brainstorm); the
+  creature and the land are not offered (the single eligible card is still a choice the rules give p0). Mode 3 drains
+  2. The discard is written as `discard: [...]` on the cast (see REPORT schema-requests). Wrong engines: charge escalate
+  for the first mode, let p1 choose, or offer the creature.
+---
+id: collective-brutality-escalate-needs-a-card-to-discard
+title: With no other card in hand, Collective Brutality cannot be cast with two modes but can be cast with one
+area: card
+cards: [Collective Brutality, Island, Swamp]
+tags: [collective-brutality, escalate, additional-cost, negative, mask-validity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.120a", text: "“Escalate [cost]” means “For each mode you choose beyond the first as you cast this spell, you pay an additional [cost].”", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can’t pay a cost without having the necessary resources to pay it fully.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Collective Brutality @cb"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    life: 20
+    hand: [Island]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@cb", modes: [1, 3], targets: [{player: p1}, {player: p1}]}}
+  - p0: {t: cast, card: "@cb", modes: [3], targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 22, graveyard: [Collective Brutality], hand: []}
+    p1: {life: 18, hand: [Island]}
+notes: >
+  Collective Brutality itself is on the stack while costs are paid (601.2a), so the hand is empty and the escalate
+  discard cannot be paid: the two-mode cast is illegal. The one-mode cast has no escalate cost and drains 2.

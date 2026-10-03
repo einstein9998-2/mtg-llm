@@ -1,0 +1,1334 @@
+{
+ "_meta": {
+  "retrieved": "2026-10-01",
+  "note": "Oracle text as returned by the Scryfall oracle data in Savecraft card_search. This is the pinned text scenarios are derived from. Dungeon room text and arrows from the same source (type Dungeon). Tokens: Monk from Cori-Steel Cutter text; Goblin/Skeleton/Zombie/Atropal descriptions are from the creating text; Treasure text recalled (standard Treasure definition), unverified in this retrieval.",
+  "wave2": "Added 2026-10-01: pool cards for the other decks (retrieved via Savecraft card_search, exact-name checked). Cards with no retrievable face text are listed in _meta.missing_text and are NOT in cards: Ajani, Nacatl Pariah, Boggart Trawler, Brazen Borrower, Tamiyo, Inquisitive Student, Witch Enchanter",
+  "missing_text": [
+   "Boggart Trawler",
+   "Brazen Borrower",
+   "Tamiyo, Inquisitive Student",
+   "Witch Enchanter"
+  ],
+  "ajani_note": "2026-10-01 later: Ajani, Nacatl Pariah (front face only) and the Cat Warrior token were added from memory, unverified, so that a few dies-trigger scenarios could be written; the card search still returns no face text for it."
+ },
+ "cards": {
+  "Flooded Strand": {
+   "name": "Flooded Strand",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Misty Rainforest": {
+   "name": "Misty Rainforest",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Polluted Delta": {
+   "name": "Polluted Delta",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Scalding Tarn": {
+   "name": "Scalding Tarn",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Thundering Falls": {
+   "name": "Thundering Falls",
+   "mana_cost": "",
+   "type_line": "Land — Island Mountain",
+   "oracle_text": "({T}: Add {U} or {R}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Volcanic Island": {
+   "name": "Volcanic Island",
+   "mana_cost": "",
+   "type_line": "Land — Island Mountain",
+   "oracle_text": "({T}: Add {U} or {R}.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Wasteland": {
+   "name": "Wasteland",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice this land: Destroy target nonbasic land.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Dragon's Rage Channeler": {
+   "name": "Dragon's Rage Channeler",
+   "mana_cost": "{R}",
+   "type_line": "Creature — Human Shaman",
+   "oracle_text": "Whenever you cast a noncreature spell, surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDelirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "1/1"
+  },
+  "Murktide Regent": {
+   "name": "Murktide Regent",
+   "mana_cost": "{5}{U}{U}",
+   "type_line": "Creature — Dragon",
+   "oracle_text": "Delve (Each card you exile from your graveyard while casting this spell pays for {1}.)\nFlying\nThis creature enters with a +1/+1 counter on it for each instant and sorcery card exiled with it.\nWhenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on this creature.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "3/3"
+  },
+  "Brainstorm": {
+   "name": "Brainstorm",
+   "mana_cost": "{U}",
+   "type_line": "Instant",
+   "oracle_text": "Draw three cards, then put two cards from your hand on top of your library in any order.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Daze": {
+   "name": "Daze",
+   "mana_cost": "{1}{U}",
+   "type_line": "Instant",
+   "oracle_text": "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.\nCounter target spell unless its controller pays {1}.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Force of Will": {
+   "name": "Force of Will",
+   "mana_cost": "{3}{U}{U}",
+   "type_line": "Instant",
+   "oracle_text": "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target spell.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Lightning Bolt": {
+   "name": "Lightning Bolt",
+   "mana_cost": "{R}",
+   "type_line": "Instant",
+   "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Ponder": {
+   "name": "Ponder",
+   "mana_cost": "{U}",
+   "type_line": "Sorcery",
+   "oracle_text": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Preordain": {
+   "name": "Preordain",
+   "mana_cost": "{U}",
+   "type_line": "Sorcery",
+   "oracle_text": "Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Prismari Charm": {
+   "name": "Prismari Charm",
+   "mana_cost": "{U}{R}",
+   "type_line": "Instant",
+   "oracle_text": "Choose one —\n• Surveil 2, then draw a card.\n• Prismari Charm deals 1 damage to each of one or two targets.\n• Return target nonland permanent to its owner's hand.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Unholy Heat": {
+   "name": "Unholy Heat",
+   "mana_cost": "{R}",
+   "type_line": "Instant",
+   "oracle_text": "Unholy Heat deals 2 damage to target creature or planeswalker.\nDelirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Cori-Steel Cutter": {
+   "name": "Cori-Steel Cutter",
+   "mana_cost": "{1}{R}",
+   "type_line": "Artifact — Equipment",
+   "oracle_text": "Equipped creature gets +1/+1 and has trample and haste.\nFlurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it. (Whenever you cast a noncreature spell, the token gets +1/+1 until end of turn.)\nEquip {1}{R}",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Mishra's Bauble": {
+   "name": "Mishra's Bauble",
+   "mana_cost": "{0}",
+   "type_line": "Artifact",
+   "oracle_text": "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Hydroblast": {
+   "name": "Hydroblast",
+   "mana_cost": "{U}",
+   "type_line": "Instant",
+   "oracle_text": "Choose one —\n• Counter target spell if it's red.\n• Destroy target permanent if it's red.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Pyroblast": {
+   "name": "Pyroblast",
+   "mana_cost": "{R}",
+   "type_line": "Instant",
+   "oracle_text": "Choose one —\n• Counter target spell if it's blue.\n• Destroy target permanent if it's blue.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Meltdown": {
+   "name": "Meltdown",
+   "mana_cost": "{X}{R}",
+   "type_line": "Sorcery",
+   "oracle_text": "Destroy each artifact with mana value X or less.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Null Rod": {
+   "name": "Null Rod",
+   "mana_cost": "{2}",
+   "type_line": "Artifact",
+   "oracle_text": "Activated abilities of artifacts can't be activated.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Pyroclasm": {
+   "name": "Pyroclasm",
+   "mana_cost": "{1}{R}",
+   "type_line": "Sorcery",
+   "oracle_text": "Pyroclasm deals 2 damage to each creature.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Surgical Extraction": {
+   "name": "Surgical Extraction",
+   "mana_cost": "{B/P}",
+   "type_line": "Instant",
+   "oracle_text": "({B/P} can be paid with either {B} or 2 life.)\nChoose target card in a graveyard other than a basic land card. Search its owner's graveyard, hand, and library for any number of cards with the same name as that card and exile them. Then that player shuffles.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Ancient Tomb": {
+   "name": "Ancient Tomb",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}: Add {C}{C}. This land deals 2 damage to you.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Boseiju, Who Endures": {
+   "name": "Boseiju, Who Endures",
+   "mana_cost": "",
+   "type_line": "Legendary Land",
+   "oracle_text": "{T}: Add {G}.\nChannel — {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "City of Traitors": {
+   "name": "City of Traitors",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "When you play another land, sacrifice this land.\n{T}: Add {C}{C}.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Hedge Maze": {
+   "name": "Hedge Maze",
+   "mana_cost": "",
+   "type_line": "Land — Forest Island",
+   "oracle_text": "({T}: Add {G} or {U}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Prismatic Vista": {
+   "name": "Prismatic Vista",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Tropical Island": {
+   "name": "Tropical Island",
+   "mana_cost": "",
+   "type_line": "Land — Forest Island",
+   "oracle_text": "({T}: Add {G} or {U}.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Acererak the Archlich": {
+   "name": "Acererak the Archlich",
+   "mana_cost": "{2}{B}",
+   "type_line": "Legendary Creature — Zombie Wizard",
+   "oracle_text": "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.\nWhenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "5/5"
+  },
+  "Atraxa, Grand Unifier": {
+   "name": "Atraxa, Grand Unifier",
+   "mana_cost": "{3}{G}{W}{U}{B}",
+   "type_line": "Legendary Creature — Phyrexian Angel",
+   "oracle_text": "Flying, vigilance, deathtouch, lifelink\nWhen Atraxa enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order. (Artifact, battle, creature, enchantment, instant, land, planeswalker, and sorcery are card types.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "7/7"
+  },
+  "Show and Tell": {
+   "name": "Show and Tell",
+   "mana_cost": "{2}{U}",
+   "type_line": "Sorcery",
+   "oracle_text": "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Stock Up": {
+   "name": "Stock Up",
+   "mana_cost": "{2}{U}",
+   "type_line": "Sorcery",
+   "oracle_text": "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Veil of Summer": {
+   "name": "Veil of Summer",
+   "mana_cost": "{G}",
+   "type_line": "Instant",
+   "oracle_text": "Draw a card if an opponent has cast a blue or black spell this turn. Spells you control can't be countered this turn. You and permanents you control gain hexproof from blue and from black until end of turn. (You and they can't be the targets of blue or black spells or abilities your opponents control.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Aluren": {
+   "name": "Aluren",
+   "mana_cost": "{2}{G}{G}",
+   "type_line": "Enchantment",
+   "oracle_text": "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Lotus Petal": {
+   "name": "Lotus Petal",
+   "mana_cost": "{0}",
+   "type_line": "Artifact",
+   "oracle_text": "{T}, Sacrifice this artifact: Add one mana of any color.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Omniscience": {
+   "name": "Omniscience",
+   "mana_cost": "{7}{U}{U}{U}",
+   "type_line": "Enchantment",
+   "oracle_text": "You may cast spells from your hand without paying their mana costs.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Carpet of Flowers": {
+   "name": "Carpet of Flowers",
+   "mana_cost": "{G}",
+   "type_line": "Enchantment",
+   "oracle_text": "At the beginning of each of your main phases, if you haven't added mana with this ability this turn, you may add X mana of any one color, where X is the number of Islands target opponent controls.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Consign to Memory": {
+   "name": "Consign to Memory",
+   "mana_cost": "{U}",
+   "type_line": "Instant",
+   "oracle_text": "Replicate {1} (When you cast this spell, copy it for each time you paid its replicate cost. You may choose new targets for the copies.)\nCounter target triggered ability or colorless spell.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Defense Grid": {
+   "name": "Defense Grid",
+   "mana_cost": "{2}",
+   "type_line": "Artifact",
+   "oracle_text": "Each spell costs {3} more to cast except during its controller's turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Disruptor Flute": {
+   "name": "Disruptor Flute",
+   "mana_cost": "{2}",
+   "type_line": "Artifact",
+   "oracle_text": "Flash\nAs this artifact enters, choose a card name.\nSpells with the chosen name cost {3} more to cast.\nActivated abilities of sources with the chosen name can't be activated unless they're mana abilities.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Faerie Macabre": {
+   "name": "Faerie Macabre",
+   "mana_cost": "{1}{B}{B}",
+   "type_line": "Creature — Faerie Rogue",
+   "oracle_text": "Flying\nDiscard this card: Exile up to two target cards from graveyards.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Force of Negation": {
+   "name": "Force of Negation",
+   "mana_cost": "{1}{U}{U}",
+   "type_line": "Instant",
+   "oracle_text": "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Dismember": {
+   "name": "Dismember",
+   "mana_cost": "{1}{B/P}{B/P}",
+   "type_line": "Instant",
+   "oracle_text": "({B/P} can be paid with either {B} or 2 life.)\nTarget creature gets -5/-5 until end of turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Stifle": {
+   "name": "Stifle",
+   "mana_cost": "{U}",
+   "type_line": "Instant",
+   "oracle_text": "Counter target activated or triggered ability. (Mana abilities can't be targeted.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Swords to Plowshares": {
+   "name": "Swords to Plowshares",
+   "mana_cost": "{W}",
+   "type_line": "Instant",
+   "oracle_text": "Exile target creature. Its controller gains life equal to its power.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Containment Priest": {
+   "name": "Containment Priest",
+   "mana_cost": "{1}{W}",
+   "type_line": "Creature — Human Cleric",
+   "oracle_text": "Flash\nIf a nontoken creature would enter and it wasn't cast, exile it instead.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Spider-Woman, Stunning Savior": {
+   "name": "Spider-Woman, Stunning Savior",
+   "mana_cost": "{1}{W/U}",
+   "type_line": "Legendary Creature — Spider Human Hero",
+   "oracle_text": "Flying\nVenom Blast — Artifacts and creatures your opponents control enter tapped.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Thoughtseize": {
+   "name": "Thoughtseize",
+   "mana_cost": "{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Island": {
+   "name": "Island",
+   "mana_cost": "",
+   "type_line": "Basic Land — Island",
+   "oracle_text": "({T}: Add {U}.)",
+   "source": "CR 305.6 intrinsic abilities of basic land types; Island/Swamp... reminder text as printed"
+  },
+  "Mountain": {
+   "name": "Mountain",
+   "mana_cost": "",
+   "type_line": "Basic Land — Mountain",
+   "oracle_text": "({T}: Add {R}.)",
+   "source": "CR 305.6 intrinsic abilities of basic land types; Island/Swamp... reminder text as printed"
+  },
+  "Forest": {
+   "name": "Forest",
+   "mana_cost": "",
+   "type_line": "Basic Land — Forest",
+   "oracle_text": "({T}: Add {G}.)",
+   "source": "CR 305.6 intrinsic abilities of basic land types; Island/Swamp... reminder text as printed"
+  },
+  "Plains": {
+   "name": "Plains",
+   "mana_cost": "",
+   "type_line": "Basic Land — Plains",
+   "oracle_text": "({T}: Add {W}.)",
+   "source": "CR 305.6 intrinsic abilities of basic land types; Island/Swamp... reminder text as printed"
+  },
+  "Swamp": {
+   "name": "Swamp",
+   "mana_cost": "",
+   "type_line": "Basic Land — Swamp",
+   "oracle_text": "({T}: Add {B}.)",
+   "source": "CR 305.6 intrinsic abilities of basic land types; Island/Swamp... reminder text as printed"
+  },
+  "Abrade": {
+   "name": "Abrade",
+   "mana_cost": "{1}{R}",
+   "type_line": "Instant",
+   "oracle_text": "Choose one —\n• Abrade deals 3 damage to target creature.\n• Destroy target artifact.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Aether Vial": {
+   "name": "Aether Vial",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "At the beginning of your upkeep, you may put a charge counter on this artifact.\n{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Amped Raptor": {
+   "name": "Amped Raptor",
+   "mana_cost": "{1}{R}",
+   "type_line": "Creature — Dinosaur",
+   "oracle_text": "First strike\nWhen this creature enters, you get {E}{E} (two energy counters). Then if you cast it from your hand, exile cards from the top of your library until you exile a nonland card. You may cast that card by paying an amount of {E} equal to its mana value rather than paying its mana cost.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/1"
+  },
+  "Animate Dead": {
+   "name": "Animate Dead",
+   "mana_cost": "{1}{B}",
+   "type_line": "Enchantment — Aura",
+   "oracle_text": "Enchant creature card in a graveyard\nWhen this Aura enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the battlefield with this Aura.\" Return enchanted creature card to the battlefield under your control and attach this Aura to it. When this Aura leaves the battlefield, that creature's controller sacrifices it.\nEnchanted creature gets -1/-0.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Archon of Cruelty": {
+   "name": "Archon of Cruelty",
+   "mana_cost": "{6}{B}{B}",
+   "type_line": "Creature — Archon",
+   "oracle_text": "Flying\nWhenever this creature enters or attacks, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "6/6"
+  },
+  "Arid Mesa": {
+   "name": "Arid Mesa",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Badlands": {
+   "name": "Badlands",
+   "mana_cost": "",
+   "type_line": "Land — Swamp Mountain",
+   "oracle_text": "({T}: Add {B} or {R}.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Barrowgoyf": {
+   "name": "Barrowgoyf",
+   "mana_cost": "{2}{B}",
+   "type_line": "Creature — Lhurgoyf",
+   "oracle_text": "Deathtouch, lifelink\nBarrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.\nWhenever this creature deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "*/1+*"
+  },
+  "Bilbo, Thief in the Night": {
+   "name": "Bilbo, Thief in the Night",
+   "mana_cost": "{1}{U}",
+   "type_line": "Legendary Creature — Halfling Rogue",
+   "oracle_text": "Spells you cast from anywhere other than your hand cost {1} less to cast.\nWhenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Bitter Triumph": {
+   "name": "Bitter Triumph",
+   "mana_cost": "{1}{B}",
+   "type_line": "Instant",
+   "oracle_text": "As an additional cost to cast this spell, discard a card or pay 3 life.\nDestroy target creature or planeswalker.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Bloodstained Mire": {
+   "name": "Bloodstained Mire",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Cabal Therapy": {
+   "name": "Cabal Therapy",
+   "mana_cost": "{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Choose a nonland card name. Target player reveals their hand and discards all cards with that name.\nFlashback—Sacrifice a creature. (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Cavern of Souls": {
+   "name": "Cavern of Souls",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "As this land enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Cloak and Dagger, Entwined": {
+   "name": "Cloak and Dagger, Entwined",
+   "mana_cost": "{1}{W}{B}",
+   "type_line": "Legendary Creature — Human Hero",
+   "oracle_text": "Deathtouch, lifelink\nWhen Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Collective Brutality": {
+   "name": "Collective Brutality",
+   "mana_cost": "{1}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Escalate—Discard a card. (Pay this cost for each mode chosen beyond the first.)\nChoose one or more —\n• Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.\n• Target creature gets -2/-2 until end of turn.\n• Target opponent loses 2 life and you gain 2 life.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Consider": {
+   "name": "Consider",
+   "mana_cost": "{U}",
+   "type_line": "Instant",
+   "oracle_text": "Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nDraw a card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Dark Ritual": {
+   "name": "Dark Ritual",
+   "mana_cost": "{B}",
+   "type_line": "Instant",
+   "oracle_text": "Add {B}{B}{B}.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Deafening Silence": {
+   "name": "Deafening Silence",
+   "mana_cost": "{W}",
+   "type_line": "Enchantment",
+   "oracle_text": "Each player can't cast more than one noncreature spell each turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Doomsday": {
+   "name": "Doomsday",
+   "mana_cost": "{B}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Search your library and graveyard for five cards and exile the rest. Put the chosen cards on top of your library in any order. You lose half your life, rounded up.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Duress": {
+   "name": "Duress",
+   "mana_cost": "{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Target opponent reveals their hand. You choose a noncreature, nonland card from it. That player discards that card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Edge of Autumn": {
+   "name": "Edge of Autumn",
+   "mana_cost": "{1}{G}",
+   "type_line": "Sorcery",
+   "oracle_text": "If you control four or fewer lands, search your library for a basic land card, put it onto the battlefield tapped, then shuffle.\nCycling—Sacrifice a land. (Sacrifice a land, Discard this card: Draw a card.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Elegant Parlor": {
+   "name": "Elegant Parlor",
+   "mana_cost": "",
+   "type_line": "Land — Mountain Plains",
+   "oracle_text": "({T}: Add {R} or {W}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Erode": {
+   "name": "Erode",
+   "mana_cost": "{W}",
+   "type_line": "Instant",
+   "oracle_text": "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Faithless Looting": {
+   "name": "Faithless Looting",
+   "mana_cost": "{R}",
+   "type_line": "Sorcery",
+   "oracle_text": "Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Fatal Push": {
+   "name": "Fatal Push",
+   "mana_cost": "{B}",
+   "type_line": "Instant",
+   "oracle_text": "Destroy target creature if it has mana value 2 or less.\nRevolt — Destroy that creature if it has mana value 4 or less instead if a permanent left the battlefield under your control this turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Flickerwisp": {
+   "name": "Flickerwisp",
+   "mana_cost": "{1}{W}{W}",
+   "type_line": "Creature — Elemental",
+   "oracle_text": "Flying\nWhen this creature enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "3/1"
+  },
+  "Flow State": {
+   "name": "Flow State",
+   "mana_cost": "{1}{U}",
+   "type_line": "Sorcery",
+   "oracle_text": "Look at the top three cards of your library. Put one of them into your hand and the rest on the bottom of your library in any order. If there is an instant card and a sorcery card in your graveyard, instead put two of them into your hand and the rest on the bottom of your library in any order.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Flusterstorm": {
+   "name": "Flusterstorm",
+   "mana_cost": "{U}",
+   "type_line": "Instant",
+   "oracle_text": "Counter target instant or sorcery spell unless its controller pays {1}.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Gaddock Teeg": {
+   "name": "Gaddock Teeg",
+   "mana_cost": "{G}{W}",
+   "type_line": "Legendary Creature — Kithkin Advisor",
+   "oracle_text": "Noncreature spells with mana value 4 or greater can't be cast.\nNoncreature spells with {X} in their mana costs can't be cast.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Goblin Bombardment": {
+   "name": "Goblin Bombardment",
+   "mana_cost": "{1}{R}",
+   "type_line": "Enchantment",
+   "oracle_text": "Sacrifice a creature: This enchantment deals 1 damage to any target.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Grafdigger's Cage": {
+   "name": "Grafdigger's Cage",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "Creature cards in graveyards and libraries can't enter the battlefield.\nPlayers can't cast spells from graveyards or libraries.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Griselbrand": {
+   "name": "Griselbrand",
+   "mana_cost": "{4}{B}{B}{B}{B}",
+   "type_line": "Legendary Creature — Demon",
+   "oracle_text": "Flying, lifelink\nPay 7 life: Draw seven cards.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "7/7"
+  },
+  "Guide of Souls": {
+   "name": "Guide of Souls",
+   "mana_cost": "{W}",
+   "type_line": "Creature — Human Cleric",
+   "oracle_text": "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter).\nWhenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "1/2"
+  },
+  "Hide on the Ceiling": {
+   "name": "Hide on the Ceiling",
+   "mana_cost": "{X}{U}",
+   "type_line": "Instant",
+   "oracle_text": "Exile X target artifacts and/or creatures. Return the exiled cards to the battlefield under their owners' control at the beginning of the next end step.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Jace, Wielder of Mysteries": {
+   "name": "Jace, Wielder of Mysteries",
+   "mana_cost": "{1}{U}{U}{U}",
+   "type_line": "Legendary Planeswalker — Jace",
+   "oracle_text": "If you would draw a card while your library has no cards in it, you win the game instead.\n+1: Target player mills two cards. Draw a card.\n−8: Draw seven cards. Then if your library has no cards in it, you win the game.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Karakas": {
+   "name": "Karakas",
+   "mana_cost": "",
+   "type_line": "Legendary Land",
+   "oracle_text": "{T}: Add {W}.\n{T}: Return target legendary creature to its owner's hand.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Kaito, Bane of Nightmares": {
+   "name": "Kaito, Bane of Nightmares",
+   "mana_cost": "{2}{U}{B}",
+   "type_line": "Legendary Planeswalker — Kaito",
+   "oracle_text": "Ninjutsu {1}{U}{B} ({1}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)\nDuring your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has hexproof.\n+1: You get an emblem with \"Ninjas you control get +1/+1.\"\n0: Surveil 2. Then draw a card for each opponent who lost life this turn.\n−2: Tap target creature. Put two stun counters on it.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Koma, World-Eater": {
+   "name": "Koma, World-Eater",
+   "mana_cost": "{3}{G}{G}{U}{U}",
+   "type_line": "Legendary Creature — Serpent",
+   "oracle_text": "This spell can't be countered.\nTrample, ward {4}\nWhenever Koma deals combat damage to a player, create four 3/3 blue Serpent creature tokens named Koma's Coil.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "8/12"
+  },
+  "Lavinia, Azorius Renegade": {
+   "name": "Lavinia, Azorius Renegade",
+   "mana_cost": "{W}{U}",
+   "type_line": "Legendary Creature — Human Soldier",
+   "oracle_text": "Each opponent can't cast noncreature spells with mana value greater than the number of lands that player controls.\nWhenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Lazotep Quarry": {
+   "name": "Lazotep Quarry",
+   "mana_cost": "",
+   "type_line": "Land — Desert",
+   "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice a creature: Add one mana of any color.\n{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Lion's Eye Diamond": {
+   "name": "Lion's Eye Diamond",
+   "mana_cost": "{0}",
+   "type_line": "Artifact",
+   "oracle_text": "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Loran of the Third Path": {
+   "name": "Loran of the Third Path",
+   "mana_cost": "{2}{W}",
+   "type_line": "Legendary Creature — Human Artificer",
+   "oracle_text": "Vigilance\nWhen Loran enters, destroy up to one target artifact or enchantment.\n{T}: You and target opponent each draw a card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/1"
+  },
+  "Magus of the Moon": {
+   "name": "Magus of the Moon",
+   "mana_cost": "{2}{R}",
+   "type_line": "Creature — Human Wizard",
+   "oracle_text": "Nonbasic lands are Mountains.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Marsh Flats": {
+   "name": "Marsh Flats",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Massacre": {
+   "name": "Massacre",
+   "mana_cost": "{2}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "If an opponent controls a Plains and you control a Swamp, you may cast this spell without paying its mana cost.\nAll creatures get -2/-2 until end of turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Meticulous Archive": {
+   "name": "Meticulous Archive",
+   "mana_cost": "",
+   "type_line": "Land — Plains Island",
+   "oracle_text": "({T}: Add {W} or {U}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Moonshadow": {
+   "name": "Moonshadow",
+   "mana_cost": "{B}",
+   "type_line": "Creature — Elemental",
+   "oracle_text": "Menace\nThis creature enters with six -1/-1 counters on it.\nWhenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "7/7"
+  },
+  "Nethergoyf": {
+   "name": "Nethergoyf",
+   "mana_cost": "{B}",
+   "type_line": "Creature — Lhurgoyf",
+   "oracle_text": "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.\nEscape—{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them. (You may cast this card from your graveyard for its escape cost.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "*/1+*"
+  },
+  "Nihil Spellbomb": {
+   "name": "Nihil Spellbomb",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "{T}, Sacrifice this artifact: Exile target player's graveyard.\nWhen this artifact is put into a graveyard from the battlefield, you may pay {B}. If you do, draw a card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Ocelot Pride": {
+   "name": "Ocelot Pride",
+   "mana_cost": "{W}",
+   "type_line": "Creature — Cat",
+   "oracle_text": "First strike, lifelink\nAscend (If you control ten or more permanents, you get the city's blessing for the rest of the game.)\nAt the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token. Then if you have the city's blessing, for each token you control that entered this turn, create a token that's a copy of it.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "1/1"
+  },
+  "Orcish Bowmasters": {
+   "name": "Orcish Bowmasters",
+   "mana_cost": "{1}{B}",
+   "type_line": "Creature — Orc Archer",
+   "oracle_text": "Flash\nWhen this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "1/1"
+  },
+  "Overlord of the Balemurk": {
+   "name": "Overlord of the Balemurk",
+   "mana_cost": "{3}{B}{B}",
+   "type_line": "Enchantment Creature — Avatar Horror",
+   "oracle_text": "Impending 5—{1}{B} (If you cast this spell for its impending cost, it enters with five time counters and isn't a creature until the last is removed. At the beginning of your end step, remove a time counter from it.)\nWhenever this permanent enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "5/5"
+  },
+  "Path to Exile": {
+   "name": "Path to Exile",
+   "mana_cost": "{W}",
+   "type_line": "Instant",
+   "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Personal Tutor": {
+   "name": "Personal Tutor",
+   "mana_cost": "{U}",
+   "type_line": "Sorcery",
+   "oracle_text": "Search your library for a sorcery card, reveal it, then shuffle and put that card on top.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Phelia, Exuberant Shepherd": {
+   "name": "Phelia, Exuberant Shepherd",
+   "mana_cost": "{1}{W}",
+   "type_line": "Legendary Creature — Dog",
+   "oracle_text": "Flash\nWhenever Phelia attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Phlage, Titan of Fire's Fury": {
+   "name": "Phlage, Titan of Fire's Fury",
+   "mana_cost": "{1}{R}{W}",
+   "type_line": "Legendary Creature — Elder Giant",
+   "oracle_text": "When Phlage enters, sacrifice it unless it escaped.\nWhenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.\nEscape—{R}{R}{W}{W}, Exile five other cards from your graveyard. (You may cast this card from your graveyard for its escape cost.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "6/6"
+  },
+  "Plateau": {
+   "name": "Plateau",
+   "mana_cost": "",
+   "type_line": "Land — Mountain Plains",
+   "oracle_text": "({T}: Add {R} or {W}.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Prismatic Ending": {
+   "name": "Prismatic Ending",
+   "mana_cost": "{X}{W}",
+   "type_line": "Sorcery",
+   "oracle_text": "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Quantum Riddler": {
+   "name": "Quantum Riddler",
+   "mana_cost": "{3}{U}{U}",
+   "type_line": "Creature — Sphinx",
+   "oracle_text": "Flying\nWhen this creature enters, draw a card.\nAs long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.\nWarp {1}{U}",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "4/6"
+  },
+  "Raph & Mikey, Troublemakers": {
+   "name": "Raph & Mikey, Troublemakers",
+   "mana_cost": "{5}{R/G}{R/G}",
+   "type_line": "Legendary Creature — Mutant Ninja Turtle",
+   "oracle_text": "Trample, haste\nWhenever Raph & Mikey attack, reveal cards from the top of your library until you reveal a creature card. Put that card onto the battlefield tapped and attacking and the rest on the bottom of your library in a random order.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "7/7"
+  },
+  "Raucous Theater": {
+   "name": "Raucous Theater",
+   "mana_cost": "",
+   "type_line": "Land — Swamp Mountain",
+   "oracle_text": "({T}: Add {B} or {R}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Reanimate": {
+   "name": "Reanimate",
+   "mana_cost": "{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to that card's mana value.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Recruiter of the Guard": {
+   "name": "Recruiter of the Guard",
+   "mana_cost": "{2}{W}",
+   "type_line": "Creature — Human Soldier",
+   "oracle_text": "When this creature enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "1/1"
+  },
+  "Samwise the Stouthearted": {
+   "name": "Samwise the Stouthearted",
+   "mana_cost": "{1}{W}",
+   "type_line": "Legendary Creature — Halfling Peasant",
+   "oracle_text": "Flash\nWhen Samwise enters, choose up to one target permanent card in your graveyard that was put there from the battlefield this turn. Return it to your hand. Then the Ring tempts you.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/1"
+  },
+  "Sand Scout": {
+   "name": "Sand Scout",
+   "mana_cost": "{1}{W}",
+   "type_line": "Creature — Human Scout",
+   "oracle_text": "When this creature enters, if an opponent controls more lands than you, search your library for a Desert card, put it onto the battlefield tapped, then shuffle.\nWhenever one or more land cards are put into your graveyard from anywhere, create a 1/1 red, green, and white Sand Warrior creature token. This ability triggers only once each turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Savannah": {
+   "name": "Savannah",
+   "mana_cost": "",
+   "type_line": "Land — Forest Plains",
+   "oracle_text": "({T}: Add {G} or {W}.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Scrubland": {
+   "name": "Scrubland",
+   "mana_cost": "",
+   "type_line": "Land — Plains Swamp",
+   "oracle_text": "({T}: Add {W} or {B}.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Shadowy Backstreet": {
+   "name": "Shadowy Backstreet",
+   "mana_cost": "",
+   "type_line": "Land — Plains Swamp",
+   "oracle_text": "({T}: Add {W} or {B}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Shallow Grave": {
+   "name": "Shallow Grave",
+   "mana_cost": "{1}{B}",
+   "type_line": "Instant",
+   "oracle_text": "Return the top creature card of your graveyard to the battlefield. That creature gains haste until end of turn. Exile it at the beginning of the next end step.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Skyclave Apparition": {
+   "name": "Skyclave Apparition",
+   "mana_cost": "{1}{W}{W}",
+   "type_line": "Creature — Kor Spirit",
+   "oracle_text": "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.\nWhen this creature leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Snuff Out": {
+   "name": "Snuff Out",
+   "mana_cost": "{3}{B}",
+   "type_line": "Instant",
+   "oracle_text": "If you control a Swamp, you may pay 4 life rather than pay this spell's mana cost.\nDestroy target nonblack creature. It can't be regenerated.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Solitude": {
+   "name": "Solitude",
+   "mana_cost": "{3}{W}{W}",
+   "type_line": "Creature — Elemental Incarnation",
+   "oracle_text": "Flash\nLifelink\nWhen this creature enters, exile up to one other target creature. That creature's controller gains life equal to its power.\nEvoke—Exile a white card from your hand.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "3/2"
+  },
+  "Street Wraith": {
+   "name": "Street Wraith",
+   "mana_cost": "{3}{B}{B}",
+   "type_line": "Creature — Wraith",
+   "oracle_text": "Swampwalk (This creature can't be blocked as long as defending player controls a Swamp.)\nCycling—Pay 2 life. (Pay 2 life, Discard this card: Draw a card.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "3/4"
+  },
+  "Stronghold Gambit": {
+   "name": "Stronghold Gambit",
+   "mana_cost": "{1}{R}",
+   "type_line": "Sorcery",
+   "oracle_text": "Each player chooses a card in their hand. Then each player reveals their chosen card. The owner of each creature card revealed this way with the lowest mana value puts it onto the battlefield.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Thassa's Oracle": {
+   "name": "Thassa's Oracle",
+   "mana_cost": "{U}{U}",
+   "type_line": "Creature — Merfolk Wizard",
+   "oracle_text": "When this creature enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game. (Each {U} in the mana costs of permanents you control counts toward your devotion to blue.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "1/3"
+  },
+  "Triumph of Saint Katherine": {
+   "name": "Triumph of Saint Katherine",
+   "mana_cost": "{4}{W}",
+   "type_line": "Creature — Human Warrior",
+   "oracle_text": "Lifelink\nPraesidium Protectiva — When this creature is put into your graveyard from the battlefield, exile it and the top six cards of your library in a face-down pile. If you do, shuffle that pile and put it back on top of your library.\nMiracle {1}{W} (You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "5/5"
+  },
+  "Tundra": {
+   "name": "Tundra",
+   "mana_cost": "",
+   "type_line": "Land — Plains Island",
+   "oracle_text": "({T}: Add {W} or {U}.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Undercity Sewers": {
+   "name": "Undercity Sewers",
+   "mana_cost": "",
+   "type_line": "Land — Island Swamp",
+   "oracle_text": "({T}: Add {U} or {B}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Underground Sea": {
+   "name": "Underground Sea",
+   "mana_cost": "",
+   "type_line": "Land — Island Swamp",
+   "oracle_text": "({T}: Add {U} or {B}.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Unmask": {
+   "name": "Unmask",
+   "mana_cost": "{3}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "You may exile a black card from your hand rather than pay this spell's mana cost.\nTarget player reveals their hand. You choose a nonland card from it. That player discards that card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Verdant Catacombs": {
+   "name": "Verdant Catacombs",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Forest card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Voice of Victory": {
+   "name": "Voice of Victory",
+   "mana_cost": "{1}{W}",
+   "type_line": "Creature — Human Bard",
+   "oracle_text": "Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)\nYour opponents can't cast spells during your turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "1/3"
+  },
+  "White Orchid Phantom": {
+   "name": "White Orchid Phantom",
+   "mana_cost": "{W}{W}",
+   "type_line": "Creature — Spirit Knight",
+   "oracle_text": "Flying, first strike\nWhen this creature enters, destroy up to one target nonbasic land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01",
+   "pt": "2/2"
+  },
+  "Windswept Heath": {
+   "name": "Windswept Heath",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Wrath of the Skies": {
+   "name": "Wrath of the Skies",
+   "mana_cost": "{X}{W}{W}",
+   "type_line": "Sorcery",
+   "oracle_text": "You get X {E} (energy counters), then you may pay any amount of {E}. Destroy each artifact, creature, and enchantment with mana value less than or equal to the amount of {E} paid this way.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Ajani, Nacatl Pariah": {
+   "name": "Ajani, Nacatl Pariah",
+   "mana_cost": "{1}{W}",
+   "type_line": "Legendary Creature — Cat Warrior",
+   "oracle_text": "When Ajani enters, create a 2/1 white Cat Warrior creature token.\nWhenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.",
+   "source": "RECALLED from memory (the card search returns no face text for this multi-face card); unverified. Scenarios quoting it are verified:false.",
+   "pt": "3/2"
+  }
+ },
+ "tokens": {
+  "Monk Token": {
+   "type_line": "Token Creature — Monk",
+   "colors": [
+    "W"
+   ],
+   "pt": "1/1",
+   "text": "Prowess",
+   "created_by": "Cori-Steel Cutter"
+  },
+  "Goblin Token": {
+   "type_line": "Token Creature — Goblin",
+   "colors": [
+    "R"
+   ],
+   "pt": "1/1",
+   "text": "",
+   "created_by": "Lost Mine of Phandelver (Goblin Lair)"
+  },
+  "Treasure Token": {
+   "type_line": "Token Artifact — Treasure",
+   "colors": [],
+   "text": "{T}, Sacrifice this token: Add one mana of any color.",
+   "created_by": "Lost Mine (Mine Tunnels), Dungeon of the Mad Mage (Goblin Bazaar)",
+   "source": "recalled, not retrieved"
+  },
+  "Skeleton Token": {
+   "type_line": "Token Creature — Skeleton",
+   "colors": [
+    "B"
+   ],
+   "pt": "1/1",
+   "text": "",
+   "created_by": "Dungeon of the Mad Mage (Muiral's Graveyard)"
+  },
+  "Zombie Token": {
+   "type_line": "Token Creature — Zombie",
+   "colors": [
+    "B"
+   ],
+   "pt": "2/2",
+   "text": "",
+   "created_by": "Acererak the Archlich"
+  },
+  "The Atropal": {
+   "type_line": "Legendary Token Creature — God Horror",
+   "colors": [
+    "B"
+   ],
+   "pt": "4/4",
+   "text": "Deathtouch",
+   "created_by": "Tomb of Annihilation (Cradle of the Death God)"
+  },
+  "Koma's Coil": {
+   "name": "Koma's Coil",
+   "type_line": "Token Creature — Serpent",
+   "colors": [
+    "U"
+   ],
+   "pt": "3/3",
+   "text": "",
+   "created_by": "Koma, World-Eater",
+   "source": "from creating card text"
+  },
+  "Warrior Token": {
+   "name": "Warrior",
+   "type_line": "Token Creature — Warrior",
+   "colors": [
+    "R"
+   ],
+   "pt": "1/1",
+   "text": "",
+   "created_by": "Voice of Victory (Mobilize 2: tapped and attacking; sacrificed at next end step)",
+   "source": "from creating card text"
+  },
+  "Cat Token (Ocelot Pride)": {
+   "name": "Cat",
+   "type_line": "Token Creature — Cat",
+   "colors": [
+    "W"
+   ],
+   "pt": "1/1",
+   "text": "",
+   "created_by": "Ocelot Pride",
+   "source": "from creating card text"
+  },
+  "Sand Warrior Token": {
+   "name": "Sand Warrior",
+   "type_line": "Token Creature — Sand Warrior",
+   "colors": [
+    "R",
+    "G",
+    "W"
+   ],
+   "pt": "1/1",
+   "text": "",
+   "created_by": "Sand Scout",
+   "source": "from creating card text"
+  },
+  "Illusion Token (Skyclave Apparition)": {
+   "name": "Illusion",
+   "type_line": "Token Creature — Illusion",
+   "colors": [
+    "U"
+   ],
+   "pt": "X/X",
+   "text": "X is the mana value of the exiled card",
+   "created_by": "Skyclave Apparition",
+   "source": "from creating card text"
+  },
+  "Kaito, Bane of Nightmares Emblem": {
+   "name": "Kaito, Bane of Nightmares Emblem",
+   "type_line": "Emblem",
+   "colors": [],
+   "text": "Ninjas you control get +1/+1.",
+   "created_by": "Kaito, Bane of Nightmares (+1)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-01"
+  },
+  "Orc Army Token": {
+   "type_line": "Token Creature — Orc Army",
+   "colors": [
+    "B"
+   ],
+   "pt": "0/0",
+   "text": "",
+   "created_by": "Orcish Bowmasters (amass Orcs 1)",
+   "source": "CR 701.47a (amass) and 111.4, retrieved; not from card_search"
+  },
+  "Cat Warrior Token": {
+   "type_line": "Token Creature — Cat Warrior",
+   "colors": [
+    "W"
+   ],
+   "pt": "2/1",
+   "text": "",
+   "created_by": "Ajani, Nacatl Pariah (recalled, unverified)"
+  }
+ },
+ "dungeons": {
+  "Lost Mine of Phandelver": {
+   "rooms": {
+    "Cave Entrance": {
+     "text": "Scry 1.",
+     "leads_to": [
+      "Goblin Lair",
+      "Mine Tunnels"
+     ]
+    },
+    "Goblin Lair": {
+     "text": "Create a 1/1 red Goblin creature token.",
+     "leads_to": [
+      "Storeroom",
+      "Dark Pool"
+     ]
+    },
+    "Mine Tunnels": {
+     "text": "Create a Treasure token.",
+     "leads_to": [
+      "Dark Pool",
+      "Fungi Cavern"
+     ]
+    },
+    "Storeroom": {
+     "text": "Put a +1/+1 counter on target creature.",
+     "leads_to": [
+      "Temple of Dumathoin"
+     ]
+    },
+    "Dark Pool": {
+     "text": "Each opponent loses 1 life and you gain 1 life.",
+     "leads_to": [
+      "Temple of Dumathoin"
+     ]
+    },
+    "Fungi Cavern": {
+     "text": "Target creature gets -4/-0 until your next turn.",
+     "leads_to": [
+      "Temple of Dumathoin"
+     ]
+    },
+    "Temple of Dumathoin": {
+     "text": "Draw a card.",
+     "leads_to": []
+    }
+   },
+   "top": "Cave Entrance",
+   "bottom": "Temple of Dumathoin"
+  },
+  "Dungeon of the Mad Mage": {
+   "rooms": {
+    "Yawning Portal": {
+     "text": "You gain 1 life.",
+     "leads_to": [
+      "Dungeon Level"
+     ]
+    },
+    "Dungeon Level": {
+     "text": "Scry 1.",
+     "leads_to": [
+      "Goblin Bazaar",
+      "Twisted Caverns"
+     ]
+    },
+    "Goblin Bazaar": {
+     "text": "Create a Treasure token.",
+     "leads_to": [
+      "Lost Level"
+     ]
+    },
+    "Twisted Caverns": {
+     "text": "Target creature can't attack until your next turn.",
+     "leads_to": [
+      "Lost Level"
+     ]
+    },
+    "Lost Level": {
+     "text": "Scry 2.",
+     "leads_to": [
+      "Runestone Caverns",
+      "Muiral's Graveyard"
+     ]
+    },
+    "Runestone Caverns": {
+     "text": "Exile the top two cards of your library. You may play them.",
+     "leads_to": [
+      "Deep Mines"
+     ]
+    },
+    "Muiral's Graveyard": {
+     "text": "Create two 1/1 black Skeleton creature tokens.",
+     "leads_to": [
+      "Deep Mines"
+     ]
+    },
+    "Deep Mines": {
+     "text": "Scry 3.",
+     "leads_to": [
+      "Mad Wizard's Lair"
+     ]
+    },
+    "Mad Wizard's Lair": {
+     "text": "Draw three cards and reveal them. You may cast one of them without paying its mana cost.",
+     "leads_to": []
+    }
+   },
+   "top": "Yawning Portal",
+   "bottom": "Mad Wizard's Lair"
+  },
+  "Tomb of Annihilation": {
+   "rooms": {
+    "Trapped Entry": {
+     "text": "Each player loses 1 life.",
+     "leads_to": [
+      "Veils of Fear",
+      "Oubliette"
+     ]
+    },
+    "Veils of Fear": {
+     "text": "Each player loses 2 life unless they discard a card.",
+     "leads_to": [
+      "Sandfall Cell"
+     ]
+    },
+    "Sandfall Cell": {
+     "text": "Each player loses 2 life unless they sacrifice a creature, artifact, or land of their choice.",
+     "leads_to": [
+      "Cradle of the Death God"
+     ]
+    },
+    "Oubliette": {
+     "text": "Discard a card and sacrifice a creature, an artifact, and a land.",
+     "leads_to": [
+      "Cradle of the Death God"
+     ]
+    },
+    "Cradle of the Death God": {
+     "text": "Create The Atropal, a legendary 4/4 black God Horror creature token with deathtouch.",
+     "leads_to": []
+    }
+   },
+   "top": "Trapped Entry",
+   "bottom": "Cradle of the Death God"
+  }
+ }
+}

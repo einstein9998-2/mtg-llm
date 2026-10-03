@@ -1,0 +1,45 @@
+id: windswept-heath-fetches-forest-or-plains-types
+title: Windswept Heath finds a Forest or Plains card, including nonbasic lands with those types, and nothing else
+area: card
+cards: [Windswept Heath, Forest, Island, Mountain, Plains, Plateau, Savannah, Swamp, Tropical Island, Volcanic Island]
+tags: [windswept-heath, fetchland, search, basic-land-types, life-payment, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Windswept Heath, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.6", text: "The basic land types are Plains, Island, Swamp, Mountain, and Forest.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 1
+    battlefield: ["Windswept Heath @fetch"]
+    library: ["Savannah @sav", "Plateau @plat", "Tropical Island @trop", "Forest @for", "Plains @pl", "Mountain @mtn", "Volcanic Island @volc", "Swamp @sw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@fetch", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@fetch", controller: p0}]
+      p0: {life: 19, graveyard: [Windswept Heath], battlefield: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: search
+      found: "@sav"
+      expect_options:
+        include: ["@sav", "@plat", "@trop", "@for", "@pl"]
+        exclude: ["@mtn", "@volc", "@sw"]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 1
+      graveyard: [Windswept Heath]
+      battlefield: [{card: Savannah, tapped: false}]
+      library_count: 17
+notes: >
+  Savannah (Forest Plains), Plateau (Mountain Plains), Tropical Island (Forest Island) and the basics Forest and Plains qualify; Mountain, Volcanic Island and Swamp do not. Library 18 -> 17; life 19; lands_played stays 1.

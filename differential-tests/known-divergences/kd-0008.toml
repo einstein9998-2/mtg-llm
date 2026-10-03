@@ -1,0 +1,12 @@
+id = "kd-0008"
+title = "Forge: lists a second noncreature spell under Deafening Silence as castable, then refuses to play it"
+status = "accepted"
+who_is_right = "engine"
+cr_citation = "Deafening Silence: 'Each player can't cast more than one noncreature spell each turn' (CR 101.2, a prohibition beats permission)"
+rulings = []
+affected_oracles = ["forge"]
+match = { sides = ["FORGE_ONLY"], kinds = ["cast"], zones = ["Hand"], feature_tags = ["deafening-silence-on-bf"] }
+suppress = true
+regression_scenario = "none yet: Forge-side behaviour, the engine correctly does not offer the cast"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Found by lockstep lines on interaction scenario deafening-silence-one-noncreature-spell: after one noncreature spell, Forge's priority menu still lists the next one (Brainstorm, Ponder); the probe's play of it fails with 'checkRestrictions refused'. The engine does not offer it. Same class as kd-0003 (Forge's hand-spell pre-check ignores a restriction that the play itself enforces). Needs Brady's approval (Forge-bug verdict, doc 04 6.4)."

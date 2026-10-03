@@ -1,0 +1,174 @@
+id: aluren-acererak-loop-two-iterations-mad-mage
+title: Aluren + Acererak loop into Dungeon of the Mad Mage, two iterations (Yawning Portal gain 1, Dungeon Level scry 1)
+area: card
+cards: [Acererak the Archlich, Aluren, Ponder]
+tags: [aluren-acererak-loop, aluren, acererak, venture, mad-mage]
+derived_from: cr
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "701.49a", text: "they choose a dungeon card they own from outside the game and put it into the command zone. They put their venture marker on the topmost room.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Dungeon of the Mad Mage: Yawning Portal (You gain 1 life.) > Dungeon Level (Scry 1.)", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    life: 18
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_dungeon, answer: Dungeon of the Mad Mage, expect_options: {count: 3}}
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {life: 19, hand: [Acererak the Archlich], command: [{dungeon: Dungeon of the Mad Mage, room: Yawning Portal}]}
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: scry, to_bottom: ["@pd"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Acererak the Archlich]
+      command: [{dungeon: Dungeon of the Mad Mage, room: Dungeon Level}]
+      library_bottom: [Ponder]
+      spells_cast_this_turn: 2
+notes: >
+  The second venture does not offer a dungeon choice (one is already in the command zone, 309.3) but a room choice.
+---
+id: aluren-acererak-recast-in-response-to-room-trigger
+title: With Aluren, Acererak is recast while its room trigger is on the stack; the later room trigger resolves first and the earlier one still resolves
+area: card
+cards: [Acererak the Archlich, Aluren, Ponder, Treasure Token]
+tags: [aluren-acererak-loop, aluren, flash, stack-order, lifo, venture, lost-mine]
+derived_from: cr
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+  - {kind: cr, ref: "117.4", text: "If all players pass in succession (that is, if all players pass without taking any actions in between passing), the spell or ability on top of the stack resolves", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Lost Mine of Phandelver: Cave Entrance (Scry 1.) leads to Goblin Lair and Mine Tunnels (Create a Treasure token.)", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_dungeon, answer: Lost Mine of Phandelver}
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "Scry 1"}
+        - {kind: spell, card: "@acer", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "Scry 1"}
+        - {kind: triggered, source: "@acer", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_room, answer: Mine Tunnels, expect_options: {exact: [Goblin Lair, Mine Tunnels]}}
+  - label: two-rooms-stacked
+    check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "Scry 1"}
+        - {kind: triggered, controller: p0, text_contains: "Treasure"}
+      p0: {command: [{dungeon: Lost Mine of Phandelver, room: Mine Tunnels}], hand: [Acererak the Archlich]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "Scry 1"}]
+      p0: {battlefield_contains: [{token: Treasure Token}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: scry, to_bottom: [], on_top_order: ["@pd"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich]
+      command: [{dungeon: Lost Mine of Phandelver, room: Mine Tunnels}]
+      battlefield: [{card: Aluren}, {token: Treasure Token}]
+      library_top: [Ponder]
+      spells_cast_this_turn: 2
+notes: >
+  Aluren's flash allows the recast above the Cave Entrance trigger. The second ETB moves the marker on while the first
+  room's ability is still waiting; the Treasure resolves first (last in), then the Scry 1 still resolves although the
+  marker is no longer in Cave Entrance. Bugs caught: refusing the cast with a non-empty stack, re-triggering or discarding
+  the older room ability, resolving in the wrong order.
+---
+id: omniscience-acererak-loop-sorcery-speed-only
+title: Omniscience also recasts Acererak for free, but only at sorcery speed; it cannot be recast while the room trigger is on the stack
+area: card
+cards: [Acererak the Archlich, Omniscience, Ponder, Goblin Token]
+tags: [aluren-acererak-loop, omniscience, timing, flash, negative, lost-mine]
+derived_from: cr
+source:
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "302.1", text: "A player who has priority may cast a creature card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Omniscience @omni"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: omniscience}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_dungeon, answer: Lost Mine of Phandelver}
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "Scry 1"}]
+      p0: {hand: [Acererak the Archlich]}
+  - expect_illegal: {p0: {t: cast, card: "@acer", alt_cost: {free: omniscience}}}
+  - expect_illegal: {p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}}
+  - resolve_top: true
+  - p0: {decision: scry, to_bottom: [], on_top_order: ["@pd"]}
+  - p0: {t: cast, card: "@acer", alt_cost: {free: omniscience}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Goblin Lair}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich]
+      command: [{dungeon: Lost Mine of Phandelver, room: Goblin Lair}]
+      battlefield: [{card: Omniscience}, {token: Goblin Token}]
+      spells_cast_this_turn: 2
+notes: >
+  Omniscience removes the mana cost but not the timing restriction: with the Scry trigger on the stack the creature cannot
+  be cast (and there is no Aluren to give flash). Once the stack is empty in p0's main phase the free recast is legal.

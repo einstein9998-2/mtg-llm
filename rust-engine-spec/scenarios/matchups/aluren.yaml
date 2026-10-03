@@ -1,0 +1,115 @@
+id: mu-aluren-ur-casts-drc-at-instant-speed
+title: The UR player uses the opponent's Aluren to cast Dragon's Rage Channeler free during Stock Up, then a Bolt surveil turns on delirium
+area: matchup
+cards: [Aluren, Stock Up, "Dragon's Rage Channeler", Lightning Bolt, "Mishra's Bauble", Scalding Tarn, Brainstorm, Ponder, Volcanic Island, Island, Tropical Island, Hedge Maze]
+tags: [matchup, aluren, free-cast, flash, delirium, surveil, cast-trigger, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: "Dragon's Rage Channeler", text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: oracle, card: "Dragon's Rage Channeler", text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: cr, ref: "702.8a", text: "Flash is a static ability that functions in any zone from which you could play the card it's on. \"Flash\" means \"You may play this card any time you could cast an instant.\"", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Dragon's Rage Channeler @drc", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @v"]
+    graveyard: ["Mishra's Bauble", "Scalding Tarn", "Brainstorm"]
+    library: ["Ponder @x"]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su"]
+    battlefield: ["Aluren @alu", "Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@su", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@drc", alt_cost: {free: aluren}}
+  - check:
+      stack:
+        - {kind: spell, card: "@su", controller: p1}
+        - {kind: spell, card: "@drc", controller: p0}
+      p0: {battlefield: [{card: Volcanic Island, tapped: false}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@su", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p0: {battlefield_contains: [{card: "Dragon's Rage Channeler", controller: p0, pt: [1, 1], sick: true}]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@su", controller: p1}
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: triggered, source: "@drc", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@x"], on_top_order: []}
+  - check:
+      stack:
+        - {kind: spell, card: "@su", controller: p1}
+        - {kind: spell, card: "@bolt", controller: p0}
+      pending: {actor: p1, kind: priority}
+      p0: {battlefield_contains: [{card: "Dragon's Rage Channeler", pt: [3, 3], keywords: [flying]}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@su", controller: p1}]
+    pending: {actor: p1, kind: priority}
+    p1: {life: 17}
+    p0:
+      hand: []
+      graveyard: ["Mishra's Bauble", Scalding Tarn, Brainstorm, Ponder, Lightning Bolt]
+      battlefield: [{card: Volcanic Island, tapped: true}, {card: "Dragon's Rage Channeler", pt: [3, 3], keywords: [flying]}]
+notes: >
+  Aluren lets p0 cast DRC (mana value 1) with no mana as though it had flash, in response to Stock Up. After DRC resolves the
+  active player p1 gets priority and passes; p0 casts Bolt, a noncreature spell, so DRC's trigger goes on the stack above
+  Bolt. The surveil puts Ponder (sorcery) into the graveyard: artifact, land, instant, sorcery = four types, so DRC is 3/3
+  flying while Bolt is still on the stack. Bolt then resolves (20 -> 17). Stock Up is still waiting.
+---
+id: mu-aluren-ur-cannot-cast-murktide-or-cutter
+title: Aluren does not let the UR player cast Murktide Regent (mana value 7) or the noncreature Cori-Steel Cutter
+area: matchup
+cards: [Aluren, Stock Up, "Dragon's Rage Channeler", Murktide Regent, Cori-Steel Cutter, Daze, Lightning Bolt, Ponder, Brainstorm, Volcanic Island, Island, Tropical Island, Hedge Maze]
+tags: [matchup, aluren, mana-value, legal-actions, delve]
+derived_from: cr
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "702.66b", text: "The delve ability isn't an additional or alternative cost and applies only after the total cost of the spell with delve is determined.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Dragon's Rage Channeler @drc", "Murktide Regent @mk", "Cori-Steel Cutter @cut"]
+    battlefield: ["Volcanic Island", "Volcanic Island"]
+    graveyard: [Daze, Lightning Bolt, Ponder, Brainstorm, Lightning Bolt]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su"]
+    battlefield: ["Aluren @alu", "Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@su", pay: auto}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+    legal:
+      p0:
+        include:
+          - {t: pass}
+          - {t: cast, card: "@drc", alt_cost: {free: aluren}}
+        exclude:
+          - {t: cast, card: "@mk"}
+          - {t: cast, card: "@cut"}
+notes: >
+  Murktide's mana value is 7 ({5}{U}{U}) whatever delve would pay, so Aluren does not apply, and without Aluren it has no
+  flash; with two lands and five graveyard cards it would be payable at sorcery speed only. Cori-Steel Cutter is an
+  artifact, not a creature spell, so Aluren gives it neither free casting nor flash.

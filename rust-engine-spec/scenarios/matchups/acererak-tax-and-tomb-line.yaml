@@ -1,0 +1,250 @@
+id: disruptor-flute-acererak-aluren-cast-costs-three
+title: Disruptor Flute naming Acererak makes each Aluren cast of Acererak cost {3}; with four lands the loop stops after one iteration
+area: matchup
+cards: [Acererak the Archlich, Aluren, Disruptor Flute, Swamp, Island, Ponder]
+tags: [aluren-acererak-loop, disruptor-flute, cost-increase, alternative-cost, choose-name, tax]
+derived_from: cr
+source:
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+  - {kind: oracle, card: Disruptor Flute, text: "As this artifact enters, choose a card name.", verified: true}
+  - {kind: oracle, card: Disruptor Flute, text: "Spells with the chosen name cost {3} more to cast.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can't pay a cost without having the necessary resources to pay it fully.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    hand: ["Disruptor Flute @flute"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@flute", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_name, answer: "Acererak the Archlich"}
+  - label: flute-in
+    check:
+      stack: []
+      phase: main1
+      pending: {actor: p0, kind: priority}
+      p1: {battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Disruptor Flute}]}
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: {tap: ["@s1", "@s2", "@s3"]}}
+  - check:
+      stack: [{kind: spell, card: "@acer", controller: p0}]
+      p0:
+        mana_pool: {}
+        battlefield: [{card: Aluren}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: false}]
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_dungeon, answer: Lost Mine of Phandelver, expect_options: {count: 3}}
+  - resolve_top: true
+  - p0: {decision: scry, to_bottom: [], on_top_order: ["@pd"]}
+  - expect_illegal: {p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@acer", pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich]
+      command: [{dungeon: Lost Mine of Phandelver, room: Cave Entrance}]
+      battlefield: [{card: Aluren}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: false}]
+notes: >
+  p1 casts the Flute (flash) after p0 passes in p0's main phase and names Acererak as it enters. The Aluren cast is an
+  alternative cost; the Flute's increase applies on top, so the free cast costs {3} (three Swamps). One Swamp is left, so
+  neither another Aluren cast ({3}) nor a hardcast ({2}{B} + {3}) is possible: the loop is stopped by mana. This is the
+  situation in which Brady switches to completing Tomb of Annihilation (next scenarios). Bugs caught: "free" ignoring the
+  Flute, the Flute taxing Aluren itself or all creatures.
+---
+id: defense-grid-opponents-turn-acererak-loop-bounded-by-mana
+title: Under Defense Grid, Acererak loops in the opponent's end step cost {3} each; six lands give exactly two iterations
+area: matchup
+cards: [Acererak the Archlich, Aluren, Defense Grid, Swamp, Ponder, Goblin Token]
+tags: [aluren-acererak-loop, defense-grid, cost-increase, alternative-cost, opponents-turn, priority, tax]
+derived_from: cr
+source:
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+setup:
+  turn: 7
+  active: p1
+  phase: end
+  priority: p1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    battlefield: ["Defense Grid @dg"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  # iteration 1 (in p1's end step; p1 is active and gets priority after each resolution)
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: {tap: ["@s1", "@s2", "@s3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@acer", controller: p0}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: choose_dungeon, answer: Lost Mine of Phandelver, expect_options: {count: 3}}
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "Scry 1"}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: scry, to_bottom: [], on_top_order: ["@pd"]}
+  - p1: {t: pass}
+  # iteration 2
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: {tap: ["@s4", "@s5", "@s6"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: choose_room, answer: Goblin Lair, expect_options: {exact: [Goblin Lair, Mine Tunnels]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    phase: end
+    active: p1
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich]
+      command: [{dungeon: Lost Mine of Phandelver, room: Goblin Lair}]
+      battlefield:
+        - {card: Aluren}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {token: Goblin Token}
+notes: >
+  On p1's turn every p0 spell costs {3} more, including Aluren's free casts (118.9d). Priority detail: after each
+  resolution the active player p1 receives priority first (117.3b), so the passes alternate p1 then p0, and after the room
+  ability resolves p1 passes once more to hand p0 priority in the same end step. Six Swamps pay for two iterations; the
+  third cast is not offered. The loop is bounded by mana, not by any loop counter. The same casts on p0's own turn would
+  be free (see aluren-defense-grid-no-tax-on-own-turn).
+---
+id: disruptor-flute-tomb-completion-line
+title: Taxed by Disruptor Flute, p0 ventures through Tomb of Annihilation (Trapped Entry, Oubliette, Cradle); after completion Acererak stays beside The Atropal
+area: matchup
+cards: [Acererak the Archlich, Aluren, Disruptor Flute, Swamp, Island, The Atropal]
+tags: [aluren-acererak-loop, disruptor-flute, tax, tomb, dungeon-completion, intervening-if, path-length, oubliette]
+derived_from: cr
+source:
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "704.5t", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game.", verified: true}
+  - {kind: cr, ref: "309.7", text: "A player completes a dungeon as that dungeon card is removed from the game.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: cr, ref: "101.3", text: "Any part of an instruction that's impossible to perform is ignored.", verified: true}
+  - {kind: oracle, card: Disruptor Flute, text: "Spells with the chosen name cost {3} more to cast.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Tomb of Annihilation: Trapped Entry (Each player loses 1 life.) > Oubliette (Discard a card and sacrifice a creature, an artifact, and a land.) > Cradle of the Death God (Create The Atropal, a legendary 4/4 black God Horror creature token with deathtouch.)", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 8
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer", "Island @isl0"]
+    battlefield: ["Aluren @alu", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7", "Swamp @s8", "Swamp @s9", "Swamp @s10", "Swamp @s11", "Swamp @s12"]
+    library_pad: 10
+  p1:
+    hand: ["Disruptor Flute @flute"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@flute", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_name, answer: "Acererak the Archlich"}
+  # venture 1: Trapped Entry
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: {tap: ["@s1", "@s2", "@s3"]}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_dungeon, answer: Tomb of Annihilation, expect_options: {count: 3, include: [Lost Mine of Phandelver, Dungeon of the Mad Mage, Tomb of Annihilation]}}
+  - resolve_top: true
+  - label: trapped-entry
+    check:
+      p0: {life: 19, hand: [Acererak the Archlich, Island], command: [{dungeon: Tomb of Annihilation, room: Trapped Entry}]}
+      p1: {life: 19}
+  # venture 2: Oubliette (p0 controls no creature and no artifact, so only the discard and the land sacrifice happen)
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: {tap: ["@s4", "@s5", "@s6"]}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Oubliette, expect_options: {exact: [Veils of Fear, Oubliette]}}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@isl0"], expect_options: {include: ["@isl0", "@acer"]}}
+  - p0: {decision: choose_cards, purpose: sacrifice, answer: ["@s1"], expect_options: {include: ["@s1", "@s12"], exclude: ["@alu", "@j1"]}}
+  - label: oubliette
+    check:
+      p0: {hand: [Acererak the Archlich], graveyard: [Island, Swamp], command: [{dungeon: Tomb of Annihilation, room: Oubliette}]}
+      p1: {battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Disruptor Flute}]}
+  # venture 3: Cradle of the Death God, then completion
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: {tap: ["@s7", "@s8", "@s9"]}}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - label: tomb-completed
+    check:
+      stack: []
+      p0: {command: [], completed_dungeons: [Tomb of Annihilation], hand: [Acererak the Archlich], battlefield_contains: [{token: The Atropal, pt: [4, 4]}]}
+  # fourth cast: no ETB trigger, Acererak stays
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}, pay: {tap: ["@s10", "@s11", "@s12"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: []
+      graveyard: [Island, Swamp]
+      command: []
+      completed_dungeons: [Tomb of Annihilation]
+      spells_cast_this_turn: 4
+      battlefield:
+        - {card: Aluren}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {token: The Atropal, pt: [4, 4], keywords: [deathtouch]}
+        - {card: Acererak the Archlich, pt: [5, 5]}
+    p1: {life: 19}
+notes: >
+  Brady's alternative line as rules facts: each taxed cast costs {3} (explicit taps so the sacrificed Swamp is an already
+  tapped one: s1 paid for venture 1 and is then sacrificed to Oubliette, leaving exactly nine untapped Swamps for three more
+  casts). Trapped Entry hurts both players (19/19). In Oubliette p0 has no creature (Acererak is in hand) and no artifact
+  (the Flute is p1's), so those parts are ignored and only the discard and a land are prompted. Tomb completes after the
+  third venture by the state-based action, so the fourth Acererak's ETB never triggers and it stays. 12 Swamps - 1
+  sacrificed = 11, all tapped at the end.

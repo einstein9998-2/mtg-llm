@@ -1,0 +1,14 @@
+[package]
+name = "mtg-debug"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+mtg-core = { workspace = true, features = ["diff-harness"] }
+mtg-view = { workspace = true, features = ["diff-harness"] }
+
+[features]
+canary = ["mtg-core/canary", "mtg-view/canary"]
+
+[dev-dependencies]
+mtg-cards.workspace = true

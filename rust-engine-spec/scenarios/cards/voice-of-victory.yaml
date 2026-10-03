@@ -1,0 +1,144 @@
+id: voice-opponent-cannot-cast-during-your-turn-but-can-on-own
+title: Under Voice of Victory the opponent cannot cast Lightning Bolt during the Voice controller's turn, but can on their own turn
+area: card
+cards: [Voice of Victory, Lightning Bolt, Mountain]
+tags: [voice-of-victory, casting-restriction, cant-beats-can, turn-structure]
+derived_from: cr
+source:
+  - {kind: oracle, card: Voice of Victory, text: "Your opponents can't cast spells during your turn.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: Voice of Victory, as: voice, sick: true}]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@bolt", targets: ["@voice"]}}
+  - expect_illegal: {p1: {t: cast, card: "@bolt", targets: [{player: p0}]}}
+  - p1: {t: pass}
+  - advance: {to: upkeep, of: p1}
+  - p1: {t: cast, card: "@bolt", targets: ["@voice"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    turn: 4
+    active: p1
+    phase: upkeep
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: []
+      graveyard: [Voice of Victory]
+    p1:
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Mountain, tapped: true}]
+notes: >
+  During p0's turn p1 holds priority (after p0 passes) with an instant and an untapped Mountain, yet no cast is legal.
+  Voice is summoning sick, so no attack declaration is raised and `advance` runs through p0's turn to p1's upkeep (p1's
+  Mountain untaps in p1's untap step). On p1's own turn the restriction no longer applies: Bolt (3 damage) kills the
+  1/3 Voice. A wrong engine blocks only sorcery-speed spells, blocks both turns, or blocks only the opponent's main phase.
+---
+id: voice-mobilize-two-tapped-attacking-warriors-deal-damage
+title: Voice of Victory attacking creates two tapped and attacking 1/1 Warriors that deal combat damage alongside it
+area: card
+cards: [Voice of Victory, "Warrior Token"]
+tags: [voice-of-victory, mobilize, attack-trigger, tokens, tapped-and-attacking]
+derived_from: cr
+source:
+  - {kind: oracle, card: Voice of Victory, text: "Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)", verified: true}
+  - {kind: cr, ref: "702.181a", text: "\"Mobilize N\" means \"Whenever this creature attacks, create N 1/1 red Warrior creature tokens. Those tokens enter tapped and attacking. Sacrifice them at the beginning of the next end step.\"", verified: true}
+  - {kind: cr, ref: "508.4", text: "If a creature is put onto the battlefield attacking, its controller chooses which defending player, planeswalker a defending player controls, or battle a defending player protects it's attacking as it enters the battlefield (unless the effect that put it onto the battlefield specifies what it's attacking).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Voice of Victory @voice"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@voice", target: {player: p1}}]}
+  - check:
+      stack: [{kind: triggered, source: "@voice", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        battlefield:
+          - {card: Voice of Victory, tapped: true}
+          - {token: "Warrior Token", tapped: true, attacking: true, pt: [1, 1], colors: [R]}
+          - {token: "Warrior Token", tapped: true, attacking: true, pt: [1, 1], colors: [R]}
+  - advance: {to: combat_damage, of: p0}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Voice of Victory, tapped: true}
+        - {token: "Warrior Token", tapped: true}
+        - {token: "Warrior Token", tapped: true}
+    p1:
+      life: 17
+notes: >
+  Split by reviewer W8 from voice-mobilize-two-attacking-warriors-sacrificed-at-end-step (moved to ambiguous/ because
+  the CR does not fix whether "Sacrifice them at the beginning of the next end step" is one delayed trigger or one per
+  token). The tokens enter attacking p1 (the only defending player, so no choice is raised, 508.4). p1 has no
+  creatures, so no block declaration is raised and `advance` reaches the combat damage step: all three attackers deal
+  combat damage, 20 - 3 = 17. A wrong engine creates untapped or non-attacking tokens, or tokens that deal no damage.
+---
+id: voice-opponent-can-still-activate-abilities
+title: Voice of Victory stops only spells; the opponent can still activate Wasteland during its controller's turn
+area: card
+cards: [Voice of Victory, Lightning Bolt, Wasteland, Plateau, Mountain]
+tags: [voice-of-victory, casting-restriction, activated-abilities, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Voice of Victory, text: "Your opponents can't cast spells during your turn.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: Voice of Victory, as: voice, sick: true}, "Plateau @plat"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Wasteland @w", "Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@bolt", targets: [{player: p0}]}}
+  - p1: {t: activate, source: "@w", ability: 1, targets: ["@plat"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Voice of Victory}]
+      graveyard: [Plateau]
+    p1:
+      hand: [Lightning Bolt]
+      graveyard: [Wasteland]
+notes: >
+  "Can't cast spells" does not restrict activating abilities. Wasteland's destroy ability (index 1; index 0 is its mana
+  ability) is legal for p1 on p0's turn and resolves normally, while Bolt stays uncastable although p1 has an untapped
+  Mountain. A wrong engine blocks every priority action of the opponent, not just casting.

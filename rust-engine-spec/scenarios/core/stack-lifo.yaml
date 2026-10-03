@@ -1,0 +1,159 @@
+id: bolt-in-response-to-bolt-lifo-order
+title: "A Lightning Bolt cast in response to a Lightning Bolt resolves first (last in, first out)"
+area: core
+cards: [Lightning Bolt, Mountain]
+tags: [stack, lifo, priority, responding]
+derived_from: cr
+source:
+  - {kind: cr, ref: "405.5", text: "When all players pass in succession, the top (last-added) spell or ability on the stack resolves.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt0"]
+    battlefield: ["Mountain @m0"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt1"]
+    battlefield: ["Mountain @m1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt0", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt1", targets: [{player: p0}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt0", controller: p0, targets: [{player: p1}]}
+        - {kind: spell, card: "@bolt1", controller: p1, targets: [{player: p0}]}
+      pending: {actor: p1, kind: priority}
+      p0: {life: 20}
+      p1: {life: 20}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt0", controller: p0}
+      pending: {actor: p0, kind: priority}
+      p0: {life: 17, graveyard: []}
+      p1: {life: 20, graveyard: [Lightning Bolt]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 17, graveyard: [Lightning Bolt], hand: []}
+    p1: {life: 17, graveyard: [Lightning Bolt], hand: []}
+notes: >
+  p0 casts the first Bolt at p1 and passes; p1 responds with a Bolt at p0. The stack is bottom to top [bolt0, bolt1]. When
+  both players pass, the top object (p1's Bolt) resolves first, so p0 is at 17 while p0's own Bolt is still on the stack,
+  and p1 is still at 20. After a resolution the active player (p0) receives priority (117.3b). A wrong engine resolves
+  FIFO (p1 would drop to 17 first) or lets the player who cast last keep priority after resolution.
+---
+id: cast-pays-costs-before-anyone-gets-priority
+title: "Casting moves the card to the stack and pays mana before any player gets priority; the caster then keeps priority"
+area: core
+cards: [Lightning Bolt, Mountain, Island, Brainstorm]
+tags: [casting, costs, stack, priority, mana-payment]
+derived_from: cr
+source:
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack. It becomes the topmost object on the stack.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "If the spell’s controller had priority before casting it, they get priority.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "The player announces their choice of an appropriate object or player for each target the spell requires.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@b1", controller: p0, targets: [{player: p1}]}
+      pending: {actor: p0, kind: priority}
+      priority: p0
+      p0:
+        hand: [Lightning Bolt]
+        battlefield: [{card: Mountain, tapped: true}]
+        spells_cast_this_turn: 1
+      p1: {life: 20}
+  - expect_illegal: {p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Mountain, tapped: true}]
+    p1: {life: 17, hand: [Brainstorm]}
+notes: >
+  The Mountain is tapped and the card is on the stack with its target chosen before any other action is possible
+  (601.2a, 601.2c, 601.2h). The caster receives priority again (601.2i, 117.3c): the pending decision right after the cast is
+  p0's, not p1's. Because the only Mountain is already tapped, the second Bolt cannot be cast (the probe checks that the
+  mana was really spent at cast time and that nothing changed). A wrong engine would give priority to p1 first, or delay
+  tapping until resolution.
+---
+id: counterspell-needs-a-spell-target
+title: "Force of Will cannot be cast with no spell on the stack, or at a permanent or player"
+area: core
+cards: [Force of Will, Ponder, Island, Volcanic Island]
+tags: [targeting, counterspell, casting, spell-on-stack, alternative-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "115.2", text: "Only permanents are legal targets for spells and abilities, unless a spell or ability (a) specifies that it can target an object in another zone or a player, or (b) targets an object that can’t exist on the battlefield, such as a spell or ability.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "The player announces their choice of an appropriate object or player for each target the spell requires.", verified: true}
+  - {kind: cr, ref: "601.2e", text: "The game checks to see if the proposed spell can legally be cast. If the proposed spell is illegal, the game returns to the moment before the casting of that spell was proposed", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Ponder @pond"]
+    battlefield: [Island, Island, Island, Island, Island]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @v"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@fow", targets: ["@v"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pond", pay_life: 1}, targets: ["@v"]}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", targets: [{player: p1}], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pond", pay_life: 1}, targets: [{player: p1}]}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pond", pay_life: 1}, targets: []}}
+  - expect_illegal: {p0: {t: cast, card: "@fow", targets: [], pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Force of Will, Ponder]
+      exile: []
+      battlefield:
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+    p1: {battlefield: [{card: Volcanic Island, tapped: false}]}
+notes: >
+  Force of Will targets a spell. A land (a permanent) and a player are not spells, and with an empty stack there is no
+  target at all, so every one of these casts, hard or via the alternative cost, must be impossible, and a failed attempt
+  must not cost life, exile Ponder, or tap lands (the 601.2e rewind is never visible because the illegal option is never
+  offered). A wrong engine that offers the alt cost when no target exists could pay 1 life and exile Ponder for nothing.

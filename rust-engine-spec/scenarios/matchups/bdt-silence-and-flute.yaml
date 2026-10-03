@@ -1,0 +1,151 @@
+id: mu-bdt-boros-silence-dt-thoughtseize-then-evoke-solitude-allowed
+title: Under Boros' Deafening Silence, after Thoughtseize D&T cannot cast Swords that turn, but can still evoke Solitude (a creature spell)
+area: matchup
+cards: [Deafening Silence, Ocelot Pride, Erode, Thoughtseize, Swords to Plowshares, Solitude, Path to Exile, Scrubland, Plains]
+tags: [matchup, boros-vs-dt, deafening-silence, thoughtseize, solitude, evoke, casting-restriction, creature-spell]
+derived_from: cr
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+  - {kind: oracle, card: Solitude, text: "Evoke—Exile a white card from your hand.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "702.74a", text: "“Evoke [cost]” means “You may cast this card by paying [cost] rather than paying its mana cost”", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Erode @er"]
+    battlefield: ["Deafening Silence @ds", "Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    hand: ["Thoughtseize @ts", "Swords to Plowshares @stp", "Solitude @sol", "Path to Exile @path"]
+    battlefield: ["Scrubland @s1", "Plains @w1"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@ts", targets: [{player: p0}], pay: {tap: ["@s1"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: discard, answer: ["@er"]}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      p1: {life: 18, graveyard: [Thoughtseize]}
+      p0: {hand: [], graveyard: [Erode]}
+  - expect_illegal: {p1: {t: cast, card: "@stp", targets: ["@oc"], pay: {tap: ["@w1"]}}}
+  - expect_illegal: {p1: {t: cast, card: "@path", targets: ["@oc"], pay: {tap: ["@w1"]}}}
+  - p1: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@path"}}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@sol", controller: p1}]
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 18
+      hand: [Swords to Plowshares]
+      exile: [Path to Exile]
+      graveyard: [Thoughtseize]
+      battlefield: [{card: Scrubland, tapped: true}, {card: Plains, tapped: false}]
+    p0:
+      hand: []
+      graveyard: [Erode]
+notes: >
+  Deafening Silence is p0's (Boros sideboard) but restricts each player. Thoughtseize is p1's one noncreature spell
+  this turn; Swords and Path are then not castable even with an untapped Plains. Solitude is a creature spell whatever
+  cost is paid for it, so the evoke cast is legal (Path pays the evoke cost by being exiled, not cast). p1 lost 2 to
+  Thoughtseize. A wrong engine counts the evoked Solitude as noncreature, or ignores Silence for the player who does
+  not control it.
+---
+id: mu-bdt-dt-silence-boros-swords-then-bombardment-and-escape-allowed
+title: Under D&T's Deafening Silence, after Swords Boros cannot cast Erode, but Goblin Bombardment (an ability) and Phlage's escape (a creature spell) are still allowed
+area: matchup
+cards: [Deafening Silence, "Phelia, Exuberant Shepherd", Swords to Plowshares, Erode, Goblin Bombardment, Ocelot Pride, "Phlage, Titan of Fire's Fury", Arid Mesa, Guide of Souls, Plateau, Amped Raptor, Mountain, Plains]
+tags: [matchup, boros-vs-dt, deafening-silence, escape, goblin-bombardment, casting-restriction, creature-spell, activated-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+  - {kind: oracle, card: "Phlage, Titan of Fire's Fury", text: "Escape—{R}{R}{W}{W}, Exile five other cards from your graveyard.", verified: true}
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp", "Erode @er"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Plains @w1", "Plains @w2", "Plains @w3", "Goblin Bombardment @bomb", "Ocelot Pride @oc"]
+    graveyard: ["Phlage, Titan of Fire's Fury @ph", "Arid Mesa @g1", "Guide of Souls @g2", "Plateau @g3", "Amped Raptor @g4", "Erode @g5"]
+    library_pad: 10
+  p1:
+    battlefield: ["Deafening Silence @ds", "Phelia, Exuberant Shepherd @phe"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@stp", targets: ["@phe"], pay: {tap: ["@w3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@er", targets: ["@oc"], pay: auto}}
+  - p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@oc"], targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@ph", alt_cost: {escape: {exile: ["@g1", "@g2", "@g3", "@g4", "@g5"]}}, pay: {tap: ["@m1", "@m2", "@w1", "@w2"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@ph", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Erode]
+      graveyard: [Swords to Plowshares, Ocelot Pride]
+      exile: [Arid Mesa, Guide of Souls, Plateau, Amped Raptor, Erode]
+    p1:
+      life: 21
+      exile: ["Phelia, Exuberant Shepherd"]
+      battlefield: [{card: Deafening Silence}]
+notes: >
+  Swords is p0's one noncreature spell this turn (Phelia exiled, p1 +2 = 22). Erode is then not castable. Bombardment's
+  ability is not a spell (p1 21). Phlage cast with escape is a creature spell, so Silence does not stop it; the five
+  cards exiled are the chosen ones (the Erode in the graveyard among them), and Swords and the sacrificed Ocelot stay in
+  the graveyard. A wrong engine counts abilities or creature spells against the limit.
+---
+id: mu-bdt-flute-naming-bombardment-no-sacrifice-in-response
+title: With Disruptor Flute naming Goblin Bombardment, Boros cannot sacrifice the Swords target in response; Swords exiles Amped Raptor and Boros gains 2
+area: matchup
+cards: [Disruptor Flute, Goblin Bombardment, Amped Raptor, Swords to Plowshares, Plains]
+tags: [matchup, boros-vs-dt, disruptor-flute, goblin-bombardment, activation-restriction, swords-to-plowshares, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Disruptor Flute, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "602.5", text: "A player can't begin to activate an ability that's prohibited from being activated.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Goblin Bombardment @bomb", "Amped Raptor @raptor"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: [{card: Disruptor Flute, as: flute, flags: {chosen_name: Goblin Bombardment}}, "Plains @w"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@stp", targets: ["@raptor"], pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@raptor"], targets: [{player: p1}]}}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 22
+      exile: [Amped Raptor]
+      graveyard: []
+      battlefield: [{card: Goblin Bombardment}]
+    p1:
+      life: 20
+      graveyard: [Swords to Plowshares]
+notes: >
+  Paired with mu-bdt-bombardment-in-response-to-swords-no-life-gained, where the same response works and Swords
+  fizzles. Here Bombardment's only ability is not a mana ability, so the Flute forbids it (602.5) and p0 can only pass:
+  Swords exiles the 2/1 Raptor and p0 gains 2. A wrong engine lets the activation through because the Flute names a
+  noncreature card, or because the cost is a sacrifice rather than mana.

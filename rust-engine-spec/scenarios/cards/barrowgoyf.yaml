@@ -1,0 +1,91 @@
+id: barrowgoyf-counts-all-graveyards-while-nethergoyf-counts-own
+title: Barrowgoyf counts card types in all graveyards; Nethergoyf on the same board counts only its controller's
+area: card
+cards: [Barrowgoyf, Nethergoyf, Island, Lightning Bolt, Ponder]
+tags: [barrowgoyf, nethergoyf, characteristic-defining-ability, card-types, graveyard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Barrowgoyf, text: "Barrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "604.3", text: "Characteristic-defining abilities function in all zones.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Barrowgoyf @bg", "Nethergoyf @ng"]
+    graveyard: [Island]
+    library_pad: 10
+  p1:
+    graveyard: [Lightning Bolt, Ponder]
+    library_pad: 10
+script: []
+expect:
+  - at: after_script
+    p0:
+      battlefield:
+        - {card: Barrowgoyf, pt: [3, 4], keywords: [deathtouch, lifelink]}
+        - {card: Nethergoyf, pt: [1, 2]}
+notes: >
+  All graveyards hold a land, an instant and a sorcery: Barrowgoyf is 3/4. p0's graveyard holds only a land: Nethergoyf is
+  1/2. An engine that shares one "goyf" count between the two cards gets one of them wrong.
+---
+id: barrowgoyf-combat-damage-lifelink-then-mill-and-take-creature
+title: Unblocked Barrowgoyf deals damage with lifelink, mills that many cards and returns a milled creature card to hand
+area: card
+cards: [Barrowgoyf, Island, Lightning Bolt, Nethergoyf, Ponder]
+tags: [barrowgoyf, combat-damage, lifelink, mill, may-ability, triggered-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Barrowgoyf, text: "Deathtouch, lifelink", verified: true}
+  - {kind: oracle, card: Barrowgoyf, text: "Whenever this creature deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.", verified: true}
+  - {kind: cr, ref: "120.3f", text: "Damage dealt by a source with lifelink causes that source's controller to gain that much life, in addition to the damage's other results.", verified: true}
+  - {kind: cr, ref: "701.17a", text: "For a player to mill a number of cards, that player puts that many cards from the top of their library into their graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Barrowgoyf @bg"]
+    graveyard: [Island]
+    library: ["Nethergoyf @lg", "Ponder @lp"]
+    library_pad: 10
+  p1:
+    graveyard: [Lightning Bolt]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@bg", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: combat_damage
+      stack: [{kind: triggered, source: "@bg", controller: p0}]
+      p0: {life: 22}
+      p1: {life: 18}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: mill, answer: true}
+  - p0: {decision: choose_cards, purpose: to_hand, answer: ["@lg"], expect_options: {include: ["@lg"], exclude: ["@lp"]}}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      hand: [Nethergoyf]
+      graveyard: [Island, Ponder]
+      library_count: 10
+      battlefield: [{card: Barrowgoyf, tapped: true, pt: [3, 4]}]
+    p1:
+      life: 18
+notes: >
+  Graveyards hold a land and an instant, so Barrowgoyf attacks as a 2/3. p1 has no creatures, so no block declaration is
+  raised and both pass through declare blockers. It deals 2 combat damage: p1 to 18, and lifelink gains p0 2 (22). The
+  trigger mills 2 (Nethergoyf and Ponder); "that many" is the damage dealt, fixed at 2 even though the mill then changes
+  Barrowgoyf's P/T. Only the creature card is offered to return. Afterwards graveyards hold a land, a sorcery and an
+  instant: 3/4. Decision shapes (yes_no, then choose_cards) are the runner adapter's; the outcome is the point.

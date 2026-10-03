@@ -1,0 +1,74 @@
+id: containment-priest-cast-from-hand-creature-enters-normally
+title: Under Containment Priest a creature that is cast from hand enters normally
+area: core
+symmetric: true
+cards: [Containment Priest, Ocelot Pride, Plains]
+tags: [replacement-effect, containment-priest, negative-case, control-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @op"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@op", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Plains, tapped: true}, {card: Ocelot Pride, controller: p0, tapped: false}]
+      exile: []
+notes: >
+  Control case for a sibling scenario: the same replacement ignores a creature
+  spell that resolves into a permanent, because that creature was cast. A wrong engine exiles every nontoken creature
+  entering under the Priest.
+---
+id: containment-priest-exiles-aether-vial-creature
+title: A creature put onto the battlefield with Aether Vial is not cast, so Containment Priest exiles it
+area: core
+cards: [Containment Priest, Aether Vial, Ocelot Pride, "Thassa's Oracle"]
+tags: [replacement-effect, containment-priest, aether-vial, put-onto-battlefield, may-put]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: Aether Vial, text: "{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @op", "Thassa's Oracle @to"]
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 1}}]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@vial", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_onto_battlefield, answer: ["@op"], expect_options: {include: ["@op"], exclude: ["@to"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Thassa's Oracle"]
+      exile: [Ocelot Pride]
+      battlefield: [{card: Aether Vial, tapped: true, counters: {charge: 1}}]
+notes: >
+  Aether Vial's ability puts the card onto the battlefield; nothing is cast, so the Priest's replacement exiles Ocelot
+  Pride instead. Only a mana value 1 creature card is eligible (Thassa's Oracle has mana value 2). The "you may put"
+  choice is one choose_cards (empty answer would decline), the same shape as other may-put choices. Ability index 0
+  is the Vial's only activated ability.

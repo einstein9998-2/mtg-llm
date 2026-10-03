@@ -1,0 +1,151 @@
+id: sba-life-zero-bolt-player-loses
+title: A player brought to 0 life by Lightning Bolt loses the game at the next state-based action check
+area: core
+cards: [Lightning Bolt, Mountain]
+tags: [state-based-actions, life-total, game-loss]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, \"Timing and Priority\"), the game checks for any of the listed conditions for state-based actions", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    life: 3
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - check:
+      p1: {life: 3}
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p1: {life: 0}
+notes: >
+  Bolt resolves, p1 goes to 0 life, and before p0 would receive priority (117.3b) the SBA check finds p1 at 0 and p1
+  loses. A wrong engine leaves the game running with a player at 0 life, or checks life only at end of turn.
+  Life tally: p1 3 - 3 = 0.
+---
+id: sba-simultaneous-loss-is-a-draw
+title: Prismari Charm dealing 1 damage to each player at 1 life makes both lose at once, and the game is a draw
+area: core
+cards: [Prismari Charm, Volcanic Island, Island]
+tags: [state-based-actions, life-total, game-loss, draw, simultaneity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Prismari Charm, text: "Prismari Charm deals 1 damage to each of one or two targets.", verified: true}
+  - {kind: cr, ref: "704.3", text: "then performs all applicable state-based actions simultaneously as a single event", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: cr, ref: "104.4a", text: "If all the players remaining in a game lose simultaneously, the game is a draw.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    hand: ["Prismari Charm @ch"]
+    battlefield: ["Volcanic Island @v", "Island @i"]
+    library_pad: 10
+  p1:
+    life: 1
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ch", modes: [2], targets: [{player: p0}, {player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, result: draw}
+    p0: {life: 0}
+    p1: {life: 0}
+notes: >
+  Both players reach 0 during the same resolution; one SBA check finds both and performs both losses as one event, so
+  the game is a draw (104.4a). A wrong engine applies the losses one at a time (and declares the second player the
+  winner) or orders them by APNAP. The `result: draw` key is a schema request (see report).
+---
+id: sba-brainstorm-overdraw-loses-even-after-putting-back
+title: Brainstorm with one card in library loses the game even though two cards are put back before state-based actions are checked
+area: core
+cards: [Brainstorm, Island, Ponder]
+tags: [state-based-actions, draw-from-empty-library, game-loss, brainstorm]
+derived_from: cr
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+  - {kind: cr, ref: "121.4", text: "A player who attempts to draw a card from a library with no cards in it loses the game the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "704.4", text: "Unlike triggered abilities, state-based actions pay no attention to what happens during the resolution of a spell or ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Island @ih"]
+    battlefield: ["Island @i1"]
+    library: ["Ponder @pd"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@ih", "@pd"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@pd", "@ih"]}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0: {library_count: 2, hand_count: 0, graveyard: [Brainstorm]}
+notes: >
+  p0 draws Ponder, then attempts two draws from an empty library. The put-back finishes the resolution with two cards in
+  the library, but 704.5b looks at whether a draw from an empty library was attempted since the last check, not at the
+  library size now. p0 loses at the check before p0 would receive priority. A wrong engine checks "library empty" instead
+  of the attempted-draw flag, or makes Brainstorm stop drawing. Choosing two cards when the hand holds exactly two is a
+  single-option choice; scenario mode presents it (SCHEMA 3), so the step is in the script. p0 has no library_pad on
+  purpose.
+---
+id: sba-brainstorm-drawing-last-cards-does-not-lose
+title: Brainstorm with exactly three cards in library draws them all and the player does not lose
+area: core
+cards: [Brainstorm, Island, Ponder, Lightning Bolt, Preordain]
+tags: [state-based-actions, draw-from-empty-library, negative-case, brainstorm]
+derived_from: cr
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Island @ih"]
+    battlefield: ["Island @i1"]
+    library: ["Ponder @pd", "Lightning Bolt @bl", "Preordain @pr"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@ih", "@bl"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@bl", "@ih"]}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder, Preordain]
+      library_top: [Lightning Bolt, Island]
+      library_count: 2
+      graveyard: [Brainstorm]
+notes: >
+  Negative case for the previous scenario: emptying the library by drawing is not a loss; only an attempted draw from
+  an empty library is. A wrong engine that ends the game when the library reaches 0 fails here.

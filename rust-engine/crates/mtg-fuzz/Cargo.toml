@@ -1,0 +1,11 @@
+[package]
+name = "mtg-fuzz"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+mtg-core = { workspace = true, features = ["diff-harness"] }
+mtg-cards.workspace = true
+mtg-view = { workspace = true, features = ["diff-harness"] }
+mtg-debug.workspace = true
+mtg-dsl.workspace = true

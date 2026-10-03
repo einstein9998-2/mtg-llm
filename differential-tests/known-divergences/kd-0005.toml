@@ -1,0 +1,12 @@
+id = "kd-0005"
+title = "Harness: cast permissions from exile (warp, adventure) cannot be injected into Forge"
+status = "scope-cut"
+who_is_right = "both-acceptable"
+cr_citation = "CR 702.185 (warp), CR 715.4 (adventure): the permission to cast the exiled card is history, not a property Forge's GameState text can express"
+rulings = []
+affected_oracles = ["forge"]
+match = { sides = ["RUST_ONLY"], kinds = ["cast"], zones = ["Exile"], cards = ["Quantum Riddler", "Brazen Borrower"] }
+suppress = true
+regression_scenario = "interaction-tests/scenarios 21-uwx-and-dimir-cards (warp and adventure scenarios cover the engine side)"
+approved_by = ""
+notes = "Forge's GameState has an OnAdventure flag but no warp permission, and positions are rebuilt from text, so Forge never offers the exiled card. These actions are therefore unverified by the differential harness; the step differential never plays them (posgen excludes cast|Exile). Revisit condition: an injection route for cast-from-exile permissions (a Forge GameState extension, or a lockstep that replays the whole game in Forge)."

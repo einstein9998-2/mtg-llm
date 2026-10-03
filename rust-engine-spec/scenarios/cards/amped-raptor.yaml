@@ -1,0 +1,142 @@
+id: raptor-put-onto-battlefield-not-cast-only-energy
+title: Amped Raptor put onto the battlefield by Show and Tell gives two energy but exiles nothing
+area: card
+cards: [Amped Raptor, Show and Tell, Island, Swords to Plowshares]
+tags: [amped-raptor, energy, cast-from-hand-condition, show-and-tell, etb-trigger]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Amped Raptor, text: "When this creature enters, you get {E}{E} (two energy counters). Then if you cast it from your hand, exile cards from the top of your library until you exile a nonland card.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Show and Tell @snt", "Amped Raptor @raptor"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Swords to Plowshares @lib_stp"]
+    library_pad: 10
+  p1:
+    hand: []
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@raptor"}
+  - check:
+      stack: [{kind: triggered, source: "@raptor", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 2
+      exile: []
+      library_top: [Swords to Plowshares]
+      library_count: 11
+      graveyard: [Show and Tell]
+      battlefield_contains: [{card: Amped Raptor}]
+notes: >
+  p1 has an empty hand, so p1 has no eligible card and no decision is raised for p1 (SCHEMA addenda). The Raptor was put
+  onto the battlefield, not cast, so the "if you cast it from your hand" part does nothing: no card is exiled and the
+  library is unchanged (11). A wrong engine treats any entry as "cast" and exiles Swords.
+---
+id: raptor-exiled-card-too-expensive-no-cast-offered
+title: When Amped Raptor exiles a card whose mana value exceeds its controller's energy, no cast is offered and the card stays exiled
+area: card
+cards: [Amped Raptor, Mountain, Plateau, Show and Tell]
+tags: [amped-raptor, energy, mask-validity, unpayable-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Amped Raptor, text: "You may cast that card by paying an amount of {E} equal to its mana value rather than paying its mana cost.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can't pay a cost without having the necessary resources to pay it fully.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Amped Raptor @raptor"]
+    battlefield: ["Mountain @mtn", "Plateau @plat"]
+    library: ["Show and Tell @lib_snt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@raptor", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 2
+      exile: [Show and Tell]
+      hand: []
+      library_count: 10
+notes: >
+  Show and Tell has mana value 3 and p0 has only two energy after the trigger's first sentence, so the energy payment is
+  impossible (118.3) and no cast prompt appears: the may-cast is a `choose_cards, purpose: cast_from_exile` decision
+  (SCHEMA addenda Bilbo-style spelling) whose candidate set is empty, and decisions on which the rules give the player
+  no choice are not raised (SCHEMA addenda; same convention as Daze with no mana). The card stays in exile. A wrong engine offers the cast, lets energy go negative, or casts it for mana.
+---
+id: raptor-first-strike-kills-blocker-before-it-deals-damage
+title: Amped Raptor's first strike kills a blocking 2/2 in the first-strike step, so the Raptor takes no damage
+area: card
+cards: [Amped Raptor, Containment Priest]
+tags: [amped-raptor, first-strike, combat, combat-damage-steps, state-based-actions]
+derived_from: cr
+source:
+  - {kind: oracle, card: Amped Raptor, text: "First strike", verified: true}
+  - {kind: cr, ref: "702.7b", text: "If at least one attacking or blocking creature has first strike or double strike (see rule 702.4) as the combat damage step begins, the only creatures that assign combat damage in that step are those with first strike or double strike. After that step, instead of proceeding to the end of combat step, the phase gets a second combat damage step. The only creatures that assign combat damage in that step are the remaining attackers and blockers that had neither first strike nor double strike as the first combat damage step began", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Amped Raptor @raptor"]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@raptor", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@cp", attacker: "@raptor"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      pending: {actor: p0, kind: priority}
+      p1: {battlefield: [], graveyard: [Containment Priest]}
+      p0: {battlefield: [{card: Amped Raptor, damage: 0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      battlefield: [{card: Amped Raptor, damage: 0, tapped: true}]
+    p1:
+      life: 20
+      graveyard: [Containment Priest]
+notes: >
+  Only the Raptor deals damage in the first-strike damage step (2 to the 2/2 Priest, lethal); the state-based action
+  destroys the Priest before anyone gets priority. In the regular damage step the Priest is gone and the Raptor (which
+  already dealt damage) deals none, so p1 stays at 20 (the Raptor was blocked; no trample). A wrong engine deals all
+  damage simultaneously (Raptor dies) or lets the Raptor deal damage twice.

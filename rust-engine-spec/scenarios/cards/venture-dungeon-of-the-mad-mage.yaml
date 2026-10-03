@@ -1,0 +1,276 @@
+id: mad-mage-first-venture-yawning-portal-gain-one
+title: Choosing Dungeon of the Mad Mage on the first venture puts the marker on Yawning Portal and p0 gains 1 life
+area: card
+cards: [Acererak the Archlich, Aluren]
+tags: [venture, choose-dungeon, room-ability, topmost-room, life-gain, mad-mage]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.49a", text: "they choose a dungeon card they own from outside the game and put it into the command zone. They put their venture marker on the topmost room.", verified: true}
+  - {kind: cr, ref: "309.4a", text: "As a player puts a dungeon they own into the command zone, they put their venture marker on the topmost room.", verified: true}
+  - {kind: cr, ref: "309.4c", text: "The full text of each room ability is \"When you move your venture marker into this room, [effect.]\"", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Dungeon of the Mad Mage, Yawning Portal (topmost): You gain 1 life.", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    life: 15
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_dungeon, answer: Dungeon of the Mad Mage, expect_options: {count: 3, include: [Lost Mine of Phandelver, Dungeon of the Mad Mage, Tomb of Annihilation]}}
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "gain 1 life"}]
+      p0: {command: [{dungeon: Dungeon of the Mad Mage, room: Yawning Portal}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 16, hand: [Acererak the Archlich], command: [{dungeon: Dungeon of the Mad Mage, room: Yawning Portal}]}
+    p1: {life: 20}
+notes: >
+  The topmost room's ability triggers when the marker is put on it (putting the marker into the room is moving it there;
+  see REPORT for the reading). A wrong engine skips the first room's ability or starts on the second room.
+---
+id: mad-mage-yawning-portal-to-dungeon-level-scry-one
+title: Yawning Portal has one arrow, to Dungeon Level, whose ability is Scry 1
+area: card
+cards: [Acererak the Archlich, Aluren, Ponder, Brainstorm]
+tags: [venture, choose-room, room-ability, scry, mad-mage]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.49b", text: "they choose an adjacent room, following the direction of an arrow pointing away from their current room.", verified: true}
+  - {kind: cr, ref: "701.22a", text: "To \"scry N\" means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Dungeon of the Mad Mage: Yawning Portal leads to Dungeon Level; Dungeon Level: Scry 1.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Dungeon of the Mad Mage, room: Yawning Portal}]
+    library: ["Ponder @pd", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: scry, to_bottom: ["@pd"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      library_top: [Brainstorm]
+      library_bottom: [Ponder]
+      command: [{dungeon: Dungeon of the Mad Mage, room: Dungeon Level}]
+notes: >
+  One arrow, so no choose_room decision is raised (309.5a; reviewer decision W6, see REVIEW.md). Life stays 20 (Yawning Portal does not trigger again: the marker moved out of it, not into it).
+---
+id: mad-mage-runestone-caverns-play-exiled-cards
+title: From Lost Level the venture offers Runestone Caverns and Muiral's Graveyard; Runestone exiles the top two and p0 may play them (land drop and paid spell)
+area: card
+cards: [Acererak the Archlich, Aluren, Lightning Bolt, Island, Ponder, Volcanic Island]
+tags: [venture, choose-room, room-ability, exile, play-from-exile, land-drop, mad-mage]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: cr, ref: "305.2a", text: "compare the number of lands the player can play this turn with the number of lands they have already played this turn (including lands played as special actions and lands played during the resolution of spells and abilities).", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Dungeon of the Mad Mage: Lost Level leads to Runestone Caverns and Muiral's Graveyard; Runestone Caverns: Exile the top two cards of your library. You may play them.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu", "Volcanic Island @volc"]
+    command: [{dungeon: Dungeon of the Mad Mage, room: Lost Level}]
+    library: ["Lightning Bolt @bolt", "Island @isl", "Ponder @pd"]
+    library_pad: 10
+    lands_played: 0
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Runestone Caverns, expect_options: {exact: [Runestone Caverns, Muiral's Graveyard]}}
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {exile: [Lightning Bolt, Island], library_top: [Ponder], hand: [Acererak the Archlich]}
+  - p0: {t: play_land, card: "@isl"}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: []
+      graveyard: [Lightning Bolt]
+      lands_played: 1
+      battlefield:
+        - {card: Aluren}
+        - {card: Volcanic Island, tapped: true}
+        - {card: Island, tapped: false}
+    p1: {life: 17}
+notes: >
+  Playing the exiled Island uses the land drop (lands_played 1) and is legal because it is p0's main phase with an empty
+  stack. The exiled Bolt is cast by paying {R} (Volcanic Island). Only same-turn play is asserted: the pinned text states no
+  duration and the reach of the permission over later turns is listed in REPORT ambiguities.
+---
+id: mad-mage-muirals-graveyard-two-skeletons
+title: Muiral's Graveyard creates two 1/1 black Skeleton tokens
+area: card
+cards: [Acererak the Archlich, Aluren, Skeleton Token]
+tags: [venture, choose-room, room-ability, token, mad-mage]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "309.5a", text: "If there are multiple arrows pointing away from the room the player's venture marker is on, they choose one of them to follow.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Dungeon of the Mad Mage, Muiral's Graveyard: Create two 1/1 black Skeleton creature tokens.", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Dungeon of the Mad Mage, room: Lost Level}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Muiral's Graveyard, expect_options: {exact: [Runestone Caverns, Muiral's Graveyard]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Aluren}
+        - {token: Skeleton Token, pt: [1, 1]}
+        - {token: Skeleton Token, pt: [1, 1]}
+      command: [{dungeon: Dungeon of the Mad Mage, room: Muiral's Graveyard}]
+notes: >
+  Two tokens, not one.
+---
+id: mad-mage-deep-mines-scry-three-reorder
+title: Muiral's Graveyard leads only to Deep Mines, whose Scry 3 can reorder the cards kept on top
+area: card
+cards: [Acererak the Archlich, Aluren, Ponder, Brainstorm, Lightning Bolt]
+tags: [venture, choose-room, room-ability, scry, mad-mage]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.22a", text: "To \"scry N\" means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Dungeon of the Mad Mage: Muiral's Graveyard leads to Deep Mines; Deep Mines: Scry 3.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Dungeon of the Mad Mage, room: Muiral's Graveyard}]
+    library: ["Ponder @pd", "Brainstorm @bs", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: scry, to_bottom: ["@pd"], on_top_order: ["@bolt", "@bs"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_top: [Lightning Bolt, Brainstorm]
+      library_bottom: [Ponder]
+      command: [{dungeon: Dungeon of the Mad Mage, room: Deep Mines}]
+notes: >
+  Kept cards may be reordered (Bolt now above Brainstorm). Only one card goes to the bottom so no bottom order is implied.
+---
+id: mad-mage-mad-wizards-lair-free-cast-and-completion
+title: Mad Wizard's Lair draws three, lets p0 cast one of them free during resolution, and the dungeon is completed with that spell still on the stack
+area: card
+cards: [Acererak the Archlich, Aluren, Lightning Bolt, Island, Ponder]
+tags: [venture, room-ability, cast-during-resolution, alternative-cost, dungeon-completion, state-based-actions, mad-mage]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2g", text: "If an effect specifically instructs or allows a player to cast a spell during resolution, they do so by following the steps in rules 601.2a-i, except no player receives priority after it's cast. That spell becomes the topmost object on the stack, and the currently resolving spell or ability continues to resolve", verified: true}
+  - {kind: cr, ref: "704.5t", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game.", verified: true}
+  - {kind: cr, ref: "118.9", text: "Alternative costs are usually phrased, \"You may [action] rather than pay [this object's] mana cost,\" or \"You may cast [this object] without paying its mana cost.\"", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Dungeon of the Mad Mage: Deep Mines leads to Mad Wizard's Lair (bottom); Mad Wizard's Lair: Draw three cards and reveal them. You may cast one of them without paying its mana cost.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Dungeon of the Mad Mage, room: Deep Mines}]
+    library: ["Lightning Bolt @bolt", "Island @i1", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: cast_without_paying, answer: ["@bolt"], expect_options: {include: ["@bolt"], exclude: ["@i1", "@acer"]}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - label: bolt-on-stack
+    check:
+      stack: [{kind: spell, card: "@bolt", controller: p0, targets: [{player: p1}]}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        hand: [Acererak the Archlich, Island, Ponder]
+        command: []
+        completed_dungeons: [Dungeon of the Mad Mage]
+        battlefield: [{card: Aluren}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    p1: {life: 17}
+    p0: {graveyard: [Lightning Bolt], spells_cast_this_turn: 2, completed_dungeons: [Dungeon of the Mad Mage]}
+notes: >
+  The three drawn cards are revealed; the cast option covers only those three and not the Island (a land is not cast) or
+  Acererak (not one of them). Bolt is cast during the resolution, goes on the stack, and nobody gets priority until the Lair
+  ability finishes. Then the Lair ability has left the stack, so the state-based action completes the dungeon before p0
+  gets priority, with Bolt still on the stack. Bolt counts as a spell cast (2 this turn). Whether a drawn sorcery (Ponder)
+  could also be chosen is not asserted (REPORT ambiguities). Decision modelling (choose_cards with one card, empty answer =
+  decline) is a format assumption flagged in REPORT.

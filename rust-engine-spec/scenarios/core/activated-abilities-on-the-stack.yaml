@@ -1,0 +1,101 @@
+id: spell-counters-cannot-target-an-ability
+title: "Force of Will and Daze cannot target an activated ability: they counter only spells"
+area: core
+cards: [Wasteland, Volcanic Island, Force of Will, Daze, Brainstorm, Island]
+tags: [activated-ability, counterspell, targeting, mask-validity, illegal-action, force-of-will, daze]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "602.2a", text: "That ability is created on the stack as an object that's not a card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Daze @daze", "Brainstorm @bs"]
+    battlefield: ["Volcanic Island @volc", "Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@w", ability: 1, targets: ["@volc"]}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {exclude: [{t: cast, card: "@fow"}, {t: cast, card: "@daze"}]}}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: [{ability_of: "@w", nth: 0}]}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: [{ability_of: "@w", nth: 0}]}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: activated, source: "@w", controller: p0}
+    p1: {hand: [Force of Will, Daze, Brainstorm], life: 20}
+notes: >
+  The ability on the stack is not a spell. With no spell on the stack neither counterspell has a legal target, so neither is
+  offered in any form (hard-cast or alternative cost), and the failed probes change nothing (p1 keeps 20 life, the Brainstorm
+  stays in hand, the Island stays on the battlefield). Catches an engine that lets "target spell" match any stack object.
+---
+id: activating-an-ability-does-not-trigger-drc
+title: "Activating Mishra's Bauble is not casting a spell: Dragon's Rage Channeler does not trigger"
+area: core
+cards: [Dragon's Rage Channeler, Mishra's Bauble, Island]
+tags: [drc, activated-ability, negative-case, not-a-spell, triggers]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: cr, ref: "602.2a", text: "That ability is created on the stack as an object that's not a card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Dragon's Rage Channeler @drc", "Mishra's Bauble @bauble"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bauble", ability: 0, targets: [{player: p0}]}
+expect:
+  - at: after_script
+    stack:
+      - {kind: activated, source: "@bauble", controller: p0}
+    pending: {actor: p0, kind: priority}
+    p0: {spells_cast_this_turn: 0, graveyard: [Mishra's Bauble]}
+notes: >
+  Only the activated ability is on the stack; no triggered ability is created and no surveil decision is raised. The spell
+  count stays at 0. Catches an engine that treats activations as casts for cast triggers.
+---
+id: activating-an-ability-does-not-count-for-flurry
+title: "Cori-Steel Cutter's 'second spell' ignores activated abilities: Bauble activation then one Bolt is only the first spell"
+area: core
+cards: [Cori-Steel Cutter, Mishra's Bauble, Lightning Bolt, Mountain]
+tags: [cori-steel-cutter, flurry, activated-ability, spell-count, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Whenever you cast your second spell each turn", verified: true}
+  - {kind: cr, ref: "602.2a", text: "That ability is created on the stack as an object that's not a card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1"]
+    battlefield: ["Cori-Steel Cutter @cutter", "Mishra's Bauble @bauble", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bauble", ability: 0, targets: [{player: p0}]}
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+expect:
+  - at: after_script
+    stack:
+      - {kind: activated, source: "@bauble", controller: p0}
+      - {kind: spell, card: "@b1", controller: p0}
+    pending: {actor: p0, kind: priority}
+    p0: {spells_cast_this_turn: 1}
+notes: >
+  An activation is not a cast, so the Bolt is p0's first spell this turn and flurry does not trigger (no triggered ability
+  on the stack). Catches an engine that counts every stack object toward "second spell".

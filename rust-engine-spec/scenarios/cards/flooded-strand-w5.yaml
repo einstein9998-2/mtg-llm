@@ -1,0 +1,61 @@
+id: flooded-strand-tapped-cannot-activate
+title: A tapped Flooded Strand cannot be cracked
+area: card
+cards: [Flooded Strand]
+tags: [flooded-strand, fetchland, tap-cost, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Flooded Strand, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: Flooded Strand, as: strand, tapped: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@strand", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 20
+      battlefield: [{card: Flooded Strand, tapped: true}]
+      graveyard: []
+notes: The {T} cost cannot be paid; no life is paid and the land is not sacrificed.
+---
+id: flooded-strand-fail-to-find-allowed
+title: Flooded Strand may fail to find even when a legal land is in the library
+area: card
+cards: [Flooded Strand, Island]
+tags: [flooded-strand, fetchland, search, fail-to-find]
+derived_from: cr
+source:
+  - {kind: oracle, card: Flooded Strand, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality ... that player isn't required to find some or all of those cards even if they're present in that zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Flooded Strand @strand"]
+    library: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@strand", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: null}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 19
+      battlefield: []
+      graveyard: [Flooded Strand]
+      library_count: 11
+notes: Failing to find is a legal answer; life was paid and the land sacrificed regardless.

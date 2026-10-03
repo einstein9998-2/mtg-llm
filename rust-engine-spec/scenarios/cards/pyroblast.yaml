@@ -1,0 +1,132 @@
+id: pyroblast-counters-daze-so-the-original-spell-resolves
+title: Pyroblast counters a Daze on the stack, so the spell Daze targeted resolves without any payment prompt
+area: card
+cards: [Pyroblast, Daze, Lightning Bolt, Mountain, Island]
+tags: [pyroblast, daze, counterspell, stack-order, alternative-cost, response]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyroblast, text: "Counter target spell if it's blue.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text, or applied to it from another effect, that its controller may pay rather than paying the spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Pyroblast @pyro"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@isl"}, targets: ["@bolt"]}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}, {kind: spell, card: "@daze", targets: ["@bolt"]}]
+      p1: {hand: [Island], battlefield: []}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@pyro", modes: [1], targets: ["@daze"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Daze]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Pyroblast, Lightning Bolt]}
+    p1: {life: 17, hand: [Island], graveyard: [Daze]}
+notes: >
+  Daze (blue, cast by returning the Island) is on top of Bolt. p0 responds with Pyroblast on Daze; Pyroblast resolves first and counters Daze, so Daze never
+  resolves and p0 is never asked to pay {1}. The Island stays in p1's hand (cost already paid). Bolt then resolves: p1 20 to 17. A wrong engine asks for the payment,
+  or cannot target a spell that was cast with an alternative cost.
+---
+id: pyroblast-targeting-a-non-blue-spell-does-nothing
+title: Pyroblast aimed at Lightning Bolt (a red spell) does not counter it
+area: card
+cards: [Pyroblast, Lightning Bolt, Mountain]
+tags: [pyroblast, colour-check, negative-case, resolution-time-condition, lightning-bolt]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyroblast, text: "Counter target spell if it's blue.", verified: true}
+  - {kind: cr, ref: "115.1a", text: "An instant or sorcery spell is targeted if its spell ability identifies something it will affect by using the phrase “target [something],” where the “something” is a phrase that describes an object and/or player.", verified: true, note: "the targeting phrase is 'target spell'; 'if it's blue' is not part of it, so any spell is a legal target"}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true, note: "the 'if it's blue' condition is part of the instruction, checked as Pyroblast resolves"}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  priority: p1
+  p0:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@pyro", modes: [1], targets: ["@bolt"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {life: 17, graveyard: [Pyroblast]}
+    p1: {graveyard: [Lightning Bolt]}
+notes: >
+  Lightning Bolt is red only, so "if it's blue" fails: Pyroblast resolves with no effect (it goes to the graveyard) and Bolt resolves afterwards, dealing 3 to p0.
+  After the Pyroblast resolves the active player is p1. A wrong engine counters any spell, or rejects the target. Support is Oracle text plus CR 115.1a
+  (the target description is only "spell") and 608.2c (the colour condition is an instruction followed on resolution); the earlier recalled ruling was
+  replaced at review.
+---
+id: pyroblast-counters-a-multicolor-spell-that-is-partly-blue
+title: Pyroblast counters Prismari Charm, which is both blue and red
+area: card
+cards: [Pyroblast, Prismari Charm, Island, Mountain]
+tags: [pyroblast, counterspell, multicolor, colour-check, prismari-charm]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyroblast, text: "Counter target spell if it's blue.", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Mountain @m2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [1], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@pyro", modes: [1], targets: ["@charm"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm], hand: [], library_count: 10}
+    p1: {graveyard: [Pyroblast]}
+notes: >
+  Prismari Charm costs {U}{R}, so it is blue and red; "if it's blue" is true and it is countered with no surveil or draw (library stays 10, no decision raised).
+  A wrong engine checks only the first colour.

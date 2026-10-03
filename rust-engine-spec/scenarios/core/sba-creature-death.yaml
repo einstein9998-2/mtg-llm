@@ -1,0 +1,126 @@
+id: sba-damage-accumulates-within-a-turn
+title: Damage from Pyroclasm and then Prismari Charm adds up on Murktide Regent and destroys it once the total reaches its toughness
+area: core
+cards: [Pyroclasm, Prismari Charm, Murktide Regent, Mountain, Volcanic Island, Island]
+tags: [state-based-actions, lethal-damage, damage-marking]
+derived_from: cr
+source:
+  - {kind: cr, ref: "120.6", text: "Damage marked on a creature remains until the cleanup step, even if that permanent stops being a creature. If the total damage marked on a creature is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed as a state-based action", verified: true}
+  - {kind: oracle, card: Pyroclasm, text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "Prismari Charm deals 1 damage to each of one or two targets.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroclasm @pc", "Prismari Charm @ch"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Volcanic Island @v", "Island @i"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pc", pay: {tap: ["@m1", "@m2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p1: {battlefield: [{card: Murktide Regent, pt: [3, 3], damage: 2}]}
+  - p0: {t: cast, card: "@ch", modes: [2], targets: ["@murk"], pay: {tap: ["@v", "@i"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {battlefield: [], graveyard: [Murktide Regent]}
+    p0: {graveyard: [Pyroclasm, Prismari Charm]}
+notes: >
+  2 damage on a 3/3 is not lethal; the later 1 damage brings the total to 3. A wrong engine compares only the latest
+  damage event with toughness, or clears damage between spells. Payment is explicit so Pyroclasm does not use the
+  Volcanic Island needed for the Charm's {U}{R}.
+---
+id: sba-damage-wears-off-in-cleanup
+title: Damage marked on a creature that survived is removed in the cleanup step and is gone on the next turn
+area: core
+cards: [Pyroclasm, Murktide Regent, Mountain]
+tags: [state-based-actions, damage-marking, cleanup]
+derived_from: cr
+source:
+  - {kind: cr, ref: "120.6", text: "All damage marked on a permanent is removed when it regenerates (see rule 701.19, \"Regenerate\") and during the cleanup step (see rule 514.2).", verified: true}
+  - {kind: cr, ref: "514.2", text: "Second, the following actions happen simultaneously: all damage marked on permanents (including phased-out permanents) is removed and all \"until end of turn\" and \"this turn\" effects end.", verified: true}
+  - {kind: oracle, card: Pyroclasm, text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroclasm @pc"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pc", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p1: {battlefield: [{card: Murktide Regent, damage: 2, pt: [3, 3]}]}
+  - advance: {to: upkeep, of: p1}
+expect:
+  - at: after_script
+    turn: 5
+    active: p1
+    p1: {battlefield: [{card: Murktide Regent, damage: 0, pt: [3, 3]}]}
+notes: >
+  p0 controls no creatures, so no declare-attackers decision should arise during the advance (if the engine raises an
+  empty declare-attackers decision anyway, see the report). A wrong engine keeps damage across turns, which would make
+  later small burn lethal.
+---
+id: sba-deathtouch-atropal-destroys-larger-blocker-and-token-ceases-to-exist
+title: The Atropal's 4 deathtouch damage destroys a 6/6 Murktide blocker, and the Atropal token dies and then ceases to exist
+area: core
+cards: [The Atropal, Murktide Regent]
+tags: [state-based-actions, deathtouch, combat, tokens, repeated-sba-check]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5h", text: "If a creature has toughness greater than 0, and it's been dealt damage by a source with deathtouch since the last time state-based actions were checked, that creature is destroyed.", verified: true}
+  - {kind: cr, ref: "702.2b", text: "A creature with toughness greater than 0 that's been dealt damage by a source with deathtouch since the last time state-based actions were checked is destroyed as a state-based action.", verified: true}
+  - {kind: cr, ref: "704.5d", text: "If a token is in a zone other than the battlefield, it ceases to exist.", verified: true}
+  - {kind: cr, ref: "510.2", text: "Second, all combat damage that's been assigned is dealt simultaneously.", verified: true}
+  - {kind: cr, ref: "704.3", text: "If any state-based actions are performed as a result of a check, the check is repeated", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: begin_combat
+  priority: p0
+  p0:
+    battlefield: [{token: The Atropal, as: atr}]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Murktide Regent, as: murk, counters: {"+1/+1": 3}}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@atr", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@murk", attacker: "@atr"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {battlefield: [], graveyard: [], life: 20}
+    p1: {battlefield: [], graveyard: [Murktide Regent], life: 20}
+notes: >
+  The Atropal (4/4 deathtouch token) is blocked by Murktide (3/3 with three +1/+1 counters = 6/6, flying, which may block
+  a non-flyer). Damage is dealt simultaneously: 4 to Murktide, 6 to the Atropal. The SBA check destroys Murktide by
+  704.5h (4 < 6, so only deathtouch kills it) and the Atropal by 704.5g. The repeated check then removes the token from
+  the graveyard (704.5d). A wrong engine ignores deathtouch for non-lethal amounts, or leaves a token card in the
+  graveyard. Combat damage assignment is trivial (one blocker, no trample); doc 02 raises AssignCombatDamage only when
+  non-trivial, so the script has no assignment step. There is no first-strike damage step. The Atropal is from the
+  oracle token list ("Legendary Token Creature, 4/4, Deathtouch").

@@ -1,0 +1,149 @@
+# UR Cutter vs Alurentell. Part B: Aluren, Acererak and dungeons, Atraxa, Omniscience.
+
+=== aluren-free-cast-any-time-p1
+title: Aluren: its controller casts Acererak (MV 3) for free at instant speed during the opponent's turn
+ref: Aluren Oracle (free and as though it had flash)
+state:
+  activeplayer=p2
+  activephase=UPKEEP
+  humanhand=Acererak the Archlich
+  humanbattlefield=Aluren
+script:
+  p1: at p2:UPKEEP
+  p1: cast Acererak the Archlich ~free
+  p1: pick Lost Mine of Phandelver
+expect:
+  zone p1 hand has "Acererak the Archlich"
+  spells p1 == 1
+
+=== aluren-opponent-may-cast-free
+title: Aluren: the OPPONENT (no lands) casts Dragon's Rage Channeler for free at instant speed
+ref: Aluren Oracle ("Any player may cast")
+xfail: FORGE BUG. Aluren's static sets MayPlayPlayer$ Player and StaticAbilityContinuous takes getDefinedPlayers(...).get(0), so only the first player in the game's player list gets the free-cast permission. The second seat can never use Aluren (checked with p2 as Aluren's controller and as its opponent).
+state:
+  humanbattlefield=Aluren
+  aihand=Dragon's Rage Channeler
+script:
+  p1: pass
+  p2: cast Dragon's Rage Channeler ~free
+expect:
+  zone p2 battlefield has "Dragon's Rage Channeler"
+
+=== aluren-seat-order-second-seat-controller
+title: Aluren with the seats swapped (p1 is second in Forge's player list): its controller p1 casts Dragon's Rage Channeler for free
+ref: Aluren Oracle. Same cause as aluren-opponent-may-cast-free: the permission goes to whoever is first in the player list.
+swap-seats: yes
+xfail: FORGE BUG (see aluren-opponent-may-cast-free). The Aluren controller cannot use Aluren when seated second.
+state:
+  humanbattlefield=Aluren
+  humanhand=Dragon's Rage Channeler
+script:
+  p1: cast Dragon's Rage Channeler ~free
+expect:
+  zone p1 battlefield has "Dragon's Rage Channeler"
+
+=== aluren-seat-order-first-seat-opponent
+title: Aluren with the seats swapped: the OPPONENT p2 (first in Forge's player list) can cast for free
+ref: Aluren Oracle
+swap-seats: yes
+state:
+  humanbattlefield=Aluren
+  aihand=Dragon's Rage Channeler
+script:
+  p1: pass
+  p2: cast Dragon's Rage Channeler ~free
+expect:
+  zone p2 battlefield has "Dragon's Rage Channeler"
+
+=== aluren-mv-limit-four
+title: Aluren does not let a player cast a creature with mana value above 3 for free (Murktide Regent MV 7, Atraxa MV 7)
+ref: Aluren Oracle
+state:
+  humanhand=Atraxa, Grand Unifier
+  humanbattlefield=Aluren
+  aihand=Murktide Regent
+script:
+  p1: try cast Atraxa, Grand Unifier ~free
+  p2: try cast Murktide Regent ~free
+expect:
+  zone p1 hand has "Atraxa, Grand Unifier"
+  zone p2 hand has "Murktide Regent"
+  zone p1 battlefield lacks "Atraxa, Grand Unifier"
+
+=== aluren-noncreature-not-free
+title: Aluren does not make noncreature spells free (Brainstorm cast with no mana fails)
+ref: Aluren Oracle ("creature spells")
+state:
+  humanhand=Brainstorm
+  humanbattlefield=Aluren
+script:
+  p1: try cast Brainstorm
+  p1: try cast Brainstorm ~free
+expect:
+  zone p1 hand has "Brainstorm"
+
+=== aluren-creature-card-in-graveyard
+title: Aluren gives no permission to cast creature cards from the graveyard (Dragon's Rage Channeler in graveyard)
+ref: Aluren Oracle; CR 601.2a (cards are cast from hand unless a rule or effect says otherwise)
+state:
+  humanbattlefield=Aluren
+  humangraveyard=Dragon's Rage Channeler
+script:
+  p1: try cast Dragon's Rage Channeler ~free
+expect:
+  zone p1 graveyard has "Dragon's Rage Channeler"
+  zone p1 battlefield lacks "Dragon's Rage Channeler"
+
+=== aluren-creature-card-in-exile
+title: Aluren gives no permission to cast creature cards from exile
+ref: Aluren Oracle
+state:
+  humanbattlefield=Aluren
+  humanexile=Dragon's Rage Channeler
+script:
+  p1: try cast Dragon's Rage Channeler ~free
+expect:
+  zone p1 exile has "Dragon's Rage Channeler"
+
+=== aluren-creature-card-top-of-library
+title: Aluren gives no permission to cast the creature card on top of the library
+ref: Aluren Oracle
+state:
+  humanbattlefield=Aluren
+  humanlibrary=Dragon's Rage Channeler;Island;Island
+script:
+  p1: try cast Dragon's Rage Channeler ~free
+expect:
+  zone p1 library has "Dragon's Rage Channeler"
+
+=== aluren-opponent-hand-not-castable
+title: Aluren: a player cannot cast creature cards from the OPPONENT's hand
+ref: CR 601.2a
+state:
+  humanbattlefield=Aluren
+  aihand=Dragon's Rage Channeler
+script:
+  p1: try cast Dragon's Rage Channeler@p2 ~free
+expect:
+  zone p2 hand has "Dragon's Rage Channeler"
+
+=== acererak-loop-lost-mine
+title: Acererak with Aluren: each free cast returns it to hand and ventures; Lost Mine rooms Cave Entrance -> Goblin Lair -> Dark Pool
+ref: Acererak the Archlich Oracle; CR 701.49 (venture), Lost Mine of Phandelver room text
+state:
+  humanhand=Acererak the Archlich
+  humanbattlefield=Aluren
+script:
+  p1: cast Acererak the Archlich ~free
+  p1: pick Lost Mine of Phandelver
+  p1: cast Acererak the Archlich ~free
+  p1: pick Goblin Lair
+  p1: cast Acererak the Archlich ~free
+  p1: pick Dark Pool
+expect:
+  zone p1 hand has "Acererak the Archlich"
+  zone p1 battlefield lacks "Acererak the Archlich"
+  life p2 == 19
+  life p1 == 21
+  spells p1 == 3
+  zone p1 command has "Lost Mine of Phandelver"

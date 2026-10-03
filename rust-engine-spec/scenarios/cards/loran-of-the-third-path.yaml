@@ -1,0 +1,81 @@
+id: loran-etb-destroys-artifact-or-enchantment
+title: Loran of the Third Path's ETB destroys up to one target artifact or enchantment, not a creature or land
+area: card
+cards: [Loran of the Third Path, "Grafdigger's Cage", Deafening Silence, Flickerwisp, Wasteland, Plains]
+tags: [loran, etb-trigger, destroy, targeting, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Loran of the Third Path, text: "When Loran enters, destroy up to one target artifact or enchantment.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Loran of the Third Path @lor"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Grafdigger's Cage @cage", "Deafening Silence @ds", "Flickerwisp @wisp", "Wasteland @wl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lor", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@cage", expect_options: {include: ["@cage", "@ds"], exclude: ["@wisp", "@wl", "@lor", "@w1"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      graveyard: ["Grafdigger's Cage"]
+      battlefield: [{card: Deafening Silence}, {card: Flickerwisp}, {card: Wasteland}]
+notes: >
+  Only artifacts and enchantments are legal (Cage, Silence). Loran is a creature spell, so the opponent's Deafening
+  Silence does not matter here.
+---
+id: loran-summoning-sick-cannot-use-tap-ability
+title: Loran of the Third Path cannot use its tap ability the turn it enters
+area: card
+cards: [Loran of the Third Path, Plains]
+tags: [loran, summoning-sickness, activated-ability, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Loran of the Third Path, text: "{T}: You and target opponent each draw a card.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Loran of the Third Path @lor"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lor", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@lor", controller: p0, targets: []}]
+  - resolve_top: true
+  - expect_illegal: {p0: {t: activate, source: "@lor", ability: 0, targets: [{player: p1}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand_count: 0
+      library_count: 10
+      battlefield:
+        - {card: Loran of the Third Path, tapped: false, sick: true, keywords: [vigilance]}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+    p1:
+      hand_count: 0
+notes: >
+  With no artifact or enchantment anywhere, the "up to one" ETB has no legal target and goes on the stack with none
+  (no decision). Vigilance does not let a summoning-sick creature use {T} abilities. Positive pair:
+  a sibling scenario.

@@ -1,0 +1,70 @@
+id: triumph-exiled-no-trigger
+title: Triumph of Saint Katherine exiled by Swords to Plowshares does not trigger; its controller gains 5
+area: card
+cards: [Triumph of Saint Katherine, Swords to Plowshares, Plains]
+tags: [triumph-of-saint-katherine, exile, no-trigger, negative, swords-to-plowshares]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Triumph of Saint Katherine, text: "When this creature is put into your graveyard from the battlefield", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Triumph of Saint Katherine @tri"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @ppl"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@tri"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 25
+      exile: [Triumph of Saint Katherine]
+      graveyard: []
+      library_count: 10
+    p1: {life: 20, graveyard: [Swords to Plowshares]}
+notes: >
+  Triumph never reaches a graveyard, so Praesidium Protectiva does not trigger (stack empty after Swords). p0 gains 5
+  (Triumph's power). Pair of the previous scenario.
+---
+id: triumph-lifelink-combat
+title: Triumph of Saint Katherine's lifelink gains its controller 5 when it deals combat damage
+area: card
+cards: [Triumph of Saint Katherine, Island]
+tags: [triumph-of-saint-katherine, lifelink, combat-damage]
+derived_from: cr
+source:
+  - {kind: oracle, card: Triumph of Saint Katherine, text: "Lifelink", verified: true}
+  - {kind: cr, ref: "702.15b", text: "Damage dealt by a source with lifelink causes that source’s controller, or its owner if it has no controller, to gain that much life", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: begin_combat
+  p0:
+    life: 4
+    battlefield: ["Triumph of Saint Katherine @tri"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@tri", target: {player: p1}}]}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    phase: main2
+    p0: {life: 9}
+    p1: {life: 15}
+notes: "Unblocked 5/5 lifelink: p1 20 -> 15, p0 4 -> 9."

@@ -1,0 +1,83 @@
+id: sba-after-resolution-drc-dies-when-no-new-type
+title: Pyroclasm kills a 1/1 Dragon's Rage Channeler when the graveyard already holds a sorcery and the fourth type never appears
+area: core
+cards: [Dragon's Rage Channeler, Pyroclasm, Mountain, Lightning Bolt, Island, Ponder]
+tags: [state-based-actions, delirium, lethal-damage, negative-case]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: cr, ref: "205.2a", text: "The card types are artifact, battle, conspiracy, creature, dungeon, enchantment, instant, kindred, land, phenomenon, plane, planeswalker, scheme, sorcery, and vanguard.", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: oracle, card: Pyroclasm, text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroclasm @pc"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Mountain @m1", "Mountain @m2"]
+    graveyard: ["Lightning Bolt", "Island", "Ponder"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pc", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@top"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+      graveyard: [Lightning Bolt, Island, Ponder, Pyroclasm, "Dragon's Rage Channeler"]
+notes: >
+  Negative case for the previous scenario. The graveyard has instant, land and sorcery; Pyroclasm is a second sorcery,
+  so the count stays at 3 and DRC is a 1/1 with 2 damage at the SBA check: destroyed. A wrong engine that counts cards
+  instead of distinct card types would make DRC 3/3 and let it survive.
+---
+id: sba-two-creatures-die-simultaneously-no-sequential-delirium
+title: Pyroclasm kills Dragon's Rage Channeler and Containment Priest in one state-based action event, so the Priest card cannot give DRC delirium in time
+area: core
+cards: [Dragon's Rage Channeler, Containment Priest, Pyroclasm, Mountain, Lightning Bolt, Island, Ponder]
+tags: [state-based-actions, simultaneity, delirium, lethal-damage]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.3", text: "the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: oracle, card: Pyroclasm, text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroclasm @pc"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Containment Priest @cp", "Mountain @m1", "Mountain @m2"]
+    graveyard: ["Lightning Bolt", "Island", "Ponder"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pc", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@top"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+      graveyard: [Lightning Bolt, Island, Ponder, Pyroclasm, "Dragon's Rage Channeler", Containment Priest]
+notes: >
+  At the first SBA check DRC is 1/1 with 2 damage (types: instant, land, sorcery) and Containment Priest is 2/2 with 2
+  damage. Both are destroyed in the same event. If an engine performed SBAs one creature at a time and moved the Priest
+  first, the creature card would give DRC delirium (3/3) and it would wrongly survive. Pyroclasm adds no new type.

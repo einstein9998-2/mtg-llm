@@ -1,0 +1,139 @@
+id: hi-surveil-to-graveyard-card-becomes-public
+title: A card surveilled into the graveyard becomes public and leaves no known top card
+area: hidden-info
+cards: [Thundering Falls, Murktide Regent, Lightning Bolt, Aluren, Tropical Island]
+tags: [hidden-info, surveil, graveyard, public-zone, enters-tapped]
+derived_from: cr
+source:
+  - {kind: oracle, card: Thundering Falls, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Thundering Falls, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "404.2", text: "Each graveyard is kept in a single face-up pile. A player can examine the cards in any graveyard at any time", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thundering Falls @tf", "Lightning Bolt @bolt"]
+    library: ["Murktide Regent @x"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@tf"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@x"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield: [{card: Thundering Falls, tapped: true}]
+      graveyard: [Murktide Regent]
+      library_count: 10
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: []}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 1, library_count: 10}
+      option_labels_exclude_names: [Lightning Bolt]
+notes: >
+  Murktide Regent goes to p0's graveyard, a public zone, so p1 sees it there (asserted on the true state, which is public).
+  p0 knows nothing about the new top card. Lightning Bolt, still in p0's hand, must stay invisible to p1.
+---
+id: hi-surveil-opponent-stream-independent-of-kept-card
+title: The opponent's stream is identical whatever card is surveilled and kept on top
+area: hidden-info
+cards: [Hedge Maze, Aluren, Show and Tell, "Atraxa, Grand Unifier", Lightning Bolt, Volcanic Island]
+tags: [hidden-info, surveil, non-interference, paired-world]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.20e", text: "Looking at a card follows the same rules as revealing a card, except that the card is shown only to the specified player.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: [Lightning Bolt]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    lands_played: 0
+    hand: ["Hedge Maze @hm", "Aluren @alu"]
+    library: ["Show and Tell @x"]
+    library_pad: 10
+world_b:
+  p1: {library: ["Atraxa, Grand Unifier @x"]}
+assert_streams_identical: {observer: p0}
+script:
+  - p1: {t: play_land, card: "@hm"}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: surveil, to_graveyard: [], on_top_order: ["@x"]}
+expect:
+  - at: after_script
+    stack: []
+    p1: {library_count: 11, graveyard: []}
+notes: >
+  Only the identity of the kept card differs between the worlds; p0's stream must be byte-identical.
+---
+id: hi-drc-surveil-trigger-owner-knows-top
+title: Dragon's Rage Channeler's surveil trigger gives its controller, and only its controller, knowledge of the top card
+area: hidden-info
+cards: [Dragon's Rage Channeler, Lightning Bolt, Murktide Regent, Volcanic Island, Aluren, Tropical Island]
+tags: [hidden-info, surveil, cast-trigger, library-knowledge, stack-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Volcanic Island @v"]
+    library: ["Murktide Regent @x"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: triggered, source: "@drc", controller: p0}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@x"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p1: {life: 17}
+    p0: {graveyard: [Lightning Bolt], library_top: [Murktide Regent], library_count: 11}
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: [Murktide Regent]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {library_count: 11}
+      option_labels_exclude_names: [Murktide Regent]
+      events_text_exclude: [Murktide Regent]
+notes: >
+  The trigger goes on the stack above Bolt and resolves first; p0 keeps Murktide on top. Then the active player p0 gets
+  priority with Bolt still on the stack, both pass, Bolt resolves (p1 20 -> 17). p0's graveyard holds only an instant, so
+  Delirium is off and irrelevant here.

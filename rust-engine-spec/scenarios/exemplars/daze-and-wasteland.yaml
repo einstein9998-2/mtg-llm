@@ -1,0 +1,92 @@
+id: daze-return-island-caster-pays
+title: Daze cast by returning an Island counters Brainstorm unless its controller pays {1}; paying lets Brainstorm resolve
+area: card
+cards: [Daze, Brainstorm, Island, Ponder, Lightning Bolt]
+tags: [daze, alternative-cost, counter-unless-pay, priority, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text ... that its controller may pay rather than paying the spell's mana cost.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library: ["Ponder @pond", "Lightning Bolt @bolt", "Island @isl_top"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}                                   # p0 got priority back after casting (117.3c) and passes
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bs"]}
+  - p1: {t: pass}                                   # p1 got priority back after casting Daze
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: true, expect_options: {include: [true, false]}}
+  - p0: {t: pass}                                   # active player receives priority after Daze resolves (117.3b)
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@pond", "@isl_top"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@pond", "@isl_top"]}     # top first
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Brainstorm]
+      library_top: [Ponder, Island]
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: []
+notes: >
+  One Island pays for Brainstorm and the other pays Daze's {1}, so both end tapped. The decision to pay is offered
+  because paying is possible. p1's hand holds the returned Island (Daze's alternative cost), not a copy of the card.
+  A wrong engine could skip the pay prompt, auto-pay, let p1 keep the Island, or leave Daze on the battlefield zone.
+---
+id: daze-unable-to-pay-no-prompt
+title: Daze with an unpayable {1} counters the spell without offering a pay option
+area: card
+cards: [Daze, Brainstorm, Island]
+tags: [daze, counter-unless-pay, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bs"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand_count: 0, graveyard: [Brainstorm], battlefield: [{card: Island, tapped: true}]}
+    p1: {hand: [Island], graveyard: [Daze]}
+notes: >
+  The only Island p0 controls is tapped, so p0 cannot pay {1}. The pay prompt must not appear (design doc 01 section 6.6:
+  the option is offered only if payment is possible). If the engine offers a yes, applying it must be impossible, which
+  is the bug this scenario catches.

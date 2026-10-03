@@ -1,0 +1,88 @@
+id: meltdown-x-one-spares-mana-value-two-and-x-is-limited-by-mana
+title: "Meltdown with X=1 still spares mana value 2 artifacts; X=2 is not castable with only two lands"
+area: core
+cards: [Meltdown, Mountain, Lotus Petal, Cori-Steel Cutter, Mishra's Bauble, Disruptor Flute, Null Rod]
+tags: [x-spell, meltdown, mana-value, mask-validity, x-announced-on-cast]
+derived_from: cr
+source:
+  - {kind: oracle, card: Meltdown, text: "Destroy each artifact with mana value X or less.", verified: true}
+  - {kind: cr, ref: "107.3a", text: "the controller of that spell or ability chooses and announces the value of X as part of casting the spell or activating the ability.", verified: true}
+  - {kind: cr, ref: "601.2b", text: "If the spell has a variable cost that will be paid as it’s being cast (such as an {X} in its mana cost; see rule 107.3), the player announces the value of that variable.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Meltdown @melt"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Cori-Steel Cutter @cutter"]
+    library_pad: 10
+  p1:
+    battlefield: ["Lotus Petal @petal", "Mishra's Bauble @bauble", {card: Disruptor Flute, as: flute, flags: {chosen_name: Null Rod}}, "Null Rod @rod"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@melt", x: 2, pay: auto}}
+  - p0: {t: cast, card: "@melt", x: 1, pay: {tap: ["@m1", "@m2"]}}
+  - check:
+      stack: [{kind: spell, card: "@melt", controller: p0, x: 1}]
+      p0: {battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Cori-Steel Cutter}]}
+      p1: {battlefield: [{card: Lotus Petal}, {card: Mishra's Bauble}, {card: Disruptor Flute}, {card: Null Rod}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Cori-Steel Cutter}]
+      graveyard: [Meltdown]
+    p1:
+      battlefield: [{card: Disruptor Flute}, {card: Null Rod}]
+      graveyard: [Lotus Petal, Mishra's Bauble]
+notes: >
+  With two Mountains the largest payable X is 1 ({1}{R}), so X=2 (cost {2}{R}) is not offered. With X=1 the artifacts of
+  mana value 0 (Petal, Bauble) are destroyed and the mana value 2 artifacts (Cori-Steel Cutter, Disruptor Flute, Null Rod)
+  survive. A wrong engine could destroy mana value 2 artifacts with X=1 (using the cost paid, 2, instead of X) or let X
+  exceed the available mana.
+---
+id: meltdown-x-two-destroys-mana-value-two-artifacts-and-unattaches
+title: "Meltdown with X=2 destroys every artifact in the pool, including an attached Equipment; the equipped creature survives"
+area: core
+cards: [Meltdown, Mountain, Lotus Petal, Cori-Steel Cutter, Mishra's Bauble, Disruptor Flute, Null Rod, Containment Priest]
+tags: [x-spell, meltdown, mana-value, equipment, mass-destroy]
+derived_from: cr
+source:
+  - {kind: oracle, card: Meltdown, text: "Destroy each artifact with mana value X or less.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Meltdown @melt"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Lotus Petal @petal", "Containment Priest @priest", {card: Cori-Steel Cutter, as: cutter, attached_to: "@priest"}]
+    library_pad: 10
+  p1:
+    battlefield: ["Mishra's Bauble @bauble", {card: Disruptor Flute, as: flute, flags: {chosen_name: Null Rod}}, "Null Rod @rod"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@melt", x: 2, pay: {tap: ["@m1", "@m2", "@m3"]}}
+  - check:
+      stack: [{kind: spell, card: "@melt", controller: p0, x: 2}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Containment Priest}]
+      graveyard: [Meltdown, Lotus Petal, Cori-Steel Cutter]
+    p1:
+      battlefield: []
+      graveyard: [Mishra's Bauble, Disruptor Flute, Null Rod]
+notes: >
+  X=2 costs {2}{R}, all three Mountains. Every artifact has mana value 2 or less, so all are destroyed, on both sides. The
+  Equipment goes to the graveyard and the Containment Priest it was attached to stays on the battlefield. A wrong engine could skip artifacts of the opponent, skip attached Equipment, or destroy the
+  equipped creature.

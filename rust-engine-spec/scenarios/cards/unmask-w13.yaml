@@ -1,0 +1,75 @@
+id: unmask-exile-black-card-alt-cost
+title: Unmask cast by exiling a black card from hand makes the opponent discard the nonland card its caster chooses
+area: card
+cards: [Unmask, Dark Ritual, Force of Will, Lightning Bolt, Island]
+tags: [unmask, alternative-cost, exile-from-hand, discard, hand-reveal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Unmask, text: "You may exile a black card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Unmask, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Unmask @um", "Dark Ritual @dr"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Lightning Bolt @lb", "Island @isl"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@um", alt_cost: {exile_black_card: "@dr"}}], exclude: [{t: cast, card: "@um", alt_cost: null}]}}
+  - p0: {t: cast, card: "@um", alt_cost: {exile_black_card: "@dr"}, targets: [{player: p1}]}
+  - check:
+      p0: {exile: [Dark Ritual], hand: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@fow"], expect_options: {include: ["@fow", "@lb"], exclude: ["@isl"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      exile: [Dark Ritual]
+      graveyard: [Unmask]
+    p1:
+      hand: [Lightning Bolt, Island]
+      graveyard: [Force of Will]
+notes: >
+  No lands, so only the alternative cost is offered. Dark Ritual (black) is exiled as the cost. The caster p0 chooses
+  the card; the Island is not a legal choice. Unlike Force of Will, the cost involves no life.
+---
+id: unmask-alt-cost-needs-another-black-card-w13
+title: Unmask cannot exile itself or a nonblack card, so with no other black card and no mana it is not offered
+area: card
+cards: [Unmask, Lightning Bolt, Island]
+tags: [unmask, alternative-cost, legal-action-mask, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: Unmask, text: "You may exile a black card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Unmask @um", "Lightning Bolt @lb"]
+    library_pad: 10
+  p1:
+    hand: ["Island @isl"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@um", alt_cost: {exile_black_card: "@um"}, targets: [{player: p1}]}}
+  - expect_illegal: {p0: {t: cast, card: "@um", alt_cost: {exile_black_card: "@lb"}, targets: [{player: p1}]}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@um"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Unmask, Lightning Bolt], exile: []}
+notes: >
+  Unmask is already on the stack when costs are paid (601.2a), so it cannot be the black card it exiles; Lightning Bolt
+  is red. Negative pair of unmask-exile-black-card-alt-cost.

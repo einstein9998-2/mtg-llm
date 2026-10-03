@@ -1,0 +1,192 @@
+id: pyroblast-counter-mode-counters-blue-spell
+title: "Pyroblast's first mode counters a blue spell (Brainstorm)"
+area: core
+cards: [Brainstorm, Island, Pyroblast, Mountain]
+tags: [pyroblast, modes, counterspell, conditional-counter, color]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyroblast, text: "• Counter target spell if it's blue.", verified: true}
+  - {kind: cr, ref: "700.2a", text: "The controller of a modal spell or ability chooses the mode(s) as part of casting that spell or activating that ability.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i"]
+    library_pad: 10
+  p1:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@pyro", modes: [1], targets: ["@bs"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bs", controller: p0}
+        - {kind: spell, card: "@pyro", controller: p1, modes: [1], targets: ["@bs"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Brainstorm], hand: []}
+    p1: {graveyard: [Pyroblast], battlefield: [{card: Mountain, tapped: true}]}
+notes: >
+  Brainstorm is a blue spell, so Pyroblast's counter mode counters it. The mode is announced on cast and stays on the
+  stack entry. p0 draws nothing (Brainstorm never resolved).
+---
+id: hydroblast-counter-mode-counters-red-spell
+title: "Hydroblast's counter mode counters a red spell (Lightning Bolt); the Bolt deals no damage"
+area: core
+cards: [Lightning Bolt, Mountain, Hydroblast, Island]
+tags: [hydroblast, modes, counterspell, conditional-counter, color]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hydroblast, text: "• Counter target spell if it's red.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Hydroblast @hb"]
+    battlefield: ["Island @i"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@hb", modes: [1], targets: ["@bolt"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1: {life: 20, graveyard: [Hydroblast]}
+notes: >
+  Lightning Bolt is red, so Hydroblast's counter mode counters it. p1 stays at 20. The mirror card Pyroblast would
+  leave the Bolt alone (see the colorless-spell scenario for the "no effect, still resolves" shape).
+---
+id: hydroblast-destroy-mode-spares-nonred-permanent
+title: "Hydroblast's destroy mode may target a blue Murktide Regent but does nothing to it, because it is not red"
+area: core
+cards: [Hydroblast, Island, Murktide Regent]
+tags: [hydroblast, modes, destroy, color, conditional-destroy, legal-target-regardless-of-color]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hydroblast, text: "• Destroy target permanent if it's red.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hydroblast @hb"]
+    battlefield: ["Island @i"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Murktide Regent, as: murk, counters: {}}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hb", modes: [2], targets: ["@murk"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Hydroblast]}
+    p1: {battlefield: [{card: Murktide Regent, counters: {}}], graveyard: []}
+notes: >
+  The destroy mode targets any permanent; "if it's red" is checked on resolution. Murktide Regent ({5}{U}{U}) is blue,
+  not red, so it survives while Hydroblast resolves and goes to the graveyard. A wrong engine refuses the target or
+  destroys it anyway.
+---
+id: pyroblast-counters-blue-red-multicolor-spell
+title: "Pyroblast counters Prismari Charm, which is blue as well as red"
+area: core
+cards: [Prismari Charm, Island, Mountain, Pyroblast]
+tags: [pyroblast, modes, counterspell, multicolor, color, prismari-charm]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyroblast, text: "• Counter target spell if it's blue.", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Mountain @m2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [1], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@pyro", modes: [1], targets: ["@charm"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm], hand: [], library_count: 10}
+    p1: {graveyard: [Pyroblast]}
+notes: >
+  Prismari Charm costs {U}{R}, so it is both blue and red (202.2c) and Pyroblast's "if it's blue" is true: the Charm is
+  countered before its surveil-and-draw mode happens (library untouched, 10 cards).
+---
+id: pyroblast-mode-legality-counter-needs-spell-destroy-needs-permanent
+title: "Pyroblast's counter mode needs a spell and its destroy mode needs a permanent; a colorless land is a legal but harmless target"
+area: core
+cards: [Pyroblast, Mountain, Island]
+tags: [pyroblast, modes, mask-validity, targeting, mode-availability, expect-illegal]
+derived_from: cr
+source:
+  - {kind: cr, ref: "700.2a", text: "If one of the modes would be illegal (due to an inability to choose legal targets, for example), that mode can’t be chosen.", verified: true}
+  - {kind: cr, ref: "115.2", text: "Only permanents are legal targets for spells and abilities, unless a spell or ability (a) specifies that it can target an object in another zone or a player, or (b) targets an object that can’t exist on the battlefield, such as a spell or ability.", verified: true}
+  - {kind: oracle, card: Pyroblast, text: "• Destroy target permanent if it's blue.", verified: true}
+  - {kind: oracle, card: Pyroblast, text: "Choose one", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@pyro", modes: [1], targets: ["@isl"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", modes: [1], targets: [], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", modes: [2], targets: [{player: p1}], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", modes: [1, 2], targets: ["@isl"], pay: auto}}
+  - p0: {t: cast, card: "@pyro", modes: [2], targets: ["@isl"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Pyroblast]}
+    p1: {battlefield: [{card: Island}], graveyard: []}
+notes: >
+  With an empty stack the counter mode has no legal target and cannot be chosen; a land is not a spell. The destroy
+  mode cannot target a player (not a permanent) and exactly one mode must be chosen. The Island is a legal target
+  for "destroy target permanent if it's blue" (any permanent); basic lands are colorless, so the Island survives and
+  Pyroblast resolves and is put into the graveyard.

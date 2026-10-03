@@ -1,0 +1,88 @@
+id: mu-unholy-heat-kills-faerie-macabre-cast-via-aluren
+title: Unholy Heat without delirium deals 2 and kills a Faerie Macabre cast through Aluren
+area: matchup
+cards: [Unholy Heat, Faerie Macabre, Aluren, Lightning Bolt, Volcanic Island, Island, Tropical Island, Hedge Maze]
+tags: [matchup, unholy-heat, delirium-off, aluren, free-cast, state-based-actions, lethal-damage]
+derived_from: cr
+source:
+  - {kind: oracle, card: Unholy Heat, text: "Unholy Heat deals 2 damage to target creature or planeswalker.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Unholy Heat @uh"]
+    battlefield: ["Volcanic Island"]
+    graveyard: [Lightning Bolt]
+    library_pad: 10
+  p1:
+    hand: ["Faerie Macabre @fm"]
+    battlefield: ["Aluren", "Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@fm", alt_cost: {free: aluren}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      p1: {battlefield_contains: [{card: Faerie Macabre, pt: [2, 2], keywords: [flying], sick: true}]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@uh", targets: ["@fm"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {graveyard: [Faerie Macabre], battlefield: [{card: Aluren}, {card: Island}, {card: Tropical Island}, {card: Hedge Maze}]}
+    p0: {graveyard: [Lightning Bolt, Unholy Heat]}
+notes: >
+  Faerie Macabre has mana value 3, so Aluren lets p1 cast it free. p0's graveyard holds one card type (instant), so Unholy
+  Heat deals 2, which is lethal for a 2/2 (704.5g). p1 does not respond here (it could discard Macabre only while it is in
+  hand, which it no longer is).
+---
+id: mu-unholy-heat-delirium-6-atraxa-survives-then-bolt
+title: Delirium Unholy Heat deals 6 to Atraxa, which survives as a 7/7, and a Lightning Bolt then finishes it
+area: matchup
+cards: [Unholy Heat, Lightning Bolt, "Atraxa, Grand Unifier", "Mishra's Bauble", Scalding Tarn, Ponder, Brainstorm, Volcanic Island, Tropical Island]
+tags: [matchup, unholy-heat, delirium, damage-accumulates, state-based-actions, lethal-damage]
+derived_from: cr
+source:
+  - {kind: oracle, card: Unholy Heat, text: "Delirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard.", verified: true}
+  - {kind: cr, ref: "120.3e", text: "Damage dealt to a creature by a source with neither wither nor infect causes that much damage to be marked on that creature.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: cr, ref: "514.2", text: "Second, the following actions happen simultaneously: all damage marked on permanents (including phased-out permanents) is removed and all \"until end of turn\" and \"this turn\" effects end.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Unholy Heat @uh", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island", "Volcanic Island"]
+    graveyard: ["Mishra's Bauble", "Scalding Tarn", "Ponder", "Brainstorm"]
+    library_pad: 10
+  p1:
+    battlefield: ["Atraxa, Grand Unifier @atx", "Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@uh", targets: ["@atx"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p1: {life: 20, battlefield_contains: [{card: "Atraxa, Grand Unifier", damage: 6, pt: [7, 7]}]}
+  - p0: {t: cast, card: "@bolt", targets: ["@atx"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {life: 20, graveyard: ["Atraxa, Grand Unifier"], battlefield: [{card: Tropical Island}]}
+    p0: {life: 20, graveyard: ["Mishra's Bauble", Scalding Tarn, Ponder, Brainstorm, Unholy Heat, Lightning Bolt]}
+notes: >
+  While Unholy Heat resolves, p0's graveyard holds artifact, land, sorcery and instant cards (Heat itself is on the stack),
+  so it deals 6. 6 < 7, so Atraxa survives with 6 damage marked. Damage stays until cleanup (514.2), so Bolt's 3 more makes
+  9 >= 7 and Atraxa is destroyed. Atraxa's lifelink is irrelevant: it deals no damage here, so nobody gains life.

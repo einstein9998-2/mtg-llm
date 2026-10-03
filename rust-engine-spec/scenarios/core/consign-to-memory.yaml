@@ -1,0 +1,213 @@
+id: consign-counters-triggered-ability
+title: "Consign to Memory counters Hedge Maze's enters trigger; the land stays and nothing is surveilled"
+area: core
+cards: [Consign to Memory, Hedge Maze, Island, Lightning Bolt]
+tags: [consign-to-memory, triggers, counter-ability, etb, surveil]
+derived_from: cr
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @consign"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@consign", targets: [{trigger_of: "@hm", nth: 0}], pay: auto}
+  - check:
+      stack:
+        - {kind: triggered, source: "@hm", controller: p0}
+        - {kind: spell, card: "@consign", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Hedge Maze, tapped: true}]
+      library_top: [Lightning Bolt]
+      graveyard: []
+    p1: {graveyard: [Consign to Memory], battlefield: [{card: Island, tapped: true}]}
+notes: >
+  Consign to Memory counters "target triggered ability", the first of its two target kinds. Without replicate it costs
+  just {U}. The surveil never happens. Catches an engine that restricts Consign to spells.
+---
+id: consign-cannot-target-colored-spell-cori-steel-cutter
+title: "Consign to Memory cannot target Cori-Steel Cutter on the stack: it is a red artifact spell, not a colorless one"
+area: core
+cards: [Consign to Memory, Cori-Steel Cutter, Mountain, Island]
+tags: [consign-to-memory, colorless, targeting, mask-validity, illegal-action, counter-spell]
+derived_from: cr
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+  - {kind: cr, ref: "202.2b", text: "Objects with no colored mana symbols in their mana costs are colorless.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Cori-Steel Cutter @cutter"]
+    battlefield: ["Mountain @m1", "Island @i1"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @consign"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@cutter", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@cutter", controller: p0}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {exclude: [{t: cast, card: "@consign"}]}}
+  - expect_illegal: {p1: {t: cast, card: "@consign", targets: ["@cutter"]}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@cutter", controller: p0}
+    pending: {actor: p1, kind: priority}
+    p1: {hand: [Consign to Memory], battlefield: [{card: Island, tapped: false}]}
+notes: >
+  Cori-Steel Cutter costs {1}{R}, so it is red, not colorless (202.2), even though it is an artifact. It is the only object
+  on the stack, so Consign to Memory has no legal target at all and no cast of it is offered. The positive colorless case
+  (Mishra's Bauble) is a sibling scenario. Catches an engine that considers any artifact
+  colorless. (Reviewer edit: the original cast Mishra's Bauble and then Cori-Steel Cutter while the Bauble was still on
+  the stack; both are noncreature artifacts without flash, so the second cast was illegal (sorcery timing needs an empty
+  stack). Rewritten to the negative case alone.)
+---
+id: consign-cannot-target-activated-ability
+title: "Consign to Memory cannot target an activated ability (only triggered abilities and colorless spells)"
+area: core
+cards: [Consign to Memory, Wasteland, Volcanic Island, Island]
+tags: [consign-to-memory, targeting, mask-validity, illegal-action, activated-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @consign"]
+    battlefield: ["Volcanic Island @volc", "Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@w", ability: 1, targets: ["@volc"]}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {exclude: [{t: cast, card: "@consign"}]}}
+  - expect_illegal: {p1: {t: cast, card: "@consign", targets: [{ability_of: "@w", nth: 0}]}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: activated, source: "@w", controller: p0}
+    p1: {hand: [Consign to Memory], battlefield: [{card: Volcanic Island}, {card: Island}]}
+notes: >
+  The only object on the stack is an activated ability, which is neither a triggered ability nor a spell. Unlike Stifle,
+  Consign to Memory has no legal target here, so the engine must not offer a cast at all. Catches an engine that merges the
+  Stifle and Consign targeting rules.
+---
+id: consign-replicate-copy-retargeted-counters-two-triggers
+title: "Consign to Memory with one replicate: the copy retargets, so one Consign counters Cutter's flurry and the copy counters DRC's surveil"
+area: core
+cards: [Consign to Memory, Dragon's Rage Channeler, Cori-Steel Cutter, Lightning Bolt, Mountain, Island, Ponder]
+tags: [consign-to-memory, replicate, copy-spell, retargeting, triggers, counter-ability, order-triggers, drc, cori-steel-cutter]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.56a", text: "\"Replicate [cost]\" means \"As an additional cost to cast this spell, you may pay [cost] any number of times\" and \"When you cast this spell, if a replicate cost was paid for it, copy it for each time its replicate cost was paid. If the spell has any targets, you may choose new targets for any of the copies.\"", verified: true}
+  - {kind: cr, ref: "707.10c", text: "The player may leave any number of the targets unchanged, even if those targets would be illegal. If the player chooses to change some or all of the targets, the new targets must be legal.", verified: true}
+  - {kind: cr, ref: "707.10", text: "A copy of a spell or ability is controlled by the player under whose control it was put on the stack.", verified: true}
+  - {kind: oracle, card: Consign to Memory, text: "Replicate {1}", verified: true}
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dragon's Rage Channeler @drc2", "Lightning Bolt @b1"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @consign"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@drc2", pay: auto}
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - p0: {decision: order_triggers, answer: ["@drc", "@cutter"]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@consign", replicate: 1, targets: [{trigger_of: "@cutter", nth: 0}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@drc2", controller: p0}
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: triggered, source: "@drc", controller: p0}
+        - {kind: triggered, source: "@cutter", controller: p0}
+        - {kind: spell, card: "@consign", controller: p1}
+        - {kind: triggered, source: "@consign", controller: p1}
+      pending: {actor: p1, kind: priority}
+      p1: {battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_target, slot: 0, answer: {trigger_of: "@drc", nth: 0}}
+  - check:
+      stack:
+        - {kind: spell, card: "@drc2", controller: p0}
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: triggered, source: "@drc", controller: p0}
+        - {kind: triggered, source: "@cutter", controller: p0}
+        - {kind: spell, card: "@consign", controller: p1}
+        - {kind: spell, copy: true, controller: p1}
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - check:
+      stack:
+        - {kind: spell, card: "@drc2", controller: p0}
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: triggered, source: "@cutter", controller: p0}
+        - {kind: spell, card: "@consign", controller: p1}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@drc2", controller: p0}
+      - {kind: spell, card: "@b1", controller: p0}
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_top: [Ponder]
+      graveyard: []
+      battlefield: [{card: Dragon's Rage Channeler}, {card: Cori-Steel Cutter}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+    p1:
+      graveyard: [Consign to Memory]
+notes: >
+  Setup of the two targets: the creature spell is p0's first spell (no triggers), Bolt is the second (DRC surveil and
+  Cutter flurry both trigger; p0 orders them, flurry on top). p1 casts Consign with replicate paid once ({U}{1}, both
+  Islands), originally targeting the flurry trigger. Replicate's own triggered ability (702.56a) goes on the stack above
+  Consign; when it resolves it puts a copy on the stack, controlled by p1, and p1 may choose a new target (707.10c): the
+  copy is retargeted to the DRC surveil trigger. The copy resolves first (counters DRC's trigger), then the original
+  Consign counters flurry, so neither a surveil nor a Monk happens, and the two spells stay on the stack. The copy
+  ceases to exist after resolving; only the original card goes to the graveyard. The script assumes the engine presents
+  only a choose_target decision for the copy's new target slot (see REPORT schema-requests about an optional preceding
+  yes/no). Catches an engine that ignores replicate, makes the copy keep the original's target, makes the copy a card in
+  the graveyard, or lets the opponent pick the copy's target.

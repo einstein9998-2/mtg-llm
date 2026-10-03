@@ -1,0 +1,158 @@
+id: hi-show-and-tell-second-chooser-sees-no-first-pick
+title: Show and Tell's second chooser does not see the identity of the first pick, and both cards become public only as they enter
+area: hidden-info
+cards: [Show and Tell, Omniscience, Brainstorm, Murktide Regent, Lightning Bolt, Island, Tropical Island, Hedge Maze, Volcanic Island]
+tags: [hidden-info, show-and-tell, simultaneous-secret-choice, apnap, redaction]
+derived_from: cr
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "101.4", text: "If multiple players would make choices and/or take actions at the same time, the active player (the player whose turn it is) makes any choices required, then the next player in turn order (usually the player seated to the active player's left) makes any choices required, followed by the remaining nonactive players in turn order. Then the actions happen simultaneously.", verified: true}
+  - {kind: cr, ref: "101.4a", text: "If an effect has each player choose a card in a hidden zone, such as their hand or library, those cards may remain face down as they're chosen. However, each player must clearly indicate which face-down card they are choosing.", verified: true}
+  - {kind: cr, ref: "101.4b", text: "A player knows the choices made by the previous players when making their choice, except as specified in 101.4a.", verified: true}
+  - {kind: ruling, card: Show and Tell, text: "Each player chooses a card without revealing it; the chosen cards are put onto the battlefield at the same time.", verified: false, note: "recalled, not retrieved"}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mk", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Omniscience @omni", "Brainstorm @bs"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: p1-picked
+    p1:
+      decision: simultaneous_secret_choice
+      answer: "@omni"
+      expect_options: {include: ["@omni", null], exclude: ["@bs", "@mk"], count: 2}
+  - p0:
+      decision: simultaneous_secret_choice
+      answer: "@mk"
+      expect_options: {include: ["@mk", null], exclude: ["@bolt", "@omni", "@bs"], count: 2}
+expect:
+  - at: p1-picked
+    pending: {actor: p0, kind: simultaneous_secret_choice}
+    stack: [{kind: spell, card: "@st", controller: p1}]
+    p1: {hand: [Omniscience, Brainstorm]}
+  - at: p1-picked
+    observer: p0
+    obs:
+      opp: {hand_count: 2, revealed_hand: []}
+      option_labels_exclude_names: [Omniscience, Brainstorm]
+      events_text_exclude: [Omniscience, Brainstorm]
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: [Brainstorm]
+      graveyard: [Show and Tell]
+      battlefield_contains: [{card: Omniscience, controller: p1}]
+    p0:
+      hand: [Lightning Bolt]
+      battlefield: [{card: Volcanic Island}, {card: Murktide Regent, controller: p0, counters: {}, pt: [3, 3], sick: true}]
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 1, revealed_hand: []}
+      events_text_exclude: [Brainstorm]
+notes: >
+  APNAP (101.4): the active player p1 chooses first, then p0; the choices stay face down (101.4a), so p0's observation at
+  its decision contains no trace of Omniscience's identity (the 101.4b exception). The scenario deliberately asserts
+  nothing more: 101.4a says each player "must clearly indicate which face-down card they are choosing", so p0 IS
+  entitled to know that p1 chose a card (and which face-down card), only not what it is. Doc 02 section 9.1's wording
+  ("no information about the first decider's pick") is stronger than the CR and is not tested here. Each mask lists only the chooser's own eligible
+  cards plus "nothing". Both cards then enter simultaneously. Murktide was put onto the battlefield, not cast, so nothing
+  was exiled with it and it enters with no counters (3/3). Neither permanent has an ETB trigger, so the stack is empty and
+  the active player gets priority. Brainstorm stays hidden throughout.
+---
+id: hi-show-and-tell-first-pick-paired-world
+title: The second chooser's stream up to its decision is identical whatever the first chooser picked
+area: hidden-info
+cards: [Show and Tell, Omniscience, Aluren, Brainstorm, Murktide Regent, Lightning Bolt, Island, Tropical Island, Hedge Maze, Volcanic Island]
+tags: [hidden-info, show-and-tell, simultaneous-secret-choice, non-interference, paired-world]
+derived_from: cr
+source:
+  - {kind: cr, ref: "101.4a", text: "If an effect has each player choose a card in a hidden zone, such as their hand or library, those cards may remain face down as they're chosen.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mk", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Omniscience @pick", "Brainstorm @bs"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+world_b:
+  p1: {hand: ["Show and Tell @st", "Aluren @pick", "Brainstorm @bs"]}
+assert_streams_identical: {observer: p0}
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: simultaneous_secret_choice, answer: "@pick"}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: simultaneous_secret_choice}
+    p1: {hand_count: 2}
+notes: >
+  The script stops at p0's pending choice, before the picks are revealed by entering. In world A p1 secretly picks
+  Omniscience, in world B Aluren. In both worlds p1 picks a card (a fact p0 may legitimately learn, CR 101.4a/b), so the
+  worlds differ only in the face-down card's identity; p0's stream (including its decision's option list) must be byte-identical. A wrong engine
+  emits a "chosen" event naming the card, or changes p0's view ids or options depending on p1's pick.
+---
+id: hi-show-and-tell-choosing-nothing-hides-eligible-card-paired-world
+title: Choosing nothing with Show and Tell does not reveal which eligible card the chooser held
+area: hidden-info
+cards: [Show and Tell, "Atraxa, Grand Unifier", Omniscience, Brainstorm, Murktide Regent, Lightning Bolt, Island, Tropical Island, Hedge Maze, Volcanic Island]
+tags: [hidden-info, show-and-tell, simultaneous-secret-choice, non-interference, paired-world]
+derived_from: cr
+source:
+  - {kind: cr, ref: "101.4a", text: "If an effect has each player choose a card in a hidden zone, such as their hand or library, those cards may remain face down as they're chosen.", verified: true}
+  - {kind: cr, ref: "101.4b", text: "A player knows the choices made by the previous players when making their choice, except as specified in 101.4a.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mk", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Atraxa, Grand Unifier @x", "Brainstorm @bs"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+world_b:
+  p1: {hand: ["Show and Tell @st", "Omniscience @x", "Brainstorm @bs"]}
+assert_streams_identical: {observer: p0}
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - p0: {decision: simultaneous_secret_choice, answer: "@mk"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {hand_count: 2, graveyard: [Show and Tell]}
+    p0: {battlefield_contains: [{card: Murktide Regent, pt: [3, 3]}]}
+notes: >
+  In both worlds p1 holds exactly one eligible card (Atraxa in world A, Omniscience in world B), so p1 gets the decision in
+  both worlds and declines. That p1 chose nothing is something p0 may know (101.4b); which eligible card p1 held is not,
+  because it never leaves p1's hand. p0's stream, through both choices and the resolution, must be byte-identical. A wrong
+  engine emits a "declined to put X" event or option label naming the card it held.
+  Rewritten at review (was hi-show-and-tell-choosing-nothing-paired-world, whose world B gave p1 no eligible card): under
+  the SCHEMA addenda a player with no eligible card gets no decision, so world B would need a different script (no p1
+  step), which the paired-world format does not allow. Whether p0's stream may differ between "p1 declined" and "p1 had no
+  eligible card" is listed as an open question in REVIEW-HI.md.

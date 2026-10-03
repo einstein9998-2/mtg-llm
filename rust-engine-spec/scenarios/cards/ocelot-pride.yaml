@@ -1,0 +1,119 @@
+id: ocelot-no-life-gained-no-end-step-trigger
+title: Ocelot Pride does not trigger at the end step if its controller gained no life this turn
+area: card
+cards: [Ocelot Pride]
+tags: [ocelot-pride, end-step-trigger, intervening-if, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Ocelot Pride, text: "At the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: cr, ref: "513.1", text: "The end step has no turn-based actions. Once it begins, the active player gets priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    battlefield: ["Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: end, of: p0}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      battlefield: [{card: Ocelot Pride}]
+notes: >
+  Starting in the second main phase avoids the attack declaration. No life was gained this turn, so the intervening-if
+  fails and the ability does not trigger at all: the end step starts with an empty stack. Positive control: the
+  scenario above.
+---
+id: ocelot-city-blessing-copies-the-new-cat
+title: With the city's blessing, Ocelot Pride's end-step trigger creates a Cat and then a copy of it, for two Cats
+area: card
+cards: [Ocelot Pride, Voice of Victory, Plains, "Cat Token (Ocelot Pride)"]
+tags: [ocelot-pride, ascend, citys-blessing, token-copy, lifelink, first-strike, end-step-trigger]
+derived_from: cr
+source:
+  - {kind: oracle, card: Ocelot Pride, text: "First strike, lifelink", verified: true}
+  - {kind: oracle, card: Ocelot Pride, text: "Ascend (If you control ten or more permanents, you get the city's blessing for the rest of the game.)", verified: true}
+  - {kind: oracle, card: Ocelot Pride, text: "At the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token. Then if you have the city's blessing, for each token you control that entered this turn, create a token that's a copy of it.", verified: true}
+  - {kind: cr, ref: "702.131b", text: "Ascend on a permanent represents a static ability. It means \"Any time you control ten or more permanents and you don't have the city's blessing, you get the city's blessing for the rest of the game.\"", verified: true}
+  - {kind: cr, ref: "702.15b", text: "Damage dealt by a source with lifelink causes that source's controller, or its owner if it has no controller, to gain that much life (in addition to any other results that damage causes).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Voice of Victory @voice"]
+    battlefield:
+      - "Ocelot Pride @oc"
+      - "Plains @l1"
+      - "Plains @l2"
+      - "Plains @l3"
+      - "Plains @l4"
+      - "Plains @l5"
+      - "Plains @l6"
+      - "Plains @l7"
+      - "Plains @l8"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@voice", pay: {tap: ["@l1", "@l2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      phase: main1
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@oc", target: {player: p1}}]}
+  - advance: {to: end, of: p0}
+  - check:
+      stack: [{kind: triggered, source: "@oc", controller: p0}]
+      p0: {life: 21}
+      p1: {life: 19}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 21
+      battlefield:
+        - {card: Ocelot Pride, tapped: true}
+        - {card: Voice of Victory, sick: true, tapped: false}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: false}
+        - {card: Plains, tapped: false}
+        - {card: Plains, tapped: false}
+        - {card: Plains, tapped: false}
+        - {card: Plains, tapped: false}
+        - {card: Plains, tapped: false}
+        - {token: "Cat Token (Ocelot Pride)", pt: [1, 1]}
+        - {token: "Cat Token (Ocelot Pride)", pt: [1, 1]}
+    p1:
+      life: 19
+notes: >
+  REWRITTEN BY REVIEWER W8. The writer's version had Guide of Souls on the battlefield and forgot that Guide triggers
+  on each of the two Cats entering at the end step (two more triggers, +2 life, +2 energy; the asserted empty stack was
+  wrong, and the order of two identical Guide triggers is not something to script). Now: p0 starts with nine permanents
+  (Ocelot Pride and eight Plains), so no city's blessing at setup. Casting Voice of Victory makes ten and ascend gives
+  the blessing at once (702.131b). Voice is summoning sick and does not attack (so no mobilize); Ocelot attacks alone,
+  p1 has no creatures (no block declaration), and Ocelot's first-strike lifelink damage gains p0 1 life (21; p1 19),
+  which satisfies the intervening-if at the end step. The trigger creates a Cat; then, with the blessing, for each
+  token that entered this turn (just that Cat) it creates one copy: two Cats in all. Nothing on the battlefield
+  triggers on the Cats entering. The city's blessing designation itself has no assertion key (SCHEMA addenda); the
+  second Cat is the observable result. A wrong engine ignores ascend (one Cat), checks ascend only on Ocelot's own
+  entry, or loops on the copy (three or more Cats).

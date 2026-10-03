@@ -1,0 +1,126 @@
+id: reanimate-own-griselbrand-loses-eight-life
+title: Reanimate returns Griselbrand from its caster's graveyard and its caster loses 8 life; a noncreature card is not a legal target
+area: card
+cards: [Reanimate, Griselbrand, Doomsday, Swamp, Island]
+tags: [reanimate, reanimation, life-loss, mana-value, targeting]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Reanimate, text: "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to that card's mana value.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Reanimate @r"]
+    battlefield: ["Swamp @s"]
+    graveyard: ["Griselbrand @g", "Doomsday @dd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@r", targets: ["@dd"]}}
+  - p0: {t: cast, card: "@r", targets: ["@g"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 12
+      graveyard: [Doomsday, Reanimate]
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Griselbrand, controller: p0, sick: true, pt: [7, 7]}
+notes: >
+  Griselbrand's mana cost {4}{B}{B}{B}{B} gives mana value 8, so 20 -> 12. It came under p0's control this turn (sick).
+  Doomsday is a sorcery card, not a creature card, so it is not a legal target. Wrong engines: lose life equal to power,
+  or to the number of black symbols (4), or allow noncreature targets.
+---
+id: reanimate-fizzles-when-target-exiled-in-response
+title: Faerie Macabre exiling Griselbrand in response makes Reanimate fail to resolve, so its caster loses no life
+area: card
+cards: [Reanimate, Griselbrand, Faerie Macabre, Swamp, Island]
+tags: [reanimate, faerie-macabre, fizzle, illegal-target, life-loss, negative]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard.", verified: true}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+  - {kind: oracle, card: Reanimate, text: "You lose life equal to that card's mana value.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Reanimate @r"]
+    battlefield: ["Swamp @s"]
+    graveyard: ["Griselbrand @g"]
+    library_pad: 10
+  p1:
+    hand: ["Faerie Macabre @fm"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@r", targets: ["@g"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@g"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@r", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [Griselbrand], graveyard: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Reanimate]
+      exile: [Griselbrand]
+      battlefield: [{card: Swamp, tapped: true}]
+    p1:
+      graveyard: [Faerie Macabre]
+      hand: []
+notes: >
+  Reanimate's only target left the graveyard, so on resolution it is illegal and Reanimate does not resolve at all
+  (608.2b): it goes to the graveyard and none of its text happens, including the life loss. Wrong engines: resolve
+  anyway and charge 8 life (the "that card" information is about the illegal target), or leave Reanimate on the stack.
+---
+id: reanimate-lethal-life-loss-kills-its-caster
+title: Reanimate on Griselbrand at exactly 8 life puts its caster to 0, and its caster loses the game
+area: card
+cards: [Reanimate, Griselbrand, Swamp, Island]
+tags: [reanimate, life-loss, state-based-actions, game-loss]
+derived_from: cr
+source:
+  - {kind: oracle, card: Reanimate, text: "You lose life equal to that card's mana value.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 8
+    hand: ["Reanimate @r"]
+    battlefield: ["Swamp @s"]
+    graveyard: ["Griselbrand @g"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@r", targets: ["@g"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0: {life: 0}
+notes: >
+  The life loss is not optional and is not capped. Griselbrand arrives, but state-based actions are checked before p0
+  could activate it, and p0 at 0 life loses. An engine that lets p0 respond with Griselbrand's "Pay 7 life" (impossible
+  at 0 anyway) or that applies the loss only if the creature arrives differently fails.

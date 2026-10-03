@@ -1,0 +1,272 @@
+id: one-land-drop-per-turn-resets-next-turn
+title: Only one land may be played per turn, and the allowance comes back on the next turn of that player
+area: core
+cards: [Island, Mountain]
+tags: [land-drop, special-action, turn-structure]
+derived_from: cr
+source:
+  - {kind: cr, ref: "305.2", text: "A player can normally play one land during their turn; however, continuous effects may increase this number.", verified: true}
+  - {kind: cr, ref: "305.2b", text: "A player can't play a land, for any reason, if the number of lands the player can play this turn is equal to or less than the number of lands they have already played this turn.", verified: true}
+  - {kind: cr, ref: "116.2a", text: "Playing a land is a special action. To play a land, a player puts that land onto the battlefield from the zone it was in (usually that player's hand). By default, a player can take this action only once during each of their turns.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Island @isl", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@isl"}
+  - label: after-first-land
+    check:
+      stack: []
+      priority: p0
+      pending: {actor: p0, kind: priority}
+      p0: {lands_played: 1, hand: [Mountain], battlefield: [{card: Island, tapped: false}]}
+  - expect_illegal: {p0: {t: play_land, card: "@mtn"}}
+  - check: {legal: {p0: {exclude: [{t: play_land, card: "@mtn"}], include: [{t: pass}]}}}
+  - advance: {to: main1, of: p0}
+  - label: next-own-turn
+    check: {turn: 5, p0: {lands_played: 0}}
+  - p0: {t: play_land, card: "@mtn"}
+expect:
+  - at: after_script
+    turn: 5
+    phase: main1
+    priority: p0
+    p0:
+      lands_played: 1
+      battlefield: [{card: Island}, {card: Mountain}]
+notes: >
+  The second land play in the same turn is not offered (305.2b). Playing the first land is a special action that does
+  not use the stack and leaves p0 with priority. After advancing through p1's turn 4 to p0's turn 5 the counter is back
+  to 0 and the Mountain can be played. A wrong engine would let the player play two lands, or never reset the counter.
+  (p0 and p1 draw cards on the way; hands stay far below eight cards.)
+---
+id: land-play-illegal-for-the-nonactive-player
+title: The nonactive player cannot play a land even in the active player's main phase with an empty stack; an instant is still castable
+area: core
+cards: [Island, Lightning Bolt, Mountain]
+tags: [land-drop, special-action, nonactive-player, timing]
+derived_from: cr
+source:
+  - {kind: cr, ref: "305.3", text: "A player can't play a land, for any reason, if it isn't their turn.", verified: true}
+  - {kind: cr, ref: "305.1", text: "A player who has priority may play a land card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    library_pad: 10
+  p1:
+    hand: ["Island @pi", "Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - check:
+      phase: main1
+      priority: p1
+      stack: []
+      legal: {p1: {include: [{t: cast, card: "@bolt"}, {t: pass}], exclude: [{t: play_land, card: "@pi"}]}}
+  - expect_illegal: {p1: {t: play_land, card: "@pi"}}
+expect:
+  - at: after_script
+    priority: p1
+    stack: []
+    p1: {hand: [Island, Lightning Bolt], lands_played: 0}
+notes: >
+  p1 has priority in p0's first main phase with an empty stack, which is the situation in which p0 could play a land,
+  but 305.3 forbids p1 from playing one on p0's turn. Bolt (an instant) is offered, so the probe is not a generic "p1 has
+  no options". A wrong engine would allow lands whenever the stack is empty and a main phase is current.
+---
+id: land-drop-shared-between-first-and-second-main-phase
+title: A land played in the first main phase uses up the turn's land drop, so none is available in the second main phase
+area: core
+cards: [Island, Mountain]
+tags: [land-drop, special-action, main-phase]
+derived_from: cr
+source:
+  - {kind: cr, ref: "305.2a", text: "To determine whether a player can play a land, compare the number of lands the player can play this turn with the number of lands they have already played this turn", verified: true}
+  - {kind: cr, ref: "505.6b", text: "During either main phase, the active player may play one land card from their hand if the stack is empty, if the player has priority, and if they haven't played a land this turn", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    lands_played: 1
+    hand: ["Mountain @mtn"]
+    battlefield: ["Island"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: play_land, card: "@mtn"}}
+  - check: {legal: {p0: {exclude: [{t: play_land, card: "@mtn"}]}}}
+expect:
+  - at: after_script
+    phase: main2
+    priority: p0
+    p0: {lands_played: 1, hand: [Mountain]}
+notes: >
+  The setup says p0 already played a land earlier this turn (lands_played 1; the Island on the battlefield came from that
+  play). In the second main phase the stack is empty and p0 has priority, but the one-land limit still applies for the
+  whole turn. A wrong engine would reset the counter between main phases.
+---
+id: fetchland-activation-is-not-a-land-drop
+title: Cracking a fetchland and putting its land onto the battlefield does not use the land drop
+area: core
+cards: [Polluted Delta, Island, Mountain]
+tags: [land-drop, fetchland, put-onto-battlefield, life-payment, sacrifice-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.4", text: "Effects may also allow players to \"put\" lands onto the battlefield. This isn't the same as \"playing a land\" and doesn't count as a land played during the current turn.", verified: true}
+  - {kind: cr, ref: "305.2a", text: "To determine whether a player can play a land, compare the number of lands the player can play this turn with the number of lands they have already played this turn (including lands played as special actions and lands played during the resolution of spells and abilities).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mountain @hand_land"]
+    battlefield: ["Polluted Delta @delta"]
+    library: ["Island @fetched"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@delta", ability: 0, targets: []}
+  - label: delta-on-stack
+    check:
+      stack: [{kind: activated, source: "@delta", controller: p0}]
+      priority: p0
+      p0: {life: 19, graveyard: [Polluted Delta], battlefield: [], lands_played: 0, library_count: 11}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@fetched", expect_options: {include: ["@fetched"]}}
+  - label: after-fetch
+    check:
+      stack: []
+      priority: p0
+      pending: {actor: p0, kind: priority}
+      p0: {lands_played: 0, library_count: 10, battlefield: [{card: Island, tapped: false}]}
+      legal: {p0: {include: [{t: play_land, card: "@hand_land"}]}}
+  - p0: {t: play_land, card: "@hand_land"}
+expect:
+  - at: after_script
+    stack: []
+    priority: p0
+    p0:
+      life: 19
+      lands_played: 1
+      hand_count: 0
+      graveyard: [Polluted Delta]
+      library_count: 10
+      battlefield: [{card: Island, tapped: false}, {card: Mountain, tapped: false}]
+notes: >
+  Activating the fetchland is an activated ability (its costs, tap, 1 life and the sacrifice, are paid at activation, so
+  Delta is already in the graveyard and p0 is at 19 while the ability is on the stack). It is not the special action of
+  playing a land, and putting the found Island onto the battlefield is not "playing" one (305.4): lands_played stays 0,
+  so the Mountain in hand can still be played as the turn's land drop. The search decision belongs to p0 (the ability's
+  controller). The library is shuffled after the search (a random event; the scenario asserts only counts).
+---
+id: city-of-traitors-sacrificed-when-another-land-is-played
+title: City of Traitors triggers when you play another land; it can still be tapped for mana in response
+area: core
+cards: [City of Traitors, Island]
+tags: [city-of-traitors, land-drop, triggered-ability, mana-ability, sacrifice]
+derived_from: oracle
+source:
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+  - {kind: oracle, card: City of Traitors, text: "{T}: Add {C}{C}.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn't go on the stack, so it can't be targeted, countered, or otherwise responded to.", verified: true}
+  - {kind: cr, ref: "305.1", text: "Playing a land is a special action; it doesn't use the stack (see rule 116).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Island @isl"]
+    battlefield: ["City of Traitors @cot"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@isl"}
+  - label: trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@cot", controller: p0, text_contains: "sacrifice"}]
+      priority: p0
+      pending: {actor: p0, kind: priority}
+      p0: {lands_played: 1, battlefield: [{card: City of Traitors, tapped: false}, {card: Island, tapped: false}]}
+  - p0: {t: activate, source: "@cot", ability: 0}
+  - label: tapped-in-response
+    check:
+      stack: [{kind: triggered, source: "@cot"}]
+      priority: p0
+      p0: {mana_pool: {C: 2}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    priority: p0
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 2}
+      lands_played: 1
+      graveyard: [City of Traitors]
+      battlefield: [{card: Island, tapped: false}]
+notes: >
+  Playing the Island is a special action (no stack); the land play triggers City's ability, which goes on the stack
+  before p0 receives priority again (603.3). While the trigger is on the stack the City is still on the battlefield and
+  p0 can tap it for {C}{C} (a mana ability, no stack, no damage). The trigger then resolves, the City is sacrificed,
+  and the mana is still in the pool because the main phase has not ended. A wrong engine would sacrifice the City
+  immediately without a stack object (no chance to tap it), or lose the floating mana on resolution.
+---
+id: city-of-traitors-not-triggered-by-fetchland-search
+title: A land put onto the battlefield by a fetchland search is not "played", so City of Traitors is not sacrificed
+area: core
+cards: [City of Traitors, Polluted Delta, Island]
+tags: [city-of-traitors, fetchland, land-drop, put-onto-battlefield, triggered-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+  - {kind: cr, ref: "305.4", text: "Effects may also allow players to \"put\" lands onto the battlefield. This isn't the same as \"playing a land\" and doesn't count as a land played during the current turn.", verified: true}
+  - {kind: cr, ref: "305.1", text: "Playing a land is a special action; it doesn't use the stack (see rule 116).", verified: true}
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["City of Traitors @cot", "Polluted Delta @delta"]
+    library: ["Island @fetched"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@delta", ability: 0, targets: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@fetched"}
+expect:
+  - at: after_script
+    stack: []
+    priority: p0
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 0
+      graveyard: [Polluted Delta]
+      battlefield: [{card: City of Traitors, tapped: false}, {card: Island, tapped: false}]
+notes: >
+  City of Traitors says "When you play another land". The fetched Island is put onto the battlefield by an effect, which
+  is explicitly not playing a land (305.4), so City's trigger never happens: the stack is empty after the search and
+  City stays. A wrong engine would treat any land entering as a land play and sacrifice City. (The opposite case, a
+  real land play, is the previous scenario.) The search decision is p0's, and the shuffle only affects hidden order.

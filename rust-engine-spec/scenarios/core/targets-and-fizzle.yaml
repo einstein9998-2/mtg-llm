@@ -1,0 +1,94 @@
+id: bolt-fizzles-when-its-only-target-leaves-the-battlefield
+title: "Lightning Bolt does not resolve when its only target left the battlefield in response; no damage is dealt to anything else"
+area: core
+cards: [Lightning Bolt, Mountain, Swords to Plowshares, Plains, Containment Priest]
+tags: [fizzle, target-becomes-illegal, targeting, stack, swords-to-plowshares]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2b", text: "A target that’s no longer in the zone it was in when it was targeted is illegal.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl", "Containment Priest @priest"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: ["@priest"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@priest"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0, targets: ["@priest"]}]
+      pending: {actor: p0, kind: priority}
+      p1: {life: 22, exile: [Containment Priest], battlefield: [{card: Plains, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, graveyard: [Lightning Bolt]}
+    p1: {life: 22, graveyard: [Swords to Plowshares], exile: [Containment Priest]}
+notes: >
+  Swords to Plowshares resolves first and exiles the Containment Priest; its controller gains life equal to its power
+  (2; oracle.json gives Containment Priest pt 2/2), so p1 is at 22. The Bolt's only target is now in a
+  different zone, so the Bolt does not resolve (608.2b): it goes to the graveyard and p1's life stays 22. A wrong engine redirects the damage
+  to the player or resolves the Bolt on a stale object.
+---
+id: prismari-charm-partial-resolution-when-one-target-illegal
+title: "Prismari Charm's damage mode still hits its remaining legal target when the other target left the battlefield"
+area: core
+cards: [Prismari Charm, Island, Mountain, Swords to Plowshares, Plains, Containment Priest]
+tags: [fizzle, partial-resolution, target-becomes-illegal, prismari-charm, modes, targeting]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard. Otherwise, the spell or ability will resolve normally. Illegal targets, if any, won’t be affected by parts of a resolving spell’s effect for which they’re illegal. Other parts of the effect for which those targets are not illegal may still affect them.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "• Prismari Charm deals 1 damage to each of one or two targets.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i", "Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl", "Containment Priest @priest"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [2], targets: ["@priest", {player: p1}], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@charm", controller: p0, modes: [2], targets: ["@priest", {player: p1}]}]
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@priest"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@charm", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {life: 22, exile: [Containment Priest]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm]}
+    p1: {life: 21, graveyard: [Swords to Plowshares], exile: [Containment Priest]}
+notes: >
+  Charm targets the Containment Priest and player p1 with its 1-damage mode. In response p1 exiles the Priest with Swords
+  (and gains life equal to its power 2, 20 -> 22; oracle.json gives Containment Priest pt 2/2). On resolution one target
+  is illegal and the other (the player) is still legal, so the spell resolves normally and deals 1 damage to p1 only
+  (22 -> 21); it is not countered on resolution and goes to the graveyard. A wrong engine fizzles the whole spell (p1 would
+  stay at 22) or applies damage to the illegal target.

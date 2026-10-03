@@ -1,0 +1,71 @@
+id: thoughtseize-takes-a-creature-and-costs-two-life
+title: Thoughtseize may take a creature card (any nonland card) and its caster loses 2 life
+area: card
+cards: [Thoughtseize, Griselbrand, Island, Swamp]
+tags: [thoughtseize, hand-disruption, life-loss]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Thoughtseize @ts"]
+    battlefield: ["Swamp @s"]
+    library_pad: 10
+  p1:
+    life: 20
+    hand: ["Griselbrand @g", "Island @i"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@g"], expect_options: {include: ["@g"], exclude: ["@i"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 18, graveyard: [Thoughtseize]}
+    p1: {life: 20, hand: [Island], graveyard: [Griselbrand]}
+notes: >
+  Unlike Duress, creature cards are legal choices; lands are not. The caster, not the target, loses 2 life. Wrong
+  engines: make the target lose the life, or exclude creatures.
+---
+id: thoughtseize-targeting-yourself-discards-your-own-creature
+title: Thoughtseize can target its own caster, who then chooses a card from their own hand to discard (a Reanimator setup)
+area: card
+cards: [Thoughtseize, Griselbrand, Island, Swamp]
+tags: [thoughtseize, target-self, discard, reanimator-setup, life-loss]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Thoughtseize @ts", "Griselbrand @g", "Island @i"]
+    battlefield: ["Swamp @s"]
+    library_pad: 10
+  p1:
+    life: 20
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: [{player: p0}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@g"], expect_options: {include: ["@g"], exclude: ["@i", "@ts"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 18, hand: [Island], graveyard: [Griselbrand, Thoughtseize]}
+    p1: {life: 20}
+notes: >
+  "Target player" includes the caster. The only nonland card left in p0's hand is Griselbrand (Thoughtseize is on the
+  stack), so the choice has one candidate, which is still presented. p0 loses 2. Wrong engines: restrict the target to
+  opponents, or offer Thoughtseize itself.

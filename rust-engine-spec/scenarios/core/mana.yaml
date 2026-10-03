@@ -1,0 +1,212 @@
+id: mana-ability-leaves-nothing-to-respond-to-stifle-not-offered
+title: After Lotus Petal's mana ability, the opponent holding Stifle gets no target and the floating mana is still in the pool
+area: core
+cards: [Lotus Petal, Stifle, Island]
+tags: [mana-ability, stifle, cannot-be-responded-to, mana-pool, stack]
+derived_from: cr
+source:
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn't go on the stack, so it can't be targeted, countered, or otherwise responded to. Rather, it resolves immediately after it is activated.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability. (Mana abilities can't be targeted.)", verified: true}
+  - {kind: cr, ref: "106.4b", text: "If a player passes priority (see rule 117) while there is mana in their mana pool, that player announces what mana is there.", verified: true}
+  - {kind: cr, ref: "601.2", text: "If a player is unable to comply with the requirements of a step listed below while performing that step, the casting of the spell is illegal; the game returns to the moment before the casting of that spell was proposed", verified: true}
+  - {kind: cr, ref: "601.2c", text: "The player announces their choice of an appropriate object or player for each target the spell requires.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Lotus Petal @petal"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: U}
+  - p0: {t: pass}
+  - label: p1-window
+    check:
+      phase: main1
+      priority: p1
+      stack: []
+      p0: {mana_pool: {U: 1}}
+      legal: {p1: {include: [{t: pass}], exclude: [{t: cast, card: "@stifle"}]}}
+  - expect_illegal: {p1: {t: cast, card: "@stifle", pay: auto}}
+expect:
+  - at: after_script
+    phase: main1
+    priority: p1
+    stack: []
+    p0: {mana_pool: {U: 1}, graveyard: [Lotus Petal]}
+    p1: {hand: [Stifle], battlefield: [{card: Island, tapped: false}]}
+notes: >
+  p1 holds Stifle with an untapped Island, but the stack is empty after p0 passes with blue floating: the mana ability
+  never used the stack, so there is no activated or triggered ability to target and Stifle is not offered (it has no
+  legal target). The floating U is still in p0's pool while the step lasts. A wrong engine that stacked the mana ability
+  would offer Stifle, and one that dropped mana on passing priority would show an empty pool.
+---
+id: ancient-tomb-deals-two-damage-immediately-while-casting
+title: "Ancient Tomb's damage is part of its mana ability, so life is 18 as soon as it is tapped for Stock Up"
+area: core
+cards: [Ancient Tomb, Island, Stock Up, Ponder, Preordain, Brainstorm, Lightning Bolt, Daze]
+tags: [mana-ability, ancient-tomb, life-loss, stack, casting-payment]
+derived_from: cr
+source:
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: cr, ref: "405.6c", text: "Mana abilities resolve immediately. If a mana ability both produces mana and has another effect, the mana is produced and the other effect happens immediately.", verified: true}
+  - {kind: cr, ref: "605.3a", text: "A player may activate an activated mana ability whenever they have priority, whenever they are casting a spell or activating an ability that requires a mana payment, or whenever a rule or effect asks for a mana payment", verified: true}
+  - {kind: cr, ref: "120.3a", text: "Damage dealt to a player by a source without infect causes that player to lose that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stock Up @su"]
+    battlefield: ["Ancient Tomb @tomb", "Island @isl"]
+    library: ["Ponder", "Preordain", "Brainstorm", "Lightning Bolt", "Daze"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@su", pay: {tap: ["@tomb", "@isl"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@su", controller: p0}]
+    priority: p0
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      mana_pool: {}
+      hand_count: 0
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Island, tapped: true}
+    p1: {life: 20}
+notes: >
+  Stock Up costs {2}{U}: Ancient Tomb's {C}{C} pays the generic part and the Island pays {U}, with no mana left over.
+  Tomb's mana ability is activated during casting (605.3a) and its damage happens immediately (405.6c): p0 is at 18
+  while Stock Up is the only object on the stack (no separate damage trigger or ability on the stack). Wrong engines:
+  put a damage trigger on the stack, deal the damage on resolution, or forget the damage when the Tomb is tapped as part
+  of paying a cost.
+---
+id: floating-mana-persists-across-a-resolution-in-the-same-phase
+title: Unspent mana stays in the pool after a spell resolves and is used for a second spell in the same phase
+area: core
+cards: [Lightning Bolt, Mountain]
+tags: [mana-pool, floating-mana, mana-ability, resolution]
+derived_from: cr
+source:
+  - {kind: cr, ref: "106.4", text: "From there, it can be used to pay costs immediately, or it can stay in the player's mana pool as unspent mana. Each player's mana pool empties at the end of each step and phase, and the player is said to lose this mana.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn't go on the stack, so it can't be targeted, countered, or otherwise responded to.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - p0: {t: activate, source: "@m2", ability: 0}
+  - label: floating
+    check:
+      stack: [{kind: spell, card: "@b1"}]
+      priority: p0
+      p0: {mana_pool: {R: 1}, battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: after-first-bolt
+    check:
+      stack: []
+      priority: p0
+      phase: main1
+      p1: {life: 17}
+      p0: {mana_pool: {R: 1}}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+  - check: {p0: {mana_pool: {}}, stack: [{kind: spell, card: "@b2"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    priority: p0
+    phase: main1
+    p1: {life: 14}
+    p0: {mana_pool: {}, graveyard: [Lightning Bolt, Lightning Bolt], hand_count: 0}
+notes: >
+  Mountain 2 is tapped for R while Bolt 1 is on the stack; the mana stays in the pool through the passes and the
+  resolution (still the same main phase), and pays for Bolt 2 (both lands are tapped, so pay: auto can only use the
+  pool). A wrong engine would empty the pool whenever priority is passed or something resolves.
+---
+id: mana-empties-at-the-end-of-a-step
+title: Mana left in the pool is lost when the upkeep ends, with no life loss
+area: core
+cards: [Island]
+tags: [mana-pool, mana-empties, upkeep, draw-step, step-end]
+derived_from: cr
+source:
+  - {kind: cr, ref: "106.4", text: "Each player's mana pool empties at the end of each step and phase, and the player is said to lose this mana.", verified: true}
+  - {kind: cr, ref: "117.3d", text: "If any mana is in that player's mana pool, they announce what mana is there. Then the next player in turn order receives priority.", verified: true}
+  - {kind: cr, ref: "117.4", text: "if the stack is empty, the phase or step ends.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  p0:
+    battlefield: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@isl", ability: 0}
+  - check: {phase: upkeep, p0: {mana_pool: {U: 1}}}
+  - p0: {t: pass}
+  - check: {phase: upkeep, priority: p1, p0: {mana_pool: {U: 1}}}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: draw
+    active: p0
+    priority: p0
+    p0: {mana_pool: {}, life: 20, battlefield: [{card: Island, tapped: true}]}
+notes: >
+  The mana added in the upkeep is still there while p1 holds priority in the same step (second check), but the pool is
+  empty once the upkeep ends and the draw step begins. The Island stays tapped (the land does not untap) and p0's life
+  stays 20: there is no mana burn. A wrong engine would carry the mana across steps (empty only at phase boundaries).
+---
+id: mana-empties-at-the-end-of-a-phase
+title: Mana left in the pool is lost when the second main phase ends
+area: core
+cards: [Island]
+tags: [mana-pool, mana-empties, main-phase, phase-end]
+derived_from: cr
+source:
+  - {kind: cr, ref: "106.4", text: "Each player's mana pool empties at the end of each step and phase, and the player is said to lose this mana.", verified: true}
+  - {kind: cr, ref: "513.1", text: "The end step has no turn-based actions. Once it begins, the active player gets priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    battlefield: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@isl", ability: 0}
+  - check: {phase: main2, p0: {mana_pool: {U: 1}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    active: p0
+    priority: p0
+    p0: {mana_pool: {}, life: 20}
+notes: >
+  Phase boundary variant of the previous scenario: blue mana floating at the end of main phase 2 disappears when the end
+  step begins. Wrong engines would keep it until the turn ends or forever.

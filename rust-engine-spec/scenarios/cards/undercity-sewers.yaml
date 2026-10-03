@@ -1,0 +1,79 @@
+id: undercity-sewers-enters-tapped-and-surveils
+title: Undercity Sewers played as the land drop enters tapped (no mana this turn) and its enter trigger surveils 1
+area: card
+cards: [Undercity Sewers, Ponder]
+tags: [undercity-sewers, enters-tapped, etb-trigger, surveil, land-drop]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Undercity Sewers, text: "This land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Undercity Sewers @sew"]
+    library: ["Ponder @l1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@sew"}
+  - check:
+      stack: [{kind: triggered, source: "@sew", controller: p0}]
+      p0: {battlefield: [{card: Undercity Sewers, tapped: true}], lands_played: 1}
+  - expect_illegal: {p0: {t: activate, source: "@sew", ability: 0, choose_color: U}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@l1"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Ponder]
+      library_count: 10
+      battlefield: [{card: Undercity Sewers, tapped: true}]
+      mana_pool: {}
+notes: >
+  "Enters tapped" is a replacement, so the land is never untapped and its mana ability cannot be activated this turn.
+  The surveil is a triggered ability that uses the stack; p0 gets priority after playing the land with the trigger on the
+  stack (playing a land is a special action, 117.3c). Surveil puts Ponder into the graveyard.
+---
+id: undercity-sewers-keep-on-top-and-land-drop-used
+title: Keeping the surveiled card on top leaves it there, and Sewers used the turn's land drop
+area: card
+cards: [Undercity Sewers, Ponder, Island]
+tags: [undercity-sewers, surveil, land-drop, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Undercity Sewers, text: "When this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Undercity Sewers @sew", "Island @isl"]
+    library: ["Ponder @l1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@sew"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@l1"]}
+  - expect_illegal: {p0: {t: play_land, card: "@isl"}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: []
+      library_top: [Ponder]
+      lands_played: 1
+      battlefield: [{card: Undercity Sewers, tapped: true}]
+notes: >
+  Ponder stays on top. Sewers was played from hand as the land drop, so a second land cannot be played this turn.

@@ -1,0 +1,198 @@
+id: force-of-will-alt-cost-allowed-at-exactly-one-life
+title: "Force of Will's 1 life payment is allowed at 1 life; the caster goes to 0 and loses when state-based actions are checked"
+area: core
+cards: [Brainstorm, Island, Force of Will, Ponder]
+tags: [force-of-will, alternative-cost, life-payment, state-based-actions, game-over]
+derived_from: cr
+source:
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment. If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    life: 1
+    hand: ["Force of Will @fow", "Ponder @pond"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pond", pay_life: 1}, targets: ["@bs"]}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p1: {life: 0, exile: [Ponder]}
+notes: >
+  Life total 1 is greater than or equal to the 1 life payment, so the alternative cost may be paid (119.4). Life then
+  reaches 0 and p1 loses the next time state-based actions are checked, before anyone gets priority (704.5a), so the game
+  is over (p0 wins, 104.2a) with Force of Will never resolving. The stack contents after the game ends are not asserted. A wrong engine that requires life strictly greater than the payment
+  would hide the option at 1 life. (The companion rule: with life 0 a player is already out of the game, so "life at least
+  1" is the only reachable boundary.)
+---
+id: force-of-will-alt-cost-exclusive-with-omniscience-free-cast
+title: "Only one alternative cost per spell: Force of Will cannot combine its own alternative cost with Omniscience's free cast"
+area: core
+cards: [Brainstorm, Island, Force of Will, Ponder, Omniscience]
+tags: [alternative-cost, one-alternative-cost, omniscience, force-of-will, mask-validity, cr-118-9a]
+derived_from: cr
+source:
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast.", verified: true}
+  - {kind: cr, ref: "601.2b", text: "A player can’t apply two alternative methods of casting or two alternative costs to a single spell.", verified: true}
+  - {kind: cr, ref: "118.9", text: "Alternative costs are usually phrased, \"You may [action] rather than pay [this object's] mana cost,\" or \"You may cast [this object] without paying its mana cost.\"", verified: true}
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Ponder @pond"]
+    battlefield: ["Omniscience @omni"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {free: omniscience, exile_blue_card: "@pond", pay_life: 1}, targets: ["@bs"]}}
+  - p1: {t: cast, card: "@fow", alt_cost: {free: omniscience}, targets: ["@bs"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@bs", controller: p0}
+        - {kind: spell, card: "@fow", controller: p1, targets: ["@bs"]}
+      p1: {life: 20, hand: [Ponder], exile: []}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Brainstorm]}
+    p1: {life: 20, hand: [Ponder], graveyard: [Force of Will], exile: []}
+notes: >
+  Omniscience lets p1 cast Force of Will from hand without paying its mana cost, which is itself an alternative cost.
+  Force of Will's own alternative cost (pay 1 life, exile a blue card) is another one, and the two cannot both be applied
+  (118.9a). The combined cast is not offered, while the Omniscience-only cast is: p1 pays nothing (still 20 life, Ponder
+  still in hand) and counters Brainstorm. A wrong engine could let the player stack both, paying the life and exile on
+  top of the free cast, or charge both.
+---
+id: defense-grid-taxes-force-of-will-alt-cost-unaffordable
+title: "Defense Grid adds {3} to Force of Will's alternative cost on the opponent's turn, so two lands are not enough"
+area: core
+cards: [Brainstorm, Island, Force of Will, Ponder, Defense Grid]
+tags: [alternative-cost, cost-increase, defense-grid, force-of-will, cr-118-9d, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "read the whole text and apply the rules of English to the text.", verified: true}
+  - {kind: cr, ref: "109.5", text: "The words “you” and “your” on an object refer to the object’s controller", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1", "Defense Grid @grid"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Ponder @pond"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pond", pay_life: 1}, targets: ["@bs"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@fow", targets: ["@bs"], pay: auto}}
+  - check:
+      legal: {p1: {exclude: [{t: cast, card: "@fow"}]}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@bs", controller: p0}
+    pending: {actor: p1, kind: priority}
+    p0: {battlefield: [{card: Island, tapped: true}, {card: Defense Grid}]}
+    p1:
+      life: 20
+      hand: [Force of Will, Ponder]
+      exile: []
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: false}]
+notes: >
+  Defense Grid taxes each spell cast outside its caster's own turn ("its controller" is the spell's controller). p0's
+  Brainstorm, cast on p0's own turn, is untaxed: p0 pays only {U} with a single Island (a wrong engine that taxes it
+  could not even cast Brainstorm). p1's Force of Will on p0's turn costs {3} more even when cast for its alternative
+  cost (cr-118-9d, 601.2f); two untapped Islands cannot pay {3}, so no cast of Force of Will is offered, neither hard
+  (5+3) nor alternative (1 life + exile + {3}). A wrong engine that ignores cost increases for alternative costs would
+  allow the free counter. Reading of "its controller's turn": the only antecedent of "its" in the sentence is "each
+  spell" (608.2c, rules of English); the Grid's own controller would be written "your" (109.5), and current Oracle text
+  names the object itself "this artifact" (as Disruptor Flute's Oracle text does). So the tax is decided per spell.
+---
+id: defense-grid-taxes-force-of-will-alt-cost-three-mana
+title: "With three lands, Force of Will's alternative cast on the opponent's turn pays 1 life, exiles a blue card, and taps three lands for Defense Grid's tax"
+area: core
+cards: [Brainstorm, Island, Force of Will, Ponder, Defense Grid]
+tags: [alternative-cost, cost-increase, defense-grid, force-of-will, cr-118-9d, mana-payment]
+derived_from: cr
+source:
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "read the whole text and apply the rules of English to the text.", verified: true}
+  - {kind: cr, ref: "109.5", text: "The words “you” and “your” on an object refer to the object’s controller", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Ponder @pond"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3", "Defense Grid @grid"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pond", pay_life: 1}, targets: ["@bs"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bs", controller: p0}
+        - {kind: spell, card: "@fow", controller: p1, targets: ["@bs"]}
+      p1:
+        life: 19
+        exile: [Ponder]
+        battlefield:
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+          - {card: Defense Grid}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Brainstorm], battlefield: [{card: Island, tapped: true}]}
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Ponder]
+      hand: []
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Defense Grid}
+notes: >
+  Same tax as the unaffordable scenario but the Defense Grid is p1's own artifact: the tax applies by whose turn it is
+  relative to the spell's controller, not by who controls the Grid. p1's Force of Will on p0's turn costs 1 life + exile
+  Ponder + {3}; all three Islands tap. p0's Brainstorm, cast on p0's turn, pays only {U}. Tally: p1 life 20-1 = 19.

@@ -1,0 +1,15 @@
+{
+"policy":"mirror","stops":"minimal","seatA_deck":"dnt.dck","seatB_deck(ForgeAI)":"jund75.dck",
+"games":15,"seatA_wins":6,"forgeAI_wins":9,"draws":0,"seatA_games_on_play":7,"seatA_wins_on_play":3,"wall_ms":33733,
+"prompts":601,"prompt_chars":434590,"prompt_tokens_est":120719,"prompts_per_game":40.1,
+"asked_by_kind":{"BottomCards":3,"Mulligan":18,"Priority":573,"YesNo":7},
+"chars_by_kind":{"BottomCards":546,"Mulligan":3401,"Priority":430055,"YesNo":588},"chars_if_every_prompt_carried_full_state":{"BottomCards":2840,"Mulligan":14494,"Priority":503420,"YesNo":1638},
+"menu_enumeration_ms_avg":0.97,"menu_calls":3299,"prompt_render_ms_avg":0.15,
+"forced_no_prompt":{"Priority":1155},
+"auto_pass_by_rule":{"stack:only-own-items":167,"stop-rule:my:COMBAT_BEGIN":101,"stop-rule:my:COMBAT_DAMAGE":32,"stop-rule:my:COMBAT_DECLARE_ATTACKERS":99,"stop-rule:my:COMBAT_DECLARE_BLOCKERS":40,"stop-rule:my:COMBAT_END":97,"stop-rule:my:COMBAT_FIRST_STRIKE_DAMAGE":24,"stop-rule:my:DRAW":110,"stop-rule:my:END_OF_TURN":95,"stop-rule:my:UPKEEP":104,"stop-rule:opp:COMBAT_BEGIN":81,"stop-rule:opp:COMBAT_DAMAGE":24,"stop-rule:opp:COMBAT_DECLARE_ATTACKERS":83,"stop-rule:opp:COMBAT_DECLARE_BLOCKERS":30,"stop-rule:opp:COMBAT_END":74,"stop-rule:opp:COMBAT_FIRST_STRIKE_DAMAGE":4,"stop-rule:opp:DRAW":85,"stop-rule:opp:END_OF_TURN":78,"stop-rule:opp:MAIN1":81,"stop-rule:opp:MAIN2":76,"stop-rule:opp:UPKEEP":86},
+"delegated_to_forge_ai":{"assignCombatDamage":17,"chooseCardName":3,"chooseCardsPile":2,"chooseCardsToDiscardFrom":22,"chooseCounterType":25,"chooseModeForAbility":2,"chooseNumber":2,"choosePermanentsToSacrifice":13,"chooseProtectionType":11,"chooseSingleCardForZoneChange":36,"chooseSingleEntityForEffect":13,"chooseSingleReplacementEffect":7,"chooseSpellAbilityToPlay":3299,"chooseStartingPlayer":7,"confirmAction":11,"confirmTrigger":81,"declareAttackers":52,"declareBlockers":13,"mulliganKeepHand":18,"orderAndPlaySimultaneousSa":87,"orderMoveToZoneList":4,"orderSimultaneousSa":87,"payManaCost":540,"playChosenSpellAbility":230,"playSpellAbilityNoStack":71,"policy:BottomCards":3,"policy:Mulligan":18,"policy:Priority":573,"policy:YesNo":7,"tuckCardsViaMulligan":3,"vote":2,"willPutCardOnTop":5},
+"problems":{},
+"leak_checks":0,"leak_failures":0,
+"mirror_ai_priority_pick_on_menu":573,"mirror_ai_priority_pick_missing":0,
+"problem_samples":[]
+}

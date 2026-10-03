@@ -1,0 +1,157 @@
+id: trigger-goes-on-stack-at-next-priority-then-resolves
+title: Hedge Maze's enters trigger is put on the stack before anyone gets priority and resolves like any other object
+area: core
+cards: [Hedge Maze, Lightning Bolt, Ponder, Island]
+tags: [triggers, trigger-timing, etb, surveil, stack, priority]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "This land enters tapped.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    library: ["Lightning Bolt @bolt", "Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - check:
+      stack:
+        - {kind: triggered, source: "@hm", controller: p0}
+      pending: {actor: p0, kind: priority}
+      priority: p0
+      p0:
+        battlefield: [{card: Hedge Maze, tapped: true}]
+        lands_played: 1
+        graveyard: []
+        library_top: [Lightning Bolt, Ponder]
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: ["@bolt"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      library_top: [Ponder]
+      battlefield: [{card: Hedge Maze, tapped: true}]
+notes: >
+  Playing a land is a special action and does not use the stack, so the trigger is not "responded to" by the land play.
+  The trigger waits until a player would next receive priority (603.3); it is already on the stack when p0 gets priority
+  back, and p1 never had a window in which the trigger was missing. A wrong engine would resolve the surveil inline
+  during the land play, or give p1 priority before the trigger is on the stack. Surveil with one card on top: the single
+  top card goes to the graveyard, so Ponder is the new top card. The lone surveil decision is presented even though it
+  has a single candidate (scenario mode has no auto-resolution).
+---
+id: trigger-resolves-after-its-source-left-the-battlefield
+title: "Hedge Maze destroyed with its trigger on the stack: the surveil still happens"
+area: core
+cards: [Hedge Maze, Wasteland, Lightning Bolt, Island]
+tags: [triggers, last-known-information, independent-of-source, wasteland, surveil]
+derived_from: cr
+source:
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won't affect the ability.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If the source of an ability has left the zone it was in, its last known information is used during this process.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@w", ability: 1, targets: ["@hm"]}
+  - check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "surveil"}
+        - {kind: activated, source: "@w", controller: p1}
+      p1: {graveyard: [Wasteland], battlefield: []}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "surveil"}
+      p0: {battlefield: [], graveyard: [Hedge Maze]}
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: ["@bolt"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    p0: {battlefield: [], graveyard: [Hedge Maze, Lightning Bolt]}
+    p1: {graveyard: [Wasteland]}
+    pending: {actor: p0, kind: priority}
+notes: >
+  p1 destroys the land in response to its own enters trigger. The trigger is an object on the stack, independent of its
+  source (113.7a); it still resolves and p0 still surveils. A wrong engine would remove the trigger together with its
+  source, or fail to resolve because the source is no longer on the battlefield. Ability index 1 of Wasteland is the
+  sacrifice ability (index 0 is the mana ability, as in the daze-and-wasteland exemplar).
+---
+id: second-stifle-fizzles-when-first-already-countered-the-trigger
+title: "Two Stifles on one trigger: the first to resolve counters it, the second has no legal target and does nothing"
+area: core
+cards: [Hedge Maze, Stifle, Island, Lightning Bolt]
+tags: [triggers, stifle, illegal-target, fizzle, stack]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve. It's removed from the stack and, if it's a spell, put into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @s1", "Stifle @s2"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@s1", targets: [{trigger_of: "@hm", nth: 0}], pay: auto}
+  - p1: {t: cast, card: "@s2", targets: [{trigger_of: "@hm", nth: 0}], pay: auto}
+  - check:
+      stack:
+        - {kind: triggered, source: "@hm"}
+        - {kind: spell, card: "@s1", controller: p1}
+        - {kind: spell, card: "@s2", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@s1", controller: p1}
+      p1: {graveyard: [Stifle]}
+      p0: {graveyard: [], library_top: [Lightning Bolt]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p1: {graveyard: [Stifle, Stifle], battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]}
+    p0: {graveyard: [], library_top: [Lightning Bolt]}
+    pending: {actor: p0, kind: priority}
+notes: >
+  The second Stifle (top of stack) resolves first and counters the trigger. When the first Stifle then resolves, its only
+  target is gone, so it is removed from the stack and put into the graveyard without doing anything (608.2b). No surveil
+  decision ever appears and Lightning Bolt stays on top of p0's library. Catches an engine that retargets, resolves a
+  Stifle with an illegal target, or leaves it on the stack.

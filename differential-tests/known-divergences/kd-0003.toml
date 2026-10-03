@@ -1,0 +1,12 @@
+id = "kd-0003"
+title = "Forge: Bilbo's cost reduction is applied to spells cast from hand during the playability pre-check"
+status = "accepted"
+who_is_right = "engine"
+cr_citation = "Bilbo, Thief in the Night: spells you cast from anywhere other than your hand cost {1} less to cast (CR 601.2f cost determination applies to the zone the spell is cast from)"
+rulings = []
+affected_oracles = ["forge"]
+match = { sides = ["FORGE_ONLY"], kinds = ["cast"], zones = ["Hand"], feature_tags = ["bilbo-on-bf"] }
+suppress = true
+regression_scenario = "differential-tests/repros/f2-bilbo-hand-spell-full-cost.scn (expectation is the rules text; Forge is expected to fail it)"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Forge's Bilbo script uses ValidCard$ Card.!wasCastFromYourHand. The flag is set only once the spell is on the stack, so the pre-check getAllPossibleAbilities/canPlay/canPayManaCost sees a discount that the real payment does not give: the probe listed Kaito as castable with three untapped sources, then 'play FAILED (cost or target)' when it actually paid. A human UI player would see an unplayable card as playable, the Forge AI may mis-evaluate. The engine's behavior (offer only when payable at full cost) is correct. Suppression covers any FORGE_ONLY hand cast while Bilbo is on the battlefield; the Kaito case was confirmed by actually playing it in the probe (play FAILED), the other cases (Force of Will hard-cast at one mana short) are inferred from the same mechanism and the count is reported."

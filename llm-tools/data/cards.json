@@ -1,0 +1,2439 @@
+{
+ "forge_ref": "fd5c996",
+ "cards": {
+  "Abrade": {
+   "name": "Abrade",
+   "script": "a/abrade.txt",
+   "faces": [
+    {
+     "name": "Abrade",
+     "mana_cost": "{1}{R}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Choose one —\n• Abrade deals 3 damage to target creature.\n• Destroy target artifact.",
+     "mana_value": 2,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Acererak the Archlich": {
+   "name": "Acererak the Archlich",
+   "script": "a/acererak_the_archlich.txt",
+   "faces": [
+    {
+     "name": "Acererak the Archlich",
+     "mana_cost": "{2}{B}",
+     "types": "Legendary Creature Zombie Wizard",
+     "pt": "5/5",
+     "loyalty": "",
+     "oracle": "When Acererak the Archlich enters, if you haven't completed Tomb of Annihilation, return Acererak the Archlich to its owner's hand and venture into the dungeon.\nWhenever Acererak the Archlich attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature.",
+     "mana_value": 3,
+     "type_line": "Legendary Creature - Zombie Wizard"
+    }
+   ]
+  },
+  "Aether Vial": {
+   "name": "Aether Vial",
+   "script": "a/aether_vial.txt",
+   "faces": [
+    {
+     "name": "Aether Vial",
+     "mana_cost": "{1}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "At the beginning of your upkeep, you may put a charge counter on Aether Vial.\n{T}: You may put a creature card with mana value equal to the number of charge counters on Aether Vial from your hand onto the battlefield.",
+     "mana_value": 1,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Ajani, Nacatl Pariah": {
+   "name": "Ajani, Nacatl Pariah",
+   "script": "a/ajani_nacatl_pariah_ajani_nacatl_avenger.txt",
+   "faces": [
+    {
+     "name": "Ajani, Nacatl Pariah",
+     "mana_cost": "{1}{W}",
+     "types": "Legendary Creature Cat Warrior",
+     "pt": "1/2",
+     "loyalty": "",
+     "oracle": "When Ajani, Nacatl Pariah enters, create a 2/1 white Cat Warrior creature token.\nWhenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.",
+     "mana_value": 2,
+     "type_line": "Legendary Creature - Cat Warrior"
+    },
+    {
+     "name": "Ajani, Nacatl Avenger",
+     "mana_cost": "",
+     "types": "Legendary Planeswalker Ajani",
+     "pt": "",
+     "loyalty": "3",
+     "oracle": "[+2]: Put a +1/+1 counter on each Cat you control.\n[0]: Create a 2/1 white Cat Warrior creature token. When you do, if you control a red permanent other than Ajani, Nacatl Avenger, he deals damage equal to the number of creatures you control to any target.\n[-4]: Each opponent chooses an artifact, a creature, an enchantment and a planeswalker from among the nonland permanents they control, then sacrifices the rest.",
+     "mana_value": 0,
+     "type_line": "Legendary Planeswalker - Ajani"
+    }
+   ]
+  },
+  "Aluren": {
+   "name": "Aluren",
+   "script": "a/aluren.txt",
+   "faces": [
+    {
+     "name": "Aluren",
+     "mana_cost": "{2}{G}{G}",
+     "types": "Enchantment",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.",
+     "mana_value": 4,
+     "type_line": "Enchantment"
+    }
+   ]
+  },
+  "Amped Raptor": {
+   "name": "Amped Raptor",
+   "script": "a/amped_raptor.txt",
+   "faces": [
+    {
+     "name": "Amped Raptor",
+     "mana_cost": "{1}{R}",
+     "types": "Creature Dinosaur",
+     "pt": "2/1",
+     "loyalty": "",
+     "oracle": "First strike\nWhen Amped Raptor enters, you get {E}{E} (two energy counters). Then if you cast it from your hand, exile cards from the top of your library until you exile a nonland card. You may cast that card by paying an amount of {E} equal to its mana value rather than paying its mana cost.",
+     "mana_value": 2,
+     "type_line": "Creature - Dinosaur"
+    }
+   ]
+  },
+  "Ancient Tomb": {
+   "name": "Ancient Tomb",
+   "script": "a/ancient_tomb.txt",
+   "faces": [
+    {
+     "name": "Ancient Tomb",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}: Add {C}{C}. Ancient Tomb deals 2 damage to you.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Animate Dead": {
+   "name": "Animate Dead",
+   "script": "a/animate_dead.txt",
+   "faces": [
+    {
+     "name": "Animate Dead",
+     "mana_cost": "{1}{B}",
+     "types": "Enchantment Aura",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Enchant creature card in a graveyard\nWhen Animate Dead enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the battlefield with Animate Dead.\" Return enchanted creature card to the battlefield under your control and attach Animate Dead to it. When Animate Dead leaves the battlefield, that creature's controller sacrifices it.\nEnchanted creature gets -1/-0.",
+     "mana_value": 2,
+     "type_line": "Enchantment - Aura"
+    }
+   ]
+  },
+  "Archon of Cruelty": {
+   "name": "Archon of Cruelty",
+   "script": "a/archon_of_cruelty.txt",
+   "faces": [
+    {
+     "name": "Archon of Cruelty",
+     "mana_cost": "{6}{B}{B}",
+     "types": "Creature Archon",
+     "pt": "6/6",
+     "loyalty": "",
+     "oracle": "Flying\nWhenever Archon of Cruelty enters or attacks, target opponent sacrifices a creature or planeswalker, discards a card, and loses 3 life. You draw a card and gain 3 life.",
+     "mana_value": 8,
+     "type_line": "Creature - Archon"
+    }
+   ]
+  },
+  "Arid Mesa": {
+   "name": "Arid Mesa",
+   "script": "a/arid_mesa.txt",
+   "faces": [
+    {
+     "name": "Arid Mesa",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Arid Mesa: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Atraxa, Grand Unifier": {
+   "name": "Atraxa, Grand Unifier",
+   "script": "a/atraxa_grand_unifier.txt",
+   "faces": [
+    {
+     "name": "Atraxa, Grand Unifier",
+     "mana_cost": "{3}{G}{W}{U}{B}",
+     "types": "Legendary Creature Phyrexian Angel",
+     "pt": "7/7",
+     "loyalty": "",
+     "oracle": "Flying, vigilance, deathtouch, lifelink\nWhen Atraxa, Grand Unifier enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order. (Artifact, battle, creature, enchantment, instant, kindred, land, planeswalker, and sorcery are card types.)",
+     "mana_value": 7,
+     "type_line": "Legendary Creature - Phyrexian Angel"
+    }
+   ]
+  },
+  "Badlands": {
+   "name": "Badlands",
+   "script": "b/badlands.txt",
+   "faces": [
+    {
+     "name": "Badlands",
+     "mana_cost": "",
+     "types": "Land Swamp Mountain",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {B} or {R}.)",
+     "mana_value": 0,
+     "type_line": "Land - Swamp Mountain"
+    }
+   ]
+  },
+  "Barrowgoyf": {
+   "name": "Barrowgoyf",
+   "script": "b/barrowgoyf.txt",
+   "faces": [
+    {
+     "name": "Barrowgoyf",
+     "mana_cost": "{2}{B}",
+     "types": "Creature Lhurgoyf",
+     "pt": "*/1+*",
+     "loyalty": "",
+     "oracle": "Deathtouch, lifelink\nBarrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.\nWhenever Barrowgoyf deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.",
+     "mana_value": 3,
+     "type_line": "Creature - Lhurgoyf"
+    }
+   ]
+  },
+  "Bilbo, Thief in the Night": {
+   "name": "Bilbo, Thief in the Night",
+   "script": "b/bilbo_thief_in_the_night.txt",
+   "faces": [
+    {
+     "name": "Bilbo, Thief in the Night",
+     "mana_cost": "{1}{U}",
+     "types": "Legendary Creature Halfling Rogue",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Spells you cast from anywhere other than your hand cost {1} less to cast.\nWhenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead.",
+     "mana_value": 2,
+     "type_line": "Legendary Creature - Halfling Rogue"
+    }
+   ]
+  },
+  "Bitter Triumph": {
+   "name": "Bitter Triumph",
+   "script": "b/bitter_triumph.txt",
+   "faces": [
+    {
+     "name": "Bitter Triumph",
+     "mana_cost": "{1}{B}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "As an additional cost to cast this spell, discard a card or pay 3 life.\nDestroy target creature or planeswalker.",
+     "mana_value": 2,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Bloodstained Mire": {
+   "name": "Bloodstained Mire",
+   "script": "b/bloodstained_mire.txt",
+   "faces": [
+    {
+     "name": "Bloodstained Mire",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Bloodstained Mire: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Boggart Trawler": {
+   "name": "Boggart Trawler",
+   "script": "b/boggart_trawler_boggart_bog.txt",
+   "faces": [
+    {
+     "name": "Boggart Trawler",
+     "mana_cost": "{2}{B}",
+     "types": "Creature Goblin",
+     "pt": "3/1",
+     "loyalty": "",
+     "oracle": "When Goblin Trawler enters, exile target player's graveyard.",
+     "mana_value": 3,
+     "type_line": "Creature - Goblin"
+    },
+    {
+     "name": "Boggart Bog",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "As Boggart Bog enters, you may pay 3 life. If you don't, it enters tapped.\n{T}: Add {B}.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Boseiju, Who Endures": {
+   "name": "Boseiju, Who Endures",
+   "script": "b/boseiju_who_endures.txt",
+   "faces": [
+    {
+     "name": "Boseiju, Who Endures",
+     "mana_cost": "",
+     "types": "Legendary Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}: Add {G}.\nChannel — {1}{G}, Discard Boseiju, Who Endures: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.",
+     "mana_value": 0,
+     "type_line": "Legendary Land"
+    }
+   ]
+  },
+  "Brainstorm": {
+   "name": "Brainstorm",
+   "script": "b/brainstorm.txt",
+   "faces": [
+    {
+     "name": "Brainstorm",
+     "mana_cost": "{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Draw three cards, then put two cards from your hand on top of your library in any order.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Brazen Borrower": {
+   "name": "Brazen Borrower",
+   "script": "b/brazen_borrower_petty_theft.txt",
+   "faces": [
+    {
+     "name": "Brazen Borrower",
+     "mana_cost": "{1}{U}{U}",
+     "types": "Creature Faerie Rogue",
+     "pt": "3/1",
+     "loyalty": "",
+     "oracle": "Flash\nFlying\nBrazen Borrower can block only creatures with flying.",
+     "mana_value": 3,
+     "type_line": "Creature - Faerie Rogue"
+    },
+    {
+     "name": "Petty Theft",
+     "mana_cost": "{1}{U}",
+     "types": "Instant Adventure",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Return target nonland permanent an opponent controls to its owner's hand.",
+     "mana_value": 2,
+     "type_line": "Instant - Adventure"
+    }
+   ]
+  },
+  "Cabal Therapy": {
+   "name": "Cabal Therapy",
+   "script": "c/cabal_therapy.txt",
+   "faces": [
+    {
+     "name": "Cabal Therapy",
+     "mana_cost": "{B}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Choose a nonland card name. Target player reveals their hand and discards all cards with that name.\nFlashback—Sacrifice a creature. (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Carpet of Flowers": {
+   "name": "Carpet of Flowers",
+   "script": "c/carpet_of_flowers.txt",
+   "faces": [
+    {
+     "name": "Carpet of Flowers",
+     "mana_cost": "{G}",
+     "types": "Enchantment",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "At the beginning of each of your main phases, if you haven't added mana with this ability this turn, you may add X mana of any one color, where X is the number of Islands target opponent controls.",
+     "mana_value": 1,
+     "type_line": "Enchantment"
+    }
+   ]
+  },
+  "Cavern of Souls": {
+   "name": "Cavern of Souls",
+   "script": "c/cavern_of_souls.txt",
+   "faces": [
+    {
+     "name": "Cavern of Souls",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "As Cavern of Souls enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "City of Traitors": {
+   "name": "City of Traitors",
+   "script": "c/city_of_traitors.txt",
+   "faces": [
+    {
+     "name": "City of Traitors",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "When you play another land, sacrifice City of Traitors.\n{T}: Add {C}{C}.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Cloak and Dagger, Entwined": {
+   "name": "Cloak and Dagger, Entwined",
+   "script": "c/cloak_and_dagger_entwined.txt",
+   "faces": [
+    {
+     "name": "Cloak and Dagger, Entwined",
+     "mana_cost": "{1}{W}{B}",
+     "types": "Legendary Creature Human Hero",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Deathtouch, lifelink\nWhen Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.",
+     "mana_value": 3,
+     "type_line": "Legendary Creature - Human Hero"
+    }
+   ]
+  },
+  "Collective Brutality": {
+   "name": "Collective Brutality",
+   "script": "c/collective_brutality.txt",
+   "faces": [
+    {
+     "name": "Collective Brutality",
+     "mana_cost": "{1}{B}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Escalate—Discard a card. (Pay this cost for each mode chosen beyond the first.)\nChoose one or more —\n• Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.\n• Target creature gets -2/-2 until end of turn.\n• Target opponent loses 2 life and you gain 2 life.",
+     "mana_value": 2,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Consider": {
+   "name": "Consider",
+   "script": "c/consider.txt",
+   "faces": [
+    {
+     "name": "Consider",
+     "mana_cost": "{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDraw a card.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Consign to Memory": {
+   "name": "Consign to Memory",
+   "script": "c/consign_to_memory.txt",
+   "faces": [
+    {
+     "name": "Consign to Memory",
+     "mana_cost": "{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Replicate {1} (When you cast this spell, copy it for each time you paid its replicate cost. You may choose new targets for the copies.)\nCounter target triggered ability or colorless spell.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Containment Priest": {
+   "name": "Containment Priest",
+   "script": "c/containment_priest.txt",
+   "faces": [
+    {
+     "name": "Containment Priest",
+     "mana_cost": "{1}{W}",
+     "types": "Creature Human Cleric",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Flash\nIf a nontoken creature would enter and it wasn't cast, exile it instead.",
+     "mana_value": 2,
+     "type_line": "Creature - Human Cleric"
+    }
+   ]
+  },
+  "Cori-Steel Cutter": {
+   "name": "Cori-Steel Cutter",
+   "script": "c/cori_steel_cutter.txt",
+   "faces": [
+    {
+     "name": "Cori-Steel Cutter",
+     "mana_cost": "{1}{R}",
+     "types": "Artifact Equipment",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Equipped creature gets +1/+1 and has trample and haste.\nFlurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it. (Whenever you cast a noncreature spell, the token gets +1/+1 until end of turn.)\nEquip {1}{R}",
+     "mana_value": 2,
+     "type_line": "Artifact - Equipment"
+    }
+   ]
+  },
+  "Dark Ritual": {
+   "name": "Dark Ritual",
+   "script": "d/dark_ritual.txt",
+   "faces": [
+    {
+     "name": "Dark Ritual",
+     "mana_cost": "{B}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Add {B}{B}{B}.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Daze": {
+   "name": "Daze",
+   "script": "d/daze.txt",
+   "faces": [
+    {
+     "name": "Daze",
+     "mana_cost": "{1}{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.\nCounter target spell unless its controller pays {1}.",
+     "mana_value": 2,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Deafening Silence": {
+   "name": "Deafening Silence",
+   "script": "d/deafening_silence.txt",
+   "faces": [
+    {
+     "name": "Deafening Silence",
+     "mana_cost": "{W}",
+     "types": "Enchantment",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Each player can't cast more than one noncreature spell each turn.",
+     "mana_value": 1,
+     "type_line": "Enchantment"
+    }
+   ]
+  },
+  "Defense Grid": {
+   "name": "Defense Grid",
+   "script": "d/defense_grid.txt",
+   "faces": [
+    {
+     "name": "Defense Grid",
+     "mana_cost": "{2}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Each spell costs {3} more to cast except during its controller's turn.",
+     "mana_value": 2,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Dismember": {
+   "name": "Dismember",
+   "script": "d/dismember.txt",
+   "faces": [
+    {
+     "name": "Dismember",
+     "mana_cost": "{1}{BP}{BP}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({B/P} can be paid with either {B} or 2 life.)\nTarget creature gets -5/-5 until end of turn.",
+     "mana_value": 3,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Disruptor Flute": {
+   "name": "Disruptor Flute",
+   "script": "d/disruptor_flute.txt",
+   "faces": [
+    {
+     "name": "Disruptor Flute",
+     "mana_cost": "{2}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Flash\nAs Disruptor Flute enters, choose a card name.\nSpells with the chosen name cost {3} more to cast.\nActivated abilities of sources with the chosen name can't be activated unless they're mana abilities.",
+     "mana_value": 2,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Doomsday": {
+   "name": "Doomsday",
+   "script": "d/doomsday.txt",
+   "faces": [
+    {
+     "name": "Doomsday",
+     "mana_cost": "{B}{B}{B}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Search your library and graveyard for five cards and exile the rest. Put the chosen cards on top of your library in any order. You lose half your life, rounded up.",
+     "mana_value": 3,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Dragon's Rage Channeler": {
+   "name": "Dragon's Rage Channeler",
+   "script": "d/dragons_rage_channeler.txt",
+   "faces": [
+    {
+     "name": "Dragon's Rage Channeler",
+     "mana_cost": "{R}",
+     "types": "Creature Human Shaman",
+     "pt": "1/1",
+     "loyalty": "",
+     "oracle": "Whenever you cast a noncreature spell, surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDelirium — As long as there are four or more card types among cards in your graveyard, Dragon's Rage Channeler gets +2/+2, has flying, and attacks each combat if able.",
+     "mana_value": 1,
+     "type_line": "Creature - Human Shaman"
+    }
+   ]
+  },
+  "Duress": {
+   "name": "Duress",
+   "script": "d/duress.txt",
+   "faces": [
+    {
+     "name": "Duress",
+     "mana_cost": "{B}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Target opponent reveals their hand. You choose a noncreature, nonland card from it. That player discards that card.",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Edge of Autumn": {
+   "name": "Edge of Autumn",
+   "script": "e/edge_of_autumn.txt",
+   "faces": [
+    {
+     "name": "Edge of Autumn",
+     "mana_cost": "{1}{G}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "If you control four or fewer lands, search your library for a basic land card, put it onto the battlefield tapped, then shuffle.\nCycling—Sacrifice a land. (Sacrifice a land, Discard this card: Draw a card.)",
+     "mana_value": 2,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Elegant Parlor": {
+   "name": "Elegant Parlor",
+   "script": "e/elegant_parlor.txt",
+   "faces": [
+    {
+     "name": "Elegant Parlor",
+     "mana_cost": "",
+     "types": "Land Mountain Plains",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {R} or {W}.)\nElegant Parlor enters tapped.\nWhen Elegant Parlor enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+     "mana_value": 0,
+     "type_line": "Land - Mountain Plains"
+    }
+   ]
+  },
+  "Erode": {
+   "name": "Erode",
+   "script": "e/erode.txt",
+   "faces": [
+    {
+     "name": "Erode",
+     "mana_cost": "{W}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Faerie Macabre": {
+   "name": "Faerie Macabre",
+   "script": "f/faerie_macabre.txt",
+   "faces": [
+    {
+     "name": "Faerie Macabre",
+     "mana_cost": "{1}{B}{B}",
+     "types": "Creature Faerie Rogue",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Flying\nDiscard Faerie Macabre: Exile up to two target cards from graveyards.",
+     "mana_value": 3,
+     "type_line": "Creature - Faerie Rogue"
+    }
+   ]
+  },
+  "Faithless Looting": {
+   "name": "Faithless Looting",
+   "script": "f/faithless_looting.txt",
+   "faces": [
+    {
+     "name": "Faithless Looting",
+     "mana_cost": "{R}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Fatal Push": {
+   "name": "Fatal Push",
+   "script": "f/fatal_push.txt",
+   "faces": [
+    {
+     "name": "Fatal Push",
+     "mana_cost": "{B}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Destroy target creature if it has mana value 2 or less.\nRevolt — Destroy that creature if it has mana value 4 or less instead if a permanent you controlled left the battlefield this turn.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Flickerwisp": {
+   "name": "Flickerwisp",
+   "script": "f/flickerwisp.txt",
+   "faces": [
+    {
+     "name": "Flickerwisp",
+     "mana_cost": "{1}{W}{W}",
+     "types": "Creature Elemental",
+     "pt": "3/1",
+     "loyalty": "",
+     "oracle": "Flying\nWhen Flickerwisp enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.",
+     "mana_value": 3,
+     "type_line": "Creature - Elemental"
+    }
+   ]
+  },
+  "Flooded Strand": {
+   "name": "Flooded Strand",
+   "script": "f/flooded_strand.txt",
+   "faces": [
+    {
+     "name": "Flooded Strand",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Flooded Strand: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Flow State": {
+   "name": "Flow State",
+   "script": "f/flow_state.txt",
+   "faces": [
+    {
+     "name": "Flow State",
+     "mana_cost": "{1}{U}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Look at the top three cards of your library. Put one of them into your hand and the rest on the bottom of your library in any order. If there is an instant card and a sorcery card in your graveyard, instead put two of them into your hand and the rest on the bottom of your library in any order.",
+     "mana_value": 2,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Flusterstorm": {
+   "name": "Flusterstorm",
+   "script": "f/flusterstorm.txt",
+   "faces": [
+    {
+     "name": "Flusterstorm",
+     "mana_cost": "{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Counter target instant or sorcery spell unless its controller pays {1}.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Force of Negation": {
+   "name": "Force of Negation",
+   "script": "f/force_of_negation.txt",
+   "faces": [
+    {
+     "name": "Force of Negation",
+     "mana_cost": "{1}{U}{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.",
+     "mana_value": 3,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Force of Will": {
+   "name": "Force of Will",
+   "script": "f/force_of_will.txt",
+   "faces": [
+    {
+     "name": "Force of Will",
+     "mana_cost": "{3}{U}{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target spell.",
+     "mana_value": 5,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Forest": {
+   "name": "Forest",
+   "script": "f/forest.txt",
+   "faces": [
+    {
+     "name": "Forest",
+     "mana_cost": "",
+     "types": "Basic Land Forest",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {G}.)",
+     "mana_value": 0,
+     "type_line": "Basic Land - Forest"
+    }
+   ]
+  },
+  "Gaddock Teeg": {
+   "name": "Gaddock Teeg",
+   "script": "g/gaddock_teeg.txt",
+   "faces": [
+    {
+     "name": "Gaddock Teeg",
+     "mana_cost": "{G}{W}",
+     "types": "Legendary Creature Kithkin Advisor",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Noncreature spells with mana value 4 or greater can't be cast.\nNoncreature spells with {X} in their mana costs can't be cast.",
+     "mana_value": 2,
+     "type_line": "Legendary Creature - Kithkin Advisor"
+    }
+   ]
+  },
+  "Goblin Bombardment": {
+   "name": "Goblin Bombardment",
+   "script": "g/goblin_bombardment.txt",
+   "faces": [
+    {
+     "name": "Goblin Bombardment",
+     "mana_cost": "{1}{R}",
+     "types": "Enchantment",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Sacrifice a creature: Goblin Bombardment deals 1 damage to any target.",
+     "mana_value": 2,
+     "type_line": "Enchantment"
+    }
+   ]
+  },
+  "Grafdigger's Cage": {
+   "name": "Grafdigger's Cage",
+   "script": "g/grafdiggers_cage.txt",
+   "faces": [
+    {
+     "name": "Grafdigger's Cage",
+     "mana_cost": "{1}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Creature cards in graveyards and libraries can't enter the battlefield.\nPlayers can't cast spells from graveyards or libraries.",
+     "mana_value": 1,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Griselbrand": {
+   "name": "Griselbrand",
+   "script": "g/griselbrand.txt",
+   "faces": [
+    {
+     "name": "Griselbrand",
+     "mana_cost": "{4}{B}{B}{B}{B}",
+     "types": "Legendary Creature Demon",
+     "pt": "7/7",
+     "loyalty": "",
+     "oracle": "Flying, lifelink\nPay 7 life: Draw seven cards.",
+     "mana_value": 8,
+     "type_line": "Legendary Creature - Demon"
+    }
+   ]
+  },
+  "Guide of Souls": {
+   "name": "Guide of Souls",
+   "script": "g/guide_of_souls.txt",
+   "faces": [
+    {
+     "name": "Guide of Souls",
+     "mana_cost": "{W}",
+     "types": "Creature Human Cleric",
+     "pt": "1/2",
+     "loyalty": "",
+     "oracle": "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter).\nWhenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.",
+     "mana_value": 1,
+     "type_line": "Creature - Human Cleric"
+    }
+   ]
+  },
+  "Hedge Maze": {
+   "name": "Hedge Maze",
+   "script": "h/hedge_maze.txt",
+   "faces": [
+    {
+     "name": "Hedge Maze",
+     "mana_cost": "",
+     "types": "Land Forest Island",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {G} or {U}.)\nHedge Maze enters tapped.\nWhen Hedge Maze enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+     "mana_value": 0,
+     "type_line": "Land - Forest Island"
+    }
+   ]
+  },
+  "Hide on the Ceiling": {
+   "name": "Hide on the Ceiling",
+   "script": "h/hide_on_the_ceiling.txt",
+   "faces": [
+    {
+     "name": "Hide on the Ceiling",
+     "mana_cost": "{X}{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Exile X target artifacts and/or creatures. Return the exiled cards to the battlefield under their owners' control at the beginning of the next end step.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Hydroblast": {
+   "name": "Hydroblast",
+   "script": "h/hydroblast.txt",
+   "faces": [
+    {
+     "name": "Hydroblast",
+     "mana_cost": "{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Choose one —\n• Counter target spell if it's red.\n• Destroy target permanent if it's red.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Island": {
+   "name": "Island",
+   "script": "i/island.txt",
+   "faces": [
+    {
+     "name": "Island",
+     "mana_cost": "",
+     "types": "Basic Land Island",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {U}.)",
+     "mana_value": 0,
+     "type_line": "Basic Land - Island"
+    }
+   ]
+  },
+  "Jace, Wielder of Mysteries": {
+   "name": "Jace, Wielder of Mysteries",
+   "script": "j/jace_wielder_of_mysteries.txt",
+   "faces": [
+    {
+     "name": "Jace, Wielder of Mysteries",
+     "mana_cost": "{1}{U}{U}{U}",
+     "types": "Legendary Planeswalker Jace",
+     "pt": "",
+     "loyalty": "4",
+     "oracle": "If you would draw a card while your library has no cards in it, you win the game instead.\n[+1]: Target player mills two cards. Draw a card.\n[-8]: Draw seven cards. Then if your library has no cards in it, you win the game.",
+     "mana_value": 4,
+     "type_line": "Legendary Planeswalker - Jace"
+    }
+   ]
+  },
+  "Kaito, Bane of Nightmares": {
+   "name": "Kaito, Bane of Nightmares",
+   "script": "k/kaito_bane_of_nightmares.txt",
+   "faces": [
+    {
+     "name": "Kaito, Bane of Nightmares",
+     "mana_cost": "{2}{U}{B}",
+     "types": "Legendary Planeswalker Kaito",
+     "pt": "",
+     "loyalty": "4",
+     "oracle": "Ninjutsu {1}{U}{B} ({1}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)\nDuring your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has hexproof.\n[+1]: You get an emblem with \"Ninjas you control get +1/+1.\"\n[0]: Surveil 2. Then draw a card for each opponent who lost life this turn.\n[-2]: Tap target creature. Put two stun counters on it.",
+     "mana_value": 4,
+     "type_line": "Legendary Planeswalker - Kaito"
+    }
+   ]
+  },
+  "Karakas": {
+   "name": "Karakas",
+   "script": "k/karakas.txt",
+   "faces": [
+    {
+     "name": "Karakas",
+     "mana_cost": "",
+     "types": "Legendary Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}: Add {W}.\n{T}: Return target legendary creature to its owner's hand.",
+     "mana_value": 0,
+     "type_line": "Legendary Land"
+    }
+   ]
+  },
+  "Koma, World-Eater": {
+   "name": "Koma, World-Eater",
+   "script": "k/koma_world_eater.txt",
+   "faces": [
+    {
+     "name": "Koma, World-Eater",
+     "mana_cost": "{3}{G}{G}{U}{U}",
+     "types": "Legendary Creature Serpent",
+     "pt": "8/12",
+     "loyalty": "",
+     "oracle": "This spell can't be countered.\nTrample, ward {4}\nWhenever Koma deals combat damage to a player, create four 3/3 blue Serpent creature tokens named Koma's Coil.",
+     "mana_value": 7,
+     "type_line": "Legendary Creature - Serpent"
+    }
+   ]
+  },
+  "Lavinia, Azorius Renegade": {
+   "name": "Lavinia, Azorius Renegade",
+   "script": "l/lavinia_azorius_renegade.txt",
+   "faces": [
+    {
+     "name": "Lavinia, Azorius Renegade",
+     "mana_cost": "{W}{U}",
+     "types": "Legendary Creature Human Soldier",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Each opponent can't cast noncreature spells with mana value greater than the number of lands that player controls.\nWhenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.",
+     "mana_value": 2,
+     "type_line": "Legendary Creature - Human Soldier"
+    }
+   ]
+  },
+  "Lazotep Quarry": {
+   "name": "Lazotep Quarry",
+   "script": "l/lazotep_quarry.txt",
+   "faces": [
+    {
+     "name": "Lazotep Quarry",
+     "mana_cost": "",
+     "types": "Land Desert",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}: Add {C}.\n{T}, Sacrifice a creature: Add one mana of any color.\n{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery.",
+     "mana_value": 0,
+     "type_line": "Land - Desert"
+    }
+   ]
+  },
+  "Lightning Bolt": {
+   "name": "Lightning Bolt",
+   "script": "l/lightning_bolt.txt",
+   "faces": [
+    {
+     "name": "Lightning Bolt",
+     "mana_cost": "{R}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Lightning Bolt deals 3 damage to any target.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Lion's Eye Diamond": {
+   "name": "Lion's Eye Diamond",
+   "script": "l/lions_eye_diamond.txt",
+   "faces": [
+    {
+     "name": "Lion's Eye Diamond",
+     "mana_cost": "{0}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Discard your hand, Sacrifice Lion's Eye Diamond: Add three mana of any one color. Activate only as an instant.",
+     "mana_value": 0,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Loran of the Third Path": {
+   "name": "Loran of the Third Path",
+   "script": "l/loran_of_the_third_path.txt",
+   "faces": [
+    {
+     "name": "Loran of the Third Path",
+     "mana_cost": "{2}{W}",
+     "types": "Legendary Creature Human Artificer",
+     "pt": "2/1",
+     "loyalty": "",
+     "oracle": "Vigilance\nWhen Loran of the Third Path enters, destroy up to one target artifact or enchantment.\n{T}: You and target opponent each draw a card.",
+     "mana_value": 3,
+     "type_line": "Legendary Creature - Human Artificer"
+    }
+   ]
+  },
+  "Lotus Petal": {
+   "name": "Lotus Petal",
+   "script": "l/lotus_petal.txt",
+   "faces": [
+    {
+     "name": "Lotus Petal",
+     "mana_cost": "{0}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Sacrifice Lotus Petal: Add one mana of any color.",
+     "mana_value": 0,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Magus of the Moon": {
+   "name": "Magus of the Moon",
+   "script": "m/magus_of_the_moon.txt",
+   "faces": [
+    {
+     "name": "Magus of the Moon",
+     "mana_cost": "{2}{R}",
+     "types": "Creature Human Wizard",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Nonbasic lands are Mountains.",
+     "mana_value": 3,
+     "type_line": "Creature - Human Wizard"
+    }
+   ]
+  },
+  "Marsh Flats": {
+   "name": "Marsh Flats",
+   "script": "m/marsh_flats.txt",
+   "faces": [
+    {
+     "name": "Marsh Flats",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Marsh Flats: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Massacre": {
+   "name": "Massacre",
+   "script": "m/massacre.txt",
+   "faces": [
+    {
+     "name": "Massacre",
+     "mana_cost": "{2}{B}{B}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "If an opponent controls a Plains and you control a Swamp, you may cast this spell without paying its mana cost.\nAll creatures get -2/-2 until end of turn.",
+     "mana_value": 4,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Meltdown": {
+   "name": "Meltdown",
+   "script": "m/meltdown.txt",
+   "faces": [
+    {
+     "name": "Meltdown",
+     "mana_cost": "{X}{R}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Destroy each artifact with mana value X or less.",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Meticulous Archive": {
+   "name": "Meticulous Archive",
+   "script": "m/meticulous_archive.txt",
+   "faces": [
+    {
+     "name": "Meticulous Archive",
+     "mana_cost": "",
+     "types": "Land Plains Island",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {W} or {U}.)\nMeticulous Archive enters tapped.\nWhen Meticulous Archive enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+     "mana_value": 0,
+     "type_line": "Land - Plains Island"
+    }
+   ]
+  },
+  "Mishra's Bauble": {
+   "name": "Mishra's Bauble",
+   "script": "m/mishras_bauble.txt",
+   "faces": [
+    {
+     "name": "Mishra's Bauble",
+     "mana_cost": "{0}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Sacrifice Mishra's Bauble: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.",
+     "mana_value": 0,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Misty Rainforest": {
+   "name": "Misty Rainforest",
+   "script": "m/misty_rainforest.txt",
+   "faces": [
+    {
+     "name": "Misty Rainforest",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Misty Rainforest: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Moonshadow": {
+   "name": "Moonshadow",
+   "script": "m/moonshadow.txt",
+   "faces": [
+    {
+     "name": "Moonshadow",
+     "mana_cost": "{B}",
+     "types": "Creature Elemental",
+     "pt": "7/7",
+     "loyalty": "",
+     "oracle": "Menace\nThis creature enters with six -1/-1 counters on it.\nWhenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.",
+     "mana_value": 1,
+     "type_line": "Creature - Elemental"
+    }
+   ]
+  },
+  "Mountain": {
+   "name": "Mountain",
+   "script": "m/mountain.txt",
+   "faces": [
+    {
+     "name": "Mountain",
+     "mana_cost": "",
+     "types": "Basic Land Mountain",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {R}.)",
+     "mana_value": 0,
+     "type_line": "Basic Land - Mountain"
+    }
+   ]
+  },
+  "Murktide Regent": {
+   "name": "Murktide Regent",
+   "script": "m/murktide_regent.txt",
+   "faces": [
+    {
+     "name": "Murktide Regent",
+     "mana_cost": "{5}{U}{U}",
+     "types": "Creature Dragon",
+     "pt": "3/3",
+     "loyalty": "",
+     "oracle": "Delve (Each card you exile from your graveyard while casting this spell pays for {1}.)\nFlying\nMurktide Regent enters with a +1/+1 counter on it for each instant and sorcery card exiled with it.\nWhenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on Murktide Regent.",
+     "mana_value": 7,
+     "type_line": "Creature - Dragon"
+    }
+   ]
+  },
+  "Nethergoyf": {
+   "name": "Nethergoyf",
+   "script": "n/nethergoyf.txt",
+   "faces": [
+    {
+     "name": "Nethergoyf",
+     "mana_cost": "{B}",
+     "types": "Creature Lhurgoyf",
+     "pt": "*/1+*",
+     "loyalty": "",
+     "oracle": "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.\nEscape—{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them. (You may cast this card from your graveyard for its escape cost.)",
+     "mana_value": 1,
+     "type_line": "Creature - Lhurgoyf"
+    }
+   ]
+  },
+  "Nihil Spellbomb": {
+   "name": "Nihil Spellbomb",
+   "script": "n/nihil_spellbomb.txt",
+   "faces": [
+    {
+     "name": "Nihil Spellbomb",
+     "mana_cost": "{1}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Sacrifice Nihil Spellbomb: Exile all cards from target player's graveyard.\nWhen Nihil Spellbomb is put into a graveyard from the battlefield, you may pay {B}. If you do, draw a card.",
+     "mana_value": 1,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Null Rod": {
+   "name": "Null Rod",
+   "script": "n/null_rod.txt",
+   "faces": [
+    {
+     "name": "Null Rod",
+     "mana_cost": "{2}",
+     "types": "Artifact",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Activated abilities of artifacts can't be activated.",
+     "mana_value": 2,
+     "type_line": "Artifact"
+    }
+   ]
+  },
+  "Ocelot Pride": {
+   "name": "Ocelot Pride",
+   "script": "o/ocelot_pride.txt",
+   "faces": [
+    {
+     "name": "Ocelot Pride",
+     "mana_cost": "{W}",
+     "types": "Creature Cat",
+     "pt": "1/1",
+     "loyalty": "",
+     "oracle": "First strike, lifelink\nAscend\nAt the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token. Then if you have the city's blessing, for each token you control that entered this turn, create a token that's a copy of it.",
+     "mana_value": 1,
+     "type_line": "Creature - Cat"
+    }
+   ]
+  },
+  "Omniscience": {
+   "name": "Omniscience",
+   "script": "o/omniscience.txt",
+   "faces": [
+    {
+     "name": "Omniscience",
+     "mana_cost": "{7}{U}{U}{U}",
+     "types": "Enchantment",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "You may cast spells from your hand without paying their mana costs.",
+     "mana_value": 10,
+     "type_line": "Enchantment"
+    }
+   ]
+  },
+  "Orcish Bowmasters": {
+   "name": "Orcish Bowmasters",
+   "script": "o/orcish_bowmasters.txt",
+   "faces": [
+    {
+     "name": "Orcish Bowmasters",
+     "mana_cost": "{1}{B}",
+     "types": "Creature Orc Archer",
+     "pt": "1/1",
+     "loyalty": "",
+     "oracle": "Flash\nWhen Orcish Bowmasters enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, Orcish Bowmasters deals 1 damage to any target. Then amass Orcs 1.",
+     "mana_value": 2,
+     "type_line": "Creature - Orc Archer"
+    }
+   ]
+  },
+  "Overlord of the Balemurk": {
+   "name": "Overlord of the Balemurk",
+   "script": "o/overlord_of_the_balemurk.txt",
+   "faces": [
+    {
+     "name": "Overlord of the Balemurk",
+     "mana_cost": "{3}{B}{B}",
+     "types": "Enchantment Creature Avatar Horror",
+     "pt": "5/5",
+     "loyalty": "",
+     "oracle": "Impending 5—{1}{B} (If you cast this spell for its impending cost, it enters with five time counters and isn't a creature until the last is removed. At the beginning of your end step, remove a time counter from it.)\nWhenever Overlord of the Balemurk enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand.",
+     "mana_value": 5,
+     "type_line": "Enchantment Creature - Avatar Horror"
+    }
+   ]
+  },
+  "Path to Exile": {
+   "name": "Path to Exile",
+   "script": "p/path_to_exile.txt",
+   "faces": [
+    {
+     "name": "Path to Exile",
+     "mana_cost": "{W}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Personal Tutor": {
+   "name": "Personal Tutor",
+   "script": "p/personal_tutor.txt",
+   "faces": [
+    {
+     "name": "Personal Tutor",
+     "mana_cost": "{U}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Search your library for a sorcery card, reveal it, then shuffle and put that card on top.",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Phelia, Exuberant Shepherd": {
+   "name": "Phelia, Exuberant Shepherd",
+   "script": "p/phelia_exuberant_shepherd.txt",
+   "faces": [
+    {
+     "name": "Phelia, Exuberant Shepherd",
+     "mana_cost": "{1}{W}",
+     "types": "Legendary Creature Dog",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Flash\nWhenever Phelia, Exuberant Shepherd attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.",
+     "mana_value": 2,
+     "type_line": "Legendary Creature - Dog"
+    }
+   ]
+  },
+  "Phlage, Titan of Fire's Fury": {
+   "name": "Phlage, Titan of Fire's Fury",
+   "script": "p/phlage_titan_of_fires_fury.txt",
+   "faces": [
+    {
+     "name": "Phlage, Titan of Fire's Fury",
+     "mana_cost": "{1}{R}{W}",
+     "types": "Legendary Creature Elder Giant",
+     "pt": "6/6",
+     "loyalty": "",
+     "oracle": "When Phlage enters, sacrifice it unless it escaped.\nWhenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.\nEscape—{R}{R}{W}{W}, Exile five other cards from your graveyard. (You may cast this card from your graveyard for its escape cost.)",
+     "mana_value": 3,
+     "type_line": "Legendary Creature - Elder Giant"
+    }
+   ]
+  },
+  "Plains": {
+   "name": "Plains",
+   "script": "p/plains.txt",
+   "faces": [
+    {
+     "name": "Plains",
+     "mana_cost": "",
+     "types": "Basic Land Plains",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {W}.)",
+     "mana_value": 0,
+     "type_line": "Basic Land - Plains"
+    }
+   ]
+  },
+  "Plateau": {
+   "name": "Plateau",
+   "script": "p/plateau.txt",
+   "faces": [
+    {
+     "name": "Plateau",
+     "mana_cost": "",
+     "types": "Land Mountain Plains",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {R} or {W}.)",
+     "mana_value": 0,
+     "type_line": "Land - Mountain Plains"
+    }
+   ]
+  },
+  "Polluted Delta": {
+   "name": "Polluted Delta",
+   "script": "p/polluted_delta.txt",
+   "faces": [
+    {
+     "name": "Polluted Delta",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Polluted Delta: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Ponder": {
+   "name": "Ponder",
+   "script": "p/ponder.txt",
+   "faces": [
+    {
+     "name": "Ponder",
+     "mana_cost": "{U}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card.",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Preordain": {
+   "name": "Preordain",
+   "script": "p/preordain.txt",
+   "faces": [
+    {
+     "name": "Preordain",
+     "mana_cost": "{U}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Prismari Charm": {
+   "name": "Prismari Charm",
+   "script": "p/prismari_charm.txt",
+   "faces": [
+    {
+     "name": "Prismari Charm",
+     "mana_cost": "{U}{R}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Choose one —\n• Surveil 2, then draw a card.\n• Prismari Charm deals 1 damage to each of one or two targets.\n• Return target nonland permanent to its owner's hand.",
+     "mana_value": 2,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Prismatic Ending": {
+   "name": "Prismatic Ending",
+   "script": "p/prismatic_ending.txt",
+   "faces": [
+    {
+     "name": "Prismatic Ending",
+     "mana_cost": "{X}{W}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Prismatic Vista": {
+   "name": "Prismatic Vista",
+   "script": "p/prismatic_vista.txt",
+   "faces": [
+    {
+     "name": "Prismatic Vista",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Prismatic Vista: Search your library for a basic land card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Pyroblast": {
+   "name": "Pyroblast",
+   "script": "p/pyroblast.txt",
+   "faces": [
+    {
+     "name": "Pyroblast",
+     "mana_cost": "{R}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Choose one —\n• Counter target spell if it's blue.\n• Destroy target permanent if it's blue.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Pyroclasm": {
+   "name": "Pyroclasm",
+   "script": "p/pyroclasm.txt",
+   "faces": [
+    {
+     "name": "Pyroclasm",
+     "mana_cost": "{1}{R}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Pyroclasm deals 2 damage to each creature.",
+     "mana_value": 2,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Quantum Riddler": {
+   "name": "Quantum Riddler",
+   "script": "q/quantum_riddler.txt",
+   "faces": [
+    {
+     "name": "Quantum Riddler",
+     "mana_cost": "{3}{U}{U}",
+     "types": "Creature Sphinx",
+     "pt": "4/6",
+     "loyalty": "",
+     "oracle": "Flying\nWhen this creature enters, draw a card.\nAs long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.\nWarp {1}{U}",
+     "mana_value": 5,
+     "type_line": "Creature - Sphinx"
+    }
+   ]
+  },
+  "Raph & Mikey, Troublemakers": {
+   "name": "Raph & Mikey, Troublemakers",
+   "script": "r/raph_mikey_troublemakers.txt",
+   "faces": [
+    {
+     "name": "Raph & Mikey, Troublemakers",
+     "mana_cost": "{5}{RG}{RG}",
+     "types": "Legendary Creature Mutant Ninja Turtle",
+     "pt": "7/7",
+     "loyalty": "",
+     "oracle": "Trample, haste\nWhenever Raph & Mikey attack, reveal cards from the top of your library until you reveal a creature card. Put that card onto the battlefield tapped and attacking and the rest on the bottom of your library in a random order.",
+     "mana_value": 7,
+     "type_line": "Legendary Creature - Mutant Ninja Turtle"
+    }
+   ]
+  },
+  "Raucous Theater": {
+   "name": "Raucous Theater",
+   "script": "r/raucous_theater.txt",
+   "faces": [
+    {
+     "name": "Raucous Theater",
+     "mana_cost": "",
+     "types": "Land Swamp Mountain",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {B} or {R}.)\nRaucous Theater enters tapped.\nWhen Raucous Theater enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+     "mana_value": 0,
+     "type_line": "Land - Swamp Mountain"
+    }
+   ]
+  },
+  "Reanimate": {
+   "name": "Reanimate",
+   "script": "r/reanimate.txt",
+   "faces": [
+    {
+     "name": "Reanimate",
+     "mana_cost": "{B}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to its mana value.",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Recruiter of the Guard": {
+   "name": "Recruiter of the Guard",
+   "script": "r/recruiter_of_the_guard.txt",
+   "faces": [
+    {
+     "name": "Recruiter of the Guard",
+     "mana_cost": "{2}{W}",
+     "types": "Creature Human Soldier",
+     "pt": "1/1",
+     "loyalty": "",
+     "oracle": "When Recruiter of the Guard enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.",
+     "mana_value": 3,
+     "type_line": "Creature - Human Soldier"
+    }
+   ]
+  },
+  "Samwise the Stouthearted": {
+   "name": "Samwise the Stouthearted",
+   "script": "s/samwise_the_stouthearted.txt",
+   "faces": [
+    {
+     "name": "Samwise the Stouthearted",
+     "mana_cost": "{1}{W}",
+     "types": "Legendary Creature Halfling Peasant",
+     "pt": "2/1",
+     "loyalty": "",
+     "oracle": "Flash\nWhen Samwise the Stouthearted enters, choose up to one target permanent card in your graveyard that was put there from the battlefield this turn. Return it to your hand. Then the Ring tempts you.",
+     "mana_value": 2,
+     "type_line": "Legendary Creature - Halfling Peasant"
+    }
+   ]
+  },
+  "Sand Scout": {
+   "name": "Sand Scout",
+   "script": "s/sand_scout.txt",
+   "faces": [
+    {
+     "name": "Sand Scout",
+     "mana_cost": "{1}{W}",
+     "types": "Creature Human Scout",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "When Sand Scout enters, if an opponent controls more lands than you, search your library for a Desert card, put it onto the battlefield tapped, then shuffle.\nWhenever one or more land cards are put into your graveyard from anywhere, create a 1/1 red, green, and white Sand Warrior creature token. This ability triggers only once each turn.",
+     "mana_value": 2,
+     "type_line": "Creature - Human Scout"
+    }
+   ]
+  },
+  "Savannah": {
+   "name": "Savannah",
+   "script": "s/savannah.txt",
+   "faces": [
+    {
+     "name": "Savannah",
+     "mana_cost": "",
+     "types": "Land Forest Plains",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {G} or {W}.)",
+     "mana_value": 0,
+     "type_line": "Land - Forest Plains"
+    }
+   ]
+  },
+  "Scalding Tarn": {
+   "name": "Scalding Tarn",
+   "script": "s/scalding_tarn.txt",
+   "faces": [
+    {
+     "name": "Scalding Tarn",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Scalding Tarn: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Scrubland": {
+   "name": "Scrubland",
+   "script": "s/scrubland.txt",
+   "faces": [
+    {
+     "name": "Scrubland",
+     "mana_cost": "",
+     "types": "Land Plains Swamp",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {W} or {B}.)",
+     "mana_value": 0,
+     "type_line": "Land - Plains Swamp"
+    }
+   ]
+  },
+  "Shadowy Backstreet": {
+   "name": "Shadowy Backstreet",
+   "script": "s/shadowy_backstreet.txt",
+   "faces": [
+    {
+     "name": "Shadowy Backstreet",
+     "mana_cost": "",
+     "types": "Land Plains Swamp",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {W} or {B}.)\nShadowy Backstreet enters tapped.\nWhen Shadowy Backstreet enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+     "mana_value": 0,
+     "type_line": "Land - Plains Swamp"
+    }
+   ]
+  },
+  "Shallow Grave": {
+   "name": "Shallow Grave",
+   "script": "s/shallow_grave.txt",
+   "faces": [
+    {
+     "name": "Shallow Grave",
+     "mana_cost": "{1}{B}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Return the top creature card of your graveyard to the battlefield. That creature gains haste until end of turn. Exile it at the beginning of the next end step.",
+     "mana_value": 2,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Show and Tell": {
+   "name": "Show and Tell",
+   "script": "s/show_and_tell.txt",
+   "faces": [
+    {
+     "name": "Show and Tell",
+     "mana_cost": "{2}{U}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.",
+     "mana_value": 3,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Skyclave Apparition": {
+   "name": "Skyclave Apparition",
+   "script": "s/skyclave_apparition.txt",
+   "faces": [
+    {
+     "name": "Skyclave Apparition",
+     "mana_cost": "{1}{W}{W}",
+     "types": "Creature Kor Spirit",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "When Skyclave Apparition enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.\nWhen Skyclave Apparition leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.",
+     "mana_value": 3,
+     "type_line": "Creature - Kor Spirit"
+    }
+   ]
+  },
+  "Snow-Covered Island": {
+   "name": "Snow-Covered Island",
+   "script": "s/snow_covered_island.txt",
+   "faces": [
+    {
+     "name": "Snow-Covered Island",
+     "mana_cost": "",
+     "types": "Basic Snow Land Island",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {U}.)",
+     "mana_value": 0,
+     "type_line": "Basic Snow Land - Island"
+    }
+   ]
+  },
+  "Snow-Covered Plains": {
+   "name": "Snow-Covered Plains",
+   "script": "s/snow_covered_plains.txt",
+   "faces": [
+    {
+     "name": "Snow-Covered Plains",
+     "mana_cost": "",
+     "types": "Basic Snow Land Plains",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {W}.)",
+     "mana_value": 0,
+     "type_line": "Basic Snow Land - Plains"
+    }
+   ]
+  },
+  "Snow-Covered Swamp": {
+   "name": "Snow-Covered Swamp",
+   "script": "s/snow_covered_swamp.txt",
+   "faces": [
+    {
+     "name": "Snow-Covered Swamp",
+     "mana_cost": "",
+     "types": "Basic Snow Land Swamp",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {B}.)",
+     "mana_value": 0,
+     "type_line": "Basic Snow Land - Swamp"
+    }
+   ]
+  },
+  "Snuff Out": {
+   "name": "Snuff Out",
+   "script": "s/snuff_out.txt",
+   "faces": [
+    {
+     "name": "Snuff Out",
+     "mana_cost": "{3}{B}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "If you control a Swamp, you may pay 4 life rather than pay this spell's mana cost.\nDestroy target nonblack creature. It can't be regenerated.",
+     "mana_value": 4,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Solitude": {
+   "name": "Solitude",
+   "script": "s/solitude.txt",
+   "faces": [
+    {
+     "name": "Solitude",
+     "mana_cost": "{3}{W}{W}",
+     "types": "Creature Elemental Incarnation",
+     "pt": "3/2",
+     "loyalty": "",
+     "oracle": "Flash\nLifelink\nWhen Solitude enters, exile up to one other target creature. That creature's controller gains life equal to its power.\nEvoke—Exile a white card from your hand.",
+     "mana_value": 5,
+     "type_line": "Creature - Elemental Incarnation"
+    }
+   ]
+  },
+  "Spider-Woman, Stunning Savior": {
+   "name": "Spider-Woman, Stunning Savior",
+   "script": "s/spider_woman_stunning_savior.txt",
+   "faces": [
+    {
+     "name": "Spider-Woman, Stunning Savior",
+     "mana_cost": "{1}{WU}",
+     "types": "Legendary Creature Spider Human Hero",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Flying\nVenom Blast — Artifacts and creatures your opponents control enter tapped.",
+     "mana_value": 2,
+     "type_line": "Legendary Creature - Spider Human Hero"
+    }
+   ]
+  },
+  "Stifle": {
+   "name": "Stifle",
+   "script": "s/stifle.txt",
+   "faces": [
+    {
+     "name": "Stifle",
+     "mana_cost": "{U}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Counter target activated or triggered ability. (Mana abilities can't be targeted.)",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Stock Up": {
+   "name": "Stock Up",
+   "script": "s/stock_up.txt",
+   "faces": [
+    {
+     "name": "Stock Up",
+     "mana_cost": "{2}{U}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.",
+     "mana_value": 3,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Street Wraith": {
+   "name": "Street Wraith",
+   "script": "s/street_wraith.txt",
+   "faces": [
+    {
+     "name": "Street Wraith",
+     "mana_cost": "{3}{B}{B}",
+     "types": "Creature Wraith",
+     "pt": "3/4",
+     "loyalty": "",
+     "oracle": "Swampwalk (This creature can't be blocked as long as defending player controls a Swamp.)\nCycling—Pay 2 life. (Pay 2 life, Discard this card: Draw a card.)",
+     "mana_value": 5,
+     "type_line": "Creature - Wraith"
+    }
+   ]
+  },
+  "Stronghold Gambit": {
+   "name": "Stronghold Gambit",
+   "script": "s/stronghold_gambit.txt",
+   "faces": [
+    {
+     "name": "Stronghold Gambit",
+     "mana_cost": "{1}{R}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Each player chooses a card in their hand. Then each player reveals their chosen card. The owner of each creature card revealed this way with the lowest mana value puts it onto the battlefield.",
+     "mana_value": 2,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Surgical Extraction": {
+   "name": "Surgical Extraction",
+   "script": "s/surgical_extraction.txt",
+   "faces": [
+    {
+     "name": "Surgical Extraction",
+     "mana_cost": "{BP}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({B/P} can be paid with either {B} or 2 life.)\nChoose target card in a graveyard other than a basic land card. Search its owner's graveyard, hand, and library for any number of cards with the same name as that card and exile them. Then that player shuffles.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Swamp": {
+   "name": "Swamp",
+   "script": "s/swamp.txt",
+   "faces": [
+    {
+     "name": "Swamp",
+     "mana_cost": "",
+     "types": "Basic Land Swamp",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {B}.)",
+     "mana_value": 0,
+     "type_line": "Basic Land - Swamp"
+    }
+   ]
+  },
+  "Swords to Plowshares": {
+   "name": "Swords to Plowshares",
+   "script": "s/swords_to_plowshares.txt",
+   "faces": [
+    {
+     "name": "Swords to Plowshares",
+     "mana_cost": "{W}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Exile target creature. Its controller gains life equal to its power.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Tamiyo, Inquisitive Student": {
+   "name": "Tamiyo, Inquisitive Student",
+   "script": "t/tamiyo_inquisitive_student_tamiyo_seasoned_scholar.txt",
+   "faces": [
+    {
+     "name": "Tamiyo, Inquisitive Student",
+     "mana_cost": "{U}",
+     "types": "Legendary Creature Moonfolk Wizard",
+     "pt": "0/3",
+     "loyalty": "",
+     "oracle": "Flying\nWhenever Tamiyo, Inquisitive Student attacks, investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\nWhenever you draw your third card in a turn, exile Tamiyo, then return her to the battlefield transformed under her owner's control.",
+     "mana_value": 1,
+     "type_line": "Legendary Creature - Moonfolk Wizard"
+    },
+    {
+     "name": "Tamiyo, Seasoned Scholar",
+     "mana_cost": "",
+     "types": "Legendary Planeswalker Tamiyo",
+     "pt": "",
+     "loyalty": "2",
+     "oracle": "[+2]: Until your next turn, whenever a creature an opponent controls attacks you or a planeswalker you control, it gets -1/-0 until end of turn.\n[-3]: Return target instant or sorcery card from your graveyard to your hand. If it's a green card, add one mana of any color.\n[-7]: Draw cards equal to half the number of cards in your library, rounded up. You get an emblem with \"You have no maximum hand size.\"",
+     "mana_value": 0,
+     "type_line": "Legendary Planeswalker - Tamiyo"
+    }
+   ]
+  },
+  "Thassa's Oracle": {
+   "name": "Thassa's Oracle",
+   "script": "t/thassas_oracle.txt",
+   "faces": [
+    {
+     "name": "Thassa's Oracle",
+     "mana_cost": "{U}{U}",
+     "types": "Creature Merfolk Wizard",
+     "pt": "1/3",
+     "loyalty": "",
+     "oracle": "When Thassa's Oracle enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game. (Each {U} in the mana costs of permanents you control counts toward your devotion to blue.)",
+     "mana_value": 2,
+     "type_line": "Creature - Merfolk Wizard"
+    }
+   ]
+  },
+  "Thoughtseize": {
+   "name": "Thoughtseize",
+   "script": "t/thoughtseize.txt",
+   "faces": [
+    {
+     "name": "Thoughtseize",
+     "mana_cost": "{B}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.",
+     "mana_value": 1,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Thundering Falls": {
+   "name": "Thundering Falls",
+   "script": "t/thundering_falls.txt",
+   "faces": [
+    {
+     "name": "Thundering Falls",
+     "mana_cost": "",
+     "types": "Land Island Mountain",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {U} or {R}.)\nThundering Falls enters tapped.\nWhen Thundering Falls enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+     "mana_value": 0,
+     "type_line": "Land - Island Mountain"
+    }
+   ]
+  },
+  "Triumph of Saint Katherine": {
+   "name": "Triumph of Saint Katherine",
+   "script": "t/triumph_of_saint_katherine.txt",
+   "faces": [
+    {
+     "name": "Triumph of Saint Katherine",
+     "mana_cost": "{4}{W}",
+     "types": "Creature Human Warrior",
+     "pt": "5/5",
+     "loyalty": "",
+     "oracle": "Lifelink\nPraesidium Protectiva — When Triumph of Saint Katherine is put into your graveyard from the battlefield, exile it and the top six cards of your library in a face-down pile. If you do, shuffle that pile and put it back on top of your library.\nMiracle {1}{W} (You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)",
+     "mana_value": 5,
+     "type_line": "Creature - Human Warrior"
+    }
+   ]
+  },
+  "Tropical Island": {
+   "name": "Tropical Island",
+   "script": "t/tropical_island.txt",
+   "faces": [
+    {
+     "name": "Tropical Island",
+     "mana_cost": "",
+     "types": "Land Forest Island",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {G} or {U}.)",
+     "mana_value": 0,
+     "type_line": "Land - Forest Island"
+    }
+   ]
+  },
+  "Tundra": {
+   "name": "Tundra",
+   "script": "t/tundra.txt",
+   "faces": [
+    {
+     "name": "Tundra",
+     "mana_cost": "",
+     "types": "Land Plains Island",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {W} or {U}.)",
+     "mana_value": 0,
+     "type_line": "Land - Plains Island"
+    }
+   ]
+  },
+  "Undercity Sewers": {
+   "name": "Undercity Sewers",
+   "script": "u/undercity_sewers.txt",
+   "faces": [
+    {
+     "name": "Undercity Sewers",
+     "mana_cost": "",
+     "types": "Land Island Swamp",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {U} or {B}.)\nUndercity Sewers enters tapped.\nWhen Undercity Sewers enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+     "mana_value": 0,
+     "type_line": "Land - Island Swamp"
+    }
+   ]
+  },
+  "Underground Sea": {
+   "name": "Underground Sea",
+   "script": "u/underground_sea.txt",
+   "faces": [
+    {
+     "name": "Underground Sea",
+     "mana_cost": "",
+     "types": "Land Island Swamp",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {U} or {B}.)",
+     "mana_value": 0,
+     "type_line": "Land - Island Swamp"
+    }
+   ]
+  },
+  "Unholy Heat": {
+   "name": "Unholy Heat",
+   "script": "u/unholy_heat.txt",
+   "faces": [
+    {
+     "name": "Unholy Heat",
+     "mana_cost": "{R}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Unholy Heat deals 2 damage to target creature or planeswalker.\nDelirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard.",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Unmask": {
+   "name": "Unmask",
+   "script": "u/unmask.txt",
+   "faces": [
+    {
+     "name": "Unmask",
+     "mana_cost": "{3}{B}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "You may exile a black card from your hand rather than pay this spell's mana cost.\nTarget player reveals their hand. You choose a nonland card from it. That player discards that card.",
+     "mana_value": 4,
+     "type_line": "Sorcery"
+    }
+   ]
+  },
+  "Veil of Summer": {
+   "name": "Veil of Summer",
+   "script": "v/veil_of_summer.txt",
+   "faces": [
+    {
+     "name": "Veil of Summer",
+     "mana_cost": "{G}",
+     "types": "Instant",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "Draw a card if an opponent has cast a blue or black spell this turn. Spells you control can't be countered this turn. You and permanents you control gain hexproof from blue and from black until end of turn. (You and they can't be the targets of blue or black spells or abilities your opponents control.)",
+     "mana_value": 1,
+     "type_line": "Instant"
+    }
+   ]
+  },
+  "Verdant Catacombs": {
+   "name": "Verdant Catacombs",
+   "script": "v/verdant_catacombs.txt",
+   "faces": [
+    {
+     "name": "Verdant Catacombs",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Verdant Catacombs: Search your library for a Swamp or Forest card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Voice of Victory": {
+   "name": "Voice of Victory",
+   "script": "v/voice_of_victory.txt",
+   "faces": [
+    {
+     "name": "Voice of Victory",
+     "mana_cost": "{1}{W}",
+     "types": "Creature Human Soldier",
+     "pt": "1/3",
+     "loyalty": "",
+     "oracle": "Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)\nYour opponents can't cast spells during your turn.",
+     "mana_value": 2,
+     "type_line": "Creature - Human Soldier"
+    }
+   ]
+  },
+  "Volcanic Island": {
+   "name": "Volcanic Island",
+   "script": "v/volcanic_island.txt",
+   "faces": [
+    {
+     "name": "Volcanic Island",
+     "mana_cost": "",
+     "types": "Land Island Mountain",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "({T}: Add {U} or {R}.)",
+     "mana_value": 0,
+     "type_line": "Land - Island Mountain"
+    }
+   ]
+  },
+  "Wasteland": {
+   "name": "Wasteland",
+   "script": "w/wasteland.txt",
+   "faces": [
+    {
+     "name": "Wasteland",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}: Add {C}.\n{T}, Sacrifice Wasteland: Destroy target nonbasic land.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "White Orchid Phantom": {
+   "name": "White Orchid Phantom",
+   "script": "w/white_orchid_phantom.txt",
+   "faces": [
+    {
+     "name": "White Orchid Phantom",
+     "mana_cost": "{W}{W}",
+     "types": "Creature Spirit Knight",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "Flying, first strike\nWhen White Orchid Phantom enters, destroy up to one target nonbasic land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+     "mana_value": 2,
+     "type_line": "Creature - Spirit Knight"
+    }
+   ]
+  },
+  "Windswept Heath": {
+   "name": "Windswept Heath",
+   "script": "w/windswept_heath.txt",
+   "faces": [
+    {
+     "name": "Windswept Heath",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "{T}, Pay 1 life, Sacrifice Windswept Heath: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Witch Enchanter": {
+   "name": "Witch Enchanter",
+   "script": "w/witch_enchanter_witch_blessed_meadow.txt",
+   "faces": [
+    {
+     "name": "Witch Enchanter",
+     "mana_cost": "{3}{W}",
+     "types": "Creature Human Warlock",
+     "pt": "2/2",
+     "loyalty": "",
+     "oracle": "When Witch Enchanter enters, destroy target artifact or enchantment an opponent controls.",
+     "mana_value": 4,
+     "type_line": "Creature - Human Warlock"
+    },
+    {
+     "name": "Witch-Blessed Meadow",
+     "mana_cost": "",
+     "types": "Land",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "As Witch-Blessed Meadow enters, you may pay 3 life. If you don't, it enters tapped.\n{T}: Add {W}.",
+     "mana_value": 0,
+     "type_line": "Land"
+    }
+   ]
+  },
+  "Wrath of the Skies": {
+   "name": "Wrath of the Skies",
+   "script": "w/wrath_of_the_skies.txt",
+   "faces": [
+    {
+     "name": "Wrath of the Skies",
+     "mana_cost": "{X}{W}{W}",
+     "types": "Sorcery",
+     "pt": "",
+     "loyalty": "",
+     "oracle": "You get X {E} (energy counters), then you may pay any amount of {E}. Destroy each artifact, creature, and enchantment with mana value less than or equal to the amount of {E} paid this way.",
+     "mana_value": 2,
+     "type_line": "Sorcery"
+    }
+   ]
+  }
+ }
+}

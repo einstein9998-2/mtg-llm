@@ -1,0 +1,163 @@
+id: sand-scout-no-trigger-when-lands-are-equal
+title: Sand Scout's enters ability does not trigger when the opponent controls the same number of lands
+area: card
+cards: [Sand Scout, Plains, Lazotep Quarry, Plateau]
+tags: [sand-scout, intervening-if, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Sand Scout, text: "When this creature enters, if an opponent controls more lands than you, search your library for a Desert card, put it onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: cr, ref: "603.4", text: "The ability triggers only if it is; otherwise it does nothing.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Sand Scout @ss"]
+    battlefield: ["Plains @a", "Plains @b"]
+    library: ["Lazotep Quarry @lq"]
+    library_pad: 10
+  p1:
+    battlefield: ["Plateau @x1", "Plateau @x2"]
+    library_pad: 10
+random: []
+script:
+  - p0: {t: cast, card: "@ss", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_count: 11
+      library_top: [Lazotep Quarry]
+      battlefield:
+        - {card: Sand Scout, sick: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  Two lands each: "more lands than you" is false, so nothing triggers, nothing is searched and nothing is shuffled
+  (random: [] makes a stray shuffle fail the scenario).
+---
+id: sand-scout-condition-rechecked-on-resolution
+title: If the opponent's land count drops to equal before Sand Scout's trigger resolves, the trigger does nothing
+area: card
+cards: [Sand Scout, Plains, Lazotep Quarry, Arid Mesa, Plateau]
+tags: [sand-scout, intervening-if, fetchland, priority, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Sand Scout, text: "When this creature enters, if an opponent controls more lands than you, search your library for a Desert card, put it onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: oracle, card: Sand Scout, text: "Whenever one or more land cards are put into your graveyard from anywhere, create a 1/1 red, green, and white Sand Warrior creature token.", verified: true}
+  - {kind: oracle, card: Arid Mesa, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "603.4", text: "If the ability triggers, it checks the stated condition again as it resolves. If the condition isn't true at that time, the ability is removed from the stack and does nothing.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Sand Scout @ss"]
+    battlefield: ["Plains @a", "Plains @b", "Plains @c"]
+    library: ["Lazotep Quarry @lq"]
+    library_pad: 10
+  p1:
+    battlefield: ["Arid Mesa @mesa", "Plateau @x1", "Plateau @x2", "Plateau @x3"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ss", pay: {tap: ["@a", "@b"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@ss", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@mesa", ability: 0}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, found: null}
+  - check:
+      stack: [{kind: triggered, source: "@ss", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {life: 19, graveyard: [Arid Mesa]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_count: 11
+      battlefield:
+        - {card: Sand Scout, sick: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: false}
+    p1:
+      life: 19
+      graveyard: [Arid Mesa]
+      battlefield: [{card: Plateau}, {card: Plateau}, {card: Plateau}]
+notes: >
+  4 lands against 3: the ability triggers. In response p1 cracks Arid Mesa and finds nothing (p1's library is only the
+  padding Islands, so the search fails; the search decision is still raised). p1 now has 3 lands, equal to p0, so on
+  resolution the condition is false and the trigger does nothing: no search, the Quarry stays in p0's library (11).
+  The Mesa went to p1's graveyard, not p0's, so Sand Scout's land-to-graveyard ability ("your graveyard") does not
+  trigger and p0 gets no Sand Warrior. A wrong engine checks the condition only on entry, or triggers the token ability
+  on the opponent's graveyard.
+---
+id: sand-scout-land-to-graveyard-token-once-per-turn
+title: Two fetchlands cracked in one turn give Sand Scout's controller only one Sand Warrior
+area: card
+cards: [Sand Scout, Arid Mesa, Windswept Heath, Plains, Sand Warrior Token]
+tags: [sand-scout, once-each-turn, fetchland, token, trigger-from-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Sand Scout, text: "Whenever one or more land cards are put into your graveyard from anywhere, create a 1/1 red, green, and white Sand Warrior creature token. This ability triggers only once each turn.", verified: true}
+  - {kind: oracle, card: Arid Mesa, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Windswept Heath, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Sand Scout @ss", "Arid Mesa @mesa", "Windswept Heath @heath"]
+    library: ["Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@mesa", ability: 0}
+  - check:
+      stack:
+        - {kind: activated, source: "@mesa", controller: p0}
+        - {kind: triggered, source: "@ss", controller: p0}
+      p0: {life: 19, graveyard: [Arid Mesa]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@pl1"}
+  - p0: {t: activate, source: "@heath", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@heath", controller: p0}]
+      p0: {life: 18, graveyard: [Arid Mesa, Windswept Heath]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@pl2"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Arid Mesa, Windswept Heath]
+      library_count: 10
+      battlefield:
+        - {card: Sand Scout}
+        - {card: Plains, tapped: false}
+        - {card: Plains, tapped: false}
+        - {token: Sand Warrior Token, pt: [1, 1], sick: true}
+notes: >
+  Sacrificing the Mesa as a cost puts a land card into p0's graveyard during activation; the trigger goes on the stack
+  above the Mesa ability, so it resolves first (one Sand Warrior), then the search. The Heath later in the same turn puts
+  another land card into the graveyard, but the ability triggers only once each turn, so no second token and the Heath
+  ability is alone on the stack. Two fetches cost 2 life. A wrong engine creates two tokens, or puts the Scout trigger
+  under the Mesa ability.

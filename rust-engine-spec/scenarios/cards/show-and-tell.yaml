@@ -1,0 +1,272 @@
+id: show-and-tell-creature-and-land-both-players
+title: Show and Tell lets each player put a card from hand onto the battlefield; a creature and a land enter together with no land drop used
+area: card
+cards: [Show and Tell, Faerie Macabre, Brainstorm, Island, Lightning Bolt]
+tags: [show-and-tell, simultaneous-secret-choice, put-onto-battlefield, not-a-land-drop, summoning-sickness]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "305.4", text: "Effects may also allow players to \"put\" lands onto the battlefield. This isn't the same as \"playing a land\" and doesn't count as a land played during the current turn.", verified: true}
+  - {kind: cr, ref: "101.4", text: "the active player ... makes any choices required, then the next player in turn order", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Faerie Macabre @fm", "Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Island @pi", "Lightning Bolt @pb"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@fm"}
+  - p1: {decision: simultaneous_secret_choice, answer: "@pi"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 0
+      spells_cast_this_turn: 1
+      hand: [Brainstorm]
+      graveyard: [Show and Tell]
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Faerie Macabre, tapped: false, sick: true, pt: [2, 2]}
+    p1:
+      lands_played: 0
+      hand: [Lightning Bolt]
+      battlefield: [{card: Island, tapped: false}]
+notes: >
+  The Brainstorm and Lightning Bolt stay in hand (instants are not among the four legal types). Both permanents enter
+  at the same time; neither land play nor spell count changes except Show and Tell itself (1 spell cast). The creature
+  entered this turn, so it is summoning sick. p1's Island enters untapped. Neither entrance triggers anything.
+---
+id: show-and-tell-artifact-and-enchantment-not-cast
+title: Show and Tell puts an enchantment and an artifact onto the battlefield without casting them
+area: card
+cards: [Show and Tell, Omniscience, Lotus Petal, Island]
+tags: [show-and-tell, simultaneous-secret-choice, put-onto-battlefield, not-cast, omniscience]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Omniscience @omni"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Lotus Petal @lp", "Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@omni"}
+  - p1: {decision: simultaneous_secret_choice, answer: "@lp"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      spells_cast_this_turn: 1
+      hand: []
+      battlefield_contains: [{card: Omniscience, types: [Enchantment], tapped: false}]
+    p1:
+      spells_cast_this_turn: 0
+      hand: [Island]
+      battlefield: [{card: Lotus Petal, types: [Artifact], tapped: false}]
+notes: >
+  Omniscience and Lotus Petal were put onto the battlefield, not cast: nothing goes on the stack and only Show and Tell
+  counts as a spell cast (p0: 1, p1: 0). Each player's choice is independent; p1's untouched Island stays in hand.
+---
+id: show-and-tell-put-in-permanent-cannot-be-countered-by-force-of-will
+title: A permanent put in by Show and Tell is not a spell, so Force of Will has nothing to counter
+area: card
+cards: [Show and Tell, Omniscience, Force of Will, Brainstorm, Island]
+tags: [show-and-tell, put-onto-battlefield, not-cast, force-of-will, mask-validity, omniscience]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Omniscience @omni"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @pbs", "Island @ph"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@omni"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pbs", pay_life: 1}, targets: ["@omni"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield_contains: [{card: Omniscience, types: [Enchantment]}]
+    p1:
+      life: 20
+      hand: [Force of Will, Brainstorm, Island]
+notes: >
+  After Show and Tell resolves p0 has priority, passes on the empty stack, and p1 receives priority. Force of Will needs
+  a target spell; Omniscience entered the battlefield without being cast and nothing else is on the stack, so the cast is
+  not offered, and nothing is paid (life 20, hand intact). A wrong engine would treat "put onto the battlefield" as a cast
+  that can be countered.
+---
+id: show-and-tell-enters-tapped-effect-spider-woman
+title: Spider-Woman makes the opponent's creature enter tapped but not the controller's own artifact
+area: card
+cards: [Show and Tell, Faerie Macabre, Lotus Petal, "Spider-Woman, Stunning Savior", Island]
+tags: [show-and-tell, enters-tapped, spider-woman, replacement-effect, put-onto-battlefield]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+  - {kind: cr, ref: "614.12", text: "Some replacement effects modify how a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Faerie Macabre @fm"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Lotus Petal @lp"]
+    battlefield: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@fm"}
+  - p1: {decision: simultaneous_secret_choice, answer: "@lp"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Faerie Macabre, tapped: true}]
+    p1:
+      battlefield: [{card: "Spider-Woman, Stunning Savior"}, {card: Lotus Petal, tapped: false}]
+notes: >
+  Spider-Woman's controller is p1, so only p0's artifacts and creatures ("your opponents control") enter tapped: Faerie
+  Macabre enters tapped. p1's own Lotus Petal enters untapped. A wrong engine would tap both, or neither, or apply the
+  effect only to cast spells.
+---
+id: show-and-tell-second-chooser-learns-nothing-about-first-pick
+title: p1's observation while choosing for Show and Tell carries no trace of p0's pick or hand change
+area: hidden-info
+cards: [Show and Tell, Omniscience, Aluren, Island, Lotus Petal]
+tags: [show-and-tell, simultaneous-secret-choice, hidden-info, non-interference]
+derived_from: cr
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "101.4", text: "If multiple players would make choices and/or take actions at the same time, the active player ... makes any choices required, then the next player in turn order ... makes any choices required, followed by the remaining nonactive players in turn order. Then the actions happen simultaneously.", verified: true}
+  - {kind: cr, ref: "101.4a", text: "If an effect has each player choose a card in a hidden zone, such as their hand or library, those cards may remain face down as they're chosen. However, each player must clearly indicate which face-down card they are choosing.", verified: true}
+  - {kind: cr, ref: "101.4b", text: "A player knows the choices made by the previous players when making their choice, except as specified in 101.4a.", verified: true}
+observer: p1
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Omniscience @omni", "Aluren @al"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Island @ph", "Lotus Petal @lp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@omni"}
+  - check:
+      observer: p1
+      pending: {actor: p1, kind: simultaneous_secret_choice}
+      obs:
+        opp: {hand_count: 2}
+        option_labels_exclude_names: [Omniscience, Aluren]
+        events_text_exclude: [Omniscience, Aluren]
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+expect:
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 1}
+      option_labels_exclude_names: [Aluren]
+      events_text_exclude: [Aluren]
+notes: >
+  CR 101.4: p0 chooses first, then p1, then the chosen cards are put onto the battlefield simultaneously. CR 101.4a/b:
+  the card is chosen from a hidden zone and may stay face down, so p1 learns THAT p0 indicated a card (101.4b) but
+  not WHICH card. Design doc 02 section 9.1 keeps it face down. While p1 decides, p0's chosen card is still in p0's
+  hand (nothing moves until both have chosen), so p0's hand size is still 2; and neither Omniscience (the pick) nor
+  Aluren (the card kept in hand) may appear in p1's observation, option labels or event text. (Reviewer note: p1 is
+  entitled to know that p0 chose a card rather than nothing; this scenario does not assert either way about that.) After both answers, Omniscience is public (it is on the battlefield) but Aluren must still not appear
+  anywhere: p0's remaining hand has size 1. The mid-script check uses the same seat-view vocabulary as the final expectation.
+---
+id: show-and-tell-countered-no-choices-made
+title: A countered Show and Tell makes nobody choose and puts nothing onto the battlefield
+area: card
+cards: [Show and Tell, "Atraxa, Grand Unifier", Island, Force of Will, Brainstorm]
+tags: [show-and-tell, force-of-will, counter, alternative-cost, priority]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur. A countered spell is put into its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @pbs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pbs", pay_life: 1}, targets: ["@snt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Atraxa, Grand Unifier"]
+      graveyard: [Show and Tell]
+      battlefield: [{card: Island}, {card: Island}, {card: Island}]
+    p1:
+      life: 19
+      hand: []
+      exile: [Brainstorm]
+      graveyard: [Force of Will]
+notes: >
+  Force of Will's alternative cost: 1 life and exiling Brainstorm from hand (Brainstorm is blue). Show and Tell is
+  countered and never resolves, so there is no secret-choice decision at all and Atraxa stays in hand. Baseline for the
+  other Show and Tell scenarios.

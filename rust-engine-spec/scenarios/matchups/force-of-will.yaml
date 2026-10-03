@@ -1,0 +1,143 @@
+id: mu-fow-war-over-show-and-tell
+title: Alurentell's Force of Will counters UR's Force of Will on Show and Tell, and Show and Tell then resolves
+area: matchup
+cards: [Show and Tell, Omniscience, "Atraxa, Grand Unifier", Force of Will, Brainstorm, "Mishra's Bauble", Island, Tropical Island, Hedge Maze, Volcanic Island]
+tags: [matchup, force-of-will, counter-war, show-and-tell, alternative-cost, simultaneous-secret-choice]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur. A countered spell is put into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow0", "Brainstorm @bs", "Mishra's Bauble @bb"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Omniscience @omni", "Force of Will @fow1", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow0", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@st"]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow1", alt_cost: {exile_blue_card: "@atx", pay_life: 1}, targets: ["@fow0"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@st", controller: p1}
+        - {kind: spell, card: "@fow0", controller: p0, targets: ["@st"]}
+        - {kind: spell, card: "@fow1", controller: p1, targets: ["@fow0"]}
+      p0: {life: 19, exile: [Brainstorm]}
+      p1: {life: 19, exile: ["Atraxa, Grand Unifier"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@st", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: [Force of Will]}
+      p1: {graveyard: [Force of Will]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: simultaneous_secret_choice, answer: "@omni"}
+  - p0: {decision: simultaneous_secret_choice, answer: "@bb"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {life: 19, hand: [], graveyard: [Force of Will, Show and Tell], battlefield_contains: [{card: Omniscience}]}
+    p0: {life: 19, hand: [], graveyard: [Force of Will], battlefield_contains: [{card: "Mishra's Bauble"}]}
+notes: >
+  Atraxa is blue ({3}{G}{W}{U}{B}), so it can pay for Force of Will. p1's Force of Will resolves first and counters p0's;
+  the active player p1 then gets priority with Show and Tell on the stack (117.3b), both pass, and it resolves. p0 can only
+  offer the Bauble (Brainstorm was exiled). Both players are at 19.
+---
+id: mu-fow-counters-free-atraxa-no-etb
+title: Force of Will on an Omniscience-cast Atraxa leaves no enters trigger and no reveal
+area: matchup
+cards: [Force of Will, Brainstorm, "Atraxa, Grand Unifier", Omniscience, Aluren, Volcanic Island, Island, Tropical Island]
+tags: [matchup, force-of-will, counterspell, omniscience, etb-trigger, creature-spell]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur. A countered spell is put into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Atraxa, Grand Unifier @atx"]
+    battlefield: ["Omniscience", "Island", "Tropical Island"]
+    library: ["Aluren"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@atx", alt_cost: {free: omniscience}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@atx"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {hand: [], graveyard: ["Atraxa, Grand Unifier"], library_count: 11, library_top: [Aluren], battlefield: [{card: Omniscience}, {card: Island}, {card: Tropical Island}]}
+    p0: {life: 19, graveyard: [Force of Will], exile: [Brainstorm]}
+notes: >
+  A creature spell is a spell and can be countered. Atraxa never enters, so its ETB never triggers: the stack is empty
+  afterward and p1's library (11 cards) is untouched. A wrong engine fires the ETB on cast or lets the free cast make it
+  uncounterable.
+---
+id: mu-fow-counters-aluren-no-free-creatures
+title: Countering Aluren means the UR player cannot cast Dragon's Rage Channeler on the Alurentell player's turn
+area: matchup
+cards: [Force of Will, Ponder, Aluren, "Dragon's Rage Channeler", Volcanic Island, Island, Tropical Island, Hedge Maze]
+tags: [matchup, force-of-will, aluren, timing, legal-actions]
+derived_from: cr
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner's graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Ponder @pd", "Dragon's Rage Channeler @drc"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Aluren @alu"]
+    battlefield: ["Island", "Tropical Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@alu", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pd", pay_life: 1}, targets: ["@alu"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    phase: main1
+    pending: {actor: p0, kind: priority}
+    p1: {graveyard: [Aluren], battlefield: [{card: Island}, {card: Tropical Island}, {card: Tropical Island}, {card: Hedge Maze}]}
+    p0: {life: 19, hand: ["Dragon's Rage Channeler"]}
+    legal:
+      p0:
+        include: [{t: pass}]
+        exclude: [{t: cast, card: "@drc"}]
+notes: >
+  After Force of Will resolves, p1 (active) passes in its main phase with an empty stack, so p0 has priority there. With
+  Aluren on the battlefield p0 could cast DRC (mana value 1) for free with flash; with Aluren countered, DRC is a creature
+  without flash on the opponent's turn and is not offered. Compare mu-aluren-ur-casts-drc-at-instant-speed.

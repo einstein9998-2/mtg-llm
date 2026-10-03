@@ -1,0 +1,76 @@
+id: spider-woman-opponents-artifact-spell-enters-tapped
+title: An artifact the opponent casts enters tapped under Spider-Woman, so a fresh Aether Vial cannot be activated
+area: card
+cards: [Aether Vial, Mountain, "Spider-Woman, Stunning Savior"]
+tags: [spider-woman, enters-tapped, artifact, replacement-effect, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Aether Vial @vial"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    battlefield: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@vial", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: activate, source: "@vial", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mountain, tapped: true}, {card: Aether Vial, tapped: true}]
+notes: >
+  Artifacts are covered as well as creatures. The Vial enters tapped, so its {T} ability cannot be activated.
+---
+id: spider-woman-does-not-tap-its-controllers-permanents
+title: Spider-Woman's controller's own creature enters untapped
+area: card
+cards: ["Spider-Woman, Stunning Savior", "Phelia, Exuberant Shepherd", Plains, Lightning Bolt, Mountain]
+tags: [spider-woman, enters-tapped, control-case, flash]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Phelia, Exuberant Shepherd @ph"]
+    battlefield: ["Spider-Woman, Stunning Savior @sw", "Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@ph", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p1: {battlefield_contains: [{card: "Phelia, Exuberant Shepherd", tapped: false}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      life: 17
+      battlefield:
+        - {card: "Spider-Woman, Stunning Savior", tapped: false}
+        - {card: "Phelia, Exuberant Shepherd", tapped: false}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  "your opponents control": Phelia (flash) enters under Spider-Woman's controller and is not affected. Control case
+  for the two enters-tapped scenarios above.

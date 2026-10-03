@@ -1,0 +1,37 @@
+# Doomsday | Combo (pile / Oracle) | Combo set
+# Legacy, banlist as of 2026-08-10. Format: N Card Name. Blank line then sideboard.
+
+4 Doomsday
+1 Thassa's Oracle
+1 Laboratory Maniac
+4 Dark Ritual
+3 Lotus Petal
+4 Brainstorm
+4 Ponder
+2 Preordain
+4 Thoughtseize
+4 Force of Will
+2 Daze
+2 Spell Pierce
+2 Dark Confidant
+2 Cabal Therapy
+2 Inquisition of Kozilek
+1 Snuff Out
+4 Polluted Delta
+2 Misty Rainforest
+4 Underground Sea
+3 Island
+2 Swamp
+1 Wasteland
+2 Mana Confluence
+
+2 Surgical Extraction
+2 Flusterstorm
+2 Duress
+2 Hymn to Tourach
+2 Fatal Push
+1 Echoing Truth
+1 Pithing Needle
+1 Engineered Explosives
+1 Tormod's Crypt
+1 Orcish Bowmasters

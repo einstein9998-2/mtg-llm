@@ -1,0 +1,144 @@
+id: misty-rainforest-fetch-tropical-island-untapped
+title: Misty Rainforest fetches a Forest or Island card, including Tropical Island, which enters untapped
+area: card
+cards: [Misty Rainforest, Tropical Island, Hedge Maze, Forest, Island, Mountain, Plains, Swamp, Ancient Tomb]
+tags: [misty-rainforest, fetchland, search, basic-land-types, life-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Misty Rainforest, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Tropical Island, text: "({T}: Add {G} or {U}.)", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 1
+    battlefield: ["Misty Rainforest @misty"]
+    library: ["Tropical Island @ti", "Hedge Maze @hm", "Forest @fo", "Island @isl", "Mountain @mo", "Plains @pl", "Swamp @sw", "Misty Rainforest @mr2", "Ancient Tomb @at"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@misty", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: search
+      found: "@ti"
+      expect_options:
+        include: ["@ti", "@hm", "@fo", "@isl"]
+        exclude: ["@mo", "@pl", "@sw", "@mr2", "@at"]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      battlefield: [{card: Tropical Island, tapped: false}]
+      graveyard: [Misty Rainforest]
+      library_count: 18
+notes: >
+  "Forest or Island card" matches any card with the Forest or Island subtype, so the duals (Tropical Island, Hedge
+  Maze) are legal and the other fetchland, Ancient Tomb, Mountain, Plains and Swamp are not. Tropical Island has no
+  enters-tapped replacement, so it enters untapped. Library 19 -> 18.
+---
+id: misty-rainforest-fetch-hedge-maze-tapped-and-surveils
+title: Fetching Hedge Maze with Misty Rainforest enters it tapped and triggers its surveil
+area: card
+cards: [Misty Rainforest, Hedge Maze, Brainstorm, Ponder]
+tags: [misty-rainforest, hedge-maze, fetchland, enters-tapped, surveil, shuffle, random]
+derived_from: cr
+source:
+  - {kind: oracle, card: Misty Rainforest, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 1
+    battlefield: ["Misty Rainforest @misty"]
+    library: ["Hedge Maze @hm", "Brainstorm @bs", "Ponder @pd"]
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Ponder, Brainstorm]}
+script:
+  - p0: {t: activate, source: "@misty", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@hm"}
+  - check:
+      stack: [{kind: triggered, source: "@hm", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        life: 19
+        battlefield: [{card: Hedge Maze, tapped: true}]
+        library_top: [Ponder, Brainstorm]
+        library_count: 2
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@pd"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Misty Rainforest, Ponder]
+      library_top: [Brainstorm]
+      library_count: 1
+      lands_played: 1
+notes: >
+  Order of events: the search puts Hedge Maze onto the battlefield (tapped, via replacement), the library is shuffled
+  (the scripted shuffle puts Ponder on top), then the Hedge Maze ETB trigger goes on the stack and resolves with surveil 1
+  looking at the shuffled top card (Ponder). The scripted shuffle is consumed exactly once, which also checks that the
+  engine neither skips nor repeats the shuffle. The library has no padding so the shuffle result is the whole library.
+---
+id: misty-rainforest-fetched-land-is-not-a-land-drop
+title: A land fetched with Misty Rainforest does not use the land drop; a land can still be played afterwards
+area: card
+cards: [Misty Rainforest, Island, Forest, Mountain]
+tags: [misty-rainforest, fetchland, not-a-land-drop, land-play]
+derived_from: cr
+source:
+  - {kind: cr, ref: "305.4", text: "Effects may also allow players to \"put\" lands onto the battlefield. This isn't the same as \"playing a land\" and doesn't count as a land played during the current turn.", verified: true}
+  - {kind: cr, ref: "305.2b", text: "A player can't play a land, for any reason, if the number of lands the player can play this turn is equal to or less than the number of lands they have already played this turn.", verified: true}
+  - {kind: oracle, card: Misty Rainforest, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 0
+    hand: ["Forest @fo2", "Mountain @mo2"]
+    battlefield: ["Misty Rainforest @misty"]
+    library: ["Island @isl_lib"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@misty", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@isl_lib"}
+  - check:
+      p0: {lands_played: 0, battlefield: [{card: Island}]}
+  - p0: {t: play_land, card: "@fo2"}
+  - expect_illegal: {p0: {t: play_land, card: "@mo2"}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      life: 19
+      hand: [Mountain]
+      battlefield: [{card: Island}, {card: Forest}]
+      graveyard: [Misty Rainforest]
+notes: >
+  Cracking the fetch leaves lands_played at 0; the Forest is then played as the turn's one land drop (lands_played 1).
+  The last probe checks that the one-land-per-turn limit is enforced afterwards (the Mountain stays in hand).

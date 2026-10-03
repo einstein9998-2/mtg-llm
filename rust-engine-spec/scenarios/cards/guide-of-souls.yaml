@@ -1,0 +1,142 @@
+id: guide-another-creature-enters-gain-1-and-energy
+title: When another creature enters under its controller, Guide of Souls gains them 1 life and one energy counter
+area: card
+cards: [Guide of Souls, Ocelot Pride, Plains]
+tags: [guide-of-souls, energy, life-gain, etb-trigger]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Guide of Souls, text: "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter).", verified: true}
+  - {kind: cr, ref: "107.14", text: "The energy symbol is {E}. It represents one energy counter.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Each time an event puts one or more permanents onto the battlefield, all permanents on the battlefield (including the newcomers) are checked for any enters-the-battlefield triggers that match the event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Ocelot Pride @oc"]
+    battlefield: ["Guide of Souls @guide", "Plains @pl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@oc", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@guide", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {life: 20, energy: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 21
+      energy: 1
+      battlefield:
+        - {card: Guide of Souls}
+        - {card: Ocelot Pride, sick: true}
+        - {card: Plains, tapped: true}
+notes: >
+  The trigger uses the stack; life and energy change only when it resolves. Energy is a counter on the player, tracked
+  as p0.energy. A wrong engine applies the gain immediately, forgets the energy, or does not trigger.
+---
+id: guide-no-trigger-for-itself-or-opponents-creature
+title: Guide of Souls does not trigger for its own entry or for a creature the opponent flashes in
+area: card
+cards: [Guide of Souls, Containment Priest, Plains]
+tags: [guide-of-souls, etb-trigger, another, control, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Guide of Souls, text: "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter).", verified: true}
+  - {kind: oracle, card: Containment Priest, text: "Flash", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Guide of Souls @guide"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Containment Priest @cp"]
+    battlefield: ["Plains @q1", "Plains @q2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@guide", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {life: 20, energy: 0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@cp", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      energy: 0
+      battlefield: [{card: Guide of Souls, sick: true}, {card: Plains, tapped: true}]
+    p1:
+      battlefield: [{card: Containment Priest, sick: true}, {card: Plains, tapped: true}, {card: Plains, tapped: true}]
+notes: >
+  "Another creature you control": Guide's own entry does not count, and Containment Priest is controlled by p1. Both
+  checks happen with the stack empty afterwards and no trigger. The positive control is the scenario above. After the
+  Priest resolves, the active player p0 gets priority.
+---
+id: guide-attack-two-energy-no-payment-offered
+title: With only two energy, Guide of Souls' attack trigger still triggers once but offers no payment and puts no counters
+area: card
+cards: [Guide of Souls, Ocelot Pride]
+tags: [guide-of-souls, energy, attack-trigger, mask-validity, unpayable-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Guide of Souls, text: "Whenever you attack, you may pay {E}{E}{E}.", verified: true}
+  - {kind: cr, ref: "508.3d", text: "An ability that reads \"Whenever [a player] attacks, . . .\" triggers if one or more creatures that player controls are declared as attackers.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can't pay a cost without having the necessary resources to pay it fully.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    energy: 2
+    battlefield: ["Guide of Souls @guide", "Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks:
+        - {creature: "@guide", target: {player: p1}}
+        - {creature: "@oc", target: {player: p1}}
+  - check:
+      stack: [{kind: triggered, source: "@guide", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 2
+      battlefield:
+        - {card: Guide of Souls, tapped: true, pt: [1, 2], keywords_exclude: [flying]}
+        - {card: Ocelot Pride, tapped: true, pt: [1, 1], keywords_exclude: [flying]}
+notes: >
+  Two attackers, one "whenever you attack" trigger (508.3d triggers once per declaration, not per creature). On
+  resolution p0 cannot pay three energy, so no pay prompt is raised (project contract, as for Daze: an option is offered
+  only if it can be paid) and nothing else happens. A wrong engine triggers once per attacker, offers a payment that
+  cannot be made, or lets energy go negative.

@@ -1,0 +1,124 @@
+id: thoughtseize-hand-of-lands-discards-nothing-but-life-is-lost
+title: Against a hand of only lands Thoughtseize discards nothing, and its caster still loses 2 life
+area: card
+cards: [Thoughtseize, Swamp, Island]
+tags: [thoughtseize, discard, no-legal-choice, life-loss]
+derived_from: cr
+source:
+  - {kind: oracle, card: Thoughtseize, text: "You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+  - {kind: cr, ref: "608.2d", text: "The player can't choose an option that's illegal or impossible, with the exception that having a library with no cards in it doesn't make drawing a card an impossible action (see rule 121.3).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thoughtseize @ts"]
+    battlefield: ["Swamp @s1"]
+    library_pad: 10
+  p1:
+    hand: ["Island @i1", "Swamp @s2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Thoughtseize]
+    p1:
+      hand: [Island, Swamp]
+      graveyard: []
+notes: >
+  There is no nonland card to choose, so no choice is raised (SCHEMA addenda: no decision when the rules give no choice)
+  and nothing is discarded; the life loss is a separate instruction and still happens. A wrong engine skips the life loss
+  when nothing was discarded, or makes p1 discard a land.
+---
+id: thoughtseize-may-target-its-caster-while-duress-may-not
+title: Thoughtseize can target its own caster (target player); Duress (target opponent) cannot
+area: card
+cards: [Thoughtseize, Duress, Brainstorm, Swamp]
+tags: [thoughtseize, duress, targeting, mask-validity, self-target]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+  - {kind: oracle, card: Duress, text: "Target opponent reveals their hand. You choose a noncreature, nonland card from it. That player discards that card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thoughtseize @ts", "Duress @du", "Brainstorm @bs"]
+    battlefield: ["Swamp @s1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@du", targets: [{player: p0}]}}
+  - p0: {t: cast, card: "@ts", targets: [{player: p0}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@bs"], expect_options: {include: ["@du", "@bs"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      hand: [Duress]
+      graveyard: [Thoughtseize, Brainstorm]
+notes: >
+  "Target player" includes the caster. When it resolves the hand holds Duress and Brainstorm (Thoughtseize is on the
+  stack), both nonland. Duress says "target opponent", so it cannot target p0. Engines that hard-code "opponent" for
+  every discard spell fail one of the two halves.
+---
+id: thoughtseize-fizzles-against-veil-hexproof-and-caster-loses-no-life
+title: Veil of Summer in response makes Thoughtseize's only target illegal, so it does nothing and its caster keeps their life
+area: card
+cards: [Thoughtseize, Swamp, Veil of Summer, Forest, Brainstorm, Ponder]
+tags: [thoughtseize, veil-of-summer, hexproof-from, fizzle, targets]
+derived_from: cr
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn. Spells you control can't be countered this turn. You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve. It's removed from the stack and, if it's a spell, put into its owner's graveyard.", verified: true}
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thoughtseize @ts"]
+    battlefield: ["Swamp @s1"]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil", "Brainstorm @bs"]
+    battlefield: ["Forest @f1"]
+    library: ["Ponder @lp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [{kind: spell, card: "@ts", controller: p0}], pending: {actor: p0, kind: priority}, p1: {hand: [Brainstorm, Ponder]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Thoughtseize]
+    p1:
+      hand: [Brainstorm, Ponder]
+      graveyard: [Veil of Summer]
+      battlefield: [{card: Forest, tapped: true}]
+notes: >
+  Thoughtseize is black and was cast by p1's opponent this turn, so Veil draws p1 a card (Ponder). p1 then has hexproof
+  from black, so Thoughtseize's only target is illegal on resolution and the whole spell does not resolve (608.2b): no
+  reveal, no discard, and p0 does not lose 2 life. A wrong engine still applies the "You lose 2 life" part.

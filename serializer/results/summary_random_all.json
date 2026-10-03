@@ -1,0 +1,15 @@
+{
+"policy":"random","stops":"all","seatA_deck":"dnt.dck","seatB_deck(ForgeAI)":"jund75.dck",
+"games":30,"seatA_wins":0,"forgeAI_wins":30,"draws":0,"seatA_games_on_play":0,"seatA_wins_on_play":0,"wall_ms":36195,
+"prompts":929,"prompt_chars":433162,"prompt_tokens_est":120323,"prompts_per_game":31.0,
+"asked_by_kind":{"Attack":6,"Block":11,"BottomCards":43,"ChooseCards":74,"ChooseName":5,"ChooseOption":4,"Mulligan":73,"Priority":638,"Target":31,"YesNo":44},
+"chars_by_kind":{"Attack":1283,"Block":11672,"BottomCards":8364,"ChooseCards":63542,"ChooseName":6677,"ChooseOption":1437,"Mulligan":13463,"Priority":312234,"Target":4922,"YesNo":9568},"chars_if_every_prompt_carried_full_state":{"Attack":5315,"Block":8792,"BottomCards":40526,"ChooseCards":61522,"ChooseName":8152,"ChooseOption":3149,"Mulligan":61611,"Priority":412600,"Target":21896,"YesNo":22500},
+"menu_enumeration_ms_avg":0.47,"menu_calls":4441,"prompt_render_ms_avg":0.1,
+"forced_no_prompt":{"ChooseCards":11,"Priority":3803,"Target":13},
+"auto_pass_by_rule":{},
+"delegated_to_forge_ai":{"assignCombatDamage":7,"chooseCardsPile":4,"chooseCounterType":2,"chooseSingleCardForZoneChange":7,"chooseSingleReplacementEffect":5,"orderMoveToZoneList":5,"payManaCost":215,"playSpellAbilityNoStack":13},
+"problems":{},
+"leak_checks":929,"leak_failures":0,
+"mirror_ai_priority_pick_on_menu":0,"mirror_ai_priority_pick_missing":0,
+"problem_samples":[]
+}

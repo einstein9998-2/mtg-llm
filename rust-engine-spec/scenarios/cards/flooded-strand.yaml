@@ -1,0 +1,79 @@
+id: flooded-strand-fetch-island-types-only
+title: Flooded Strand pays 1 life and sacrifices as a cost, then finds a Plains or Island card (a dual with the Island type counts), not a Mountain
+area: card
+cards: [Flooded Strand, Mountain, Volcanic Island, Island, Plains, Scalding Tarn]
+tags: [fetchland, search, land-types, sacrifice-cost, life-payment, shuffle]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Flooded Strand, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it's a hidden zone) and find a card that matches the given description.", verified: true}
+  - {kind: cr, ref: "602.2b", text: "The remainder of the process for activating an ability is identical to the process for casting a spell listed in rules 601.2b–i.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Flooded Strand @strand"]
+    library: ["Mountain @mtn", "Volcanic Island @volc", "Island @isl", "Plains @pl", "Scalding Tarn @tarn"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@strand", ability: 0, targets: []}
+  - check:
+      stack: [{kind: activated, source: "@strand"}]
+      p0: {life: 19, graveyard: [Flooded Strand], battlefield: [], library_count: 15}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, purpose: fetch, found: "@volc", expect_options: {include: ["@volc", "@isl", "@pl"], exclude: ["@mtn", "@tarn"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 0
+      graveyard: [Flooded Strand]
+      battlefield: [{card: Volcanic Island, tapped: false}]
+      library_count: 14
+    p1: {life: 20}
+notes: >
+  Costs (tap, 1 life, sacrifice) are paid on activation, so the land is already in the graveyard and life is 19 while the ability is on the stack
+  (mid-script check). The search filter is "a Plains or Island card": Volcanic Island qualifies because it has the Island subtype; Mountain and
+  Scalding Tarn do not. The fetched land is untapped (nothing says it enters tapped) and the effect is not a land play, so lands_played stays 0.
+  A wrong engine would filter by exact card name, forget the life payment, or make the fetched land enter tapped. The library is shuffled
+  (random: any, so only the count is asserted).
+---
+id: flooded-strand-pay-life-at-one-life-loses
+title: Flooded Strand can be activated at 1 life; the life payment takes the player to 0 and they lose before the ability resolves
+area: card
+cards: [Flooded Strand, Island]
+tags: [fetchland, life-payment, state-based-actions, game-over]
+derived_from: cr
+source:
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment. If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: oracle, card: Flooded Strand, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    battlefield: ["Flooded Strand @strand"]
+    library: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@strand", ability: 0}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0:
+      life: 0
+      graveyard: [Flooded Strand]
+notes: >
+  Paying 1 life with a life total of 1 is allowed (119.4: total greater than or equal to the payment). The payment leaves the player at 0, and the
+  next state-based action check (before any player would receive priority, 704.3) ends the game (704.5a); the search never happens. A wrong engine
+  refuses the activation at 1 life (offers no activate action) or lets the search resolve first. The game-over assertion key winner is a schema request.

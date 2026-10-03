@@ -1,0 +1,128 @@
+id: bilbo-attack-trigger-may-cast-instant-from-graveyard
+title: Bilbo's attack trigger lets its controller choose to cast Lightning Bolt from the graveyard; it still costs {R} and is exiled after resolving
+area: card
+cards: ["Bilbo, Thief in the Night", Lightning Bolt, Mountain]
+tags: [bilbo, may-cast, cast-from-graveyard, cast-during-resolution, cost-reduction, exile-instead]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Bilbo, Thief in the Night", text: "Whenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead.", verified: true}
+  - {kind: oracle, card: "Bilbo, Thief in the Night", text: "Spells you cast from anywhere other than your hand cost {1} less to cast.", verified: true}
+  - {kind: cr, ref: "118.7a", text: "Effects that reduce a cost by an amount of generic mana affect only the generic mana component of that cost. They can’t affect the colored or colorless mana components of that cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Bilbo, Thief in the Night @bil", "Mountain @m"]
+    graveyard: ["Lightning Bolt @lb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@bil", target: {player: p1}}]}
+  - check:
+      stack: [{kind: triggered, source: "@bil", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: cast_from_graveyard, answer: ["@lb"], expect_options: {include: ["@lb"]}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack: [{kind: spell, card: "@lb", controller: p0, targets: [{player: p1}]}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [{card: "Bilbo, Thief in the Night", tapped: true}, {card: Mountain, tapped: true}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: declare_attackers
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: []
+      exile: [Lightning Bolt]
+      spells_cast_this_turn: 1
+    p1:
+      life: 17
+notes: >
+  "You may cast" is a choice made while the trigger resolves (one choose_cards; an empty answer declines). The Bolt is
+  cast during the resolution, its target chosen then, and it costs {R}: Bilbo's {1} reduction only reduces generic
+  mana (118.7a), so the Mountain is tapped. After the trigger finishes, the active player gets priority with Bolt on
+  the stack; Bolt resolves (p1 17) and is exiled instead of going to the graveyard. A wrong engine casts it for free,
+  skips the choice, puts the Bolt back in the graveyard, or does not count it as cast.
+---
+id: bilbo-flashback-costs-one-less
+title: With Bilbo, Faithless Looting's flashback costs {1}{R}, so two Mountains are enough
+area: card
+cards: ["Bilbo, Thief in the Night", Faithless Looting, Lightning Bolt, Ponder, Island, Mountain]
+tags: [bilbo, cost-reduction, flashback, alternative-cost, cast-from-graveyard]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Bilbo, Thief in the Night", text: "Spells you cast from anywhere other than your hand cost {1} less to cast.", verified: true}
+  - {kind: oracle, card: Faithless Looting, text: "Flashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @hb"]
+    battlefield: ["Bilbo, Thief in the Night @bil", "Mountain @m1", "Mountain @m2"]
+    graveyard: ["Faithless Looting @loot"]
+    library: ["Island @d1", "Ponder @d2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@loot", alt_cost: {flashback: true}}]}}
+  - p0: {t: cast, card: "@loot", alt_cost: {flashback: true}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@d1", "@hb"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Island, Lightning Bolt]
+      exile: [Faithless Looting]
+      battlefield:
+        - {card: "Bilbo, Thief in the Night"}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+notes: >
+  Flashback {2}{R} reduced by {1} is {1}{R} (118.9d applies the reduction to the alternative cost). Paired with
+  bilbo-absent-flashback-unaffordable-with-two-lands.
+---
+id: bilbo-absent-flashback-unaffordable-with-two-lands
+title: Without Bilbo, two Mountains cannot pay Faithless Looting's flashback, so it is not offered
+area: card
+cards: [Faithless Looting, Mountain]
+tags: [flashback, legal-action-mask, unaffordable, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Faithless Looting, text: "Flashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    graveyard: ["Faithless Looting @loot"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@loot", alt_cost: {flashback: true}, pay: auto}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@loot"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Faithless Looting], battlefield: [{card: Mountain, tapped: false}, {card: Mountain, tapped: false}]}
+notes: >
+  Design doc 02: every offered option is pre-validated as completable, so an unaffordable cast is not in the mask.

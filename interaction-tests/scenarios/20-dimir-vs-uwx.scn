@@ -1,0 +1,447 @@
+# Dimir Tempo (p1) vs UWx Control (p2): stack interaction, Stifle, Consign, Force of Negation, Daze, Bowmasters, graveyard-count creatures.
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see ../README.md.
+
+=== stifle-fetchland-activation
+title: Stifle counters a fetchland's activated ability (land is sacrificed as a cost, nothing is fetched)
+ref: Stifle Oracle; CR 602.2 (cost paid on activation), CR 608.2b
+state:
+  humanbattlefield=Flooded Strand
+  humanlibrary=Island;Island;Island;Island
+  aihand=Stifle
+  aibattlefield=Island
+script:
+  p1: activate Flooded Strand
+  p1: pass
+  p2: when-stack Flooded Strand
+  p2: cast Stifle -> stack:Flooded Strand
+expect:
+  zone p1 graveyard has "Flooded Strand"
+  zone p1 battlefield size == 0
+  life p1 == 19
+  zone p2 graveyard has "Stifle"
+  stack empty
+
+=== stifle-bowmasters-trigger
+title: Stifle on the Bowmasters ETB trigger stops the damage and the Orc Army
+ref: Orcish Bowmasters Oracle; CR 603.3 (triggers go on the stack), Stifle Oracle
+state:
+  humanhand=Orcish Bowmasters
+  humanbattlefield=Swamp;Swamp
+  aihand=Stifle
+  aibattlefield=Island
+script:
+  p1: cast Orcish Bowmasters
+  p1: pass
+  p2: pass
+  p1: wait-empty
+  p1: pass
+  p2: when-stack Orcish Bowmasters
+  p2: cast Stifle -> stack:Orcish Bowmasters
+expect:
+  controls p1 "Orcish Bowmasters"
+  not controls p1 "Orc Army Token"
+  life p2 == 20
+  zone p2 graveyard has "Stifle"
+
+=== bowmasters-etb-damage-and-amass
+title: Bowmasters ETB deals 1 damage to any target and amasses Orcs 1 (an Orc Army token with one +1/+1 counter)
+ref: Orcish Bowmasters Oracle
+state:
+  humanhand=Orcish Bowmasters
+  humanbattlefield=Swamp;Swamp
+script:
+  p1: cast Orcish Bowmasters
+  p1: pass
+  p2: pass
+expect:
+  life p2 == 19
+  controls p1 "Orc Army Token"
+  counters p1 "Orc Army Token" P1P1 == 1
+
+=== bowmasters-triggers-on-extra-draw-not-draw-step
+title: Bowmasters does not trigger on the opponent's draw-step draw, but does on a second draw (Brainstorm gives three)
+ref: Orcish Bowmasters Oracle ("except the first one they draw in each of their draw steps")
+state:
+  turn=2
+  activeplayer=ai
+  activephase=UPKEEP
+  humanbattlefield=Orcish Bowmasters
+  aihand=Brainstorm
+  aibattlefield=Island
+script:
+  p2: at MAIN1
+  p2: cast Brainstorm
+  p2: pass
+  p2: pick Island
+  p2: pick Island
+  p1: pass
+expect:
+  draws p2 == 4
+  counters p1 "Orc Army Token" P1P1 == 3
+
+=== consign-counters-trigger
+title: Consign to Memory counters a triggered ability (Bowmasters ETB)
+ref: Consign to Memory Oracle
+state:
+  humanhand=Orcish Bowmasters
+  humanbattlefield=Swamp;Swamp
+  aihand=Consign to Memory
+  aibattlefield=Island
+script:
+  p1: cast Orcish Bowmasters
+  p1: pass
+  p2: pass
+  p1: wait-empty
+  p1: pass
+  p2: when-stack Orcish Bowmasters
+  p2: cast Consign to Memory -> stack:Orcish Bowmasters
+expect:
+  controls p1 "Orcish Bowmasters"
+  not controls p1 "Orc Army Token"
+  life p2 == 20
+
+=== consign-counters-colorless-spell
+title: Consign to Memory counters a colorless spell (Mishra's Bauble)
+ref: Consign to Memory Oracle
+state:
+  humanhand=Mishra's Bauble
+  humanbattlefield=Swamp
+  aihand=Consign to Memory
+  aibattlefield=Island
+script:
+  p1: cast Mishra's Bauble
+  p1: pass
+  p2: when-stack Mishra's Bauble
+  p2: cast Consign to Memory -> Mishra's Bauble
+expect:
+  zone p1 graveyard has "Mishra's Bauble"
+  not controls p1 "Mishra's Bauble"
+
+=== consign-cannot-target-colored-spell
+title: Consign to Memory cannot target a colored spell (Fatal Push)
+ref: Consign to Memory Oracle
+state:
+  humanhand=Fatal Push
+  humanbattlefield=Swamp
+  aibattlefield=Island;Island;Phelia, Exuberant Shepherd
+  aihand=Consign to Memory
+script:
+  p1: cast Fatal Push -> Phelia, Exuberant Shepherd
+  p1: pass
+  p2: when-stack Fatal Push
+  p2: try cast Consign to Memory -> Fatal Push
+expect:
+  zone p2 hand has "Consign to Memory"
+  trace has "CASTFAIL"
+
+=== consign-replicate-copies
+title: Consign to Memory replicate creates a copy that is not cast (the spell count stays 1) and the trigger is still countered
+ref: Consign to Memory Oracle; CR 702.56c (replicate copies are created, not cast). The AI payer decides how many times to replicate.
+state:
+  humanhand=Orcish Bowmasters
+  humanbattlefield=Swamp;Swamp
+  aihand=Consign to Memory
+  aibattlefield=Island;Island
+script:
+  p1: cast Orcish Bowmasters
+  p1: pass
+  p2: pass
+  p1: wait-empty
+  p1: pass
+  p2: when-stack Orcish Bowmasters
+  p2: cast Consign to Memory -> stack:Orcish Bowmasters
+expect:
+  not controls p1 "Orc Army Token"
+  spells p2 == 1
+
+=== force-of-negation-free-on-opponents-turn
+title: Force of Negation exiles a blue card to counter a noncreature spell for free on the opponent's turn, and exiles the spell
+ref: Force of Negation Oracle
+state:
+  humanhand=Thoughtseize
+  humanbattlefield=Swamp
+  aihand=Force of Negation;Brainstorm
+  aibattlefield=Island
+script:
+  p1: cast Thoughtseize -> p2
+  p1: pass
+  p2: when-stack Thoughtseize
+  p2: cast Force of Negation ~alt -> Thoughtseize
+  p2: pick Brainstorm
+expect:
+  zone p1 exile has "Thoughtseize"
+  zone p1 graveyard lacks "Thoughtseize"
+  zone p2 exile has "Brainstorm"
+  life p1 == 20
+  life p2 == 20
+
+=== force-of-negation-no-free-on-own-turn
+title: Force of Negation's alternative cost is unavailable on its controller's own turn
+ref: Force of Negation Oracle ("If it's not your turn")
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanhand=Thoughtseize
+  humanbattlefield=Swamp
+  aihand=Force of Negation;Brainstorm;Lightning Bolt
+  aibattlefield=Mountain
+script:
+  p2: cast Lightning Bolt -> p1
+  p2: pass
+  p1: when-stack Lightning Bolt
+  p1: pass
+  p2: try cast Force of Negation ~alt -> Lightning Bolt
+expect:
+  zone p2 hand has "Force of Negation"
+
+=== force-of-negation-cannot-hit-creature
+title: Force of Negation cannot target a creature spell
+ref: Force of Negation Oracle
+state:
+  humanhand=Nethergoyf
+  humanbattlefield=Swamp
+  aihand=Force of Negation;Brainstorm
+  aibattlefield=Island
+script:
+  p1: cast Nethergoyf
+  p1: pass
+  p2: when-stack Nethergoyf
+  p2: try cast Force of Negation ~alt -> Nethergoyf
+expect:
+  zone p2 hand has "Force of Negation"
+
+=== daze-counter-unless-pays-one
+title: Daze counters a spell unless its controller pays {1}; paying with an untapped land saves it
+ref: Daze Oracle
+state:
+  humanhand=Brainstorm
+  humanbattlefield=Island;Island
+  aihand=Daze
+  aibattlefield=Island
+script:
+  p1: cast Brainstorm
+  p1: pass
+  p2: when-stack Brainstorm
+  p2: cast Daze ~alt -> Brainstorm
+expect:
+  zone p2 hand has "Island"
+  zone p2 graveyard has "Daze"
+  log has "Daze"
+
+=== daze-return-island-cost
+title: Daze's alternative cost returns an Island you control to hand (the Island is a cost, not an effect)
+ref: Daze Oracle; CR 118.9
+state:
+  humanhand=Brainstorm
+  humanbattlefield=Island
+  aihand=Daze
+  aibattlefield=Island;Island
+script:
+  p1: cast Brainstorm
+  p1: pass
+  p2: when-stack Brainstorm
+  p2: cast Daze ~alt -> Brainstorm
+  p2: pick Island
+expect:
+  zone p2 battlefield count "Island" == 1
+  zone p2 hand count "Island" == 1
+
+=== nethergoyf-power-counts-card-types
+title: Nethergoyf's power equals the number of card types in your graveyard (creature, instant, land = 3, so 3/4)
+ref: Nethergoyf Oracle
+state:
+  humanbattlefield=Nethergoyf
+  humangraveyard=Fatal Push;Orcish Bowmasters;Island
+expect:
+  pt p1 "Nethergoyf" 3/4
+
+=== nethergoyf-power-ignores-opponent-graveyard
+title: Nethergoyf counts only its controller's graveyard
+ref: Nethergoyf Oracle
+state:
+  humanbattlefield=Nethergoyf
+  humangraveyard=Island
+  aigraveyard=Fatal Push;Orcish Bowmasters
+expect:
+  pt p1 "Nethergoyf" 1/2
+
+=== barrowgoyf-counts-all-graveyards
+title: Barrowgoyf counts card types in all graveyards (instant, creature, land across both = 3)
+ref: Barrowgoyf Oracle
+state:
+  humanbattlefield=Barrowgoyf
+  humangraveyard=Island
+  aigraveyard=Fatal Push;Orcish Bowmasters
+expect:
+  pt p1 "Barrowgoyf" 3/4
+
+=== nethergoyf-escape
+title: Nethergoyf can escape from the graveyard exiling cards with four or more card types among them
+ref: Nethergoyf Oracle; CR 702.138
+state:
+  humanbattlefield=Swamp;Swamp;Swamp
+  humangraveyard=Nethergoyf;Island;Fatal Push;Orcish Bowmasters;Mishra's Bauble;Brainstorm
+script:
+  p1: cast Nethergoyf ~escape
+  p1: pick Island;Fatal Push;Orcish Bowmasters;Mishra's Bauble
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Nethergoyf"
+  zone p1 exile count "Mishra's Bauble" == 1
+  zone p1 graveyard has "Brainstorm"
+
+=== moonshadow-enters-with-six-counters
+title: Moonshadow enters as a 1/1 (seven-seven with six -1/-1 counters)
+ref: Moonshadow Oracle
+state:
+  humanhand=Moonshadow
+  humanbattlefield=Swamp
+script:
+  p1: cast Moonshadow
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Moonshadow"
+  counters p1 "Moonshadow" M1M1 == 6
+  pt p1 "Moonshadow" 1/1
+
+=== moonshadow-loses-counter-on-permanent-to-graveyard
+title: Moonshadow removes a -1/-1 counter when a permanent card is put into your graveyard
+ref: Moonshadow Oracle
+state:
+  humanbattlefield=Moonshadow|Counters:M1M1=6;Flooded Strand
+  humanlibrary=Island;Island;Island
+script:
+  p1: activate Flooded Strand
+  p1: pass
+  p2: pass
+expect:
+  counters p1 "Moonshadow" M1M1 == 5
+
+=== moonshadow-not-for-instants
+title: Moonshadow ignores instant and sorcery cards going to the graveyard
+ref: Moonshadow Oracle ("permanent cards")
+state:
+  humanhand=Fatal Push
+  humanbattlefield=Moonshadow|Counters:M1M1=6;Swamp
+  aibattlefield=Phelia, Exuberant Shepherd
+script:
+  p1: cast Fatal Push -> Phelia, Exuberant Shepherd
+  p1: pass
+  p2: pass
+expect:
+  counters p1 "Moonshadow" M1M1 == 6
+
+=== fatal-push-no-revolt-kills-cmc-two
+title: Fatal Push without revolt kills a creature with mana value 2 or less but not a mana value 3 one
+ref: Fatal Push Oracle
+state:
+  humanhand=Fatal Push
+  humanbattlefield=Swamp
+  aibattlefield=Phelia, Exuberant Shepherd;Brazen Borrower
+script:
+  p1: cast Fatal Push -> Brazen Borrower
+  p1: pass
+  p2: pass
+expect:
+  controls p2 "Brazen Borrower"
+  zone p1 graveyard has "Fatal Push"
+
+=== fatal-push-revolt-kills-cmc-four
+title: Fatal Push with revolt (a permanent left the battlefield this turn) kills a mana value 3 creature
+ref: Fatal Push Oracle
+state:
+  humanhand=Fatal Push
+  humanbattlefield=Swamp;Flooded Strand
+  humanlibrary=Island;Island;Island
+  aibattlefield=Brazen Borrower
+script:
+  p1: activate Flooded Strand
+  p1: pass
+  p2: pass
+  p1: wait-empty
+  p1: cast Fatal Push -> Brazen Borrower
+  p1: pass
+  p2: pass
+expect:
+  not controls p2 "Brazen Borrower"
+  zone p2 graveyard has "Brazen Borrower"
+
+=== snuff-out-alt-cost-needs-swamp
+title: Snuff Out's free alternative cost (4 life) requires a Swamp
+ref: Snuff Out Oracle
+state:
+  humanhand=Snuff Out
+  humanbattlefield=Island
+  aibattlefield=Brazen Borrower
+script:
+  p1: try cast Snuff Out ~alt -> Brazen Borrower
+  p1: pass
+expect:
+  life p1 == 20
+  zone p1 hand has "Snuff Out"
+
+=== snuff-out-pays-four-life
+title: Snuff Out with a Swamp pays 4 life and destroys a nonblack creature
+ref: Snuff Out Oracle
+state:
+  humanhand=Snuff Out
+  humanbattlefield=Swamp
+  aibattlefield=Brazen Borrower
+script:
+  p1: cast Snuff Out ~alt -> Brazen Borrower
+  p1: pass
+  p2: pass
+expect:
+  life p1 == 16
+  zone p2 graveyard has "Brazen Borrower"
+
+=== snuff-out-cannot-target-black
+title: Snuff Out cannot target a black creature (Nethergoyf)
+ref: Snuff Out Oracle
+state:
+  humanhand=Snuff Out
+  humanbattlefield=Swamp
+  aibattlefield=Nethergoyf
+script:
+  p1: try cast Snuff Out ~alt -> Nethergoyf
+  p1: pass
+expect:
+  life p1 == 20
+  zone p1 hand has "Snuff Out"
+
+=== thoughtseize-takes-nonland
+title: Thoughtseize makes the opponent discard a nonland card of the caster's choice and costs 2 life
+ref: Thoughtseize Oracle
+state:
+  humanhand=Thoughtseize
+  humanbattlefield=Swamp
+  aihand=Island;Swords to Plowshares;Stifle
+script:
+  p1: cast Thoughtseize -> p2
+  p1: pass
+  p2: pass
+  p1: pick Swords to Plowshares
+expect:
+  life p1 == 18
+  zone p2 graveyard has "Swords to Plowshares"
+  zone p2 hand has "Island"
+  zone p2 hand has "Stifle"
+
+=== thoughtseize-cannot-take-land
+title: Thoughtseize cannot take a land even if the hand is all lands (still costs life)
+ref: Thoughtseize Oracle
+state:
+  humanhand=Thoughtseize
+  humanbattlefield=Swamp
+  aihand=Island;Tundra
+script:
+  p1: cast Thoughtseize -> p2
+  p1: pass
+  p2: pass
+expect:
+  life p1 == 18
+  zone p2 hand size == 2
+  zone p2 graveyard size == 0

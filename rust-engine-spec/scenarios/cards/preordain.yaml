@@ -1,0 +1,112 @@
+id: preordain-keep-both-reorder-then-draw-the-new-top
+title: Preordain scries 2, keeps both on top in a new order, and then draws the new top card
+area: card
+cards: [Preordain, Lightning Bolt, Island, Daze]
+tags: [preordain, scry, library-order, draw, ordering]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Preordain, text: "Scry 2, then draw a card.", verified: true}
+  - {kind: cr, ref: "701.22a", text: "To \"scry N\" means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Preordain @pre"]
+    battlefield: ["Island @i1"]
+    library: ["Lightning Bolt @a", "Island @b", "Daze @c"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pre", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: scry, to_bottom: [], on_top_order: ["@b", "@a"], expect_options: {include: ["@a", "@b"], exclude: ["@c"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: [Preordain]
+      library_top: [Lightning Bolt, Daze]
+      library_count: 12
+notes: >
+  Only the top two cards (Lightning Bolt, Island) are offered; the third (Daze) is not. They are kept on top with Island first (the answer lists
+  the top card first), and then the draw takes that new top card, Island. The scry must finish before the draw. A wrong engine draws first or draws
+  the original top card (Lightning Bolt). The 13 library cards become 12 after the draw.
+---
+id: preordain-both-to-the-bottom-then-draw-the-third-card
+title: Preordain scries both cards to the bottom, so the draw takes the card that was third from the top
+area: card
+cards: [Preordain, Lightning Bolt, Island, Daze]
+tags: [preordain, scry, bottom-of-library, draw, library-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Preordain, text: "Scry 2, then draw a card.", verified: true}
+  - {kind: cr, ref: "701.22a", text: "To \"scry N\" means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Preordain @pre"]
+    battlefield: ["Island @i1"]
+    library: ["Lightning Bolt @a", "Island @b", "Daze @c"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pre", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: scry, to_bottom: ["@a", "@b"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Daze]
+      graveyard: [Preordain]
+      library_count: 12
+      library_bottom_multiset: [Lightning Bolt, Island]
+notes: >
+  Scrying away both cards exposes the third card (Daze), which the draw then takes. Both scried cards end at the bottom (their relative order is the
+  scrying player's choice under 701.22a, so only the multiset of the bottom two is asserted). A wrong engine draws one of the scried cards or puts
+  them back on top.
+---
+id: preordain-with-a-one-card-library-bottoming-it-still-draws-it
+title: Preordain with a one-card library, even after scrying that card to the bottom, draws it and does not lose the game
+area: card
+cards: [Preordain, Island]
+tags: [preordain, scry, small-library, draw, boundary]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Preordain, text: "Scry 2, then draw a card.", verified: true}
+  - {kind: cr, ref: "701.22a", text: "To \"scry N\" means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Preordain @pre"]
+    battlefield: ["Island @i1"]
+    library: ["Island @a"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pre", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: scry, to_bottom: ["@a"], on_top_order: [], expect_options: {count: 1}}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Island], graveyard: [Preordain], library_count: 0}
+notes: >
+  Scry 2 of a one-card library looks at that one card. Putting a one-card library's card on the bottom leaves it the only card, so the draw takes it.
+  The library is empty afterwards but the player attempted no draw from an empty library, so there is no state-based loss (that happens only at their
+  next draw). A wrong engine skips the draw or loses the game.

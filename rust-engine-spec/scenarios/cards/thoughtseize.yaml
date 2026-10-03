@@ -1,0 +1,76 @@
+id: thoughtseize-caster-picks-nonland-card-and-loses-two
+title: Thoughtseize lets its caster pick a nonland card from the revealed hand to discard, and its caster loses 2 life
+area: card
+cards: [Thoughtseize, Brainstorm, Flickerwisp, Island, Swamp]
+tags: [thoughtseize, discard, reveal, life-loss, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thoughtseize @ts"]
+    battlefield: ["Swamp @b1"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Flickerwisp @fw", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@fw"], expect_options: {include: ["@bs", "@fw"], exclude: ["@isl"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Thoughtseize]
+    p1:
+      life: 20
+      hand: [Brainstorm, Island]
+      graveyard: [Flickerwisp]
+notes: >
+  The caster p0 chooses (not the target player), creature cards are allowed (unlike Duress), lands are not. The life
+  loss is the caster's. A wrong engine lets p1 choose, offers the Island, or makes p1 lose the life.
+---
+id: thoughtseize-no-nonland-card-no-choice-still-lose-two
+title: Thoughtseize on a hand with only lands discards nothing, raises no choice, and its caster still loses 2 life
+area: card
+cards: [Thoughtseize, Island, Plains, Swamp]
+tags: [thoughtseize, discard, no-legal-choice, life-loss]
+derived_from: cr
+source:
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+  - {kind: cr, ref: "609.3", text: "If an effect attempts to do something impossible, it does only as much as possible.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thoughtseize @ts"]
+    battlefield: ["Swamp @b1"]
+    library_pad: 10
+  p1:
+    hand: ["Island @isl", "Plains @pl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Thoughtseize]
+    p1:
+      hand: [Island, Plains]
+      graveyard: []
+notes: >
+  With no nonland card the choice cannot be made, so no decision is raised (the rules give no choice); the rest of the
+  spell still happens, including the caster's life loss. A wrong engine skips the life loss or raises an empty choice.

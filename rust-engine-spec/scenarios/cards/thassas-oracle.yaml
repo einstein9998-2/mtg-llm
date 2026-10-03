@@ -1,0 +1,133 @@
+id: thassas-oracle-wins-when-devotion-equals-library-size
+title: Thassa's Oracle with devotion 2 and exactly 2 cards in library wins the game when its trigger resolves
+area: card
+cards: ["Thassa's Oracle", Ponder, Consider, Island]
+tags: [thassas-oracle, devotion, etb-trigger, win-the-game, library-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Thassa's Oracle", text: "When this creature enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game.", verified: true}
+  - {kind: cr, ref: "700.5", text: "A player’s devotion to [color] is equal to the number of mana symbols of that color among the mana costs of permanents that player controls.", verified: true}
+  - {kind: cr, ref: "104.2b", text: "An effect may state that a player wins the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thassa's Oracle @to"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library: ["Ponder @a", "Consider @b"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@to", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@to", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: "Thassa's Oracle", sick: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: oracle_top, answer: ["@b"], expect_options: {include: ["@a", "@b"]}}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+notes: >
+  Devotion to blue counts the {U}{U} of Thassa's Oracle itself (Islands have no mana cost), so X = 2. The library has
+  2 cards, and 2 >= 2, so p0 wins as the trigger finishes resolving. The look/put-back still happens first (one card on
+  top, the other to the bottom). Wrong engines: use strict "greater than", compute X before Oracle is on the battlefield
+  (X = 0), or count the lands.
+---
+id: thassas-oracle-removed-in-response-devotion-drops-no-win
+title: If Thassa's Oracle is destroyed in response to its trigger, devotion is computed without it on resolution and a 1-card library is not a win
+area: card
+cards: ["Thassa's Oracle", Fatal Push, Island, Swamp]
+tags: [thassas-oracle, devotion, etb-trigger, resolution-time-information, removal-in-response]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2h", text: "If an effect requires information from the game (such as the number of creatures on the battlefield), the answer is determined only once, when the effect is applied.", verified: true}
+  - {kind: cr, ref: "700.5", text: "A player’s devotion to [color] is equal to the number of mana symbols of that color among the mana costs of permanents that player controls.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+  - {kind: oracle, card: Fatal Push, text: "Destroy target creature if it has mana value 2 or less.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thassa's Oracle @to"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library: ["Island @a"]
+  p1:
+    hand: ["Fatal Push @fp"]
+    battlefield: ["Swamp @ps"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@to", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fp", targets: ["@to"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@to", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: ["Thassa's Oracle"]}
+      p1: {graveyard: [Fatal Push]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_count: 1
+      library_top: [Island]
+      graveyard: ["Thassa's Oracle"]
+notes: >
+  The trigger survives its source (113.7a). X is game information read when the effect is applied (608.2h): at that
+  time p0 controls no permanent with {U} in its mana cost, so X = 0. p0 looks at no cards (no decision is raised) and
+  0 < 1, so no win. An engine that locks X when the trigger is put on the stack (X = 2, a win) fails. Priority: after
+  Push resolves the active player p0 receives priority with the trigger still on the stack.
+---
+id: thassas-oracle-empty-library-wins-even-if-removed-in-response
+title: With an empty library, Thassa's Oracle's trigger wins even after Oracle is destroyed in response (X = 0 >= 0)
+area: card
+cards: ["Thassa's Oracle", Fatal Push, Island, Swamp]
+tags: [thassas-oracle, devotion, win-the-game, removal-in-response]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Thassa's Oracle", text: "If X is greater than or equal to the number of cards in your library, you win the game.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "If an effect requires information from the game (such as the number of creatures on the battlefield), the answer is determined only once, when the effect is applied.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thassa's Oracle @to"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library: []
+  p1:
+    hand: ["Fatal Push @fp"]
+    battlefield: ["Swamp @ps"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@to", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fp", targets: ["@to"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+notes: >
+  Same line as the previous scenario but p0's library is empty. X = 0 after Oracle is destroyed, and 0 >= 0, so p0
+  still wins. Together the pair pins that removal changes X but not whether the trigger resolves. An engine that removes
+  a trigger whose source left the battlefield, or that requires X > 0, fails. p0 never draws during this script, so the
+  empty library causes no loss.

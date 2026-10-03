@@ -1,0 +1,61 @@
+GLOSSARY (oracle text; per-decision prompts use names only)
+Abrupt Decay {B}{G} | Instant: This spell can't be countered. / Destroy target nonland permanent with mana value 3 or less.
+Aether Vial {1} | Artifact: At the beginning of your upkeep, you may put a charge counter on Aether Vial. / {T}: You may put a creature card with mana value equal to the number of charge counters on Aether Vial from your hand onto the battlefield.
+Ancient Grudge {1}{R} | Instant: Destroy target artifact. / Flashback {G} (You may cast this card from your graveyard for its flashback cost. Then exile it.)
+Armageddon {3}{W} | Sorcery: Destroy all lands.
+Badlands | Land - Swamp Mountain: ({T}: Add {B} or {R}.)
+Batterskull {5} | Artifact - Equipment: Living weapon (When this Equipment enters, create a 0/0 black Phyrexian Germ creature token, then attach this to it.) / Equipped creature gets +4/+4 and has vigilance and lifelink. / {3}: Return Batterskull to its owner's hand. / Equip {5}
+Bayou | Land - Swamp Forest: ({T}: Add {B} or {G}.)
+Bloodbraid Elf {2}{R}{G} | Creature - Elf Berserker 3/2: Haste / Cascade (When you cast this spell, exile cards from the top of your library until you exile a nonland card that costs less. You may cast it without paying its mana cost. Put the exiled cards on the bottom in a random order.)
+Bloodstained Mire | Land: {T}, Pay 1 life, Sacrifice Bloodstained Mire: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.
+Brimaz, King of Oreskos {1}{W}{W} | Legendary Creature - Cat Soldier 3/4: Vigilance / Whenever Brimaz, King of Oreskos attacks, create a 1/1 white Cat Soldier creature token with vigilance that's attacking. / Whenever Brimaz blocks a creature, create a 1/1 white Cat Soldier creature token with vigilance that's blocking that creature.
+Collective Brutality {1}{B} | Sorcery: Escalate—Discard a card. (Pay this cost for each mode chosen beyond the first.) / Choose one or more — / • Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card. / • Target creature gets -2/-2 until end of turn. / • Target opponent loses 2 life and you gain 2 life.
+Containment Priest {1}{W} | Creature - Human Cleric 2/2: Flash / If a nontoken creature would enter and it wasn't cast, exile it instead.
+Council's Judgment {1}{W}{W} | Sorcery: Will of the council — Starting with you, each player votes for a nonland permanent you don't control. Exile each permanent with the most votes or tied for most votes.
+Dark Confidant {1}{B} | Creature - Human Wizard 2/1: At the beginning of your upkeep, reveal the top card of your library and put that card into your hand. You lose life equal to its mana value.
+Disenchant {1}{W} | Instant: Destroy target artifact or enchantment.
+Elspeth, Sun's Champion {4}{W}{W} | Legendary Planeswalker - Elspeth: [+1]: Create three 1/1 white Soldier creature tokens. / [-3]: Destroy all creatures with power 4 or greater. / [-7]: You get an emblem with "Creatures you control get +2/+2 and have flying."
+Ethersworn Canonist {1}{W} | Artifact Creature - Human Cleric 2/2: Each player who has cast a nonartifact spell this turn can't cast additional nonartifact spells.
+Fatal Push {B} | Instant: Destroy target creature if it has mana value 2 or less. / Revolt — Destroy that creature if it has mana value 4 or less instead if a permanent you controlled left the battlefield this turn.
+Flickerwisp {1}{W}{W} | Creature - Elemental 3/1: Flying / When Flickerwisp enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.
+Forest | Basic Land - Forest: ({T}: Add {G}.)
+Grim Lavamancer {R} | Creature - Human Wizard 1/1: {R}, {T}, Exile two cards from your graveyard: Grim Lavamancer deals 2 damage to any target.
+Hymn to Tourach {B}{B} | Sorcery: Target player discards two cards at random.
+Inquisition of Kozilek {B} | Sorcery: Target player reveals their hand. You choose a nonland card from it with mana value 3 or less. That player discards that card.
+Karakas | Legendary Land: {T}: Add {W}. / {T}: Return target legendary creature to its owner's hand.
+Kataki, War's Wage {1}{W} | Legendary Creature - Spirit 2/1: All artifacts have "At the beginning of your upkeep, sacrifice this artifact unless you pay {1}."
+Kolaghan's Command {1}{B}{R} | Instant: Choose two — / • Return target creature card from your graveyard to your hand. / • Target player discards a card. / • Destroy target artifact. / • Kolaghan's Command deals 2 damage to any target.
+Lightning Bolt {R} | Instant: Lightning Bolt deals 3 damage to any target.
+Liliana of the Veil {1}{B}{B} | Legendary Planeswalker - Liliana: [+1]: Each player discards a card. / [-2]: Target player sacrifices a creature. / [-6]: Separate all permanents target player controls into two piles. That player sacrifices all permanents in the pile of their choice.
+Liliana, the Last Hope {1}{B}{B} | Legendary Planeswalker - Liliana: [+1]: Up to one target creature gets -2/-1 until your next turn. / [-2]: Mill two cards, then you may return a creature card from your graveyard to your hand. / [-7]: You get an emblem with "At the beginning of your end step, create X 2/2 black Zombie creature tokens, where X is two plus the number of Zombies you control."
+Maelstrom Pulse {1}{B}{G} | Sorcery: Destroy target nonland permanent and all other permanents with the same name as that permanent.
+Mana Tithe {W} | Instant: Counter target spell unless its controller pays {1}.
+Mirran Crusader {1}{W}{W} | Creature - Human Knight 2/2: Double strike, protection from black and from green
+Mother of Runes {W} | Creature - Human Cleric 1/1: {T}: Target creature you control gains protection from the color of your choice until end of turn.
+Mountain | Basic Land - Mountain: ({T}: Add {R}.)
+Oblivion Ring {2}{W} | Enchantment: When Oblivion Ring enters, exile another target nonland permanent. / When Oblivion Ring leaves the battlefield, return the exiled card to the battlefield under its owner's control.
+Obstinate Baloth {2}{G}{G} | Creature - Beast 4/4: When Obstinate Baloth enters, you gain 4 life. / If a spell or ability an opponent controls causes you to discard Obstinate Baloth, put it onto the battlefield instead of putting it into your graveyard.
+Orcish Bowmasters {1}{B} | Creature - Orc Archer 1/1: Flash / When Orcish Bowmasters enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, Orcish Bowmasters deals 1 damage to any target. Then amass Orcs 1.
+Pernicious Deed {1}{B}{G} | Enchantment: {X}, Sacrifice Pernicious Deed: Destroy each artifact, creature, and enchantment with mana value X or less.
+Phyrexian Revoker {2} | Artifact Creature - Phyrexian Horror 2/1: As Phyrexian Revoker enters, choose a nonland card name. / Activated abilities of sources with the chosen name can't be activated.
+Pithing Needle {1} | Artifact: As Pithing Needle enters, choose a card name. / Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.
+Plains | Basic Land - Plains: ({T}: Add {W}.)
+Pyrokinesis {4}{R}{R} | Instant: You may exile a red card from your hand rather than pay this spell's mana cost. / Pyrokinesis deals 4 damage divided as you choose among any number of target creatures.
+Recruiter of the Guard {2}{W} | Creature - Human Soldier 1/1: When Recruiter of the Guard enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.
+Rest in Peace {1}{W} | Enchantment: When Rest in Peace enters, exile all graveyards. / If a card or token would be put into a graveyard from anywhere, exile it instead.
+Scavenging Ooze {1}{G} | Creature - Ooze 2/2: {G}: Exile target card from a graveyard. If it was a creature card, put a +1/+1 counter on Scavenging Ooze and you gain 1 life.
+Stoneforge Mystic {1}{W} | Creature - Kor Artificer 1/2: When Stoneforge Mystic enters, you may search your library for an Equipment card, reveal it, put it into your hand, then shuffle. / {1}{W}, {T}: You may put an Equipment card from your hand onto the battlefield.
+Surgical Extraction {B/P} | Instant: ({B/P} can be paid with either {B} or 2 life.) / Choose target card in a graveyard other than a basic land card. Search its owner's graveyard, hand, and library for any number of cards with the same name as that card and exile them. Then that player shuffles.
+Swamp | Basic Land - Swamp: ({T}: Add {B}.)
+Sword of Fire and Ice {3} | Artifact - Equipment: Equipped creature gets +2/+2 and has protection from red and from blue. / Whenever equipped creature deals combat damage to a player, Sword of Fire and Ice deals 2 damage to any target and you draw a card. / Equip {2}
+Swords to Plowshares {W} | Instant: Exile target creature. Its controller gains life equal to its power.
+Taiga | Land - Mountain Forest: ({T}: Add {R} or {G}.)
+Tarmogoyf {1}{G} | Creature - Lhurgoyf */1+*: Tarmogoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.
+Thalia, Guardian of Thraben {1}{W} | Legendary Creature - Human Soldier 2/1: First strike / Noncreature spells cost {1} more to cast.
+Thoughtseize {B} | Sorcery: Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.
+Toxic Deluge {2}{B} | Sorcery: As an additional cost to cast this spell, pay X life. / All creatures get -X/-X until end of turn.
+Umezawa's Jitte {2} | Legendary Artifact - Equipment: Whenever equipped creature deals combat damage, put two charge counters on Umezawa's Jitte. / Remove a charge counter from Umezawa's Jitte: Choose one — / • Equipped creature gets +2/+2 until end of turn. / • Target creature gets -1/-1 until end of turn. / • You gain 2 life. / Equip {2}
+Verdant Catacombs | Land: {T}, Pay 1 life, Sacrifice Verdant Catacombs: Search your library for a Swamp or Forest card, put it onto the battlefield, then shuffle.
+Wasteland | Land: {T}: Add {C}. / {T}, Sacrifice Wasteland: Destroy target nonbasic land.
+Wear // Tear {1}{R}{W} | Instant: Destroy target artifact. / Fuse (You may cast one or both halves of this card from your hand.) /  / Destroy target enchantment. / Fuse (You may cast one or both halves of this card from your hand.)
+Wooded Foothills | Land: {T}, Pay 1 life, Sacrifice Wooded Foothills: Search your library for a Mountain or Forest card, put it onto the battlefield, then shuffle.

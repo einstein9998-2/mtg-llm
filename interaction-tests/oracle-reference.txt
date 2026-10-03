@@ -1,0 +1,819 @@
+# Oracle text of the 144-card pool, as stored in Forge's card scripts (read from the scripts; the Oracle: line is the printed text). Generated 2026-10-01.
+
+Name:Abrade
+ManaCost:1 R
+Types:Instant
+Oracle:Choose one —\n• Abrade deals 3 damage to target creature.\n• Destroy target artifact.
+
+Name:Acererak the Archlich
+ManaCost:2 B
+Types:Legendary Creature Zombie Wizard
+PT:5/5
+Oracle:When Acererak the Archlich enters, if you haven't completed Tomb of Annihilation, return Acererak the Archlich to its owner's hand and venture into the dungeon.\nWhenever Acererak the Archlich attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature.
+
+Name:Aether Vial
+ManaCost:1
+Types:Artifact
+Oracle:At the beginning of your upkeep, you may put a charge counter on Aether Vial.\n{T}: You may put a creature card with mana value equal to the number of charge counters on Aether Vial from your hand onto the battlefield.
+
+Name:Ajani, Nacatl Pariah
+ManaCost:1 W
+Types:Legendary Creature Cat Warrior
+PT:1/2
+AlternateMode:DoubleFaced
+Oracle:When Ajani, Nacatl Pariah enters, create a 2/1 white Cat Warrior creature token.\nWhenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.
+Name:Ajani, Nacatl Avenger
+ManaCost:no cost
+Types:Legendary Planeswalker Ajani
+Loyalty:3
+Oracle:[+2]: Put a +1/+1 counter on each Cat you control.\n[0]: Create a 2/1 white Cat Warrior creature token. When you do, if you control a red permanent other than Ajani, Nacatl Avenger, he deals damage equal to the number of creatures you control to any target.\n[-4]: Each opponent chooses an artifact, a creature, an enchantment and a planeswalker from among the nonland permanents they control, then sacrifices the rest.
+
+Name:Aluren
+ManaCost:2 G G
+Types:Enchantment
+Oracle:Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.
+
+Name:Amped Raptor
+ManaCost:1 R
+Types:Creature Dinosaur
+PT:2/1
+Oracle:First strike\nWhen Amped Raptor enters, you get {E}{E} (two energy counters). Then if you cast it from your hand, exile cards from the top of your library until you exile a nonland card. You may cast that card by paying an amount of {E} equal to its mana value rather than paying its mana cost.
+
+Name:Ancient Tomb
+ManaCost:no cost
+Types:Land
+Oracle:{T}: Add {C}{C}. Ancient Tomb deals 2 damage to you.
+
+Name:Animate Dead
+ManaCost:1 B
+Types:Enchantment Aura
+Oracle:Enchant creature card in a graveyard\nWhen Animate Dead enters, if it's on the battlefield, it loses "enchant creature card in a graveyard" and gains "enchant creature put onto the battlefield with Animate Dead." Return enchanted creature card to the battlefield under your control and attach Animate Dead to it. When Animate Dead leaves the battlefield, that creature's controller sacrifices it.\nEnchanted creature gets -1/-0.
+
+Name:Archon of Cruelty
+ManaCost:6 B B
+Types:Creature Archon
+PT:6/6
+Oracle:Flying\nWhenever Archon of Cruelty enters or attacks, target opponent sacrifices a creature or planeswalker, discards a card, and loses 3 life. You draw a card and gain 3 life.
+
+Name:Arid Mesa
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Arid Mesa: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.
+
+Name:Atraxa, Grand Unifier
+ManaCost:3 G W U B
+Types:Legendary Creature Phyrexian Angel
+PT:7/7
+Oracle:Flying, vigilance, deathtouch, lifelink\nWhen Atraxa, Grand Unifier enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order. (Artifact, battle, creature, enchantment, instant, kindred, land, planeswalker, and sorcery are card types.)
+
+Name:Badlands
+ManaCost:no cost
+Types:Land Swamp Mountain
+Oracle:({T}: Add {B} or {R}.)
+
+Name:Barrowgoyf
+ManaCost:2 B
+Types:Creature Lhurgoyf
+PT:*/1+*
+Oracle:Deathtouch, lifelink\nBarrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.\nWhenever Barrowgoyf deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.
+
+Name:Bilbo, Thief in the Night
+ManaCost:1 U
+Types:Legendary Creature Halfling Rogue
+PT:2/2
+Oracle:Spells you cast from anywhere other than your hand cost {1} less to cast.\nWhenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead.
+
+Name:Bitter Triumph
+ManaCost:1 B
+Types:Instant
+Oracle:As an additional cost to cast this spell, discard a card or pay 3 life.\nDestroy target creature or planeswalker.
+
+Name:Bloodstained Mire
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Bloodstained Mire: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.
+
+Name:Boggart Trawler
+ManaCost:2 B
+Types:Creature Goblin
+PT:3/1
+AlternateMode:Modal
+Oracle:When Goblin Trawler enters, exile target player's graveyard.
+Name:Boggart Bog
+ManaCost:no cost
+Types:Land
+Oracle:As Boggart Bog enters, you may pay 3 life. If you don't, it enters tapped.\n{T}: Add {B}.
+
+Name:Boseiju, Who Endures
+ManaCost:no cost
+Types:Legendary Land
+Oracle:{T}: Add {G}.\nChannel — {1}{G}, Discard Boseiju, Who Endures: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.
+
+Name:Brainstorm
+ManaCost:U
+Types:Instant
+Oracle:Draw three cards, then put two cards from your hand on top of your library in any order.
+
+Name:Brazen Borrower
+ManaCost:1 U U
+Types:Creature Faerie Rogue
+PT:3/1
+AlternateMode:Adventure
+Oracle:Flash\nFlying\nBrazen Borrower can block only creatures with flying.
+Name:Petty Theft
+ManaCost:1 U
+Types:Instant Adventure
+Oracle:Return target nonland permanent an opponent controls to its owner's hand.
+
+Name:Cabal Therapy
+ManaCost:B
+Types:Sorcery
+Oracle:Choose a nonland card name. Target player reveals their hand and discards all cards with that name.\nFlashback—Sacrifice a creature. (You may cast this card from your graveyard for its flashback cost. Then exile it.)
+
+Name:Carpet of Flowers
+ManaCost:G
+Types:Enchantment
+Oracle:At the beginning of each of your main phases, if you haven't added mana with this ability this turn, you may add X mana of any one color, where X is the number of Islands target opponent controls.
+
+Name:Cavern of Souls
+ManaCost:no cost
+Types:Land
+Oracle:As Cavern of Souls enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered.
+
+Name:City of Traitors
+ManaCost:no cost
+Types:Land
+Oracle:When you play another land, sacrifice City of Traitors.\n{T}: Add {C}{C}.
+
+Name:Cloak and Dagger, Entwined
+ManaCost:1 W B
+Types:Legendary Creature Human Hero
+PT:2/2
+Oracle:Deathtouch, lifelink\nWhen Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.
+
+Name:Collective Brutality
+ManaCost:1 B
+Types:Sorcery
+Oracle:Escalate—Discard a card. (Pay this cost for each mode chosen beyond the first.)\nChoose one or more —\n• Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.\n• Target creature gets -2/-2 until end of turn.\n• Target opponent loses 2 life and you gain 2 life.
+
+Name:Consider
+ManaCost:U
+Types:Instant
+Oracle:Surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDraw a card.
+
+Name:Consign to Memory
+ManaCost:U
+Types:Instant
+Oracle:Replicate {1} (When you cast this spell, copy it for each time you paid its replicate cost. You may choose new targets for the copies.)\nCounter target triggered ability or colorless spell.
+
+Name:Containment Priest
+ManaCost:1 W
+Types:Creature Human Cleric
+PT:2/2
+Oracle:Flash\nIf a nontoken creature would enter and it wasn't cast, exile it instead.
+
+Name:Cori-Steel Cutter
+ManaCost:1 R
+Types:Artifact Equipment
+Oracle:Equipped creature gets +1/+1 and has trample and haste.\nFlurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it. (Whenever you cast a noncreature spell, the token gets +1/+1 until end of turn.)\nEquip {1}{R}
+
+Name:Dark Ritual
+ManaCost:B
+Types:Instant
+Oracle:Add {B}{B}{B}.
+
+Name:Daze
+ManaCost:1 U
+Types:Instant
+Oracle:You may return an Island you control to its owner's hand rather than pay this spell's mana cost.\nCounter target spell unless its controller pays {1}.
+
+Name:Deafening Silence
+ManaCost:W
+Types:Enchantment
+Oracle:Each player can't cast more than one noncreature spell each turn.
+
+Name:Defense Grid
+ManaCost:2
+Types:Artifact
+Oracle:Each spell costs {3} more to cast except during its controller's turn.
+
+Name:Dismember
+ManaCost:1 BP BP
+Types:Instant
+Oracle:({B/P} can be paid with either {B} or 2 life.)\nTarget creature gets -5/-5 until end of turn.
+
+Name:Disruptor Flute
+ManaCost:2
+Types:Artifact
+Oracle:Flash\nAs Disruptor Flute enters, choose a card name.\nSpells with the chosen name cost {3} more to cast.\nActivated abilities of sources with the chosen name can't be activated unless they're mana abilities.
+
+Name:Doomsday
+ManaCost:B B B
+Types:Sorcery
+Oracle:Search your library and graveyard for five cards and exile the rest. Put the chosen cards on top of your library in any order. You lose half your life, rounded up.
+
+Name:Dragon's Rage Channeler
+ManaCost:R
+Types:Creature Human Shaman
+PT:1/1
+Oracle:Whenever you cast a noncreature spell, surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDelirium — As long as there are four or more card types among cards in your graveyard, Dragon's Rage Channeler gets +2/+2, has flying, and attacks each combat if able.
+
+Name:Duress
+ManaCost:B
+Types:Sorcery
+Oracle:Target opponent reveals their hand. You choose a noncreature, nonland card from it. That player discards that card.
+
+Name:Edge of Autumn
+ManaCost:1 G
+Types:Sorcery
+Oracle:If you control four or fewer lands, search your library for a basic land card, put it onto the battlefield tapped, then shuffle.\nCycling—Sacrifice a land. (Sacrifice a land, Discard this card: Draw a card.)
+
+Name:Elegant Parlor
+ManaCost:no cost
+Types:Land Mountain Plains
+Oracle:({T}: Add {R} or {W}.)\nElegant Parlor enters tapped.\nWhen Elegant Parlor enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
+
+Name:Erode
+ManaCost:W
+Types:Instant
+Oracle:Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.
+
+Name:Faerie Macabre
+ManaCost:1 B B
+Types:Creature Faerie Rogue
+PT:2/2
+Oracle:Flying\nDiscard Faerie Macabre: Exile up to two target cards from graveyards.
+
+Name:Faithless Looting
+ManaCost:R
+Types:Sorcery
+Oracle:Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)
+
+Name:Fatal Push
+ManaCost:B
+Types:Instant
+Oracle:Destroy target creature if it has mana value 2 or less.\nRevolt — Destroy that creature if it has mana value 4 or less instead if a permanent you controlled left the battlefield this turn.
+
+Name:Flickerwisp
+ManaCost:1 W W
+Types:Creature Elemental
+PT:3/1
+Oracle:Flying\nWhen Flickerwisp enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.
+
+Name:Flooded Strand
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Flooded Strand: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.
+
+Name:Flow State
+ManaCost:1 U
+Types:Sorcery
+Oracle:Look at the top three cards of your library. Put one of them into your hand and the rest on the bottom of your library in any order. If there is an instant card and a sorcery card in your graveyard, instead put two of them into your hand and the rest on the bottom of your library in any order.
+
+Name:Flusterstorm
+ManaCost:U
+Types:Instant
+Oracle:Counter target instant or sorcery spell unless its controller pays {1}.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)
+
+Name:Force of Negation
+ManaCost:1 U U
+Types:Instant
+Oracle:If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.
+
+Name:Force of Will
+ManaCost:3 U U
+Types:Instant
+Oracle:You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target spell.
+
+Name:Forest
+ManaCost:no cost
+Types:Basic Land Forest
+Oracle:({T}: Add {G}.)
+
+Name:Gaddock Teeg
+ManaCost:G W
+Types:Legendary Creature Kithkin Advisor
+PT:2/2
+Oracle:Noncreature spells with mana value 4 or greater can't be cast.\nNoncreature spells with {X} in their mana costs can't be cast.
+
+Name:Goblin Bombardment
+ManaCost:1 R
+Types:Enchantment
+Oracle:Sacrifice a creature: Goblin Bombardment deals 1 damage to any target.
+
+Name:Grafdigger's Cage
+ManaCost:1
+Types:Artifact
+Oracle:Creature cards in graveyards and libraries can't enter the battlefield.\nPlayers can't cast spells from graveyards or libraries.
+
+Name:Griselbrand
+ManaCost:4 B B B B
+Types:Legendary Creature Demon
+PT:7/7
+Oracle:Flying, lifelink\nPay 7 life: Draw seven cards.
+
+Name:Guide of Souls
+ManaCost:W
+Types:Creature Human Cleric
+PT:1/2
+Oracle:Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter).\nWhenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.
+
+Name:Hedge Maze
+ManaCost:no cost
+Types:Land Forest Island
+Oracle:({T}: Add {G} or {U}.)\nHedge Maze enters tapped.\nWhen Hedge Maze enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
+
+Name:Hide on the Ceiling
+ManaCost:X U
+Types:Instant
+Oracle:Exile X target artifacts and/or creatures. Return the exiled cards to the battlefield under their owners' control at the beginning of the next end step.
+
+Name:Hydroblast
+ManaCost:U
+Types:Instant
+Oracle:Choose one —\n• Counter target spell if it's red.\n• Destroy target permanent if it's red.
+
+Name:Island
+ManaCost:no cost
+Types:Basic Land Island
+Oracle:({T}: Add {U}.)
+
+Name:Jace, Wielder of Mysteries
+ManaCost:1 U U U
+Types:Legendary Planeswalker Jace
+Loyalty:4
+Oracle:If you would draw a card while your library has no cards in it, you win the game instead.\n[+1]: Target player mills two cards. Draw a card.\n[-8]: Draw seven cards. Then if your library has no cards in it, you win the game.
+
+Name:Kaito, Bane of Nightmares
+ManaCost:2 U B
+Types:Legendary Planeswalker Kaito
+Loyalty:4
+Oracle:Ninjutsu {1}{U}{B} ({1}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)\nDuring your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has hexproof.\n[+1]: You get an emblem with "Ninjas you control get +1/+1."\n[0]: Surveil 2. Then draw a card for each opponent who lost life this turn.\n[-2]: Tap target creature. Put two stun counters on it.
+
+Name:Karakas
+ManaCost:no cost
+Types:Legendary Land
+Oracle:{T}: Add {W}.\n{T}: Return target legendary creature to its owner's hand.
+
+Name:Koma, World-Eater
+ManaCost:3 G G U U
+Types:Legendary Creature Serpent
+PT:8/12
+Oracle:This spell can't be countered.\nTrample, ward {4}\nWhenever Koma deals combat damage to a player, create four 3/3 blue Serpent creature tokens named Koma's Coil.
+
+Name:Lavinia, Azorius Renegade
+ManaCost:W U
+Types:Legendary Creature Human Soldier
+PT:2/2
+Oracle:Each opponent can't cast noncreature spells with mana value greater than the number of lands that player controls.\nWhenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.
+
+Name:Lazotep Quarry
+ManaCost:no cost
+Types:Land Desert
+Oracle:{T}: Add {C}.\n{T}, Sacrifice a creature: Add one mana of any color.\n{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery.
+
+Name:Lightning Bolt
+ManaCost:R
+Types:Instant
+Oracle:Lightning Bolt deals 3 damage to any target.
+
+Name:Lion's Eye Diamond
+ManaCost:0
+Types:Artifact
+Oracle:Discard your hand, Sacrifice Lion's Eye Diamond: Add three mana of any one color. Activate only as an instant.
+
+Name:Loran of the Third Path
+ManaCost:2 W
+Types:Legendary Creature Human Artificer
+PT:2/1
+Oracle:Vigilance\nWhen Loran of the Third Path enters, destroy up to one target artifact or enchantment.\n{T}: You and target opponent each draw a card.
+
+Name:Lotus Petal
+ManaCost:0
+Types:Artifact
+Oracle:{T}, Sacrifice Lotus Petal: Add one mana of any color.
+
+Name:Magus of the Moon
+ManaCost:2 R
+Types:Creature Human Wizard
+PT:2/2
+Oracle:Nonbasic lands are Mountains.
+
+Name:Marsh Flats
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Marsh Flats: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.
+
+Name:Massacre
+ManaCost:2 B B
+Types:Sorcery
+Oracle:If an opponent controls a Plains and you control a Swamp, you may cast this spell without paying its mana cost.\nAll creatures get -2/-2 until end of turn.
+
+Name:Meltdown
+ManaCost:X R
+Types:Sorcery
+Oracle:Destroy each artifact with mana value X or less.
+
+Name:Meticulous Archive
+ManaCost:no cost
+Types:Land Plains Island
+Oracle:({T}: Add {W} or {U}.)\nMeticulous Archive enters tapped.\nWhen Meticulous Archive enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
+
+Name:Mishra's Bauble
+ManaCost:0
+Types:Artifact
+Oracle:{T}, Sacrifice Mishra's Bauble: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.
+
+Name:Misty Rainforest
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Misty Rainforest: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.
+
+Name:Moonshadow
+ManaCost:B
+Types:Creature Elemental
+PT:7/7
+Oracle:Menace\nThis creature enters with six -1/-1 counters on it.\nWhenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.
+
+Name:Mountain
+ManaCost:no cost
+Types:Basic Land Mountain
+Oracle:({T}: Add {R}.)
+
+Name:Murktide Regent
+ManaCost:5 U U
+Types:Creature Dragon
+PT:3/3
+Oracle:Delve (Each card you exile from your graveyard while casting this spell pays for {1}.)\nFlying\nMurktide Regent enters with a +1/+1 counter on it for each instant and sorcery card exiled with it.\nWhenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on Murktide Regent.
+
+Name:Nethergoyf
+ManaCost:B
+Types:Creature Lhurgoyf
+PT:*/1+*
+Oracle:Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.\nEscape—{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them. (You may cast this card from your graveyard for its escape cost.)
+
+Name:Nihil Spellbomb
+ManaCost:1
+Types:Artifact
+Oracle:{T}, Sacrifice Nihil Spellbomb: Exile all cards from target player's graveyard.\nWhen Nihil Spellbomb is put into a graveyard from the battlefield, you may pay {B}. If you do, draw a card.
+
+Name:Null Rod
+ManaCost:2
+Types:Artifact
+Oracle:Activated abilities of artifacts can't be activated.
+
+Name:Ocelot Pride
+ManaCost:W
+Types:Creature Cat
+PT:1/1
+Oracle:First strike, lifelink\nAscend\nAt the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token. Then if you have the city's blessing, for each token you control that entered this turn, create a token that's a copy of it.
+
+Name:Omniscience
+ManaCost:7 U U U
+Types:Enchantment
+Oracle:You may cast spells from your hand without paying their mana costs.
+
+Name:Orcish Bowmasters
+ManaCost:1 B
+Types:Creature Orc Archer
+PT:1/1
+Oracle:Flash\nWhen Orcish Bowmasters enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, Orcish Bowmasters deals 1 damage to any target. Then amass Orcs 1.
+
+Name:Overlord of the Balemurk
+ManaCost:3 B B
+Types:Enchantment Creature Avatar Horror
+PT:5/5
+Oracle:Impending 5—{1}{B} (If you cast this spell for its impending cost, it enters with five time counters and isn't a creature until the last is removed. At the beginning of your end step, remove a time counter from it.)\nWhenever Overlord of the Balemurk enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand.
+
+Name:Path to Exile
+ManaCost:W
+Types:Instant
+Oracle:Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle.
+
+Name:Personal Tutor
+ManaCost:U
+Types:Sorcery
+Oracle:Search your library for a sorcery card, reveal it, then shuffle and put that card on top.
+
+Name:Phelia, Exuberant Shepherd
+ManaCost:1 W
+Types:Legendary Creature Dog
+PT:2/2
+Oracle:Flash\nWhenever Phelia, Exuberant Shepherd attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.
+
+Name:Phlage, Titan of Fire's Fury
+ManaCost:1 R W
+Types:Legendary Creature Elder Giant
+PT:6/6
+Oracle:When Phlage enters, sacrifice it unless it escaped.\nWhenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.\nEscape—{R}{R}{W}{W}, Exile five other cards from your graveyard. (You may cast this card from your graveyard for its escape cost.)
+
+Name:Plains
+ManaCost:no cost
+Types:Basic Land Plains
+Oracle:({T}: Add {W}.)
+
+Name:Plateau
+ManaCost:no cost
+Types:Land Mountain Plains
+Oracle:({T}: Add {R} or {W}.)
+
+Name:Polluted Delta
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Polluted Delta: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.
+
+Name:Ponder
+ManaCost:U
+Types:Sorcery
+Oracle:Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card.
+
+Name:Preordain
+ManaCost:U
+Types:Sorcery
+Oracle:Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)
+
+Name:Prismari Charm
+ManaCost:U R
+Types:Instant
+Oracle:Choose one —\n• Surveil 2, then draw a card.\n• Prismari Charm deals 1 damage to each of one or two targets.\n• Return target nonland permanent to its owner's hand.
+
+Name:Prismatic Ending
+ManaCost:X W
+Types:Sorcery
+Oracle:Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.
+
+Name:Prismatic Vista
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Prismatic Vista: Search your library for a basic land card, put it onto the battlefield, then shuffle.
+
+Name:Pyroblast
+ManaCost:R
+Types:Instant
+Oracle:Choose one —\n• Counter target spell if it's blue.\n• Destroy target permanent if it's blue.
+
+Name:Pyroclasm
+ManaCost:1 R
+Types:Sorcery
+Oracle:Pyroclasm deals 2 damage to each creature.
+
+Name:Quantum Riddler
+ManaCost:3 U U
+Types:Creature Sphinx
+PT:4/6
+Oracle:Flying\nWhen this creature enters, draw a card.\nAs long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.\nWarp {1}{U}
+
+Name:Raph & Mikey, Troublemakers
+ManaCost:5 RG RG
+Types:Legendary Creature Mutant Ninja Turtle
+PT:7/7
+Oracle:Trample, haste\nWhenever Raph & Mikey attack, reveal cards from the top of your library until you reveal a creature card. Put that card onto the battlefield tapped and attacking and the rest on the bottom of your library in a random order.
+
+Name:Raucous Theater
+ManaCost:no cost
+Types:Land Swamp Mountain
+Oracle:({T}: Add {B} or {R}.)\nRaucous Theater enters tapped.\nWhen Raucous Theater enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
+
+Name:Reanimate
+ManaCost:B
+Types:Sorcery
+Oracle:Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to its mana value.
+
+Name:Recruiter of the Guard
+ManaCost:2 W
+Types:Creature Human Soldier
+PT:1/1
+Oracle:When Recruiter of the Guard enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.
+
+Name:Samwise the Stouthearted
+ManaCost:1 W
+Types:Legendary Creature Halfling Peasant
+PT:2/1
+Oracle:Flash\nWhen Samwise the Stouthearted enters, choose up to one target permanent card in your graveyard that was put there from the battlefield this turn. Return it to your hand. Then the Ring tempts you.
+
+Name:Sand Scout
+ManaCost:1 W
+Types:Creature Human Scout
+PT:2/2
+Oracle:When Sand Scout enters, if an opponent controls more lands than you, search your library for a Desert card, put it onto the battlefield tapped, then shuffle.\nWhenever one or more land cards are put into your graveyard from anywhere, create a 1/1 red, green, and white Sand Warrior creature token. This ability triggers only once each turn.
+
+Name:Savannah
+ManaCost:no cost
+Types:Land Forest Plains
+Oracle:({T}: Add {G} or {W}.)
+
+Name:Scalding Tarn
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Scalding Tarn: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.
+
+Name:Scrubland
+ManaCost:no cost
+Types:Land Plains Swamp
+Oracle:({T}: Add {W} or {B}.)
+
+Name:Shadowy Backstreet
+ManaCost:no cost
+Types:Land Plains Swamp
+Oracle:({T}: Add {W} or {B}.)\nShadowy Backstreet enters tapped.\nWhen Shadowy Backstreet enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
+
+Name:Shallow Grave
+ManaCost:1 B
+Types:Instant
+Oracle:Return the top creature card of your graveyard to the battlefield. That creature gains haste until end of turn. Exile it at the beginning of the next end step.
+
+Name:Show and Tell
+ManaCost:2 U
+Types:Sorcery
+Oracle:Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.
+
+Name:Skyclave Apparition
+ManaCost:1 W W
+Types:Creature Kor Spirit
+PT:2/2
+Oracle:When Skyclave Apparition enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.\nWhen Skyclave Apparition leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.
+
+Name:Snow-Covered Island
+ManaCost:no cost
+Types:Basic Snow Land Island
+Oracle:({T}: Add {U}.)
+
+Name:Snow-Covered Plains
+ManaCost:no cost
+Types:Basic Snow Land Plains
+Oracle:({T}: Add {W}.)
+
+Name:Snow-Covered Swamp
+ManaCost:no cost
+Types:Basic Snow Land Swamp
+Oracle:({T}: Add {B}.)
+
+Name:Snuff Out
+ManaCost:3 B
+Types:Instant
+Oracle:If you control a Swamp, you may pay 4 life rather than pay this spell's mana cost.\nDestroy target nonblack creature. It can't be regenerated.
+
+Name:Solitude
+ManaCost:3 W W
+Types:Creature Elemental Incarnation
+PT:3/2
+Oracle:Flash\nLifelink\nWhen Solitude enters, exile up to one other target creature. That creature's controller gains life equal to its power.\nEvoke—Exile a white card from your hand.
+
+Name:Spider-Woman, Stunning Savior
+ManaCost:1 WU
+Types:Legendary Creature Spider Human Hero
+PT:2/2
+Oracle:Flying\nVenom Blast — Artifacts and creatures your opponents control enter tapped.
+
+Name:Stifle
+ManaCost:U
+Types:Instant
+Oracle:Counter target activated or triggered ability. (Mana abilities can't be targeted.)
+
+Name:Stock Up
+ManaCost:2 U
+Types:Sorcery
+Oracle:Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.
+
+Name:Street Wraith
+ManaCost:3 B B
+Types:Creature Wraith
+PT:3/4
+Oracle:Swampwalk (This creature can't be blocked as long as defending player controls a Swamp.)\nCycling—Pay 2 life. (Pay 2 life, Discard this card: Draw a card.)
+
+Name:Stronghold Gambit
+ManaCost:1 R
+Types:Sorcery
+Oracle:Each player chooses a card in their hand. Then each player reveals their chosen card. The owner of each creature card revealed this way with the lowest mana value puts it onto the battlefield.
+
+Name:Surgical Extraction
+ManaCost:BP
+Types:Instant
+Oracle:({B/P} can be paid with either {B} or 2 life.)\nChoose target card in a graveyard other than a basic land card. Search its owner's graveyard, hand, and library for any number of cards with the same name as that card and exile them. Then that player shuffles.
+
+Name:Swamp
+ManaCost:no cost
+Types:Basic Land Swamp
+Oracle:({T}: Add {B}.)
+
+Name:Swords to Plowshares
+ManaCost:W
+Types:Instant
+Oracle:Exile target creature. Its controller gains life equal to its power.
+
+Name:Tamiyo, Inquisitive Student
+ManaCost:U
+Types:Legendary Creature Moonfolk Wizard
+PT:0/3
+AlternateMode:DoubleFaced
+Oracle:Flying\nWhenever Tamiyo, Inquisitive Student attacks, investigate. (Create a Clue token. It's an artifact with "{2}, Sacrifice this token: Draw a card.")\nWhenever you draw your third card in a turn, exile Tamiyo, then return her to the battlefield transformed under her owner's control.
+Name:Tamiyo, Seasoned Scholar
+ManaCost:no cost
+Types:Legendary Planeswalker Tamiyo
+Loyalty:2
+Oracle:[+2]: Until your next turn, whenever a creature an opponent controls attacks you or a planeswalker you control, it gets -1/-0 until end of turn.\n[-3]: Return target instant or sorcery card from your graveyard to your hand. If it's a green card, add one mana of any color.\n[-7]: Draw cards equal to half the number of cards in your library, rounded up. You get an emblem with "You have no maximum hand size."
+
+Name:Thassa's Oracle
+ManaCost:U U
+Types:Creature Merfolk Wizard
+PT:1/3
+Oracle:When Thassa's Oracle enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game. (Each {U} in the mana costs of permanents you control counts toward your devotion to blue.)
+
+Name:Thoughtseize
+ManaCost:B
+Types:Sorcery
+Oracle:Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.
+
+Name:Thundering Falls
+ManaCost:no cost
+Types:Land Island Mountain
+Oracle:({T}: Add {U} or {R}.)\nThundering Falls enters tapped.\nWhen Thundering Falls enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
+
+Name:Triumph of Saint Katherine
+ManaCost:4 W
+Types:Creature Human Warrior
+PT:5/5
+Oracle:Lifelink\nPraesidium Protectiva — When Triumph of Saint Katherine is put into your graveyard from the battlefield, exile it and the top six cards of your library in a face-down pile. If you do, shuffle that pile and put it back on top of your library.\nMiracle {1}{W} (You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)
+
+Name:Tropical Island
+ManaCost:no cost
+Types:Land Forest Island
+Oracle:({T}: Add {G} or {U}.)
+
+Name:Tundra
+ManaCost:no cost
+Types:Land Plains Island
+Oracle:({T}: Add {W} or {U}.)
+
+Name:Undercity Sewers
+ManaCost:no cost
+Types:Land Island Swamp
+Oracle:({T}: Add {U} or {B}.)\nUndercity Sewers enters tapped.\nWhen Undercity Sewers enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
+
+Name:Underground Sea
+ManaCost:no cost
+Types:Land Island Swamp
+Oracle:({T}: Add {U} or {B}.)
+
+Name:Unholy Heat
+ManaCost:R
+Types:Instant
+Oracle:Unholy Heat deals 2 damage to target creature or planeswalker.\nDelirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard.
+
+Name:Unmask
+ManaCost:3 B
+Types:Sorcery
+Oracle:You may exile a black card from your hand rather than pay this spell's mana cost.\nTarget player reveals their hand. You choose a nonland card from it. That player discards that card.
+
+Name:Veil of Summer
+ManaCost:G
+Types:Instant
+Oracle:Draw a card if an opponent has cast a blue or black spell this turn. Spells you control can't be countered this turn. You and permanents you control gain hexproof from blue and from black until end of turn. (You and they can't be the targets of blue or black spells or abilities your opponents control.)
+
+Name:Verdant Catacombs
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Verdant Catacombs: Search your library for a Swamp or Forest card, put it onto the battlefield, then shuffle.
+
+Name:Voice of Victory
+ManaCost:1 W
+Types:Creature Human Soldier
+PT:1/3
+Oracle:Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)\nYour opponents can't cast spells during your turn.
+
+Name:Volcanic Island
+ManaCost:no cost
+Types:Land Island Mountain
+Oracle:({T}: Add {U} or {R}.)
+
+Name:Wasteland
+ManaCost:no cost
+Types:Land
+Oracle:{T}: Add {C}.\n{T}, Sacrifice Wasteland: Destroy target nonbasic land.
+
+Name:White Orchid Phantom
+ManaCost:W W
+Types:Creature Spirit Knight
+PT:2/2
+Oracle:Flying, first strike\nWhen White Orchid Phantom enters, destroy up to one target nonbasic land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.
+
+Name:Windswept Heath
+ManaCost:no cost
+Types:Land
+Oracle:{T}, Pay 1 life, Sacrifice Windswept Heath: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.
+
+Name:Witch Enchanter
+ManaCost:3 W
+Types:Creature Human Warlock
+PT:2/2
+AlternateMode:Modal
+Oracle:When Witch Enchanter enters, destroy target artifact or enchantment an opponent controls.
+Name:Witch-Blessed Meadow
+ManaCost:no cost
+Types:Land
+Oracle:As Witch-Blessed Meadow enters, you may pay 3 life. If you don't, it enters tapped.\n{T}: Add {W}.
+
+Name:Wrath of the Skies
+ManaCost:X W W
+Types:Sorcery
+Oracle:You get X {E} (energy counters), then you may pay any amount of {E}. Destroy each artifact, creature, and enchantment with mana value less than or equal to the amount of {E} paid this way.

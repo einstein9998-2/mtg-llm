@@ -1,0 +1,115 @@
+id: hydroblast-counters-a-red-spell-and-modes-have-separate-target-types
+title: Hydroblast mode 1 counters Lightning Bolt (a red spell), and each mode accepts only its own kind of target
+area: card
+cards: [Hydroblast, Lightning Bolt, Mountain, Island]
+tags: [hydroblast, counterspell, colour-check, modal, targeting, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hydroblast, text: "Counter target spell if it's red.", verified: true}
+  - {kind: oracle, card: Hydroblast, text: "Destroy target permanent if it's red.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Hydroblast @hydro"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@hydro", modes: [2], targets: ["@bolt"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@hydro", modes: [1], targets: ["@mtn"], pay: auto}}
+  - p1: {t: cast, card: "@hydro", modes: [1], targets: ["@bolt"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}, {kind: spell, card: "@hydro", modes: [1], targets: ["@bolt"]}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt], life: 20}
+    p1: {graveyard: [Hydroblast], life: 20}
+notes: >
+  Lightning Bolt's only colored mana symbol is {R}, so it is red and Hydroblast counters it; p1 stays at 20. The counter mode targets a spell only (not a
+  permanent such as the Mountain) and the destroy mode targets a permanent only (not a spell on the stack); both probes are illegal and change nothing.
+  A wrong engine confuses the two target types. The countered Bolt goes to its owner's graveyard.
+---
+id: hydroblast-mode-two-does-nothing-to-a-non-red-permanent
+title: Hydroblast mode 2 targeting a blue Murktide Regent is legal but destroys nothing
+area: card
+cards: [Hydroblast, Murktide Regent, Island]
+tags: [hydroblast, destroy, colour-check, negative-case, resolution-time-condition]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hydroblast, text: "Destroy target permanent if it's red.", verified: true}
+  - {kind: cr, ref: "115.1a", text: "An instant or sorcery spell is targeted if its spell ability identifies something it will affect by using the phrase “target [something],” where the “something” is a phrase that describes an object and/or player.", verified: true, note: "the target phrase is 'target permanent'; 'if it's red' is outside it and is an instruction checked as the spell resolves"}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hydroblast @hydro"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @mur"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hydro", modes: [2], targets: ["@mur"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Hydroblast]}
+    p1: {battlefield: [{card: Murktide Regent, pt: [3, 3], damage: 0}], graveyard: []}
+notes: >
+  Murktide Regent's cost has only {U} symbols so it is blue, not red: the destroy instruction does nothing and the Regent remains. The cast is legal because
+  the target restriction is simply "target permanent" (the colour is checked on resolution). A wrong engine rejects the cast or destroys it. Reviewer replaced the recalled ruling with Oracle + 115.1a (target phrase "target permanent").
+---
+id: hydroblast-counters-a-multicolor-spell-that-is-partly-red
+title: Hydroblast counters Prismari Charm, which is both blue and red
+area: card
+cards: [Hydroblast, Prismari Charm, Island, Mountain]
+tags: [hydroblast, counterspell, multicolor, colour-check, prismari-charm]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hydroblast, text: "Counter target spell if it's red.", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Hydroblast @hydro"]
+    battlefield: ["Island @i2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [1], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@hydro", modes: [1], targets: ["@charm"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm], hand: [], library_count: 10}
+    p1: {graveyard: [Hydroblast]}
+notes: >
+  Prismari Charm's mana cost {U}{R} makes it both blue and red, so "if it's red" is true and it is countered. No surveil or draw happens (library stays at 10 and
+  no decision is raised). A wrong engine counts only a single color for multicolored spells.

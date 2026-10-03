@@ -1,0 +1,175 @@
+id: cutter-equip-gives-haste-fresh-creature-attacks
+title: A creature cast this turn and equipped with Cori-Steel Cutter has haste and can attack
+area: core
+cards: ["Dragon's Rage Channeler", Cori-Steel Cutter, Mountain, "Goblin Token"]
+tags: [combat, haste, summoning-sickness, equipment, equip, trample, declare-attackers]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Cori-Steel Cutter", text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: oracle, card: "Cori-Steel Cutter", text: "Equip {1}{R}", verified: true}
+  - {kind: cr, ref: "702.6a", text: "“Equip [cost]” means “[Cost]: Attach this permanent to target creature you control. Activate only as a sorcery.”", verified: true}
+  - {kind: cr, ref: "702.10b", text: "If a creature has haste, it can attack even if it hasn’t been controlled by its controller continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.", verified: true}
+  - {kind: cr, ref: "508.1a", text: "The chosen creatures must be untapped, they can’t also be battles, and each one must either have haste or have been controlled by the active player continuously since the turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dragon's Rage Channeler @drc"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Cori-Steel Cutter @cutter"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@drc", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      priority: p0
+      p0: {battlefield_contains: [{card: "Dragon's Rage Channeler", sick: true, pt: [1, 1]}]}
+  - p0: {t: activate, source: "@cutter", ability: 0, targets: ["@drc"]}
+  - check: {stack: [{kind: activated, source: "@cutter"}], priority: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0:
+        battlefield_contains:
+          - {card: "Dragon's Rage Channeler", pt: [2, 2], keywords: [trample, haste]}
+          - {card: Cori-Steel Cutter, attached_to: "@drc"}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks: [{creature: "@drc", target: {player: p1}}]
+      expect_options: {include: ["@drc"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [], expect_options: {include: ["@gob"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p1: {life: 18}
+    p0:
+      battlefield_contains:
+        - {card: "Dragon's Rage Channeler", tapped: true, pt: [2, 2]}
+        - {card: Cori-Steel Cutter, attached_to: "@drc"}
+notes: >
+  The Channeler is cast this turn (summoning sick, 1/1) and cannot attack by itself (302.6). Equip {1}{R} (an activated
+  ability, ability index 0 because the Flurry ability is a trigger) attaches the Cutter: 2/2 with trample and haste, which
+  lets it attack without having been controlled since the turn began (702.10b, 508.1a). It deals 2 to p1 (20 to 18). Three Mountains pay
+  R for the Channeler and {1}{R} for the equip. Equip is not a spell, so the Channeler's surveil trigger does not fire.
+  The Goblin gives p1 a possible blocker so the declare_blockers decision is raised.
+---
+id: drc-delirium-must-attack-each-combat
+title: With delirium the Dragon's Rage Channeler is 3/3 with flying and must attack each combat if able
+area: core
+cards: ["Dragon's Rage Channeler", "Goblin Token", Lightning Bolt, Ponder, Island, "Mishra's Bauble", "Spider-Woman, Stunning Savior"]
+tags: [combat, delirium, forced-attack, attack-requirement, declare-attackers, mask-validity, flying]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Dragon's Rage Channeler", text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: cr, ref: "508.1d", text: "If the number of requirements that are being obeyed is fewer than the maximum possible number of requirements that could be obeyed without disobeying any restrictions, the declaration of attackers is illegal.", verified: true}
+  - {kind: cr, ref: "508.1a", text: "The chosen creatures must be untapped, they can’t also be battles, and each one must either have haste or have been controlled by the active player continuously since the turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Dragon's Rage Channeler @drc", {token: Goblin Token, as: gob}]
+    graveyard: ["Lightning Bolt", "Ponder", "Island", "Mishra's Bauble"]
+    library_pad: 10
+  p1:
+    battlefield: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - check:
+      p0:
+        battlefield_contains:
+          - {card: "Dragon's Rage Channeler", pt: [3, 3], keywords: [flying]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {decision: declare_attackers, attacks: []}}
+  - expect_illegal: {p0: {decision: declare_attackers, attacks: [{creature: "@gob", target: {player: p1}}]}}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@drc", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [], expect_options: {include: ["@sw"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p1: {life: 17}
+    p0:
+      battlefield:
+        - {card: "Dragon's Rage Channeler", tapped: true, pt: [3, 3]}
+        - {token: Goblin Token, tapped: false}
+notes: >
+  p0's graveyard holds an instant, a sorcery, a land and an artifact (Lightning Bolt, Ponder, Island, Mishra's Bauble): four
+  card types, so delirium is active and the Channeler is 3/3 with flying and "attacks each combat if able". At the
+  declaration, a requirement that is obeyed less than the maximum possible makes the declaration illegal (508.1d):
+  attacking with nobody, or with only the Goblin, is not in the legal set; attacking with the Channeler alone (or with both)
+  is. The Channeler attacks alone and deals 3 in the air (p1: 20 to 17). The Spider-Woman is a flying legal blocker and declines.
+---
+id: sorcery-cannot-be-cast-during-combat-instant-can
+title: A sorcery cannot be cast in any combat step (even with priority and an empty stack); an instant can, and the sorcery is castable again in the second main phase
+area: core
+cards: [Pyroclasm, Lightning Bolt, Mountain, "Goblin Token", "Skeleton Token"]
+tags: [combat, timing, sorcery, instant, mask-validity, priority]
+derived_from: cr
+source:
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority. A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+  - {kind: oracle, card: "Pyroclasm", text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+  - {kind: oracle, card: "Lightning Bolt", text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Pyroclasm @pyro", "Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", {token: Goblin Token, as: gob}]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Skeleton Token, as: skel}]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@pyro", pay: auto}}
+  - check: {legal: {p0: {include: [{t: cast, card: "@bolt"}], exclude: [{t: cast, card: "@pyro"}]}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@gob", target: {player: p1}}]}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: []}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {phase: main2, priority: p0, stack: [], legal: {p0: {include: [{t: cast, card: "@pyro"}, {t: cast, card: "@bolt"}]}}}
+expect:
+  - at: after_script
+    phase: main2
+    active: p0
+    priority: p0
+    p1: {life: 19}
+    p0: {hand: [Pyroclasm, Lightning Bolt]}
+notes: >
+  Pyroclasm is a sorcery: a noninstant spell may be cast only in a main phase with the stack empty (117.1a). It is not
+  offered in the beginning of combat, declare attackers, declare blockers, combat damage or end of combat steps, although p0 has
+  priority and enough mana, while the instant Lightning Bolt is offered in the first check. Once the second main phase starts
+  both are offered again. The Goblin attacks and p1's Skeleton declines to block, so p1 is at 19.

@@ -1,0 +1,104 @@
+id: white-orchid-phantom-destroys-nonbasic-controller-fetches-basic-tapped
+title: White Orchid Phantom destroys a nonbasic land, and that land's controller may search for a basic land that enters tapped
+area: card
+cards: [White Orchid Phantom, Wasteland, Island, Swamp, Plains]
+tags: [white-orchid-phantom, etb-trigger, land-destruction, search, enters-tapped, opponent-decision]
+derived_from: oracle
+source:
+  - {kind: oracle, card: White Orchid Phantom, text: "When this creature enters, destroy up to one target nonbasic land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["White Orchid Phantom @wop"]
+    battlefield: ["Plains @w1", "Plains @w2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @waste", "Island @isl"]
+    library: ["Swamp @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wop", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@waste", expect_options: {include: ["@waste"], exclude: ["@isl", "@w1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: true}
+  - p1: {decision: search, found: "@sw"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: White Orchid Phantom, keywords: [flying]}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+    p1:
+      graveyard: [Wasteland]
+      library_count: 10
+      battlefield: [{card: Island, tapped: false}, {card: Swamp, tapped: true}]
+notes: >
+  Basic lands (p1's Island, p0's Plains) are not legal targets. The search belongs to the destroyed land's controller
+  p1, not to p0: both the yes_no and the search decision are p1's. The Swamp enters tapped. A wrong engine lets p0
+  search, puts the basic in untapped, or searches p0's library.
+---
+id: white-orchid-phantom-fizzles-when-target-fetchland-is-sacrificed
+title: If the targeted fetchland is sacrificed in response, White Orchid Phantom's trigger does not resolve and offers no basic land search
+area: card
+cards: [White Orchid Phantom, Marsh Flats, Island, Swamp, Plains]
+tags: [white-orchid-phantom, fizzle, fetchland, marsh-flats, life-payment, stack]
+derived_from: cr
+source:
+  - {kind: oracle, card: White Orchid Phantom, text: "When this creature enters, destroy up to one target nonbasic land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: oracle, card: Marsh Flats, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["White Orchid Phantom @wop"]
+    battlefield: ["Plains @w1", "Plains @w2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Marsh Flats @flats", "Island @isl"]
+    library: ["Swamp @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wop", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@flats"}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@flats", ability: 0}
+  - check:
+      stack:
+        - {kind: triggered, source: "@wop", controller: p0, targets: ["@flats"]}
+        - {kind: activated, source: "@flats", controller: p1}
+      p1: {life: 19, graveyard: [Marsh Flats]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, found: "@sw", expect_options: {include: ["@sw"], exclude: [Island]}}
+  - check:
+      stack: [{kind: triggered, source: "@wop", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      life: 19
+      graveyard: [Marsh Flats]
+      library_count: 10
+      battlefield: [{card: Island}, {card: Swamp, tapped: false}]
+notes: >
+  p1 pays 1 life and sacrifices Marsh Flats as costs, so the Phantom's only target is gone. The fetch puts the Swamp in
+  untapped (Marsh Flats does not say tapped). The Phantom's trigger then does not resolve (608.2b): no destroy, and no
+  second search for p1 (its "Its controller may search" part never happens). A wrong engine would offer p1 a second
+  basic land or apply the search to p0. Island cards are not Plains or Swamp, so they are not findable by the fetch.

@@ -1,0 +1,120 @@
+id: edge-of-autumn-with-five-lands-does-nothing
+title: Edge of Autumn resolving while its caster controls five lands searches nothing and does not shuffle
+area: card
+cards: [Edge of Autumn, Forest, Swamp, Island]
+tags: [edge-of-autumn, condition, no-shuffle, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Edge of Autumn, text: "If you control four or fewer lands, search your library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Edge of Autumn @e"]
+    battlefield: ["Forest @f", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: []
+script:
+  - p0: {t: cast, card: "@e", pay: {tap: ["@f", "@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_count: 10
+      graveyard: [Edge of Autumn]
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: false}
+        - {card: Swamp, tapped: false}
+        - {card: Swamp, tapped: false}
+notes: >
+  Tapped lands still count as lands p0 controls: five lands fail the "four or fewer" condition when Edge resolves, so no
+  search decision is raised and nothing is shuffled (random: [] fails an engine that shuffles anyway). Pairs with the
+  positive fetch above.
+---
+id: edge-of-autumn-cycling-by-sacrificing-a-land-at-instant-speed
+title: Edge of Autumn's cycling (sacrifice a land, discard it) is activated from hand in the opponent's end step and draws a card
+area: card
+cards: [Edge of Autumn, Swamp, Island, Ponder]
+tags: [edge-of-autumn, cycling, sacrifice-cost, activated-from-hand, instant-speed]
+derived_from: cr
+source:
+  - {kind: oracle, card: Edge of Autumn, text: "Cycling—Sacrifice a land.", verified: true}
+  - {kind: cr, ref: "702.29a", text: "Cycling is an activated ability that functions only while the card with cycling is in a player’s hand. “Cycling [cost]” means “[Cost], Discard this card: Draw a card.”", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  priority: p0
+  p0:
+    hand: ["Edge of Autumn @e"]
+    battlefield: ["Swamp @s", "Island @i"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate_from_hand, source: "@e", ability: 0, sacrifice: ["@s"]}
+  - check:
+      stack: [{kind: activated, source: "@e", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [], graveyard: [Edge of Autumn, Swamp], battlefield: [{card: Island, tapped: false}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    phase: end
+    p0:
+      hand: [Ponder]
+      library_count: 10
+      graveyard: [Edge of Autumn, Swamp]
+      battlefield: [{card: Island, tapped: false}]
+notes: >
+  Cycling is an activated ability usable whenever p0 has priority, here in p1's end step (setup gives p0 priority after
+  p1 passed). Both costs (sacrificing the chosen Swamp, discarding Edge) are paid on activation, so they are in the
+  graveyard while the ability is on the stack. After it resolves the active player p1 gets priority. The cost choice is
+  written as `sacrifice: [...]` on the action (see REPORT schema-requests). Wrong engines: treat cycling as sorcery-speed,
+  tap instead of sacrifice, or draw before paying.
+---
+id: edge-of-autumn-cycling-cost-needs-a-land
+title: Edge of Autumn cannot be cycled by sacrificing a nonland permanent; with no land, cycling is not offered
+area: card
+cards: [Edge of Autumn, Lotus Petal, Island]
+tags: [edge-of-autumn, cycling, sacrifice-cost, negative, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Edge of Autumn, text: "Cycling—Sacrifice a land.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can’t pay a cost without having the necessary resources to pay it fully.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Edge of Autumn @e"]
+    battlefield: ["Lotus Petal @lp"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@e", ability: 0, sacrifice: ["@lp"]}}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@e", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Edge of Autumn], battlefield: [{card: Lotus Petal}], graveyard: []}
+    legal: {p0: {exclude: [{t: activate_from_hand, source: "@e"}]}}
+notes: >
+  The only permanent is Lotus Petal, an artifact, so the cost "sacrifice a land" cannot be paid (118.3) and cycling must
+  not appear in the legal set. (Petal makes only one mana, so Edge cannot be cast for {1}{G} either; this scenario
+  asserts only that the cycling action is absent.) Paired with the positive cycling scenario above.

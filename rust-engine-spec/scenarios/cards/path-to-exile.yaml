@@ -1,0 +1,82 @@
+id: path-to-exile-controller-searches-basic-land-tapped
+title: Path to Exile exiles a creature and its controller may put a basic land from their library onto the battlefield tapped
+area: card
+cards: [Path to Exile, Griselbrand, Plains]
+tags: [path-to-exile, exile, search, enters-tapped, opponent-decision]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Path to Exile, text: "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Path to Exile @path"]
+    battlefield: ["Plains @w1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Griselbrand @gris"]
+    library: ["Plains @pp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@path", targets: ["@gris"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: true}
+  - p1: {decision: search, found: "@pp", expect_options: {include: ["@pp"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Path to Exile]
+      battlefield: [{card: Plains, tapped: true}]
+    p1:
+      life: 20
+      exile: [Griselbrand]
+      library_count: 10
+      battlefield: [{card: Plains, controller: p1, tapped: true}]
+notes: >
+  The exiled creature's controller p1 makes both decisions (may search, then which basic). The Plains enters tapped
+  under p1's control. Path gives no life (unlike Swords to Plowshares). A wrong engine asks p0, untaps the land, or
+  gains life.
+---
+id: path-to-exile-search-with-no-basic-finds-nothing
+title: Path to Exile's controller may search even with no basic land in library and finds nothing
+area: card
+cards: [Path to Exile, Griselbrand, Wasteland, Marsh Flats, Plains]
+tags: [path-to-exile, search, fail-to-find, opponent-decision]
+derived_from: cr
+source:
+  - {kind: oracle, card: Path to Exile, text: "Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn’t required to find some or all of those cards even if they’re present in that zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Path to Exile @path"]
+    battlefield: ["Plains @w1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Griselbrand @gris"]
+    library: ["Wasteland @wl", "Marsh Flats @mf"]
+script:
+  - p0: {t: cast, card: "@path", targets: ["@gris"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: true}
+  - p1: {decision: search, found: null, expect_options: {exclude: ["@wl", "@mf"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      exile: [Griselbrand]
+      library_count: 2
+      battlefield: []
+notes: >
+  p1's library holds only nonbasic lands (no library_pad, which would add basic Islands; no draw happens in this
+  script). The search is raised and can find nothing (SCHEMA addendum: a search decision is raised even when nothing
+  legal can be found). A wrong engine lets p1 take Wasteland or Marsh Flats.

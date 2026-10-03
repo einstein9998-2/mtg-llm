@@ -1,0 +1,73 @@
+id: abrade-mode-1-three-damage-kills-creature
+title: Abrade's first mode deals 3 damage to a 3/3 creature, which dies
+area: card
+cards: [Abrade, Mountain, Plains, Murktide Regent]
+tags: [abrade, modal, damage, state-based-actions]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Abrade, text: "Abrade deals 3 damage to target creature.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Abrade @ab"]
+    battlefield: ["Mountain @m", "Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ab", modes: [1], targets: ["@murk"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@ab", controller: p0, modes: [1], targets: ["@murk"]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Abrade]
+      battlefield: [{card: Mountain, tapped: true}, {card: Plains, tapped: true}]
+    p1:
+      life: 20
+      battlefield: []
+      graveyard: [Murktide Regent]
+notes: >
+  Modes are 1-based in printed order. 3 damage to the 3/3 is lethal; the state-based action destroys it. Murktide has no
+  counters here.
+---
+id: abrade-each-mode-has-its-own-target-type
+title: Abrade's damage mode cannot target an artifact or a player, and its destroy mode cannot target a creature
+area: card
+cards: [Abrade, Mountain, Plains, Null Rod, "Dragon's Rage Channeler"]
+tags: [abrade, modal, targeting, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Abrade, text: "Abrade deals 3 damage to target creature.", verified: true}
+  - {kind: oracle, card: Abrade, text: "Destroy target artifact.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Abrade @ab"]
+    battlefield: ["Mountain @m", "Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Null Rod @rod", "Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ab", modes: [1], targets: ["@rod"]}}
+  - expect_illegal: {p0: {t: cast, card: "@ab", modes: [1], targets: [{player: p1}]}}
+  - expect_illegal: {p0: {t: cast, card: "@ab", modes: [2], targets: ["@drc"]}}
+  - p0: {t: cast, card: "@ab", modes: [2], targets: ["@rod"], pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@ab", controller: p0, modes: [2], targets: ["@rod"]}]
+    pending: {actor: p0, kind: priority}
+notes: >
+  Mode 1 says "target creature" (not "any target"), so neither the noncreature artifact nor a player qualifies; mode 2
+  needs an artifact, so a non-artifact creature is illegal. The final cast is the positive control.

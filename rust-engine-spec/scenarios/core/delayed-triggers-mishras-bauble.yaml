@@ -1,0 +1,158 @@
+id: bauble-activated-on-own-turn-draws-at-opponents-upkeep
+title: "Mishra's Bauble activated in p0's main phase draws a card at the beginning of the next turn's upkeep, which is the opponent's upkeep"
+area: core
+cards: [Mishra's Bauble, Ponder, Island]
+tags: [delayed-triggers, mishras-bauble, upkeep, trigger-timing, independent-of-source]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "603.7a", text: "Delayed triggered abilities are created during the resolution of spells or abilities, as the result of a replacement effect being applied, or as a result of a static ability that allows a player to take an action.", verified: true}
+  - {kind: cr, ref: "603.7e", text: "If an activated or triggered ability creates a delayed triggered ability, the source of that delayed triggered ability is the same as the source of that other ability. The controller of that delayed triggered ability is the player who controlled that other ability as it resolved.", verified: true}
+  - {kind: cr, ref: "603.7b", text: "A delayed triggered ability will trigger only once-the next time its trigger event occurs-unless it has a stated duration, such as \"this turn.\"", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @bauble"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bauble", ability: 0, targets: [{player: p0}]}
+  - check:
+      stack:
+        - {kind: activated, source: "@bauble", controller: p0}
+      p0: {graveyard: [Mishra's Bauble], battlefield: [], hand_count: 0}
+  - resolve_top: true
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {hand_count: 0, library_count: 11}
+  - advance: {to: upkeep, of: p1}
+  - check:
+      turn: 4
+      active: p1
+      stack:
+        - {kind: triggered, controller: p0}
+      pending: {actor: p1, kind: priority}
+      p0: {hand_count: 0, graveyard: [Mishra's Bauble]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 4
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {hand: [Ponder], library_count: 10, graveyard: [Mishra's Bauble]}
+notes: >
+  The ability resolves in turn 3 and only creates the delayed trigger (nothing is drawn during turn 3). "The next turn" is
+  turn 4, p1's turn, so the trigger goes on the stack at the beginning of p1's upkeep, controlled by p0 (603.7e), and
+  p0 draws there (Ponder, the card that was on top). The Bauble sits in the graveyard the whole time: the delayed trigger does
+  not depend on it. p1, the active player, receives priority first with the trigger on the stack. Catches an engine that draws
+  immediately, draws at p0's own next upkeep, or gives the delayed trigger to the wrong player.
+---
+id: bauble-activated-in-opponents-end-step-draws-in-own-upkeep
+title: "Mishra's Bauble activated in the opponent's end step draws in p0's own upkeep of the very next turn"
+area: core
+cards: [Mishra's Bauble, Ponder, Island]
+tags: [delayed-triggers, mishras-bauble, upkeep, end-step, trigger-timing, instant-speed]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "603.7a", text: "Delayed triggered abilities are created during the resolution of spells or abilities, as the result of a replacement effect being applied, or as a result of a static ability that allows a player to take an action.", verified: true}
+  - {kind: cr, ref: "603.7e", text: "If an activated or triggered ability creates a delayed triggered ability, the source of that delayed triggered ability is the same as the source of that other ability. The controller of that delayed triggered ability is the player who controlled that other ability as it resolved.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    battlefield: ["Mishra's Bauble @bauble"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@bauble", ability: 0, targets: [{player: p0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      turn: 4
+      p0: {hand_count: 0, graveyard: [Mishra's Bauble]}
+      pending: {actor: p1, kind: priority}
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 5
+      active: p0
+      stack:
+        - {kind: triggered, controller: p0}
+      pending: {actor: p0, kind: priority}
+      p0: {hand_count: 0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 5
+    active: p0
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Ponder], library_count: 10}
+notes: >
+  p1 passes priority in its own end step, so p0 can activate at instant speed. The "next turn's upkeep" is turn 5's, which
+  is p0's own upkeep. The draw happens there, before p0's draw step (hand is still empty when the trigger is on the stack, and
+  the card drawn by the trigger is Ponder). Catches an engine that treats "next turn" as "next own turn after this turn
+  ends" in a way that skips it, or that draws during the end step.
+---
+id: bauble-delayed-draw-survives-bauble-exiled-from-graveyard
+title: "The delayed draw still happens after Mishra's Bauble is exiled from the graveyard by Faerie Macabre"
+area: core
+cards: [Mishra's Bauble, Faerie Macabre, Ponder, Island]
+tags: [delayed-triggers, mishras-bauble, faerie-macabre, independent-of-source, upkeep, last-known-information]
+derived_from: cr
+source:
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won't affect the ability.", verified: true}
+  - {kind: cr, ref: "603.7e", text: "If an activated or triggered ability creates a delayed triggered ability, the source of that delayed triggered ability is the same as the source of that other ability.", verified: true}
+  - {kind: cr, ref: "603.7c", text: "A delayed triggered ability that refers to a particular object still affects it even if the object changes characteristics.", verified: true}
+  - {kind: oracle, card: Mishra's Bauble, text: "Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @bauble"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+  p1:
+    hand: ["Faerie Macabre @fm"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bauble", ability: 0, targets: [{player: p0}]}
+  - resolve_top: true
+  - p0: {t: pass}
+  - p1: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@bauble"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [Mishra's Bauble], graveyard: [], hand_count: 0}
+      p1: {graveyard: [Faerie Macabre], hand: []}
+  - advance: {to: upkeep, of: p1}
+  - check:
+      turn: 4
+      stack:
+        - {kind: triggered, controller: p0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 4
+    stack: []
+    p0: {hand: [Ponder], exile: [Mishra's Bauble]}
+notes: >
+  After the Bauble's ability resolves, p0 passes with an empty stack; p1 (who then receives priority) activates Faerie
+  Macabre from hand, exiling the Bauble from p0's graveyard. The delayed trigger was created by the resolved ability and
+  belongs to no object in particular, so it still triggers at turn 4's upkeep and p0 still draws. Catches an engine that ties
+  the delayed trigger's lifetime to the source object's current zone.

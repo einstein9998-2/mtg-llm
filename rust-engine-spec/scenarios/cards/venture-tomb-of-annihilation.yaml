@@ -1,0 +1,301 @@
+id: tomb-first-venture-trapped-entry-each-player-loses-one
+title: Choosing Tomb of Annihilation puts the marker on Trapped Entry and each player loses 1 life
+area: card
+cards: [Acererak the Archlich, Aluren]
+tags: [venture, choose-dungeon, room-ability, life-loss, tomb]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.49a", text: "they choose a dungeon card they own from outside the game and put it into the command zone. They put their venture marker on the topmost room.", verified: true}
+  - {kind: cr, ref: "309.4c", text: "The full text of each room ability is \"When you move your venture marker into this room, [effect.]\"", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Tomb of Annihilation, Trapped Entry (topmost): Each player loses 1 life.", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_dungeon, answer: Tomb of Annihilation, expect_options: {count: 3, include: [Lost Mine of Phandelver, Dungeon of the Mad Mage, Tomb of Annihilation]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 19, hand: [Acererak the Archlich], command: [{dungeon: Tomb of Annihilation, room: Trapped Entry}], completed_dungeons: []}
+    p1: {life: 19}
+notes: >
+  Trapped Entry hurts both players, including the dungeon's owner. Acererak still returns (Tomb is started, not completed).
+---
+id: tomb-veils-of-fear-apnap-discard-or-lose-two
+title: From Trapped Entry the venture offers Veils of Fear and Oubliette; in Veils of Fear p0 chooses first (discards), then p1 (declines and loses 2)
+area: card
+cards: [Acererak the Archlich, Aluren, Island, Force of Will]
+tags: [venture, choose-room, room-ability, apnap, opponent-choice, discard, life-loss, tomb]
+derived_from: cr
+source:
+  - {kind: cr, ref: "101.4", text: "If multiple players would make choices and/or take actions at the same time, the active player ... makes any choices required, then the next player in turn order ... Then the actions happen simultaneously.", verified: true}
+  - {kind: cr, ref: "701.9b", text: "By default, effects that cause a player to discard a card allow the affected player to choose which card to discard.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Tomb of Annihilation: Trapped Entry leads to Veils of Fear and Oubliette; Veils of Fear: Each player loses 2 life unless they discard a card.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    life: 19
+    hand: ["Acererak the Archlich @acer", "Island @isl0"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Tomb of Annihilation, room: Trapped Entry}]
+    library_pad: 10
+  p1:
+    life: 19
+    hand: ["Force of Will @fow"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Veils of Fear, expect_options: {exact: [Veils of Fear, Oubliette]}}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: discard_instead, answer: true}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@isl0"], expect_options: {include: ["@isl0", "@acer"], exclude: ["@fow"]}}
+  - p1: {decision: yes_no, purpose: discard_instead, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 19, hand: [Acererak the Archlich], graveyard: [Island], command: [{dungeon: Tomb of Annihilation, room: Veils of Fear}]}
+    p1: {life: 17, hand: [Force of Will], graveyard: []}
+notes: >
+  Each player decides for themselves, in APNAP order (p0 is active, so p0's choice and card come first), then everything
+  happens at once. p0 may discard any card in hand, including the just-returned Acererak; p0 picks the Island. p1 keeps
+  Force of Will and loses 2. Bugs caught (one observed in an earlier engine): the dungeon owner choosing the opponent's
+  discard, the engine choosing a discard for p0, Veils hurting only opponents, and wrong choice order.
+---
+id: tomb-veils-of-fear-empty-hand-loses-two-without-prompt
+title: A player with an empty hand cannot discard to Veils of Fear and simply loses 2 life, with no prompt
+area: card
+cards: [Acererak the Archlich, Aluren]
+tags: [venture, room-ability, opponent-choice, mask-validity, life-loss, tomb]
+derived_from: oracle
+source:
+  - {kind: cr, ref: "101.4", text: "the active player ... makes any choices required, then the next player in turn order ... Then the actions happen simultaneously.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Tomb of Annihilation, Veils of Fear: Each player loses 2 life unless they discard a card.", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Tomb of Annihilation, room: Trapped Entry}]
+    library_pad: 10
+  p1:
+    hand: []
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Veils of Fear}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: discard_instead, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 18, hand: [Acererak the Archlich]}
+    p1: {life: 18, hand_count: 0}
+notes: >
+  p0 holds Acererak (returned before the venture), so p0 gets the choice and declines. p1 has no card, so discarding is
+  impossible and p1 must not be prompted: the next decision after p0's answer is p0's priority. Both lose 2.
+---
+id: tomb-sandfall-cell-sacrifice-or-lose-two
+title: Veils of Fear leads only to Sandfall Cell; each player loses 2 unless they sacrifice a creature, artifact, or land of their choice
+area: card
+cards: [Acererak the Archlich, Aluren, Swamp, Island, Dragon's Rage Channeler]
+tags: [venture, choose-room, room-ability, apnap, opponent-choice, sacrifice, life-loss, tomb]
+derived_from: cr
+source:
+  - {kind: cr, ref: "101.4", text: "the active player ... makes any choices required, then the next player in turn order ... Then the actions happen simultaneously.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner's graveyard.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Tomb of Annihilation: Veils of Fear leads to Sandfall Cell; Sandfall Cell: Each player loses 2 life unless they sacrifice a creature, artifact, or land of their choice.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu", "Swamp @s1"]
+    command: [{dungeon: Tomb of Annihilation, room: Veils of Fear}]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @pi1", "Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: sacrifice_instead, answer: false}
+  - p1: {decision: yes_no, purpose: sacrifice_instead, answer: true}
+  - p1: {decision: choose_cards, purpose: sacrifice, answer: ["@pi1"], expect_options: {include: ["@pi1", "@drc"], exclude: ["@s1", "@alu"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 18, battlefield: [{card: Aluren}, {card: Swamp}], command: [{dungeon: Tomb of Annihilation, room: Sandfall Cell}]}
+    p1: {life: 20, battlefield: [{card: Dragon's Rage Channeler}], graveyard: [Island]}
+notes: >
+  p1 may pick a creature, an artifact or a land and picks the Island. p0 had a land (the Swamp) and therefore a choice, but
+  declined. Aluren is an enchantment and is not a candidate. Decision modelling as in Veils of Fear.
+---
+id: tomb-cradle-creates-atropal-and-completes
+title: Cradle of the Death God creates The Atropal, and Tomb of Annihilation is completed once that ability has resolved
+area: card
+cards: [Acererak the Archlich, Aluren, The Atropal]
+tags: [venture, room-ability, token, legendary-token, dungeon-completion, state-based-actions, tomb]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5t", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game.", verified: true}
+  - {kind: cr, ref: "309.7", text: "A player completes a dungeon as that dungeon card is removed from the game.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Tomb of Annihilation: Sandfall Cell leads to Cradle of the Death God (bottom); Cradle of the Death God: Create The Atropal, a legendary 4/4 black God Horror creature token with deathtouch.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Tomb of Annihilation, room: Sandfall Cell}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - label: cradle-on-stack
+    check:
+      stack: [{kind: triggered, controller: p0, text_contains: "The Atropal"}]
+      p0:
+        hand: [Acererak the Archlich]
+        command: [{dungeon: Tomb of Annihilation, room: Cradle of the Death God}]
+        completed_dungeons: []
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich]
+      command: []
+      completed_dungeons: [Tomb of Annihilation]
+      battlefield:
+        - {card: Aluren}
+        - {token: The Atropal, pt: [4, 4], keywords: [deathtouch], colors: [B], supertypes: [Legendary], sick: true}
+notes: >
+  This venture's ETB trigger still returned Acererak (the condition was true when it resolved; Tomb was completed only
+  afterwards), so Acererak ends in hand; the next cast stays (see the path scenarios). The dungeon is removed by the
+  state-based action, not by a further venture.
+---
+id: tomb-veils-path-four-ventures-opponent-choices
+title: Tomb of Annihilation via Veils of Fear and Sandfall Cell takes four ventures, with both players choosing in each of those rooms
+area: card
+cards: [Acererak the Archlich, Aluren, Swamp, Island, Force of Will, The Atropal]
+tags: [venture, path-length, dungeon-completion, opponent-choice, apnap, intervening-if, tomb]
+derived_from: cr
+source:
+  - {kind: cr, ref: "101.4", text: "the active player ... makes any choices required, then the next player in turn order ... Then the actions happen simultaneously.", verified: true}
+  - {kind: cr, ref: "704.5t", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game.", verified: true}
+  - {kind: cr, ref: "603.4", text: "The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Tomb of Annihilation rooms and arrows (Trapped Entry > Veils of Fear > Sandfall Cell > Cradle of the Death God)", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer", "Island @isl0"]
+    battlefield: ["Aluren @alu", "Swamp @s1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow"]
+    battlefield: ["Island @pi1", "Island @pi2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_dungeon, answer: Tomb of Annihilation, expect_options: {count: 3}}
+  - resolve_top: true
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Veils of Fear, expect_options: {exact: [Veils of Fear, Oubliette]}}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: discard_instead, answer: true}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@isl0"]}
+  - p1: {decision: yes_no, purpose: discard_instead, answer: true}
+  - p1: {decision: choose_cards, purpose: discard, answer: ["@fow"]}
+  - check:
+      p0: {life: 19, graveyard: [Island], command: [{dungeon: Tomb of Annihilation, room: Veils of Fear}]}
+      p1: {life: 19, graveyard: [Force of Will], hand_count: 0}
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: sacrifice_instead, answer: false}
+  - p1: {decision: yes_no, purpose: sacrifice_instead, answer: true}
+  - p1: {decision: choose_cards, purpose: sacrifice, answer: ["@pi1"]}
+  - check:
+      p0: {life: 17}
+      p1: {life: 19, graveyard: [Force of Will, Island]}
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - check:
+      p0: {command: [], completed_dungeons: [Tomb of Annihilation], hand: [Acererak the Archlich]}
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      hand: []
+      graveyard: [Island]
+      completed_dungeons: [Tomb of Annihilation]
+      command: []
+      battlefield:
+        - {card: Aluren}
+        - {card: Swamp}
+        - {token: The Atropal}
+        - {card: Acererak the Archlich}
+    p1:
+      life: 19
+      graveyard: [Force of Will, Island]
+      battlefield: [{card: Island}]
+notes: >
+  Life: Trapped Entry 20 -> 19 for both. Veils: both discard (no loss). Sandfall: p0 declines (19 -> 17), p1 sacrifices an
+  Island (stays 19). Cradle completes Tomb after the fourth venture; the fifth Acererak stays. In Veils p0 is prompted
+  first (active player). p0's choices are never made by the engine.

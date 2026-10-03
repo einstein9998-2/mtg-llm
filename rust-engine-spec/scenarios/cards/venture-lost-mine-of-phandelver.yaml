@@ -1,0 +1,299 @@
+id: lost-mine-goblin-lair-to-storeroom-counter-on-target
+title: From Goblin Lair the venture offers Storeroom and Dark Pool only; Storeroom puts a +1/+1 counter on a target creature chosen as it goes on the stack
+area: card
+cards: [Acererak the Archlich, Aluren, Dragon's Rage Channeler, Goblin Token]
+tags: [venture, choose-room, room-ability, targeting, counters, lost-mine]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.49b", text: "they choose an adjacent room, following the direction of an arrow pointing away from their current room.", verified: true}
+  - {kind: cr, ref: "603.3d", text: "The remainder of the process for putting a triggered ability on the stack is identical to the process for casting a spell listed in rules 601.2c-d.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Lost Mine of Phandelver: Goblin Lair leads to Storeroom and Dark Pool; Storeroom: Put a +1/+1 counter on target creature.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu", {token: Goblin Token, as: gob}]
+    command: [{dungeon: Lost Mine of Phandelver, room: Goblin Lair}]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Storeroom, expect_options: {exact: [Storeroom, Dark Pool]}}
+  - p0: {decision: choose_target, slot: 0, answer: "@gob", expect_options: {include: ["@gob", "@drc"], exclude: ["@acer"]}}
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "+1/+1 counter", targets: ["@gob"]}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Aluren}
+        - {token: Goblin Token, counters: {"+1/+1": 1}, pt: [2, 2]}
+      command: [{dungeon: Lost Mine of Phandelver, room: Storeroom}]
+    p1:
+      battlefield: [{card: Dragon's Rage Channeler, pt: [1, 1], counters: {}}]
+notes: >
+  Fungi Cavern is not adjacent to Goblin Lair, so it must not be offered. The Storeroom target is chosen when the ability is
+  put on the stack (after the ETB trigger finished resolving); any creature is legal, including the opponent's. Acererak is
+  in hand by then and is not a candidate.
+---
+id: lost-mine-storeroom-without-creature-is-removed
+title: Storeroom's ability with no creature on the battlefield has no legal target and is removed; the marker stays in Storeroom
+area: card
+cards: [Acererak the Archlich, Aluren]
+tags: [venture, room-ability, targeting, no-legal-target, lost-mine, aluren-acererak-loop]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.3d", text: "If a choice is required when the triggered ability goes on the stack but no legal choices can be made for it, or if a rule or a continuous effect otherwise makes the ability illegal, the ability is simply removed from the stack.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Lost Mine of Phandelver, Storeroom: Put a +1/+1 counter on target creature.", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Lost Mine of Phandelver, room: Goblin Lair}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Storeroom, expect_options: {exact: [Storeroom, Dark Pool]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      command: [{dungeon: Lost Mine of Phandelver, room: Storeroom}]
+      hand: [Acererak the Archlich]
+      battlefield: [{card: Aluren}]
+notes: >
+  This is the trap of looping with Acererak through Storeroom: Acererak has already returned to hand when the Storeroom
+  ability would go on the stack, and no other creature exists, so there is no legal target and the ability is removed
+  (no choose_target decision; the next decision is p0's priority with an empty stack). The marker still moved. Bugs
+  caught: a target prompt with no candidates, targeting the Acererak card in hand, refusing to let p0 pick Storeroom.
+---
+id: lost-mine-dark-pool-drains-one
+title: From Mine Tunnels the venture offers Dark Pool and Fungi Cavern only; Dark Pool makes each opponent lose 1 and p0 gain 1
+area: card
+cards: [Acererak the Archlich, Aluren]
+tags: [venture, choose-room, room-ability, life-loss, lost-mine]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.49b", text: "they choose an adjacent room, following the direction of an arrow pointing away from their current room.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Lost Mine of Phandelver: Mine Tunnels leads to Dark Pool and Fungi Cavern; Dark Pool: Each opponent loses 1 life and you gain 1 life.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    life: 12
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Lost Mine of Phandelver, room: Mine Tunnels}]
+    library_pad: 10
+  p1:
+    life: 9
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Dark Pool, expect_options: {exact: [Dark Pool, Fungi Cavern]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 13, command: [{dungeon: Lost Mine of Phandelver, room: Dark Pool}], hand: [Acererak the Archlich]}
+    p1: {life: 8}
+notes: >
+  Storeroom is not adjacent to Mine Tunnels. Dark Pool: p1 9 -> 8; p0 12 -> 13. Non-default life totals catch
+  an engine that sets rather than changes life or applies the drain to the wrong player.
+---
+id: lost-mine-fungi-cavern-lasts-until-your-next-turn
+title: Fungi Cavern gives the opponent's creature -4/-0 that is still in effect during the opponent's next turn
+area: card
+cards: [Acererak the Archlich, Aluren, Dragon's Rage Channeler]
+tags: [venture, room-ability, targeting, duration, until-your-next-turn, lost-mine]
+derived_from: oracle
+source:
+  - {kind: cr, ref: "611.2a", text: "A continuous effect generated by the resolution of a spell or ability lasts as long as stated by the spell or ability creating it", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Lost Mine of Phandelver, Fungi Cavern: Target creature gets -4/-0 until your next turn.", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Lost Mine of Phandelver, room: Mine Tunnels}]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Fungi Cavern, expect_options: {exact: [Dark Pool, Fungi Cavern]}}
+  - p0: {decision: choose_target, slot: 0, answer: "@drc", expect_options: {include: ["@drc"]}}
+  - resolve_top: true
+  - check:
+      p1: {battlefield: [{card: Dragon's Rage Channeler, pt: [-3, 1]}]}
+  - advance: {to: main1, of: p1}
+expect:
+  - at: after_script
+    turn: 5
+    active: p1
+    phase: main1
+    p1: {battlefield: [{card: Dragon's Rage Channeler, pt: [-3, 1]}]}
+    p0: {command: [{dungeon: Lost Mine of Phandelver, room: Fungi Cavern}]}
+notes: >
+  Power may go negative (1 - 4 = -3). The duration is "until your next turn" (p0's), so the effect survives p0's cleanup
+  step and is still applied in p1's main phase; an engine that treats it as "until end of turn" fails here. When exactly it
+  ends at the start of p0's next turn is not asserted. The advance crosses p0's end and cleanup steps and p1's untap,
+  upkeep and draw steps with no decisions (p0 holds one card).
+---
+id: lost-mine-temple-draws-then-sba-completes-dungeon
+title: Temple of Dumathoin draws a card; the dungeon stays while its ability is on the stack and is completed by the state-based action afterwards
+area: card
+cards: [Acererak the Archlich, Aluren, Ponder]
+tags: [venture, room-ability, bottommost-room, state-based-actions, dungeon-completion, lost-mine]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5t", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game.", verified: true}
+  - {kind: cr, ref: "309.6", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game. (This is a state-based action. See rule 704.)", verified: true}
+  - {kind: cr, ref: "309.7", text: "A player completes a dungeon as that dungeon card is removed from the game.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Lost Mine of Phandelver: Fungi Cavern leads to Temple of Dumathoin (bottom); Temple of Dumathoin: Draw a card.", verified: false, note: "dungeon room text and arrows from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Lost Mine of Phandelver, room: Fungi Cavern}]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - label: temple-on-stack
+    check:
+      stack: [{kind: triggered, controller: p0, text_contains: "Draw a card"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        command: [{dungeon: Lost Mine of Phandelver, room: Temple of Dumathoin}]
+        completed_dungeons: []
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich, Ponder]
+      command: []
+      completed_dungeons: [Lost Mine of Phandelver]
+      library_count: 10
+notes: >
+  Fungi Cavern has a single arrow, so no choose_room decision is raised (309.5a: the marker moves to the next room; the
+  player chooses only "if there are multiple arrows"; reviewer decision W6, see REVIEW.md). While the Temple ability is on the stack the dungeon must stay (bug:
+  removing it at once). After the draw resolves, the state-based action removes the dungeon and p0 has completed Lost
+  Mine of Phandelver, without any further venture.
+---
+id: venture-from-bottom-room-completes-and-chooses-new-dungeon
+title: Venturing while the marker is on the bottommost room (its ability still on the stack) completes that dungeon and starts a new one; the old room ability still resolves
+area: card
+cards: [Acererak the Archlich, Aluren, Ponder]
+tags: [venture, bottommost-room, dungeon-completion, choose-dungeon, stack-independence, aluren, flash, lost-mine, mad-mage]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.49c", text: "If a player is instructed to venture into the dungeon while their venture marker is in the bottommost room of a dungeon card, they remove that dungeon card from the game. Doing so causes the player to complete that dungeon (see rule 309.7). They then choose an appropriate dungeon card they own from outside the game, put it into the command zone, and put their venture marker on the topmost room of that dungeon.", verified: true}
+  - {kind: cr, ref: "309.5b", text: "If a player ventures into the dungeon while they own a dungeon card in the command zone and their venture marker is on that dungeon card's bottommost room, they remove that dungeon card from the game. They then choose a dungeon card they own from outside the game and put it into the command zone.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won't affect the ability.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Lost Mine of Phandelver: Dark Pool leads to Temple of Dumathoin (Draw a card.); Dungeon of the Mad Mage: Yawning Portal (You gain 1 life.)", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Lost Mine of Phandelver, room: Dark Pool}]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "Draw a card"}]
+      p0: {command: [{dungeon: Lost Mine of Phandelver, room: Temple of Dumathoin}], hand: [Acererak the Archlich]}
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+    note: "in response to the Temple ability, with Aluren's flash"
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "Draw a card"}
+        - {kind: triggered, source: "@acer", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_dungeon, answer: Dungeon of the Mad Mage, expect_options: {include: [Dungeon of the Mad Mage, Tomb of Annihilation]}}
+  - label: new-dungeon
+    check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "Draw a card"}
+        - {kind: triggered, controller: p0, text_contains: "gain 1 life"}
+      p0:
+        command: [{dungeon: Dungeon of the Mad Mage, room: Yawning Portal}]
+        completed_dungeons: [Lost Mine of Phandelver]
+        hand: [Acererak the Archlich]
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 21
+      hand: [Acererak the Archlich, Ponder]
+      command: [{dungeon: Dungeon of the Mad Mage, room: Yawning Portal}]
+      completed_dungeons: [Lost Mine of Phandelver]
+notes: >
+  The marker reaches Temple of Dumathoin and its ability is on the stack, so the state-based action does not remove the
+  dungeon. p0 recasts Acererak above it (Aluren gives flash). The second ETB ventures while the marker is on the bottommost
+  room: Lost Mine is removed and completed as part of the venture, and p0 chooses a new dungeon (the mask is checked only
+  for the two dungeons not yet completed, see ambiguities) with the marker on Yawning Portal, whose ability goes on the
+  stack above the Temple ability. Yawning Portal resolves first (+1 life), then the Temple ability still resolves although
+  its dungeon has left the game (113.7a) and draws Ponder. Bugs caught: refusing to venture from the bottom room, moving
+  the marker "past" the bottom, dropping the orphaned Temple ability, completing twice.

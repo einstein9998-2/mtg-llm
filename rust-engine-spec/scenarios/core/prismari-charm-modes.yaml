@@ -1,0 +1,126 @@
+id: prismari-charm-mode-two-one-or-two-targets
+title: "Prismari Charm's damage mode needs one or two different targets and damages each for 1"
+area: core
+cards: [Prismari Charm, Island, Mountain, Dragon's Rage Channeler]
+tags: [modes, prismari-charm, targeting, variable-number-of-targets, mask-validity, expect-illegal]
+derived_from: cr
+source:
+  - {kind: oracle, card: Prismari Charm, text: "• Prismari Charm deals 1 damage to each of one or two targets.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "Choose one", verified: true}
+  - {kind: cr, ref: "601.2c", text: "The same target can’t be chosen multiple times for any one instance of the word “target” on the spell.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "If the spell has a variable number of targets, the player announces how many targets they will choose before they announce those targets.", verified: true}
+  - {kind: cr, ref: "700.2c", text: "If a spell or ability targets one or more targets only if a particular mode is chosen for it, its controller will need to choose those targets only if they chose that mode.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i", "Mountain @m"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc", "Dragon's Rage Channeler @drc2"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [2], targets: ["@drc", "@drc"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [2], targets: ["@drc", "@drc2", {player: p1}], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [2], targets: [], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [1, 2], targets: ["@drc"], pay: auto}}
+  - p0: {t: cast, card: "@charm", modes: [2], targets: [{player: p1}, "@drc"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@charm", controller: p0, modes: [2], targets: [{player: p1}, "@drc"]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm]}
+    p1: {life: 19, battlefield: [{card: Dragon's Rage Channeler}], graveyard: [Dragon's Rage Channeler]}
+notes: >
+  "Each of one or two targets" means one target or two different targets. Naming the same creature twice, naming three
+  targets, naming none, or choosing two modes ("Choose one") are not offered. The real cast has two targets: p1 takes 1
+  (20 -> 19) and one Channeler (1/1) dies; the other Channeler is untouched. Wrong engines allow the same target twice
+  (double damage to one target), more than two targets, or zero.
+---
+id: prismari-charm-mode-three-bounces-nonland-permanents-only
+title: "Prismari Charm's bounce mode targets only nonland permanents (an Equipment qualifies, a land does not)"
+area: core
+cards: [Prismari Charm, Island, Mountain, Volcanic Island, Cori-Steel Cutter]
+tags: [modes, prismari-charm, targeting, nonland-permanent, mask-validity, bounce]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismari Charm, text: "• Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "Choose one", verified: true}
+  - {kind: cr, ref: "700.2a", text: "If one of the modes would be illegal (due to an inability to choose legal targets, for example), that mode can’t be chosen.", verified: true}
+  - {kind: cr, ref: "601.2b", text: "If the spell is modal, the player announces the mode choice (see rule 700.2).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i", "Mountain @m"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @v", "Cori-Steel Cutter @cutter"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [3], targets: ["@v"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [3], targets: ["@i"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [3], targets: [], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [1, 3], targets: ["@cutter"], pay: auto}}
+  - p0: {t: cast, card: "@charm", modes: [3], targets: ["@cutter"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm]}
+    p1: {hand: [Cori-Steel Cutter], battlefield: [{card: Volcanic Island}]}
+notes: >
+  Volcanic Island and the caster's own Island are lands, so they are not legal targets of "target nonland permanent".
+  The opponent's Cori-Steel Cutter is. Choosing two modes is not allowed, and a mode with no target cannot be chosen.
+  The Cutter returns to its owner's hand (p1), the Volcanic Island stays.
+---
+id: prismari-charm-bounce-mode-unavailable-with-only-lands
+title: "With only lands on the battlefield, Prismari Charm cannot be cast for its bounce mode, but its other modes are still offered"
+area: core
+cards: [Prismari Charm, Island, Mountain, Volcanic Island, Lightning Bolt]
+tags: [modes, prismari-charm, mask-validity, mode-availability]
+derived_from: cr
+source:
+  - {kind: cr, ref: "700.2a", text: "If one of the modes would be illegal (due to an inability to choose legal targets, for example), that mode can’t be chosen.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "• Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "• Surveil 2, then draw a card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i", "Mountain @m"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @v"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [3], targets: ["@v"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [3], targets: ["@i"], pay: auto}}
+  - check:
+      legal:
+        p0:
+          include:
+            - {t: cast, card: "@charm", modes: [1]}
+            - {t: cast, card: "@charm", modes: [2]}
+          exclude:
+            - {t: cast, card: "@charm", modes: [3]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Prismari Charm]}
+notes: >
+  No nonland permanent exists anywhere, so the third mode has no legal target and "that mode can't be chosen" (700.2a).
+  The first mode (surveil, draw; no target) and the second (any target, including players) remain castable.

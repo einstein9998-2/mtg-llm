@@ -1,0 +1,29 @@
+[package]
+name = "mtg-agent"
+version.workspace = true
+edition.workspace = true
+
+# Agent-side code: search, evaluators and the batched environment for a trainer. Deliberately built
+# against `mtg-view` WITHOUT `diff-harness` (see tests/agent_api.rs for the compile check): it holds
+# `SeatView`s only and can never name the other seat or reach the raw engine.
+[dependencies]
+mtg-core.workspace = true
+mtg-view.workspace = true
+mtg-cards.workspace = true
+serde_json.workspace = true
+
+[[bin]]
+name = "envserver"
+path = "src/bin/envserver.rs"
+
+[[bin]]
+name = "mctsmatch"
+path = "src/bin/mctsmatch.rs"
+
+[[bin]]
+name = "netcheck"
+path = "src/bin/netcheck.rs"
+
+[[bin]]
+name = "mctsdata"
+path = "src/bin/mctsdata.rs"

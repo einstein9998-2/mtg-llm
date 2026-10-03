@@ -1,0 +1,146 @@
+id: mu-charm-bounces-omniscience-in-upkeep
+title: Bouncing Omniscience in the Alurentell upkeep leaves Atraxa uncastable that main phase
+area: matchup
+cards: [Prismari Charm, Omniscience, "Atraxa, Grand Unifier", Volcanic Island, Island, Tropical Island, Hedge Maze]
+tags: [matchup, prismari-charm, bounce, omniscience, legal-actions, upkeep]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismari Charm, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "Partial payments are not allowed. Unpayable costs can't be paid.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: upkeep
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Volcanic Island", "Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Atraxa, Grand Unifier @atx"]
+    battlefield: ["Omniscience @omni", "Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@charm", modes: [3], targets: ["@omni"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: main1, of: p1}
+expect:
+  - at: after_script
+    phase: main1
+    pending: {actor: p1, kind: priority}
+    p1: {hand: ["Atraxa, Grand Unifier", Omniscience, Island], battlefield: [{card: Island}, {card: Tropical Island}, {card: Hedge Maze}]}
+    p0: {graveyard: [Prismari Charm]}
+    legal:
+      p1:
+        include: [{t: pass}]
+        exclude: [{t: cast, card: "@atx"}, {t: cast, card: "@omni"}]
+notes: >
+  p1 passes in its upkeep; p0 casts the Charm (mode 3) on Omniscience, which returns to hand. p1 draws a padding Island.
+  In main1 p1 has three lands (four after a land drop): Atraxa ({3}{G}{W}{U}{B}) and Omniscience (ten mana) are
+  unpayable, so neither cast is offered.
+---
+id: mu-veil-counters-charm-via-hexproof-from-blue
+title: Veil of Summer in response to Prismari Charm on Atraxa gives hexproof from blue and draws; the Charm does not resolve
+area: matchup
+cards: [Veil of Summer, Prismari Charm, "Atraxa, Grand Unifier", Volcanic Island, Tropical Island]
+tags: [matchup, veil-of-summer, hexproof-from-blue, target-illegal, prismari-charm, draw]
+derived_from: cr
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn. Spells you control can't be countered this turn. You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: cr, ref: "702.11d", text: "\"Hexproof from [quality]\" on a permanent means \"This permanent can't be the target of [quality] spells your opponents control or abilities your opponents control from [quality] sources.\"", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If the spell or ability specifies targets, it checks whether the targets are still legal.", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Volcanic Island", "Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil"]
+    battlefield: ["Atraxa, Grand Unifier @atx", "Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [3], targets: ["@atx"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@charm", controller: p0, targets: ["@atx"]}]
+      pending: {actor: p0, kind: priority}
+      p1: {hand_count: 1, graveyard: [Veil of Summer], library_count: 9}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {battlefield_contains: [{card: "Atraxa, Grand Unifier"}], hand_count: 1, graveyard: [Veil of Summer]}
+    p0: {graveyard: [Prismari Charm], hand: []}
+notes: >
+  Prismari Charm ({U}{R}) is blue and red (202.2c), so p0 has cast a blue spell this turn and Veil draws. Atraxa gains
+  hexproof from blue; when the Charm tries to resolve its only target is illegal (702.11d, 608.2b), so it does nothing and
+  goes to the graveyard. Atraxa stays.
+---
+id: mu-veil-makes-show-and-tell-uncounterable-vs-force-of-will
+title: Veil of Summer in response to Force of Will makes Show and Tell uncounterable; Force of Will resolves and does nothing
+area: matchup
+cards: [Veil of Summer, Force of Will, Brainstorm, "Mishra's Bauble", Show and Tell, Omniscience, Island, Tropical Island, Hedge Maze, Volcanic Island]
+tags: [matchup, veil-of-summer, cant-be-countered, force-of-will, show-and-tell, can-t-beats-can]
+derived_from: cr
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Brainstorm @bs", "Mishra's Bauble @bb"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Omniscience @omni", "Veil of Summer @veil"]
+    battlefield: ["Island @i", "Tropical Island @t1", "Hedge Maze @hm", "Tropical Island @t2"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@st", pay: {tap: ["@i", "@t1", "@hm"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@st"]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@st", controller: p1}
+        - {kind: spell, card: "@fow", controller: p0, targets: ["@st"]}
+      pending: {actor: p1, kind: priority}
+      p1: {hand_count: 2, graveyard: [Veil of Summer]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@st", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: [Force of Will]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: simultaneous_secret_choice, answer: "@omni"}
+  - p0: {decision: simultaneous_secret_choice, answer: null}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {hand: [Island], graveyard: [Veil of Summer, Show and Tell], battlefield_contains: [{card: Omniscience}]}
+    p0: {life: 19, hand: ["Mishra's Bauble"], graveyard: [Force of Will], exile: [Brainstorm]}
+notes: >
+  Veil resolves first: p0 cast a blue spell (Force of Will) this turn, so p1 draws a padding Island; Show and Tell can't be
+  countered. Force of Will's target is still legal (a spell that can't be countered is still a spell), so it resolves, but
+  the counter is prevented by the "can't" effect (101.2) and Show and Tell stays. Then Show and Tell resolves; p0 keeps the
+  Bauble in hand.

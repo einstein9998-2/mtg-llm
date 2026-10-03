@@ -1,0 +1,75 @@
+{
+ "note": "curated, not Gatherer",
+ "rulings": {
+  "Force of Will": [
+   "Exiling a blue card and paying 1 life is an alternative cost. The exiled card must be a different card from Force of Will (it is already on the stack).",
+   "If Force of Will is cast without paying its mana cost (for example with Omniscience), you cannot also use the alternative cost: nothing is exiled and no life is paid (CR 118.9a)."
+  ],
+  "Daze": [
+   "Returning an Island you control to hand is an alternative cost. The 'pays {1}' check happens on resolution, so the opponent may tap mana in response to Daze.",
+   "If Daze is cast without paying its mana cost, you cannot use its alternative cost (CR 118.9a)."
+  ],
+  "Stifle": [
+   "It counters an activated or triggered ability on the stack. It cannot counter spells, and it cannot target mana abilities because they never use the stack (CR 605.3b).",
+   "Countering a fetchland's ability leaves the land sacrificed with nothing fetched. Countering a triggered ability (for example Acererak the Archlich's enter trigger) means none of its effects happen."
+  ],
+  "Lotus Petal": [
+   "Sacrificing it for mana is a mana ability: it does not use the stack and cannot be responded to (CR 605.3b)."
+  ],
+  "Lion's Eye Diamond": [
+   "Its ability is a mana ability: it does not use the stack and cannot be responded to or Stifled, and it may be activated while paying costs for a spell (CR 605.3a). Its cost discards your whole hand."
+  ],
+  "Ancient Tomb": [
+   "Its damage is part of the mana ability and cannot be responded to. Each activation deals 2 damage to you."
+  ],
+  "Show and Tell": [
+   "Each player may put one card of the allowed types from their hand onto the battlefield; all chosen cards enter at the same time.",
+   "Putting a card onto the battlefield is not casting it: it cannot be countered, Aluren does not apply, and 'when you cast' triggers do not happen. Enter-the-battlefield triggers do happen.",
+   "If both players put in legendary permanents with the same name, each player applies the legend rule to their own."
+  ],
+  "Aluren": [
+   "Additional costs of a creature spell are still paid; mana abilities and other abilities are not affected.",
+   "A creature cast this way is still a spell: it can be countered, and cast triggers happen."
+  ],
+  "Omniscience": [
+   "You may cast spells from your hand without paying their mana costs. Lands are not cast and activated abilities are not affected.",
+   "Additional costs are still paid. A spell with X in its cost has X = 0 when cast for free. Alternative costs cannot be combined with casting without paying the mana cost (CR 118.9a, 601.2b)."
+  ],
+  "Acererak the Archlich": [
+   "When he enters the battlefield and you have not completed Tomb of Annihilation, he returns to your hand and you venture. Once Tomb of Annihilation is completed, the trigger no longer applies and he stays on the battlefield."
+  ],
+  "Atraxa, Grand Unifier": [
+   "You choose at most one card per card type from the ten revealed, and a card that has several types can be chosen for only one of them because it goes to your hand once. The rest go to the bottom in a random order."
+  ],
+  "Containment Priest": [
+   "A nontoken creature that would enter without being cast (Show and Tell, Reanimate, Animate Dead, Shallow Grave, Aether Vial and similar) is exiled instead. A creature that was cast, including one cast free with Aluren or Omniscience, enters normally."
+  ],
+  "Grafdigger's Cage": [
+   "Creature cards cannot enter the battlefield from graveyards or libraries, so Reanimate, Animate Dead and Shallow Grave return nothing, and spells cannot be cast from graveyards or libraries."
+  ],
+  "Doomsday": [
+   "You choose five cards from your library and graveyard combined, put them on top of your library in the order you choose, and exile every other card in both zones. You then lose half your life, rounded up, so at 1 life you lose the game."
+  ],
+  "Thassa's Oracle": [
+   "Devotion to blue counts the mana symbols {U} in the mana costs of permanents you control, including Thassa's Oracle's own {U}{U}. You win if X is greater than or equal to the number of cards in your library when the trigger resolves."
+  ],
+  "Dragon's Rage Channeler": [
+   "Delirium counts card types among cards in your own graveyard only. Each distinct type (artifact, creature, instant, land, sorcery, ...) counts once; tokens are not cards."
+  ],
+  "Murktide Regent": [
+   "Delve exiles cards from your graveyard to pay generic mana only. It enters with a +1/+1 counter for each instant and sorcery card exiled with it, and gets another counter whenever an instant or sorcery card leaves your graveyard."
+  ],
+  "Veil of Summer": [
+   "Spells you control cannot be countered this turn, but abilities can still be countered (Stifle). The card draw checks whether an opponent cast a blue or black spell earlier this turn when Veil resolves."
+  ],
+  "Prismatic Ending": [
+   "Converge counts the distinct colors of mana spent to cast it. It exiles a nonland permanent whose mana value is at most that number (it needs two colors paid to hit a mana value 2 permanent)."
+  ],
+  "Wasteland": [
+   "It destroys a nonbasic land. Basic lands, including Snow-Covered ones, are safe. The target is chosen on activation and Wasteland is sacrificed as a cost."
+  ],
+  "Cavern of Souls": [
+   "Only the colored mana is restricted: it can be spent only on a creature spell of the chosen type, and a spell cast with it cannot be countered. Triggered abilities of that creature can still be countered (Stifle)."
+  ]
+ }
+}

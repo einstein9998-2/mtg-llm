@@ -1,0 +1,64 @@
+id: tropical-island-taps-for-green-or-blue
+title: Tropical Island (Forest Island) taps for {G} or {U} and not for other colors
+area: card
+cards: [Tropical Island, Forest, Island]
+tags: [tropical-island, mana-ability, basic-land-types, choose-color]
+derived_from: cr
+source:
+  - {kind: oracle, card: Tropical Island, text: "({T}: Add {G} or {U}.)", verified: true}
+  - {kind: cr, ref: "305.6", text: "An object with the land card type and a basic land type has the intrinsic ability \"{T}: Add [mana symbol],\"", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Tropical Island @ti"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@ti", ability: 0, choose_color: W}}
+  - p0: {t: activate, source: "@ti", ability: 0, choose_color: G}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {G: 1}
+      battlefield: [{card: Tropical Island, tapped: true, subtypes: [Forest, Island]}]
+notes: >
+  Ability index 0 is the intrinsic mana ability. Only G and U are legal; no life loss (it is not a painland).
+---
+id: tropical-island-is-nonbasic-wasteland-target
+title: Wasteland can destroy Tropical Island although it has basic land types; a basic Forest is not a legal target
+area: card
+cards: [Tropical Island, Wasteland, Forest]
+tags: [tropical-island, wasteland, nonbasic-land, targeting]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Tropical Island, text: "({T}: Add {G} or {U}.)", verified: true}
+  - {kind: cr, ref: "205.4c", text: "Any land with the supertype \"basic\" is a basic land. Any land that doesn't have this supertype is a nonbasic land, even if it has a basic land type.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+  p1:
+    battlefield: ["Tropical Island @ti", "Forest @fo"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@w", ability: 1, targets: ["@fo"]}}
+  - p0: {t: activate, source: "@w", ability: 1, targets: ["@ti"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Wasteland], battlefield: []}
+    p1: {graveyard: [Tropical Island], battlefield: [{card: Forest}]}
+notes: >
+  "Nonbasic" is about the supertype Basic, not about land types: Tropical Island lacks the Basic supertype and is a
+  legal Wasteland target, while the basic Forest is not. A wrong engine could treat any land with basic land types as basic.

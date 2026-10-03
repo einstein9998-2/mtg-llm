@@ -1,0 +1,194 @@
+id: combat-damage-simultaneous-trade-token-ceases-to-exist
+title: Attacker and blocker deal combat damage simultaneously and both die; the token leaves nothing in the graveyard
+area: core
+cards: ["Zombie Token", Containment Priest]
+tags: [combat, combat-damage, simultaneous, state-based-actions, token]
+derived_from: cr
+source:
+  - {kind: cr, ref: "510.2", text: "Second, all combat damage that’s been assigned is dealt simultaneously. This turn-based action doesn’t use the stack.", verified: true}
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: cr, ref: "510.1d", text: "A blocking creature assigns combat damage to the creatures it’s blocking. If it isn’t currently blocking any creatures (if, for example, they were destroyed or removed from combat), it assigns no combat damage.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: cr, ref: "704.5d", text: "If a token is in a zone other than the battlefield, it ceases to exist.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: Zombie Token, as: zomb}]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @priest"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@zomb", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@priest", attacker: "@zomb"}]}
+  - check: {phase: declare_blockers, priority: p0, p0: {battlefield: [{token: Zombie Token, damage: 0}]}, p1: {battlefield: [{card: Containment Priest, damage: 0}]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    stack: []
+    p0: {life: 20, battlefield: [], graveyard: []}
+    p1: {life: 20, battlefield: [], graveyard: [Containment Priest]}
+notes: >
+  A 2/2 attacker blocked by a 2/2: combat damage is dealt simultaneously (510.2), so the blocker still deals its damage
+  although it dies, and each is dealt lethal damage; the state-based action destroys both at once (704.5g). The Zombie is a token,
+  so it ceases to exist in the graveyard (704.5d) and p0's graveyard is empty; the Priest card is in p1's graveyard.
+  Neither player took damage because the attacker was blocked. A wrong engine applies damage one creature at a time and
+  lets the first dead creature skip its damage.
+---
+id: combat-damage-lethal-to-player-loses-game
+title: Unblocked combat damage that reduces a player to 0 life makes that player lose the game
+area: core
+cards: ["Zombie Token", "Goblin Token", "Skeleton Token"]
+tags: [combat, combat-damage, life-loss, state-based-actions, game-over]
+derived_from: cr
+source:
+  - {kind: cr, ref: "510.2", text: "Second, all combat damage that’s been assigned is dealt simultaneously. This turn-based action doesn’t use the stack.", verified: true}
+  - {kind: cr, ref: "120.3a", text: "Damage dealt to a player by a source without infect causes that player to lose that much life.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, “Timing and Priority”), the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: Zombie Token, as: zomb}, {token: Goblin Token, as: gob}]
+    library_pad: 10
+  p1:
+    life: 3
+    battlefield: [{token: Skeleton Token, as: skel}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks:
+        - {creature: "@zomb", target: {player: p1}}
+        - {creature: "@gob", target: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [], expect_options: {include: ["@skel"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p1: {life: 0}
+notes: >
+  Both attackers are unblocked: 2 + 1 = 3 combat damage dealt simultaneously to a player at 3 life leaves 0, and the
+  state-based action check right after damage makes p1 lose (704.5a). The Skeleton could have chump blocked, but p1 declines.
+  A wrong engine keeps playing or checks life only at end of turn.
+---
+id: burn-damage-and-combat-damage-accumulate-on-attacker
+title: Unholy Heat damage marked before combat damage adds to the damage the blocker deals, destroying an attacker that would otherwise survive
+area: core
+cards: [Murktide Regent, "Spider-Woman, Stunning Savior", Unholy Heat, Mountain]
+tags: [combat, combat-damage, damage-marked, burn, instant, priority]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Unholy Heat", text: "Unholy Heat deals 2 damage to target creature or planeswalker.", verified: true}
+  - {kind: cr, ref: "120.3e", text: "Damage dealt to a creature by a source with neither wither nor infect causes that much damage to be marked on that creature.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+  - {kind: cr, ref: "509.2", text: "Second, the active player gets priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+  p1:
+    hand: ["Unholy Heat @heat"]
+    battlefield: ["Spider-Woman, Stunning Savior @sw", "Mountain @mtn"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@murk", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@sw", attacker: "@murk"}], expect_options: {include: ["@sw"]}}
+  - check: {phase: declare_blockers, priority: p0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@heat", targets: ["@murk"], pay: auto}
+  - check: {priority: p1, stack: [{kind: spell, card: "@heat", controller: p1, targets: ["@murk"]}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      phase: declare_blockers
+      priority: p0
+      stack: []
+      p0: {battlefield: [{card: Murktide Regent, damage: 2, pt: [3, 3]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p0: {life: 20, battlefield: [], graveyard: [Murktide Regent]}
+    p1:
+      life: 20
+      hand: []
+      battlefield: [{card: Mountain, tapped: true}]
+      graveyard: [Unholy Heat, "Spider-Woman, Stunning Savior"]
+notes: >
+  p1 has no cards in the graveyard when Unholy Heat resolves, so delirium is off and it deals 2 damage (marked on the 3/3
+  Murktide Regent, which survives for now). Combat damage then adds 2 more from the 2/2 blocker (total 4 >= 3), so the Regent
+  is destroyed, while the Regent's 3 damage kills the Spider-Woman. Without the Heat the Regent would survive with 2 damage.
+  p1 casts at instant speed with priority after the block: p0, the active player, passes first (509.2), p1 acts and gets
+  priority back (117.3c); when the Heat resolves the active player gets priority (117.3b).
+---
+id: prowess-not-triggered-by-creature-spell
+title: Casting a creature spell does not trigger prowess
+area: core
+cards: ["Monk Token", Containment Priest, Plains, Island, "Skeleton Token"]
+tags: [combat, prowess, triggers, creature-spell, negative-case, flash]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.108a", text: "Prowess is a triggered ability. “Prowess” means “Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.”", verified: true}
+  - {kind: oracle, card: "Cori-Steel Cutter", text: "create a 1/1 white Monk creature token with prowess", verified: true}
+  - {kind: oracle, card: "Containment Priest", text: "Flash", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Containment Priest @priest"]
+    battlefield: [{token: Monk Token, as: monk}, "Plains @pl", "Island @isl"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Skeleton Token, as: skel}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@monk", target: {player: p1}}]}
+  - p0: {t: cast, card: "@priest", pay: auto}
+  - check:
+      priority: p0
+      stack: [{kind: spell, card: "@priest", controller: p0}]
+      p0: {battlefield_contains: [{token: Monk Token, pt: [1, 1]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    priority: p0
+    stack: []
+    p0:
+      battlefield_contains: [{token: Monk Token, pt: [1, 1], tapped: true}, {card: Containment Priest}]
+notes: >
+  Prowess reads "noncreature spell" (702.108a). Containment Priest is a creature spell, so no trigger is put on the stack
+  and the Monk stays 1/1. After the Priest resolves the active player has priority (stack empty). A wrong engine treats
+  any spell as a prowess trigger.

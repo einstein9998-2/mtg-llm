@@ -1,0 +1,130 @@
+id: alt-cost-force-of-will-hard-cast-and-pitch-are-separate-actions
+title: With five Islands and a blue card, Force of Will is offered both for its mana cost and for its alternative cost; the hard cast pays no life
+area: core
+cards: [Force of Will, Brainstorm, Island, Lightning Bolt, Mountain]
+tags: [alternative-cost, force-of-will, legal-action-mask, hard-cast]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text, or applied to it from another effect, that its controller may pay rather than paying the spell's mana cost.", verified: true}
+  - {kind: cr, ref: "601.2b", text: "If the spell has alternative or additional costs that will be paid as it’s being cast such as buyback or kicker costs (see rules 118.8 and 118.9), the player announces their intentions to pay any or all of those costs (see rule 601.2f).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - check:
+      legal:
+        p1:
+          include:
+            - {t: cast, card: "@fow", alt_cost: null, targets: ["@bolt"]}
+            - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}
+  - p1: {t: cast, card: "@fow", alt_cost: null, targets: ["@bolt"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1:
+      life: 20
+      hand: [Brainstorm]
+      graveyard: [Force of Will]
+      exile: []
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  Each way of paying is its own legal action. Paying the mana cost {3}{U}{U} taps five Islands and neither costs life
+  nor exiles Brainstorm. A wrong engine offers only one of the two, or charges the pitch cost on the hard cast.
+---
+id: alt-cost-force-of-will-pitch-only-without-mana
+title: With no lands Force of Will is offered only for its alternative cost
+area: core
+cards: [Force of Will, Brainstorm, Lightning Bolt, Mountain]
+tags: [alternative-cost, force-of-will, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: null, targets: ["@bolt"], pay: auto}}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1: {life: 19, hand: [], exile: [Brainstorm], graveyard: [Force of Will]}
+notes: >
+  Life tally: p1 20 - 1 (Force of Will) = 19; Bolt is countered so it deals nothing.
+---
+id: alt-cost-daze-can-return-a-tapped-island
+title: Daze's alternative cost can return a tapped Island; with no other mana the countered spell's controller gets no pay prompt
+area: core
+cards: [Daze, Island, Lightning Bolt, Mountain]
+tags: [alternative-cost, daze, tapped-permanent, counter-unless-pay, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: [{card: Island, as: j1, tapped: true}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - check:
+      legal:
+        p1:
+          include: [{t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bolt"]}]
+          exclude: [{t: cast, card: "@daze", alt_cost: null}]
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt], battlefield: [{card: Mountain, tapped: true}]}
+    p1: {life: 20, hand: [Island], battlefield: [], graveyard: [Daze]}
+notes: >
+  The cost is "return an Island you control", with no untapped requirement. The hard cast is unaffordable. p0's only
+  land paid for Bolt, so p0 cannot pay {1} and no pay prompt is raised; Bolt is countered.

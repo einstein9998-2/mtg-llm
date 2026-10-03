@@ -1,0 +1,104 @@
+id: koma-spell-cannot-be-countered-by-force-of-will
+title: Force of Will may target the Koma spell but does not counter it, ward does not trigger on the stack, and Koma resolves
+area: card
+cards: ["Koma, World-Eater", Force of Will, Brainstorm, Tropical Island, Island]
+tags: [koma-world-eater, cant-be-countered, ward, force-of-will, stack]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Koma, World-Eater", text: "This spell can't be countered.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Ward [cost] means “Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].”", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Koma, World-Eater @koma"]
+    battlefield: ["Tropical Island", "Tropical Island", "Tropical Island", "Tropical Island", "Island", "Island", "Island"]
+    library_pad: 10
+  p1:
+    life: 20
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@koma", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@koma"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@koma", controller: p0}
+        - {kind: spell, card: "@fow", controller: p1, targets: ["@koma"]}
+      p1: {life: 19, exile: [Brainstorm]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@koma", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Force of Will]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: "Koma, World-Eater", controller: p0, sick: true, pt: [8, 12]}]
+      graveyard: []
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  Koma is a legal target for "counter target spell"; Force of Will resolves, but its counter instruction is overridden
+  by "can't be countered" (101.2), so Koma stays on the stack and then resolves. Ward is an ability of the permanent
+  (702.21a "this permanent") and does nothing while Koma is a spell, so no ward trigger appears above Force of Will.
+  Force of Will's alternative cost is still paid (1 life, Brainstorm exiled). Wrong engines: counter Koma, forbid the
+  target, or trigger ward from the stack.
+---
+id: koma-ward-counters-swords-to-plowshares-when-unpaid
+title: Koma's ward triggers when an opponent targets it with Swords to Plowshares and counters it when the opponent cannot pay {4}
+area: card
+cards: ["Koma, World-Eater", Swords to Plowshares, Plains, Island]
+tags: [koma-world-eater, ward, triggered-ability, counter-unless-pay, swords-to-plowshares]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.21a", text: "Ward is a triggered ability. Ward [cost] means “Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].”", verified: true}
+  - {kind: oracle, card: "Koma, World-Eater", text: "Trample, ward {4}", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 8
+  active: p1
+  phase: main1
+  p0:
+    life: 20
+    battlefield: [{card: "Koma, World-Eater", as: koma}]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@stp", targets: ["@koma"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@stp", controller: p1}
+        - {kind: triggered, source: "@koma", controller: p0}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      battlefield: [{card: "Koma, World-Eater", controller: p0}]
+    p1:
+      graveyard: [Swords to Plowshares]
+      battlefield: [{card: Plains, tapped: true}]
+notes: >
+  The ward trigger is controlled by Koma's controller p0 and goes on the stack above Swords before p1 receives priority
+  again. On resolution p1, whose only land paid for Swords, cannot pay {4}, so no pay prompt is raised and Swords is
+  countered (graveyard). Koma stays and p0 gains no life. Wrong engines: no ward trigger, ward controlled by p1, or
+  Swords resolving.

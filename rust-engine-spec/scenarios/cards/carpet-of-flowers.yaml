@@ -1,0 +1,190 @@
+id: carpet-of-flowers-adds-x-mana-islands-opponent-controls
+title: Carpet of Flowers targets the opponent at the start of main phase 1 and adds one mana of a chosen color per Island that opponent controls
+area: card
+cards: [Carpet of Flowers, Island, Tropical Island, Volcanic Island, Mountain, Forest]
+tags: [carpet-of-flowers, triggered-ability, targets-opponent, island-count, choose-color, mana-pool, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Carpet of Flowers, text: "At the beginning of each of your main phases, if you haven't added mana with this ability this turn, you may add X mana of any one color, where X is the number of Islands target opponent controls.", verified: true}
+  - {kind: cr, ref: "605.1b", text: "A triggered ability is a mana ability if it meets all of the following criteria: it doesn't require a target (see rule 115.6), it triggers from the activation or resolution of an activated mana ability (see rule 605.1a) or from mana being added to a player's mana pool, and it could add mana to a player's mana pool when it resolves.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: draw
+  priority: p0
+  p0:
+    battlefield: ["Carpet of Flowers @carpet", "Island @mi"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @pi1", "Tropical Island @pti", "Volcanic Island @pvi", "Mountain @pm", "Forest @pf"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      phase: main1
+      stack: [{kind: triggered, source: "@carpet", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {mana_pool: {}}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: carpet_add_mana, answer: true}
+  - p0: {decision: choose_color, answer: G, expect_options: {exact: [W, U, B, R, G]}}
+expect:
+  - at: after_script
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {G: 3}
+notes: >
+  The trigger goes on the stack at the beginning of main phase 1 (after the draw step), targets the opponent (a target
+  decision is presented even though p1 is the only candidate) and is not a mana ability (it has a target and the trigger
+  event is not a mana ability), so it uses the stack. On resolution p0 may add X mana of any ONE color, X = Islands p1
+  controls: Island, Tropical Island and Volcanic Island = 3 (Mountain and Forest are not Islands; p0's own Island does
+  not count). Colorless is not a color choice. The yes_no/choose_color order (may first, then color) is an assumption
+  recorded in the report.
+---
+id: carpet-of-flowers-trigger-uses-stack-and-stifle-counters-it
+title: Stifle counters Carpet of Flowers' trigger, proving it is a targeted triggered ability on the stack and not a mana ability
+area: card
+cards: [Carpet of Flowers, Island, Stifle]
+tags: [carpet-of-flowers, stifle, triggered-ability, counter-ability, stack, mana-pool]
+derived_from: cr
+source:
+  - {kind: oracle, card: Carpet of Flowers, text: "you may add X mana of any one color, where X is the number of Islands target opponent controls.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability. (Mana abilities can't be targeted.)", verified: true}
+  - {kind: cr, ref: "605.1b", text: "A triggered ability is a mana ability if it meets all of the following criteria: it doesn't require a target (see rule 115.6), it triggers from the activation or resolution of an activated mana ability (see rule 605.1a) or from mana being added to a player's mana pool, and it could add mana to a player's mana pool when it resolves.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: draw
+  priority: p0
+  p0:
+    battlefield: ["Carpet of Flowers @carpet"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @pi1", "Island @pi2"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@carpet", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+    p1:
+      graveyard: [Stifle]
+notes: >
+  Carpet's ability targets, so it is not a mana ability (605.1b needs "doesn't require a target") and p1 can respond
+  to it. Stifle counters it: no decision is raised for p0 (no "may add" prompt) and the pool stays empty. A wrong engine
+  would add mana immediately when the phase begins.
+---
+id: carpet-of-flowers-no-second-trigger-after-adding-mana-main2-separate-phase
+title: After adding mana in main phase 1 Carpet does not trigger in main phase 2, and the mana is gone when main phase 1 ends
+area: card
+cards: [Carpet of Flowers, Island]
+tags: [carpet-of-flowers, intervening-if, mana-empties, main-phase-2, once-per-turn]
+derived_from: cr
+source:
+  - {kind: oracle, card: Carpet of Flowers, text: "At the beginning of each of your main phases, if you haven't added mana with this ability this turn", verified: true}
+  - {kind: cr, ref: "603.4", text: "The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: cr, ref: "500.5", text: "As a step or phase ends, if there are effects that last until the end of that step or phase, those effects expire. Then any unspent mana left in a player's mana pool empties.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: draw
+  priority: p0
+  p0:
+    battlefield: ["Carpet of Flowers @carpet"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @pi1", "Island @pi2"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: carpet_add_mana, answer: true}
+  - p0: {decision: choose_color, answer: U}
+  - label: after-main1-add
+    check:
+      phase: main1
+      p0: {mana_pool: {U: 2}}
+  - advance: {to: end_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: main2
+    active: p0
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+notes: >
+  Step "advance" runs the beginning of combat and end of combat steps (no creatures) with both players passing; the
+  mana from main phase 1 empties before main phase 2 (500.5). At the beginning of main phase 2 Carpet's intervening-if
+  ("if you haven't added mana with this ability this turn") is false, so it does not trigger: stack empty, no target
+  decision, p0 gets priority. A wrong engine would trigger again (or keep the mana).
+---
+id: carpet-of-flowers-x-counts-islands-on-resolution
+title: Carpet's X is counted on resolution, so an Island fetched in response increases it
+area: card
+cards: [Carpet of Flowers, Island, Misty Rainforest]
+tags: [carpet-of-flowers, island-count, misty-rainforest, response, resolution-time-count]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Carpet of Flowers, text: "you may add X mana of any one color, where X is the number of Islands target opponent controls.", verified: true}
+  - {kind: oracle, card: Misty Rainforest, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: draw
+  priority: p0
+  p0:
+    battlefield: ["Carpet of Flowers @carpet"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @pi1", "Misty Rainforest @misty"]
+    library: ["Island @isl2"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@misty", ability: 0}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, found: "@isl2"}
+  - check:
+      stack: [{kind: triggered, source: "@carpet"}]
+      pending: {actor: p0, kind: priority}
+      p1: {life: 19, battlefield: [{card: Island}, {card: Island}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: carpet_add_mana, answer: true}
+  - p0: {decision: choose_color, answer: U}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {U: 2}
+notes: >
+  With Carpet's trigger on the stack p1 has one Island; p1 responds by cracking Misty Rainforest for a second Island.
+  X is evaluated when the ability resolves ("the number of Islands target opponent controls"), so p0 adds two mana. The
+  Misty ability resolves first (top of stack); the active player gets priority after it resolves.

@@ -1,0 +1,55 @@
+id: show-and-tell-two-lands-apnap-triggers
+title: Show and Tell puts a surveil land onto the battlefield for each player; the active player's trigger goes on the stack first and resolves last
+area: core
+cards: [Show and Tell, Hedge Maze, Island, Lightning Bolt, Ponder]
+tags: [apnap, triggers, show-and-tell, simultaneous-secret-choice, enters-tapped, surveil]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.3b", text: "each player, in APNAP order, puts each triggered ability they control ... on the stack in any order they choose", verified: true}
+  - {kind: cr, ref: "101.4", text: "the active player ... makes any choices required, then the next player in turn order", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Hedge Maze @hm0"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    hand: ["Hedge Maze @hm1"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@hm0"}
+  - p1: {decision: simultaneous_secret_choice, answer: "@hm1"}
+  - check:
+      stack:
+        - {kind: triggered, source: "@hm0", controller: p0}
+        - {kind: triggered, source: "@hm1", controller: p1}
+      p0: {battlefield_contains: [{card: Hedge Maze, tapped: true}], lands_played: 0}
+      p1: {battlefield: [{card: Hedge Maze, tapped: true}]}
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - p1: {decision: surveil, to_graveyard: ["@bolt"], on_top_order: []}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@pd"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {graveyard: [Lightning Bolt], hand_count: 0}
+    p0: {library_top: [Ponder], graveyard: [Show and Tell], hand_count: 0}
+notes: >
+  Both lands enter at once; both ETB triggers wait until p0 would next receive priority (603.3). APNAP puts p0's trigger
+  on the stack first and p1's on top, so p1's trigger resolves first: the first surveil decision belongs to p1. Putting a
+  land onto the battlefield is not a land play, so lands_played stays 0. In scenario mode the secret-choice decisions are
+  issued as a pair; p1's observation must not reveal p0's pick (see the hidden-info scenarios for the formal check).
+  The first assertion block runs mid-script and also pins the stack order, bottom to top.

@@ -1,0 +1,104 @@
+id: lotus-petal-sacrifice-for-one-mana-of-chosen-color
+title: Lotus Petal taps and sacrifices itself as a mana ability for one mana of the chosen color
+area: card
+cards: [Lotus Petal]
+tags: [lotus-petal, mana-ability, sacrifice-cost, choose-color, artifact]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn't require a target (see rule 115.6), it could add mana to a player's mana pool when it resolves, and it's not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn't go on the stack, so it can't be targeted, countered, or otherwise responded to.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Lotus Petal @lp"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@lp", ability: 0, choose_color: G}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {G: 1}
+      battlefield: []
+      graveyard: [Lotus Petal]
+notes: >
+  The color is chosen on activation (choose_color). The sacrifice is a cost, the ability is a mana ability, so nothing
+  uses the stack and p0 keeps priority. Pool: exactly one G.
+---
+id: lotus-petal-mana-empties-at-end-of-main-phase
+title: Unused mana from Lotus Petal empties when the main phase ends
+area: card
+cards: [Lotus Petal]
+tags: [lotus-petal, mana-pool, phase-end, mana-empties]
+derived_from: cr
+source:
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "500.5", text: "As a step or phase ends, if there are effects that last until the end of that step or phase, those effects expire. Then any unspent mana left in a player's mana pool empties.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Lotus Petal @lp"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@lp", ability: 0, choose_color: U}
+  - check:
+      p0: {mana_pool: {U: 1}}
+  - advance: {to: begin_combat, of: p0}
+expect:
+  - at: after_script
+    phase: begin_combat
+    active: p0
+    p0:
+      mana_pool: {}
+      graveyard: [Lotus Petal]
+notes: >
+  The blue mana produced in main phase 1 is gone by the time the beginning of combat step starts. A wrong engine would
+  keep the pool across phases.
+---
+id: lotus-petal-cast-for-zero-and-use-same-turn
+title: Lotus Petal is cast for {0}, resolves, and can be sacrificed for mana immediately (no summoning sickness for artifacts)
+area: card
+cards: [Lotus Petal]
+tags: [lotus-petal, artifact, cast, mana-ability, summoning-sickness]
+derived_from: cr
+source:
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature's activated ability with the tap symbol or the untap symbol in its activation cost can't be activated unless the creature has been under its controller's control continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lotus Petal @lp"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lp", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@lp", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {R: 1}
+      spells_cast_this_turn: 1
+      hand: []
+      battlefield: []
+      graveyard: [Lotus Petal]
+notes: >
+  Summoning sickness (302.6) restricts creatures only; the artifact that entered this turn can use its {T} ability at once.
+  Casting it counts as one spell cast, costs {0}, and needs both passes to resolve.

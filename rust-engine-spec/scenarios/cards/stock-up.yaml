@@ -1,0 +1,148 @@
+id: stock-up-two-to-hand-rest-to-bottom-in-chosen-order
+title: Stock Up puts two of the top five into hand and the other three on the bottom in an order the caster chooses
+area: card
+cards: [Stock Up, Lotus Petal, Brainstorm, Aluren, Island, Ponder]
+tags: [stock-up, library-bottom, choose-cards, order-cards, look-at-top]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stock Up, text: "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+  - {kind: cr, ref: "401.4", text: "If an effect puts two or more cards in a specific position in a library at the same time, the owner of those cards may arrange them in any order. That library's owner doesn't reveal the order in which the cards go into the library.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stock Up @su"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Lotus Petal @lp", "Brainstorm @bs", "Aluren @al", "Island @is", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@su", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: to_hand, answer: ["@lp", "@pd"], expect_options: {include: ["@lp", "@bs", "@al", "@is", "@pd"], count: 5}}
+  - p0: {decision: order_cards, purpose: bottom, answer: ["@al", "@bs", "@is"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lotus Petal, Ponder]
+      graveyard: [Stock Up]
+      library_count: 13
+      library_bottom: [Aluren, Brainstorm, Island]
+notes: >
+  Two cards go to hand, the remaining three go beneath the 10 padding cards. Order convention for order_cards: the answer
+  lists the group top first, so Aluren ends highest of the three and Island is the bottom-most card of the library
+  (library_bottom lists bottom-most last). Library: 15 - 2 = 13. The card choice is exactly two cards (see next scenario for fewer cards).
+---
+id: stock-up-sorcery-timing-stack-not-empty
+title: Stock Up cannot be cast while another spell is on the stack
+area: card
+cards: [Stock Up, Lotus Petal, Island]
+tags: [stock-up, sorcery-timing, mask-validity, stack]
+derived_from: cr
+source:
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stock Up @su", "Lotus Petal @lp"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lp", pay: auto}
+  - expect_illegal: {p0: {t: cast, card: "@su", pay: auto}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@lp", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Stock Up]
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: false}, {card: Island, tapped: false}]
+notes: >
+  Lotus Petal costs {0}, so all three Islands are untapped and Stock Up is affordable, but the stack is not empty, so the
+  sorcery cannot be cast. Nothing may be tapped by the probe.
+---
+id: stock-up-opponent-sees-no-card-identities
+title: The opponent watching Stock Up learns only the hand and library counts, not which cards were looked at or taken
+area: hidden-info
+cards: [Stock Up, Lotus Petal, Brainstorm, Aluren, Island, Ponder]
+tags: [stock-up, hidden-info, library-bottom, non-interference]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stock Up, text: "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+  - {kind: cr, ref: "401.4", text: "That library's owner doesn't reveal the order in which the cards go into the library.", verified: true}
+observer: p1
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stock Up @su"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Lotus Petal @lp", "Brainstorm @bs", "Aluren @al", "Island @is", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@su", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: to_hand, answer: ["@lp", "@pd"]}
+  - p0: {decision: order_cards, purpose: bottom, answer: ["@al", "@bs", "@is"]}
+expect:
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 2, library_count: 13}
+      option_labels_exclude_names: [Lotus Petal, Brainstorm, Aluren, Ponder]
+      events_text_exclude: [Lotus Petal, Brainstorm, Aluren, Ponder]
+notes: >
+  p1 sees that Stock Up was cast and that p0's hand grew by two (hand_count 2, as the cast removed Stock Up from the
+  hand of 1) and the library shrank by two (15 to 13), but none of the five looked-at card names (nothing was revealed;
+  the two taken cards are in a hidden zone and the three on the bottom are hidden-position cards). "Island" is not listed
+  because Islands are visible elsewhere in the game state.
+---
+id: stock-up-owner-knows-bottom-order
+title: After Stock Up the owner knows the exact bottom-three order they chose
+area: hidden-info
+cards: [Stock Up, Lotus Petal, Brainstorm, Aluren, Island, Ponder]
+tags: [stock-up, hidden-info, library-bottom, library-knowledge]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stock Up, text: "Put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+  - {kind: cr, ref: "401.4", text: "If an effect puts two or more cards in a specific position in a library at the same time, the owner of those cards may arrange them in any order. That library's owner doesn't reveal the order in which the cards go into the library.", verified: true}
+observer: p0
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stock Up @su"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Lotus Petal @lp", "Brainstorm @bs", "Aluren @al", "Island @is", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@su", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: to_hand, answer: ["@lp", "@pd"]}
+  - p0: {decision: order_cards, purpose: bottom, answer: ["@al", "@bs", "@is"]}
+expect:
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_count: 13, library_known_bottom: [Aluren, Brainstorm, Island], library_known_top: []}
+notes: >
+  Design doc 02 section 6: for cards put on the bottom in a chosen order, the owner keeps identity and position
+  knowledge (FromBottom(n)); the top of the library (padding Islands the owner never looked at) is unknown. 
+  library_known_bottom (bottom-most last) is defined in the SCHEMA addenda (2026-10-01).

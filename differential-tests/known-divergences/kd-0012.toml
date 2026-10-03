@@ -1,0 +1,12 @@
+id = "kd-0012"
+title = "Engine: Animate Dead's leaves-the-battlefield trigger exists even if its enters trigger never resolved (one extra empty stack object)"
+status = "accepted"
+who_is_right = "design"
+cr_citation = "CR 603.10a, 603.7; Animate Dead Oracle (the leave trigger is part of the enters ability's text, a delayed trigger in Forge's script)"
+rulings = []
+affected_oracles = ["engine"]
+match = { kinds = ["WINDOW"], cards = ["Animate Dead"], feature_tags = [] }
+suppress = false
+regression_scenario = "differential-tests/repros/e5-animate-dead-leaves-trigger-without-etb.scn (fails by design)"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Finding E5. If Animate Dead leaves before its enters trigger resolves, the engine puts a second, empty trigger on the stack; Forge does not. One extra stack object and priority window, no state change, no play made unavailable. Accepted as a documented limit; 3 lockstep lines (reanimator-02 l3, l6, reanimator-08 l3) are classed with this entry."

@@ -1,0 +1,202 @@
+id: bowmasters-flash-etb-kills-one-toughness-creature-in-opponents-end-step
+title: Orcish Bowmasters is cast with flash in the opponent's end step and its enter trigger kills a 1/1
+area: card
+cards: [Orcish Bowmasters, Swamp, Island, "Dragon's Rage Channeler"]
+tags: [bowmasters, flash, etb-trigger, any-target, damage, state-based-actions, priority]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Orcish Bowmasters, text: "Flash", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "702.8a", text: "Flash is a static ability that functions in any zone from which you could play the card it's on. \"Flash\" means \"You may play this card any time you could cast an instant.\"", verified: true}
+  - {kind: cr, ref: "115.4", text: "These targets may be creatures, players, planeswalkers, or battles.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    hand: ["Orcish Bowmasters @bow"]
+    battlefield: ["Swamp @s1", "Island @i1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bow", pay: auto}
+  - check: {stack: [{kind: spell, card: "@bow", controller: p0}], priority: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@drc", expect_options: {include: ["@drc", {player: p1}, {player: p0}, "@bow"]}}
+  - check: {stack: [{kind: triggered, source: "@bow", controller: p0}], pending: {actor: p1, kind: priority}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: []
+      battlefield_contains:
+        - {card: Orcish Bowmasters, pt: [1, 1]}
+        - {card: Swamp, tapped: true}
+        - {card: Island, tapped: true}
+    p1:
+      life: 20
+      battlefield: []
+      graveyard: ["Dragon's Rage Channeler"]
+notes: >
+  Flash lets p0 cast Bowmasters in p1's end step after p1 passes. p0 receives priority after casting (117.3c) and passes;
+  p1 passes and Bowmasters resolves. Its enter trigger is put on the stack before anyone gets priority, and p0 chooses
+  the target then ("any target": both players, DRC and Bowmasters itself are legal). p1 (the active player) gets priority
+  first (117.3b). On resolution DRC takes 1 damage and is destroyed by state-based actions. The amass part also creates an
+  Orc Army token for p0; that is asserted only in bowmasters-amass-creates-orc-army-token-with-one-counter, so this
+  scenario uses battlefield_contains for p0. A wrong engine refuses the flash cast, asks p1 to choose the target, or gives
+  p0 priority first after the trigger resolves.
+---
+id: bowmasters-amass-creates-orc-army-token-with-one-counter
+title: Bowmasters' enter trigger pings the opponent and amass Orcs 1 creates a 0/0 black Orc Army token with one +1/+1 counter
+area: card
+cards: [Orcish Bowmasters, Swamp, Island]
+tags: [bowmasters, amass, token, counters, etb-trigger]
+derived_from: cr
+source:
+  - {kind: oracle, card: Orcish Bowmasters, text: "this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "701.47a", text: "To amass [subtype] N means \"If you don't control an Army creature, create a 0/0 black [subtype] Army creature token. Choose an Army creature you control. Put N +1/+1 counters on that creature. If it isn't a [subtype], it becomes a [subtype] in addition to its other types.\"", verified: true}
+  - {kind: cr, ref: "111.4", text: "If the spell or ability doesn't specify the name of the token, its name is the same as its subtype(s) plus the word \"Token.\"", verified: true}
+  - {kind: cr, ref: "120.3a", text: "Damage dealt to a player by a source without infect causes that player to lose that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orcish Bowmasters @bow"]
+    battlefield: ["Swamp @s1", "Island @i1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bow", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {life: 19}
+    p0:
+      life: 20
+      battlefield:
+        - {card: Orcish Bowmasters, pt: [1, 1]}
+        - {card: Swamp, tapped: true}
+        - {card: Island, tapped: true}
+        - {token: Orc Army Token, controller: p0, counters: {"+1/+1": 1}, pt: [1, 1], colors: [B], subtypes: [Orc, Army]}
+notes: >
+  p0 controls no Army, so amass Orcs 1 creates a 0/0 black Orc Army creature token, then puts one +1/+1 counter on the
+  only Army p0 controls (the choice has one candidate and the rules give no real choice, so no decision is scripted; if
+  the runner presents it, the adapter answers it). The token is 1/1. Its name follows CR 111.4 (subtypes plus "Token");
+  the Orc Army token is not in reference/oracle.json, so its description here is derived only from 701.47a and 111.4.
+  The 0/0 token never sees a state-based action check before it gets the counter, because amass finishes during the
+  trigger's resolution (704.4). A wrong engine creates a 1/1 token without a counter, lets the 0/0 die, or names it
+  differently.
+---
+id: bowmasters-opponent-draw-outside-draw-step-triggers
+title: An opponent drawing with Consider in their main phase triggers Bowmasters, which pings that opponent
+area: card
+cards: [Orcish Bowmasters, Consider, Island, Ponder]
+tags: [bowmasters, draw-trigger, any-target, surveil, trigger-controller]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Orcish Bowmasters, text: "whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target", verified: true}
+  - {kind: oracle, card: Consider, text: "Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nDraw a card.", verified: true}
+  - {kind: cr, ref: "603.3a", text: "A triggered ability is controlled by the player who controlled its source at the time it triggered, unless it's a delayed triggered ability.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Orcish Bowmasters @bow"]
+    library_pad: 10
+  p1:
+    hand: ["Consider @con"]
+    battlefield: ["Island @j1"]
+    library: ["Ponder @p1top"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@con", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: surveil, to_graveyard: [], on_top_order: ["@p1top"]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check: {stack: [{kind: triggered, source: "@bow", controller: p0}], pending: {actor: p1, kind: priority}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 19
+      hand: [Ponder]
+      graveyard: [Consider]
+      battlefield: [{card: Island, tapped: true}]
+    p0:
+      life: 20
+      battlefield_contains: [{card: Orcish Bowmasters}]
+notes: >
+  The draw is p1's, in p1's main phase, so it is not the first draw of a draw step and the trigger fires. Bowmasters is
+  p0's permanent, so p0 controls the trigger and picks its target as it goes on the stack (603.3a), even though it is p1's
+  turn; p1 then receives priority as the active player. Surveil keeps Ponder on top, so the drawn card is Ponder. p0's
+  Orc Army token is not asserted here (see the amass scenario).
+---
+id: bowmasters-upkeep-draw-triggers-and-later-first-draw-step-draw-does-not
+title: An opponent's draw in their upkeep triggers Bowmasters, and their next draw (the draw step's first) still does not
+area: card
+cards: [Orcish Bowmasters, Consider, Island, Ponder, Brainstorm]
+tags: [bowmasters, draw-trigger, draw-step, upkeep, per-step-history]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Orcish Bowmasters, text: "whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target", verified: true}
+  - {kind: cr, ref: "504.1", text: "First, the active player draws a card. This turn-based action doesn't use the stack.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: upkeep
+  p0:
+    battlefield: ["Orcish Bowmasters @bow"]
+    library_pad: 10
+  p1:
+    hand: ["Consider @con"]
+    battlefield: ["Island @j1"]
+    library: ["Ponder @a", "Brainstorm @b"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@con", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: surveil, to_graveyard: [], on_top_order: ["@a"]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {phase: upkeep, stack: [], p1: {life: 19, hand: [Ponder]}}
+  - advance: {to: draw, of: p1}
+expect:
+  - at: after_script
+    phase: draw
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 19
+      hand: [Ponder, Brainstorm]
+      graveyard: [Consider]
+notes: >
+  The exception counts the first card drawn in each draw step, not the first card drawn in the turn. The upkeep draw
+  (Consider) is outside any draw step, so it triggers (p1 to 19). In the draw step, Brainstorm is p1's second card of the
+  turn but the first of the draw step, so it does not trigger: the advance must not stop at a target choice and p1 stays
+  at 19. A wrong engine tracks "first draw this turn" and triggers on the draw-step draw (p1 at 18).

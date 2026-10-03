@@ -1,0 +1,149 @@
+id: deafening-silence-second-noncreature-spell-illegal-creature-still-allowed
+title: Under Deafening Silence a player who cast one noncreature spell this turn cannot cast another, but can still cast creature spells
+area: card
+cards: [Deafening Silence, Swords to Plowshares, Path to Exile, "Phelia, Exuberant Shepherd", Griselbrand, Plains]
+tags: [deafening-silence, casting-restriction, spell-count, flash, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp", "Path to Exile @path", "Phelia, Exuberant Shepherd @ph"]
+    battlefield: ["Deafening Silence @ds", "Plains @w1", "Plains @w2", "Plains @w3", "Plains @w4"]
+    library_pad: 10
+  p1:
+    battlefield: ["Griselbrand @gris"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@stp", targets: ["@gris"], pay: {tap: ["@w1"]}}
+  - expect_illegal: {p0: {t: cast, card: "@path"}}
+  - p0: {t: cast, card: "@ph", pay: {tap: ["@w2", "@w3"]}}
+  - check:
+      stack: [{kind: spell, card: "@stp", controller: p0}, {kind: spell, card: "@ph", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@path"}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Path to Exile]
+      spells_cast_this_turn: 2
+      graveyard: [Swords to Plowshares]
+      battlefield:
+        - {card: Deafening Silence}
+        - {card: "Phelia, Exuberant Shepherd"}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: false}
+    p1:
+      life: 27
+      exile: [Griselbrand]
+      battlefield: []
+notes: >
+  After Swords (noncreature spell 1), Path to Exile is not offered even though p0 has an untapped Plains and a legal
+  target (Griselbrand, later Phelia). Phelia is a creature spell (and has flash, so it can be cast over Swords) and is
+  not limited. Phelia resolves first, then Swords exiles Griselbrand (power 7). The second probe shows the restriction
+  lasts for the turn, not only while Swords is on the stack. A wrong engine counts creature spells or forgets the
+  count once the stack empties.
+---
+id: deafening-silence-counts-spells-cast-before-it-entered
+title: Noncreature spells cast earlier in the turn, including Deafening Silence itself, count toward its limit
+area: card
+cards: [Deafening Silence, Swords to Plowshares, Path to Exile, Griselbrand, Flickerwisp, Plains]
+tags: [deafening-silence, casting-restriction, spell-count, turn-history]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+  - {kind: ruling, card: Deafening Silence, text: "Deafening Silence looks at spells cast earlier in the turn, even before it entered the battlefield.", verified: false, note: "recalled, not retrieved"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp", "Deafening Silence @ds", "Path to Exile @path"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Griselbrand @gris", "Flickerwisp @wisp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@stp", targets: ["@gris"], pay: {tap: ["@w1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@ds", pay: {tap: ["@w2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@path", targets: ["@wisp"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Path to Exile]
+      spells_cast_this_turn: 2
+      battlefield: [{card: Deafening Silence}, {card: Plains, tapped: true}, {card: Plains, tapped: true}, {card: Plains, tapped: false}]
+    p1:
+      life: 27
+      battlefield: [{card: Flickerwisp}]
+notes: >
+  Before Deafening Silence is on the battlefield nothing restricts p0, so casting it as a second noncreature spell is
+  legal. Once it is on the battlefield p0 has already cast two noncreature spells this turn, so a third is more than one
+  and Path is not offered despite an untapped Plains and a legal target. A wrong engine counts only spells cast after
+  the enchantment entered. The literal Oracle text supports this; the recalled ruling is listed for verification.
+---
+id: deafening-silence-impending-overlord-is-still-a-creature-spell
+title: An Overlord cast for its impending cost is a creature spell, so Deafening Silence does not stop it after a noncreature spell
+area: card
+cards: [Deafening Silence, Overlord of the Balemurk, Swords to Plowshares, Thoughtseize, Flickerwisp, Swamp, Plains]
+tags: [deafening-silence, impending, overlord-of-the-balemurk, casting-restriction, spell-types]
+derived_from: cr
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+  - {kind: cr, ref: "702.176a", text: "“As long as this permanent’s impending cost was paid and it has a time counter on it, it’s not a creature,”", verified: true}
+  - {kind: cr, ref: "702.176a", text: "The first is a static ability that functions while the spell with impending is on the stack.", verified: true}
+  - {kind: cr, ref: "702.176a", text: "The third is a static ability that functions on the battlefield.", verified: true}
+  - {kind: cr, ref: "110.1", text: "A permanent is a card or token on the battlefield.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "It has all the characteristics of the card (or the copy of a card) associated with it, and that player becomes its controller.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp", "Thoughtseize @ts", "Overlord of the Balemurk @ov"]
+    battlefield: ["Deafening Silence @ds", "Swamp @b1", "Plains @w1", "Plains @w2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Flickerwisp @wisp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@stp", targets: ["@wisp"], pay: {tap: ["@w1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@ts"}}
+  - p0: {t: cast, card: "@ov", alt_cost: {impending: true}, pay: {tap: ["@b1", "@w2"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@ov", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Thoughtseize]
+      spells_cast_this_turn: 2
+    p1:
+      life: 23
+      exile: [Flickerwisp]
+notes: >
+  The "not a creature" part of impending is the third ability, which functions on the battlefield (702.176a) and
+  speaks of "this permanent" (110.1); the only ability that functions on the stack is the alternative cost. On the
+  stack the spell has the card's characteristics (Enchantment Creature), so it is a creature spell and the Silence does
+  not limit it. Thoughtseize (a second noncreature spell) is not offered though the Swamp is untapped. A wrong engine
+  applies the noncreature status on the stack and refuses the Overlord.

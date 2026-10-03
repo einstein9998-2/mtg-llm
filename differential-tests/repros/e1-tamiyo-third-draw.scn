@@ -1,0 +1,20 @@
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see interaction-tests/README.md.
+
+=== tamiyo-flips-on-third-draw
+title: Tamiyo, Inquisitive Student flips on the controller's third draw of the turn (Brainstorm after a draw step)
+ref: Tamiyo Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=UPKEEP
+  aibattlefield=Tamiyo, Inquisitive Student;Island
+  aihand=Brainstorm
+script:
+  p2: at MAIN1
+  p2: cast Brainstorm
+  p2: pass
+  p1: pass
+  p2: pick Island;Island
+expect:
+  controls p2 "Tamiyo, Seasoned Scholar"
+

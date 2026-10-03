@@ -1,0 +1,88 @@
+id: prismatic-vista-fetch-any-basic-pay-one-life
+title: Prismatic Vista, played and cracked the same turn, pays 1 life, sacrifices itself, and fetches any basic land (not a nonbasic)
+area: card
+cards: [Prismatic Vista, Forest, Island, Tropical Island]
+tags: [prismatic-vista, fetchland, search, life-payment, sacrifice-cost, land-play]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Vista, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+  - {kind: cr, ref: "305.1", text: "Playing a land is a special action; it doesn't use the stack.", verified: true}
+  - {kind: cr, ref: "205.4c", text: "Any land that doesn't have this supertype is a nonbasic land, even if it has a basic land type.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature's activated ability with the tap symbol ... can't be activated unless the creature has been under its controller's control continuously", verified: true, note: "applies to creatures only; lands have no summoning sickness"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismatic Vista @pv"]
+    library: ["Forest @fo", "Tropical Island @ti", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@pv"}
+  - p0: {t: activate, source: "@pv", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@pv", controller: p0}]
+      p0:
+        life: 19
+        battlefield: []
+        graveyard: [Prismatic Vista]
+        lands_played: 1
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@fo", expect_options: {include: ["@fo", "@isl"], exclude: ["@ti"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 1
+      battlefield: [{card: Forest, tapped: false}]
+      graveyard: [Prismatic Vista]
+      library_count: 12
+notes: >
+  Costs (tap, 1 life, sacrifice) are paid on activation: while the ability is on the stack the land is already in the
+  graveyard and life is 19. A land played this turn can still use its {T} ability (summoning sickness is for creatures).
+  The search mask contains basic land cards only: Forest and Island yes, Tropical Island (nonbasic) no. Library: 13 ->
+  12 after the fetch. The fetched land is not a land drop (lands_played remains 1, from the play).
+---
+id: prismatic-vista-fail-to-find-allowed
+title: Prismatic Vista's controller may fail to find even when basic lands are present
+area: card
+cards: [Prismatic Vista, Forest]
+tags: [prismatic-vista, fetchland, search, fail-to-find]
+derived_from: cr
+source:
+  - {kind: oracle, card: Prismatic Vista, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn't required to find some or all of those cards even if they're present in that zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Prismatic Vista @pv"]
+    library: ["Forest @fo"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@pv", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: null}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      battlefield: []
+      graveyard: [Prismatic Vista]
+      library_count: 11
+notes: >
+  Searching for a card "with a stated quality" does not force finding (701.23b). Life is still paid and the land
+  sacrificed. Whether the library is shuffled after a failed search is not asserted here (shuffling still happens by the
+  Oracle text, but only counts are checked).

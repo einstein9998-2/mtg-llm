@@ -1,0 +1,45 @@
+id: arid-mesa-fetches-mountain-or-plains-types
+title: Arid Mesa finds a Mountain or Plains card, including nonbasic lands with those types, and nothing else
+area: card
+cards: [Arid Mesa, Elegant Parlor, Forest, Island, Mountain, Plains, Plateau, Savannah, Swamp, Tropical Island]
+tags: [arid-mesa, fetchland, search, basic-land-types, life-payment, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Arid Mesa, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.6", text: "The basic land types are Plains, Island, Swamp, Mountain, and Forest.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 1
+    battlefield: ["Arid Mesa @fetch"]
+    library: ["Plateau @plat", "Savannah @sav", "Mountain @mtn", "Plains @pl", "Elegant Parlor @ep", "Tropical Island @trop", "Forest @for", "Swamp @sw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@fetch", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@fetch", controller: p0}]
+      p0: {life: 19, graveyard: [Arid Mesa], battlefield: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: search
+      found: "@plat"
+      expect_options:
+        include: ["@plat", "@sav", "@mtn", "@pl", "@ep"]
+        exclude: ["@trop", "@for", "@sw"]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 1
+      graveyard: [Arid Mesa]
+      battlefield: [{card: Plateau, tapped: false}]
+      library_count: 17
+notes: >
+  Plateau and Elegant Parlor (Mountain Plains), Savannah (Forest Plains), and the basics Mountain and Plains all qualify; Tropical Island (Forest Island), Forest and Swamp do not. The fetched Plateau enters untapped (no enters-tapped text) and is not a land play (lands_played stays 1). Pay 1 life and the sacrifice are costs, done before the ability can be responded to. Library 18 -> 17.

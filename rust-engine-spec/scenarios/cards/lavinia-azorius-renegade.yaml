@@ -1,0 +1,151 @@
+id: lavinia-x-counts-in-mana-value-on-the-stack
+title: Under Lavinia, Prismatic Ending with X=2 (mana value 3) is not castable by an opponent with two lands, but X=1 (mana value 2) is
+area: card
+cards: ["Lavinia, Azorius Renegade", Prismatic Ending, Plains, Island, Lotus Petal]
+tags: [lavinia, x-cost, mana-value, casting-restriction, prismatic-ending, converge]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Each opponent can't cast noncreature spells with mana value greater than the number of lands that player controls.", verified: true}
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: cr, ref: "202.3e", text: "X is treated as the number chosen for it while the object is on the stack.", verified: true}
+  - {kind: cr, ref: "601.2e", text: "The game checks to see if the proposed spell can legally be cast.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Lavinia, Azorius Renegade @lav"]
+    library_pad: 10
+  p1:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Plains @pl", "Island @isl", "Lotus Petal @petal"]
+    library_pad: 10
+script:
+  - expect_illegal: {p1: {t: cast, card: "@pe", x: 2, targets: ["@lav"]}}
+  - p1: {t: cast, card: "@pe", x: 1, targets: ["@lav"], pay: {tap: ["@pl", "@isl"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: []
+      exile: ["Lavinia, Azorius Renegade"]
+    p1:
+      graveyard: [Prismatic Ending]
+      battlefield:
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Lotus Petal}
+notes: >
+  The check of 601.2e happens after X is announced (601.2b), and on the stack X is the chosen number (202.3e): X=2 gives
+  mana value 3 > 2 lands, illegal even though three mana (Plains, Island, Petal) is available. X=1 gives mana value 2,
+  legal. Paid with W and U, two colors: Lavinia (mana value 2) is exiled. Bug caught: computing the spell's mana value
+  with X=0 (the card's value in hand), which would allow any X.
+---
+id: lavinia-counters-spell-cast-without-mana
+title: Lavinia's trigger counters a Force of Will cast by its alternative cost (no mana spent)
+area: card
+cards: ["Lavinia, Azorius Renegade", Force of Will, Brainstorm, Lightning Bolt, Mountain, Island]
+tags: [lavinia, triggered-ability, intervening-if, alternative-cost, force-of-will, counter]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3", "Island @j4", "Island @j5"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@fow", controller: p1}
+        - {kind: triggered, source: "@lav", controller: p0}
+      pending: {actor: p1, kind: priority}
+      p1: {life: 19, exile: [Brainstorm]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      p1: {graveyard: [Force of Will]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1:
+      life: 16
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+      battlefield:
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+notes: >
+  p1 controls five lands, so Force of Will (mana value 5) is castable under Lavinia's first ability. Cast by its
+  alternative cost, no mana was spent: Lavinia (controlled by p0) triggers and is put on the stack before p1 receives
+  priority. It resolves first and counters Force of Will (the intervening-if is still true). Bolt then resolves:
+  p1 20 - 1 (Force of Will) - 3 = 16. Bugs caught: no trigger for alternative-cost spells, the trigger checking the
+  spell's mana value instead of mana spent, p1 losing the exiled Brainstorm back.
+---
+id: lavinia-no-trigger-when-mana-spent
+title: A Force of Will hard-cast with mana does not trigger Lavinia and counters the spell
+area: card
+cards: ["Lavinia, Azorius Renegade", Force of Will, Lightning Bolt, Mountain, Island]
+tags: [lavinia, triggered-ability, intervening-if, negative, force-of-will]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", verified: true}
+  - {kind: cr, ref: "603.4", text: "The ability triggers only if it is; otherwise it does nothing.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3", "Island @j4", "Island @j5"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", targets: ["@bolt"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@fow", controller: p1}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1: {life: 20, graveyard: [Force of Will]}
+notes: >
+  Five Islands pay {3}{U}{U}, so mana was spent and Lavinia does not trigger. Force of Will resolves and counters Bolt.
+  Pair of the previous scenario. Bug caught: Lavinia triggering on every opponent spell.

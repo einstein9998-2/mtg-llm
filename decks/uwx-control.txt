@@ -1,0 +1,35 @@
+# UWx Control (Phelia / Riddler / Stifle) | Control-tempo (non-combo)
+# Source: HJ_Kaiser, 5th-8th, MTGO Challenge 32, 2026-09-27 (65 players)
+# https://mtgtop8.com/event?e=91385&d=894042&f=LE
+# Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.
+
+2 Arid Mesa
+4 Flooded Strand
+1 Meticulous Archive
+3 Polluted Delta
+1 Snow-Covered Island
+1 Snow-Covered Plains
+3 Tundra
+1 Volcanic Island
+4 Wasteland
+3 Murktide Regent
+4 Phelia, Exuberant Shepherd
+4 Quantum Riddler
+4 Tamiyo, Inquisitive Student
+4 Brainstorm
+1 Consign to Memory
+2 Force of Negation
+4 Force of Will
+4 Ponder
+2 Prismatic Ending
+4 Stifle
+4 Swords to Plowshares
+
+2 Consign to Memory
+2 Containment Priest
+2 Erode
+1 Hydroblast
+2 Lavinia, Azorius Renegade
+2 Pyroblast
+2 Triumph of Saint Katherine
+2 Wrath of the Skies

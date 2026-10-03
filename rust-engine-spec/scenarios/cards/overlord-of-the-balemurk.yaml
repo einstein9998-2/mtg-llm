@@ -1,0 +1,131 @@
+id: overlord-impending-enters-with-time-counters-not-a-creature-and-returns-creature
+title: Overlord of the Balemurk cast for its impending cost enters with five time counters as a noncreature enchantment, mills four and may return a non-Avatar creature or planeswalker card
+area: card
+cards: [Overlord of the Balemurk, "Phelia, Exuberant Shepherd", Lightning Bolt, "Jace, Wielder of Mysteries", Swamp, Plains]
+tags: [overlord-of-the-balemurk, impending, alternative-cost, time-counters, type-changing, etb-trigger, mill, may-choice]
+derived_from: cr
+source:
+  - {kind: oracle, card: Overlord of the Balemurk, text: "Whenever this permanent enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand.", verified: true}
+  - {kind: oracle, card: Overlord of the Balemurk, text: "Impending 5—{1}{B}", verified: true}
+  - {kind: cr, ref: "702.176a", text: "“Impending N—[cost]” means “You may choose to pay [cost] rather than pay this spell’s mana cost,” “If you chose to pay this permanent’s impending cost, it enters with N time counters on it,” “As long as this permanent’s impending cost was paid and it has a time counter on it, it’s not a creature,”", verified: true}
+  - {kind: cr, ref: "701.17a", text: "For a player to mill a number of cards, that player puts that many cards from the top of their library into their graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Overlord of the Balemurk @ov"]
+    battlefield: ["Swamp @b1", "Plains @w1"]
+    library: ["Phelia, Exuberant Shepherd @ph", "Overlord of the Balemurk @ov2", "Lightning Bolt @bolt", "Jace, Wielder of Mysteries @jace"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ov", alt_cost: {impending: true}, pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@ov", controller: p0}]
+      p0: {battlefield: [{card: Swamp, tapped: true}, {card: Plains, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@ov", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: Overlord of the Balemurk, counters: {time: 5}, types: [Enchantment]}]}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: return_to_hand, answer: ["@ph"], expect_options: {include: ["@ph", "@jace"], exclude: ["@ov2", "@bolt"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Phelia, Exuberant Shepherd"]
+      graveyard: [Overlord of the Balemurk, Lightning Bolt, "Jace, Wielder of Mysteries"]
+      library_count: 10
+      battlefield:
+        - {card: Overlord of the Balemurk, counters: {time: 5}, types: [Enchantment]}
+        - {card: Swamp, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  Impending is an alternative cost ({1}{B}, paid by Swamp and Plains). The permanent enters with five time counters
+  (a replacement, 614.1c) and is not a creature while it has one, so its types are only Enchantment. Its "enters" trigger
+  still fires (it says "this permanent", not "this creature"). The four milled cards are Phelia, a second Overlord
+  (an Avatar, not returnable), Lightning Bolt (not a creature) and Jace (a planeswalker card, returnable). The "may
+  return" is one choose_cards that may be empty. A wrong engine makes it a 5/5 creature, skips the trigger, or offers
+  the Avatar.
+---
+id: overlord-hardcast-is-a-five-five-creature-without-counters
+title: Overlord of the Balemurk cast for its mana cost enters as a 5/5 enchantment creature with no time counters
+area: card
+cards: [Overlord of the Balemurk, Swamp, Plains, Island]
+tags: [overlord-of-the-balemurk, impending, creature, mill]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.176a", text: "“If you chose to pay this permanent’s impending cost, it enters with N time counters on it,”", verified: true}
+  - {kind: oracle, card: Overlord of the Balemurk, text: "Whenever this permanent enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Overlord of the Balemurk @ov"]
+    battlefield: ["Swamp @b1", "Swamp @b2", "Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ov", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Island, Island, Island, Island]
+      library_count: 6
+      battlefield_contains:
+        - {card: Overlord of the Balemurk, counters: {}, pt: [5, 5], types: [Enchantment, Creature]}
+notes: >
+  Paying {3}{B}{B} is not the impending cost, so no time counters and it is a creature from the start. The ETB mills
+  four padding Islands; there is no creature or planeswalker card to return, so no return decision is raised (the rules
+  give no choice). A wrong engine adds time counters or keeps it noncreature.
+---
+id: overlord-last-time-counter-removed-becomes-creature
+title: When the last time counter is removed from an impending Overlord, it becomes a 5/5 creature
+area: card
+cards: [Overlord of the Balemurk]
+tags: [overlord-of-the-balemurk, impending, time-counters, type-changing, end-step]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.176a", text: "“As long as this permanent’s impending cost was paid and it has a time counter on it, it’s not a creature,”", verified: true}
+  - {kind: oracle, card: Overlord of the Balemurk, text: "it enters with five time counters and isn't a creature until the last is removed", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    battlefield: [{card: Overlord of the Balemurk, as: ov, counters: {time: 1}, flags: {impending_paid: true}}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield: [{card: Overlord of the Balemurk, counters: {time: 1}, types: [Enchantment]}]}
+  - advance: {to: end, of: p0}
+  - check:
+      stack: [{kind: triggered, source: "@ov", controller: p0}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Overlord of the Balemurk, counters: {}, pt: [5, 5], types: [Enchantment, Creature]}]
+notes: >
+  Setup flag impending_paid records that the Overlord entered via its impending cost (reachable: four earlier end steps
+  removed four counters). Removing the last time counter ends the "not a creature" effect, so it is a 5/5 Enchantment
+  Creature. A wrong engine keeps it noncreature (tracking "was impending" instead of "has a time counter") or makes it
+  a creature at a different counter count.

@@ -1,0 +1,134 @@
+id: drc-noncreature-cast-trigger-above-spell-resolves-first
+title: "Dragon's Rage Channeler: casting a noncreature spell puts a surveil trigger above the spell, and it resolves first"
+area: core
+cards: [Dragon's Rage Channeler, Brainstorm, Island, Lightning Bolt, Ponder]
+tags: [drc, triggers, cast-trigger, surveil, trigger-timing, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Island @i1"]
+    library: ["Lightning Bolt @bolt", "Island @isl2", "Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bs", controller: p0}
+        - {kind: triggered, source: "@drc", controller: p0}
+      pending: {actor: p0, kind: priority}
+      priority: p0
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: ["@bolt"], on_top_order: []}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@bs", controller: p0}
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      hand_count: 0
+      library_top: [Island, Ponder]
+      battlefield_contains: [{card: Dragon's Rage Channeler, pt: [1, 1]}]
+notes: >
+  The trigger goes on the stack as soon as p0 would receive priority after casting (603.3), above Brainstorm, so the
+  surveil happens before Brainstorm resolves (hand is still empty and the library top has already changed). A wrong
+  engine would resolve the surveil after the spell, or put the trigger under the spell. DRC stays 1/1 because the
+  graveyard has fewer than four card types (the delirium clause is not the point here).
+---
+id: drc-creature-spell-does-not-trigger
+title: "Dragon's Rage Channeler: casting a creature spell does not trigger the surveil"
+area: core
+cards: [Dragon's Rage Channeler, Mountain, Lightning Bolt]
+tags: [drc, triggers, negative-case, noncreature]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: cr, ref: "603.2", text: "Whenever a game event or game state matches a triggered ability's trigger event, that ability automatically triggers.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dragon's Rage Channeler @drc2"]
+    battlefield: ["Dragon's Rage Channeler @drc1", "Mountain @m1"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@drc2", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@drc2", controller: p0}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_top: [Lightning Bolt]
+      graveyard: []
+      battlefield_contains: [{card: Dragon's Rage Channeler, alias: drc2}]
+notes: >
+  The only object on the stack after the cast is the creature spell itself; when it resolves nothing triggers and no
+  surveil decision is raised (Lightning Bolt stays on top). A wrong engine would treat every spell as noncreature or
+  trigger on the creature entering.
+---
+id: drc-trigger-resolves-even-if-the-spell-is-countered
+title: "Dragon's Rage Channeler's surveil trigger still resolves after its spell is countered by Daze"
+area: core
+cards: [Dragon's Rage Channeler, Brainstorm, Island, Daze, Lightning Bolt]
+tags: [drc, triggers, independent-of-spell, daze, stack]
+derived_from: cr
+source:
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Island @i1"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bs"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack:
+        - {kind: triggered, source: "@drc", controller: p0}
+      p0: {graveyard: [Brainstorm], hand_count: 0}
+      p1: {graveyard: [Daze], hand: [Island]}
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: ["@bolt"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    p0: {graveyard: [Brainstorm, Lightning Bolt], hand_count: 0}
+    pending: {actor: p0, kind: priority}
+notes: >
+  Stack order after the cast and the response is [Brainstorm, DRC trigger, Daze]. Daze resolves first; p0's only Island is
+  tapped for Brainstorm, so p0 cannot pay {1} and no pay prompt appears (see the Daze exemplar). Brainstorm is countered,
+  but the surveil trigger already on the stack is independent of the spell and resolves afterwards.

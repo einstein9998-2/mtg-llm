@@ -1,0 +1,47 @@
+{
+  "tag": "w4_n30",
+  "deck1": "delver.dck",
+  "deck2": "jund.dck",
+  "workers": 4,
+  "games_per_worker": 30,
+  "games_completed": 120,
+  "wins": {
+    "Ai(1)-UR Delver": 42,
+    "Ai(2)-Jund": 78
+  },
+  "return_codes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "wall_sec_total": 104.5,
+  "games_per_sec_wall_incl_jvm_startup": 1.148,
+  "games_per_sec_per_worker_in_game_time": 1.369,
+  "aggregate_games_per_sec_steady_state": 1.573,
+  "ms_per_game": {
+    "mean": 2921,
+    "p50": 2142,
+    "p90": 5570,
+    "max": 9760
+  },
+  "mean_turns": 8.57,
+  "worker_wall_sec": [
+    104.5,
+    100.8,
+    102.3,
+    101.2
+  ],
+  "warnings_sample": [
+    "Abrupt Decay Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Bloodbraid Elf Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Bloodstained Mire Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Counterspell Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Dark Confidant Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Daze Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Deathrite Shaman Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Delver of Secrets Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Dragon's Rage Channeler Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Error handling registered!"
+  ]
+}

@@ -1,0 +1,97 @@
+id: mu-murktide-delve-counters-and-drc-loses-delirium
+title: Murktide Regent delving five cards gets three counters, and Dragon's Rage Channeler loses delirium as the graveyard empties
+area: matchup
+cards: [Murktide Regent, "Dragon's Rage Channeler", Daze, Lightning Bolt, Ponder, "Mishra's Bauble", Scalding Tarn, Volcanic Island, Aluren, Tropical Island]
+tags: [matchup, murktide, delve, enters-with-counters, delirium, continuous-effect]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Murktide Regent, text: "This creature enters with a +1/+1 counter on it for each instant and sorcery card exiled with it.", verified: true}
+  - {kind: oracle, card: "Dragon's Rage Channeler", text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: cr, ref: "702.66a", text: "Delve is a static ability that functions while the spell with delve is on the stack. \"Delve\" means \"For each generic mana in this spell's total cost, you may exile a card from your graveyard rather than pay that mana.\"", verified: true}
+  - {kind: cr, ref: "614.1c", text: "Effects that read \"[This permanent] enters with . . . ,\" \"As [this permanent] enters . . . ,\" or \"[This permanent] enters as . . . \" are replacement effects.", verified: true}
+  - {kind: cr, ref: "205.2a", text: "The card types are artifact, battle, conspiracy, creature, dungeon, enchantment, instant, kindred, land, phenomenon, plane, planeswalker, scheme, sorcery, and vanguard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mk"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Volcanic Island", "Volcanic Island"]
+    graveyard: ["Daze @g1", "Lightning Bolt @g2", "Ponder @g3", "Mishra's Bauble @g4", "Scalding Tarn @g5"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: "Dragon's Rage Channeler", pt: [3, 3], keywords: [flying]}]}
+  - p0: {t: cast, card: "@mk", delve: ["@g1", "@g2", "@g3", "@g4", "@g5"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@mk", controller: p0}]
+      p0:
+        graveyard: []
+        exile: [Daze, Lightning Bolt, Ponder, "Mishra's Bauble", Scalding Tarn]
+        battlefield_contains: [{card: "Dragon's Rage Channeler", pt: [1, 1], keywords_exclude: [flying]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      battlefield:
+        - {card: "Dragon's Rage Channeler", pt: [1, 1]}
+        - {card: Volcanic Island, tapped: true}
+        - {card: Volcanic Island, tapped: true}
+        - {card: Murktide Regent, counters: {"+1/+1": 3}, pt: [6, 6], keywords: [flying], sick: true}
+notes: >
+  Before casting, the graveyard holds instant, sorcery, artifact and land cards: four types, so DRC is 3/3 flying. Delve
+  pays five of the {5} generic with the five cards; the two Volcanic Islands pay {U}{U}. The exiled instants and sorceries
+  are Daze, Bolt and Ponder: three counters, so Murktide is 6/6. Its "leaves your graveyard" trigger is not on the
+  battlefield while it is a spell, so delve does not trigger it. With the graveyard empty, DRC is 1/1 again immediately.
+---
+id: mu-murktide-countered-delved-cards-stay-exiled
+title: Countering Murktide Regent does not return the cards exiled by delve
+area: matchup
+cards: [Murktide Regent, Force of Will, Brainstorm, Daze, Lightning Bolt, "Mishra's Bauble", Scalding Tarn, Volcanic Island, Island, Tropical Island]
+tags: [matchup, murktide, delve, counterspell, no-refund]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn't get a \"refund\" of any costs that were paid.", verified: true}
+  - {kind: cr, ref: "702.66a", text: "For each generic mana in this spell's total cost, you may exile a card from your graveyard rather than pay that mana.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mk"]
+    battlefield: ["Volcanic Island", "Volcanic Island", "Island"]
+    graveyard: ["Daze @g1", "Lightning Bolt @g2", "Mishra's Bauble @g3", "Scalding Tarn @g4"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mk", delve: ["@g1", "@g2", "@g3", "@g4"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@mk"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Murktide Regent]
+      exile: [Daze, Lightning Bolt, "Mishra's Bauble", Scalding Tarn]
+      battlefield: [{card: Volcanic Island, tapped: true}, {card: Volcanic Island, tapped: true}, {card: Island, tapped: true}]
+    p1: {life: 19, graveyard: [Force of Will], exile: [Brainstorm]}
+notes: >
+  Four cards delved pay {4}; {1}{U}{U} comes from the three lands. Delve is part of paying the cost, so the exiled cards are
+  a paid cost and are not refunded when the spell is countered (701.6b). Murktide goes to the graveyard as a countered
+  spell.

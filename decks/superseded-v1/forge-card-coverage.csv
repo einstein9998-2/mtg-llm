@@ -1,0 +1,136 @@
+card,forge_script,ai_remove_deck_flag,named_in_forge_unit_tests,decks
+Abrade,a/abrade.txt,,,izzet-delver
+Abrupt Decay,a/abrupt_decay.txt,,,jund
+Ad Nauseam,a/ad_nauseam.txt,All,,storm
+Aether Vial,a/aether_vial.txt,,yes,death-and-taxes
+Ancient Grudge,a/ancient_grudge.txt,,,jund
+Animate Dead,a/animate_dead.txt,,yes,rakdos-reanimator
+Archon of Cruelty,a/archon_of_cruelty.txt,,,rakdos-reanimator;sneak-and-show
+Arid Mesa,a/arid_mesa.txt,,,jeskai-control
+Armageddon,a/armageddon.txt,,yes,death-and-taxes
+"Atraxa, Grand Unifier",a/atraxa_grand_unifier.txt,,,rakdos-reanimator;sneak-and-show
+Badlands,b/badlands.txt,,,jund;rakdos-reanimator;storm
+Batterskull,b/batterskull.txt,,,death-and-taxes
+Bayou,b/bayou.txt,,yes,jund
+Blood Crypt,b/blood_crypt.txt,,,rakdos-reanimator
+Bloodbraid Elf,b/bloodbraid_elf.txt,,,jund
+Bloodghast,b/bloodghast.txt,,yes,rakdos-reanimator
+Bloodstained Mire,b/bloodstained_mire.txt,,yes,jund;rakdos-reanimator;storm
+Brainstorm,b/brainstorm.txt,,,izzet-delver;jeskai-control;sneak-and-show;doomsday;storm
+Brazen Borrower,b/brazen_borrower_petty_theft.txt,,,izzet-delver
+"Brimaz, King of Oreskos",b/brimaz_king_of_oreskos.txt,,,death-and-taxes
+Cabal Ritual,c/cabal_ritual.txt,Random,,storm
+Cabal Therapy,c/cabal_therapy.txt,All,,rakdos-reanimator;doomsday
+Cavern of Souls,c/cavern_of_souls.txt,,,rakdos-reanimator
+Chain Lightning,c/chain_lightning.txt,,,izzet-delver
+Collective Brutality,c/collective_brutality.txt,,,jund;rakdos-reanimator
+Containment Priest,c/containment_priest.txt,,,death-and-taxes;jeskai-control
+Council's Judgment,c/councils_judgment.txt,,,death-and-taxes;jeskai-control
+Counterspell,c/counterspell.txt,,yes,izzet-delver;jeskai-control
+Dark Confidant,d/dark_confidant.txt,,yes,jund;doomsday
+Dark Ritual,d/dark_ritual.txt,,yes,rakdos-reanimator;doomsday;storm
+Daze,d/daze.txt,,,izzet-delver;sneak-and-show;doomsday
+Delver of Secrets,d/delver_of_secrets_insectile_aberration.txt,,,izzet-delver
+Disenchant,d/disenchant.txt,,,death-and-taxes;jeskai-control
+Doomsday,d/doomsday.txt,All,,doomsday
+Dragon's Rage Channeler,d/dragons_rage_channeler.txt,,,izzet-delver
+Duress,d/duress.txt,,,rakdos-reanimator;doomsday;storm
+Echoing Truth,e/echoing_truth.txt,,,doomsday
+"Elspeth, Sun's Champion",e/elspeth_suns_champion.txt,,,death-and-taxes;jeskai-control
+Empty the Warrens,e/empty_the_warrens.txt,,,storm
+"Emrakul, the Aeons Torn",e/emrakul_the_aeons_torn.txt,,yes,sneak-and-show
+Engineered Explosives,e/engineered_explosives.txt,All,,sneak-and-show;doomsday
+Ethersworn Canonist,e/ethersworn_canonist.txt,Random,,death-and-taxes
+Exhume,e/exhume.txt,,yes,rakdos-reanimator
+Faithless Looting,f/faithless_looting.txt,All,,rakdos-reanimator
+Fatal Push,f/fatal_push.txt,,yes,jund;rakdos-reanimator;doomsday
+Fire // Ice,f/fire_ice.txt,,yes,izzet-delver
+Flickerwisp,f/flickerwisp.txt,,,death-and-taxes
+Flooded Strand,f/flooded_strand.txt,,yes,jeskai-control
+Flusterstorm,f/flusterstorm.txt,,,izzet-delver;jeskai-control;sneak-and-show;doomsday;storm
+Force of Will,f/force_of_will.txt,,yes,izzet-delver;jeskai-control;sneak-and-show;doomsday
+Gamble,g/gamble.txt,Random,,sneak-and-show
+Grave Titan,g/grave_titan.txt,,,rakdos-reanimator
+Grim Lavamancer,g/grim_lavamancer.txt,,,jund
+Griselbrand,g/griselbrand.txt,,yes,rakdos-reanimator;sneak-and-show
+Hymn to Tourach,h/hymn_to_tourach.txt,,yes,jund;rakdos-reanimator;doomsday;storm
+Infernal Tutor,i/infernal_tutor.txt,All,,storm
+Inquisition of Kozilek,i/inquisition_of_kozilek.txt,,,jund;rakdos-reanimator;doomsday;storm
+Intuition,i/intuition.txt,,,sneak-and-show
+"Jace, the Mind Sculptor",j/jace_the_mind_sculptor.txt,,,jeskai-control
+Karakas,k/karakas.txt,,,death-and-taxes;jeskai-control
+"Kataki, War's Wage",k/kataki_wars_wage.txt,Random,,death-and-taxes
+Kolaghan's Command,k/kolaghans_command.txt,,,jund;rakdos-reanimator
+Laboratory Maniac,l/laboratory_maniac.txt,,yes,doomsday
+Lightning Bolt,l/lightning_bolt.txt,,yes,jund;izzet-delver;jeskai-control;sneak-and-show
+Liliana of the Veil,l/liliana_of_the_veil.txt,,,jund
+"Liliana, the Last Hope",l/liliana_the_last_hope.txt,,,jund
+Lion's Eye Diamond,l/lions_eye_diamond.txt,All,,storm
+Lotus Petal,l/lotus_petal.txt,Random,,rakdos-reanimator;sneak-and-show;doomsday;storm
+Maelstrom Pulse,m/maelstrom_pulse.txt,,,jund
+Mana Confluence,m/mana_confluence.txt,,yes,doomsday
+Mana Leak,m/mana_leak.txt,,,jeskai-control
+Mana Tithe,m/mana_tithe.txt,,,death-and-taxes
+Manamorphose,m/manamorphose.txt,All,,storm
+Memory Lapse,m/memory_lapse.txt,,,jeskai-control
+Mirran Crusader,m/mirran_crusader.txt,,,death-and-taxes
+Misdirection,m/misdirection.txt,All,,sneak-and-show
+Misty Rainforest,m/misty_rainforest.txt,,,izzet-delver;sneak-and-show;doomsday
+Mother of Runes,m/mother_of_runes.txt,,,death-and-taxes
+Murktide Regent,m/murktide_regent.txt,,,izzet-delver
+Oblivion Ring,o/oblivion_ring.txt,,,death-and-taxes
+Obstinate Baloth,o/obstinate_baloth.txt,,,jund
+Omniscience,o/omniscience.txt,Random,,sneak-and-show
+Orcish Bowmasters,o/orcish_bowmasters.txt,,,jund;doomsday
+Past in Flames,p/past_in_flames.txt,All,,storm
+Pernicious Deed,p/pernicious_deed.txt,Random,,jund
+Phyrexian Revoker,p/phyrexian_revoker.txt,,,death-and-taxes
+Pithing Needle,p/pithing_needle.txt,,yes,death-and-taxes;jund;jeskai-control;rakdos-reanimator;doomsday;storm
+Plateau,p/plateau.txt,,yes,jeskai-control
+Polluted Delta,p/polluted_delta.txt,,,doomsday;storm
+Ponder,p/ponder.txt,,,izzet-delver;jeskai-control;sneak-and-show;doomsday;storm
+Preordain,p/preordain.txt,,,izzet-delver;sneak-and-show;doomsday;storm
+Putrid Imp,p/putrid_imp.txt,All,,rakdos-reanimator
+Pyroblast,p/pyroblast.txt,Random,,izzet-delver;sneak-and-show;storm
+Pyroclasm,p/pyroclasm.txt,,yes,izzet-delver;jeskai-control
+Pyrokinesis,p/pyrokinesis.txt,,,jund;rakdos-reanimator
+Reanimate,r/reanimate.txt,,,rakdos-reanimator
+Recruiter of the Guard,r/recruiter_of_the_guard.txt,,,death-and-taxes
+Red Elemental Blast,r/red_elemental_blast.txt,Random,,izzet-delver;jeskai-control;sneak-and-show;storm
+Rest in Peace,r/rest_in_peace.txt,Random,,death-and-taxes;jeskai-control
+Scalding Tarn,s/scalding_tarn.txt,,,izzet-delver;jeskai-control;sneak-and-show
+Scavenging Ooze,s/scavenging_ooze.txt,,,jund
+Show and Tell,s/show_and_tell.txt,,,sneak-and-show
+Smash to Smithereens,s/smash_to_smithereens.txt,,,izzet-delver
+Snapcaster Mage,s/snapcaster_mage.txt,,,izzet-delver;jeskai-control
+Sneak Attack,s/sneak_attack.txt,Random,,sneak-and-show
+Snuff Out,s/snuff_out.txt,,,doomsday
+Solitude,s/solitude.txt,,,jeskai-control
+Spell Pierce,s/spell_pierce.txt,,,izzet-delver;sneak-and-show;doomsday
+Spell Snare,s/spell_snare.txt,,,sneak-and-show
+Stoneforge Mystic,s/stoneforge_mystic.txt,,,death-and-taxes
+Supreme Verdict,s/supreme_verdict.txt,,,jeskai-control
+Surgical Extraction,s/surgical_extraction.txt,,,jund;izzet-delver;jeskai-control;rakdos-reanimator;sneak-and-show;doomsday;storm
+Sword of Fire and Ice,s/sword_of_fire_and_ice.txt,,,death-and-taxes
+Swords to Plowshares,s/swords_to_plowshares.txt,,yes,death-and-taxes;jeskai-control
+Taiga,t/taiga.txt,,,jund
+Tarmogoyf,t/tarmogoyf.txt,,,jund
+"Teferi, Time Raveler",t/teferi_time_raveler.txt,,,jeskai-control
+Tendrils of Agony,t/tendrils_of_agony.txt,,,storm
+Terminus,t/terminus.txt,,,jeskai-control
+"Thalia, Guardian of Thraben",t/thalia_guardian_of_thraben.txt,,yes,death-and-taxes
+Thassa's Oracle,t/thassas_oracle.txt,,,doomsday
+Thoughtseize,t/thoughtseize.txt,,,jund;rakdos-reanimator;doomsday;storm
+Tormod's Crypt,t/tormods_crypt.txt,Random,,izzet-delver;sneak-and-show;doomsday;storm
+Torrential Gearhulk,t/torrential_gearhulk.txt,,,jeskai-control
+Toxic Deluge,t/toxic_deluge.txt,All,,jund
+Tundra,t/tundra.txt,,,jeskai-control
+Umezawa's Jitte,u/umezawas_jitte.txt,,,death-and-taxes
+Underground Sea,u/underground_sea.txt,,,doomsday;storm
+Unearth,u/unearth.txt,,,rakdos-reanimator
+Vendilion Clique,v/vendilion_clique.txt,,,izzet-delver;jeskai-control
+Verdant Catacombs,v/verdant_catacombs.txt,,,jund
+Volcanic Island,v/volcanic_island.txt,,,izzet-delver;jeskai-control;sneak-and-show;storm
+Wasteland,w/wasteland.txt,,,death-and-taxes;jund;izzet-delver;sneak-and-show;doomsday
+Wear // Tear,w/wear_tear.txt,,,death-and-taxes;jeskai-control
+Wooded Foothills,w/wooded_foothills.txt,,,jund

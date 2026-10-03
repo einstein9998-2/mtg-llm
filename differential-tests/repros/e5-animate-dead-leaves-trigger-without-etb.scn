@@ -1,0 +1,25 @@
+# Finding E5 (lockstep lines, reanimator-02): Animate Dead leaves the battlefield before its enters ability resolved.
+# Forge models "When Animate Dead leaves the battlefield, that creature's controller sacrifices it" as a delayed trigger created when the
+# enters ability resolves (animate_dead.txt: DBDelay), so with the target gone it never exists and only the enters trigger is on the stack.
+# The engine has it as a separate triggered ability (legacy.cards.ron), so Animate Dead going to the graveyard puts a second, empty trigger on the stack.
+# Effect on play: one extra stack object and priority window, no change in the game result. The Oracle text keeps the sentence inside the one ability.
+=== animate-dead-leaves-before-etb-resolves
+title: Surgical Extraction exiles the target while Animate Dead's enters trigger is on the stack: one trigger left (the enters trigger)
+ref: Animate Dead Oracle; CR 603.7, 608.2b, 704.5m
+state:
+  humanhand=Animate Dead
+  humanbattlefield=Swamp;Swamp
+  humangraveyard=Griselbrand
+  aihand=Surgical Extraction
+script:
+  p1: cast Animate Dead -> Griselbrand
+  p1: pass
+  p2: pass
+  p1: pass
+  p2: cast Surgical Extraction -> Griselbrand
+  p2: pass
+  p1: pass
+  p1: check stack size == 1
+expect:
+  zone p1 exile has "Griselbrand"
+  zone p1 graveyard has "Animate Dead"

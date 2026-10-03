@@ -1,0 +1,83 @@
+id: cleanup-discard-to-seven-only-the-active-player-chooses
+title: The active player discards down to seven in the cleanup step by their own choice; the nonactive player does not discard, and no one gets priority
+area: core
+cards: [Brainstorm, Ponder, Preordain, Island, Mountain, Lightning Bolt, Hydroblast, Pyroblast]
+tags: [cleanup, hand-size, discard, turn-structure, priority]
+derived_from: cr
+source:
+  - {kind: cr, ref: "514.1", text: "First, if the active player's hand contains more cards than their maximum hand size (normally seven), they discard enough cards to reduce their hand size to that number. This turn-based action doesn't use the stack.", verified: true}
+  - {kind: cr, ref: "402.2", text: "Each player has a maximum hand size, which is normally seven cards. A player may have any number of cards in their hand, but as part of their cleanup step, the player must discard excess cards down to the maximum hand size.", verified: true}
+  - {kind: cr, ref: "514.3", text: "Normally, no player receives priority during the cleanup step, so no spells can be cast and no abilities can be activated.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: end
+  p0:
+    hand:
+      - "Brainstorm @c1"
+      - "Ponder @c2"
+      - "Preordain @c3"
+      - "Island @c4"
+      - "Island @c5"
+      - "Mountain @c6"
+      - "Lightning Bolt @c7"
+      - "Hydroblast @c8"
+      - "Pyroblast @c9"
+    library_pad: 10
+  p1:
+    hand: [Island, Island, Island, Island, Island, Island, Island, Island]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@c8", "@c9"], expect_options: {include: ["@c1", "@c2", "@c3", "@c4", "@c5", "@c6", "@c7", "@c8", "@c9"]}}
+expect:
+  - at: after_script
+    turn: 4
+    phase: upkeep
+    active: p1
+    priority: p1
+    pending: {actor: p1, kind: priority}
+    stack: []
+    p0:
+      hand: [Brainstorm, Ponder, Preordain, Island, Island, Mountain, Lightning Bolt]
+      graveyard: [Hydroblast, Pyroblast]
+    p1: {hand_count: 8, library_count: 10}
+notes: >
+  p0 ends its turn with nine cards and must discard two in the cleanup step. The discard is a decision of the active
+  player (p0 chooses which cards; here Hydroblast and Pyroblast), not an automatic one. After it, the cleanup step ends
+  without priority and turn 4 begins with p1's untap and upkeep: the first priority decision belongs to p1. p1 holds
+  eight cards but is not the active player in this cleanup, so p1 discards nothing now (hand_count 8) and has not drawn
+  yet (library_count 10). A wrong engine would discard automatically, make the nonactive player discard as well, or give
+  priority in the cleanup step.
+---
+id: cleanup-no-discard-with-exactly-seven-cards
+title: With exactly seven cards in hand the cleanup step raises no discard decision
+area: core
+cards: [Brainstorm, Ponder, Preordain, Island, Mountain, Lightning Bolt, Hydroblast]
+tags: [cleanup, hand-size, discard, turn-structure]
+derived_from: cr
+source:
+  - {kind: cr, ref: "514.1", text: "First, if the active player's hand contains more cards than their maximum hand size (normally seven), they discard enough cards to reduce their hand size to that number.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: end
+  p0:
+    hand: [Brainstorm, Ponder, Preordain, Island, Mountain, Lightning Bolt, Hydroblast]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: upkeep
+    priority: p1
+    p0:
+      hand: [Brainstorm, Ponder, Preordain, Island, Mountain, Lightning Bolt, Hydroblast]
+      graveyard: []
+notes: >
+  Seven cards equals the maximum hand size, so nothing is discarded. The advance step fails if the engine raises any
+  decision other than priority on the way (a discard prompt would). A wrong engine would use "hand size >= 7".

@@ -1,0 +1,238 @@
+id: mu-bdt-flickerwisp-return-replaced-by-boros-containment-priest
+title: An Ocelot Pride exiled by Flickerwisp would return at the end step, but its own controller's Containment Priest exiles it instead (it was not cast)
+area: matchup
+cards: [Flickerwisp, Ocelot Pride, Containment Priest, Plains]
+tags: [matchup, boros-vs-dt, flickerwisp, containment-priest, replacement-effect, delayed-trigger, not-cast]
+derived_from: cr
+source:
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: Flickerwisp, text: "Return that card to the battlefield under its owner's control at the beginning of the next end step.", verified: true}
+  - {kind: cr, ref: "614.1a", text: "Effects that use the word “instead” are replacement effects.", verified: true}
+  - {kind: cr, ref: "614.6", text: "If an event is replaced, it never happens. A modified event occurs instead, which may in turn trigger abilities.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Ocelot Pride @oc", "Containment Priest @cp"]
+    library_pad: 10
+  p1:
+    hand: ["Flickerwisp @wisp"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@wisp", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_target, slot: 0, answer: "@oc", expect_options: {include: ["@oc", "@cp", "@w1"], exclude: ["@wisp"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p0: {exile: [Ocelot Pride]}
+  - advance: {to: end, of: p1}
+  - check:
+      stack: [{kind: triggered, source: "@wisp", controller: p1}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      exile: [Ocelot Pride]
+      graveyard: []
+      battlefield: [{card: Containment Priest}]
+    p1:
+      battlefield:
+        - {card: Flickerwisp}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  Containment Priest's replacement is not limited to its controller's opponents: Ocelot Pride (p0's own nontoken
+  creature) would enter from exile without being cast, so it is exiled instead and never enters (614.6). Nothing
+  triggers and the stack is empty after the delayed trigger resolves. Note that Ocelot is p0's own card and p0's own
+  Priest; the Priest is in Boros' sideboard. A wrong engine returns Ocelot, or applies the Priest only to the
+  opponent's creatures.
+---
+id: mu-bdt-flickerwisp-returns-elegant-parlor-tapped-owner-surveils
+title: Flickerwisp exiles Boros' Elegant Parlor; at the end step it returns tapped under Boros' control and Boros surveils
+area: matchup
+cards: [Flickerwisp, Elegant Parlor, Plateau, Mountain, Plains]
+tags: [matchup, boros-vs-dt, flickerwisp, elegant-parlor, enters-tapped, etb-trigger, surveil, delayed-trigger]
+derived_from: cr
+source:
+  - {kind: oracle, card: Elegant Parlor, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Elegant Parlor, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: oracle, card: Flickerwisp, text: "Return that card to the battlefield under its owner's control at the beginning of the next end step.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Each time an event puts one or more permanents onto the battlefield, all permanents on the battlefield (including the newcomers) are checked for any enters-the-battlefield triggers that match the event.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Elegant Parlor @parlor", "Plateau @plat"]
+    library: ["Mountain @mt"]
+    library_pad: 10
+  p1:
+    hand: ["Flickerwisp @wisp"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@wisp", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_target, slot: 0, answer: "@parlor"}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p0: {exile: [Elegant Parlor], battlefield: [{card: Plateau}]}
+  - advance: {to: end, of: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@parlor", controller: p0}]
+      pending: {actor: p1, kind: priority}
+      p0: {exile: [], battlefield: [{card: Elegant Parlor, tapped: true, controller: p0}, {card: Plateau, tapped: false}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@mt"], on_top_order: []}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Mountain]
+      library_count: 10
+      battlefield: [{card: Elegant Parlor, tapped: true}, {card: Plateau, tapped: false}]
+notes: >
+  The Parlor returns as a new permanent under its owner's control, so its enters-tapped replacement applies again and
+  its enters trigger fires for p0, who makes the surveil decision (it is p1's turn, but the trigger is p0's). The first
+  advance stops with Flickerwisp's delayed trigger on the stack (no creature can attack: Flickerwisp is summoning sick).
+  A wrong engine returns the land untapped, gives the surveil to Flickerwisp's controller, or skips the trigger for a
+  land that was not played.
+---
+id: mu-bdt-flickerwisp-killed-in-response-its-exile-and-return-still-happen
+title: Goblin Bombardment kills Flickerwisp in response to its enters trigger; the trigger still exiles Bombardment and the delayed return still brings it back at the end step
+area: matchup
+cards: [Flickerwisp, Goblin Bombardment, "Cat Token (Ocelot Pride)", Plains]
+tags: [matchup, boros-vs-dt, flickerwisp, goblin-bombardment, trigger-independence, delayed-trigger, lethal-damage]
+derived_from: cr
+source:
+  - {kind: oracle, card: Flickerwisp, text: "When this creature enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.", verified: true}
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+  - {kind: cr, ref: "603.7a", text: "Delayed triggered abilities are created during the resolution of spells or abilities", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Goblin Bombardment @bomb", {token: "Cat Token (Ocelot Pride)", as: cat}]
+    library_pad: 10
+  p1:
+    hand: ["Flickerwisp @wisp"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@wisp", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_target, slot: 0, answer: "@bomb", expect_options: {include: ["@bomb", "@cat"], exclude: ["@wisp"]}}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@cat"], targets: ["@wisp"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@wisp", controller: p1, targets: ["@bomb"]}]
+      pending: {actor: p1, kind: priority}
+      p1: {graveyard: [Flickerwisp]}
+      p0: {battlefield: [{card: Goblin Bombardment}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p0: {exile: [Goblin Bombardment], battlefield: []}
+  - advance: {to: end, of: p1}
+  - check:
+      stack: [{kind: triggered, controller: p1}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      exile: []
+      battlefield: [{card: Goblin Bombardment, controller: p0}]
+    p1:
+      graveyard: [Flickerwisp]
+      battlefield:
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  The Cat token is sacrificed as Bombardment's cost (it ceases to exist) and 1 damage kills the 3/1 Flickerwisp before
+  its enters trigger resolves. The trigger is independent of its source (113.7a): it still exiles Bombardment and, while
+  resolving, creates the delayed return trigger (603.7a), which p1 controls. At p1's end step Bombardment returns to
+  its owner p0. Nothing can attack during the advance (neither player controls a creature). A wrong engine removes the
+  trigger when Flickerwisp dies, or never returns the exiled card because its creator is gone. The delayed trigger's
+  source is not asserted.
+---
+id: mu-bdt-abrade-destroys-vial-ability-uses-last-known-counters
+title: Abrade destroys Aether Vial in response to its activation; the ability still resolves using the Vial's last known two charge counters
+area: matchup
+cards: [Abrade, Aether Vial, "Phelia, Exuberant Shepherd", Skyclave Apparition, Plateau]
+tags: [matchup, boros-vs-dt, abrade, aether-vial, last-known-information, modal, activated-ability, end-step]
+derived_from: cr
+source:
+  - {kind: oracle, card: Abrade, text: "Destroy target artifact.", verified: true}
+  - {kind: oracle, card: Aether Vial, text: "{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Otherwise, it will check that information when it resolves. In both instances, if the source is no longer in the zone it’s expected to be in at that time, its last known information is used.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: end
+  p0:
+    hand: ["Abrade @abr"]
+    battlefield: ["Plateau @l1", "Plateau @l2"]
+    library_pad: 10
+  p1:
+    hand: ["Phelia, Exuberant Shepherd @phe", "Skyclave Apparition @sky"]
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 2}}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@vial", ability: 0}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@abr", modes: [2], targets: ["@vial"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: activated, source: "@vial", controller: p1}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Aether Vial], battlefield: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: choose_cards, purpose: put_onto_battlefield, answer: ["@phe"], expect_options: {include: ["@phe"], exclude: ["@sky"]}}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Abrade]
+      battlefield: [{card: Plateau, tapped: true}, {card: Plateau, tapped: true}]
+    p1:
+      hand: [Skyclave Apparition]
+      graveyard: [Aether Vial]
+      battlefield: [{card: "Phelia, Exuberant Shepherd", sick: true}]
+notes: >
+  p1 activates the Vial in p0's end step; p0 answers with Abrade's second mode. Abrade resolves first and the Vial is
+  in the graveyard when its ability resolves. The ability checks the number of charge counters on resolution, and its
+  source is gone, so the Vial's last known information (two counters) is used (113.7a): Phelia (mana value 2) is offered
+  and Skyclave (3) is not. A wrong engine reads zero counters from the destroyed Vial (nothing offered) or removes the
+  ability with its source. No Voice of Victory is involved: Abrade is p0's spell on p0's own turn.

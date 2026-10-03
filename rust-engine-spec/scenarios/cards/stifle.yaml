@@ -1,0 +1,318 @@
+id: stifle-phelia-attack-trigger-nothing-exiled-no-return
+title: Stifle on Phelia's attack trigger exiles nothing and creates no delayed return; the targeted creature can still block
+area: card
+cards: [Stifle, "Phelia, Exuberant Shepherd", "Dragon's Rage Channeler", Island]
+tags: [stifle, phelia, attack-trigger, delayed-trigger-not-created, counter-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "Whenever Phelia attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+  - {kind: cr, ref: "603.7a", text: "A delayed triggered ability won’t trigger until it has actually been created", verified: true}
+  - {kind: oracle, card: "Dragon's Rage Channeler", text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Phelia, Exuberant Shepherd @phelia"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Island @isl"]
+    library: ["Island @p1top"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@phelia", target: {player: p1}}]}
+  - p0: {decision: choose_target, slot: 0, answer: "@drc"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@phelia", nth: 0}]}
+  - check:
+      stack:
+        - {kind: triggered, source: "@phelia", controller: p0}
+        - {kind: spell, card: "@stifle", controller: p1}
+        - {kind: triggered, source: "@drc", controller: p1, text_contains: "surveil"}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: surveil, to_graveyard: [], on_top_order: ["@p1top"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p1: {battlefield: [{card: "Dragon's Rage Channeler"}, {card: Island, tapped: true}], exile: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: []}
+  - advance: {to: end, of: p0}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {battlefield: [{card: "Phelia, Exuberant Shepherd", pt: [2, 2], tapped: true}]}
+    p1:
+      life: 18
+      exile: []
+      graveyard: [Stifle]
+      battlefield: [{card: "Dragon's Rage Channeler"}, {card: Island, tapped: true}]
+notes: >
+  Stifle is a noncreature spell cast by DRC's controller, so DRC's surveil 1 triggers above Stifle and resolves first
+  (p1 keeps the card on top). The countered trigger never resolves, so DRC is not exiled and the delayed return is never
+  created: at p0's end step the stack is empty. DRC stays and could block (p1 declares no block). Phelia deals 2. Bugs caught: the exile happening
+  anyway, a delayed trigger created at trigger time rather than at resolution, DRC unable to block.
+---
+id: stifle-phelia-return-trigger-card-stays-exiled
+title: Stifle on Phelia's delayed return trigger leaves the exiled creature in exile for good and Phelia gets no counter
+area: card
+cards: [Stifle, "Phelia, Exuberant Shepherd", "Dragon's Rage Channeler", Island]
+tags: [stifle, phelia, delayed-trigger, end-step, counter-ability, permanent-exile]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "At the beginning of the next end step, return that card to the battlefield under its owner's control.", verified: true}
+  - {kind: cr, ref: "603.7b", text: "A delayed triggered ability will trigger only once—the next time its trigger event occurs—unless it has a stated duration", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Phelia, Exuberant Shepherd @phelia"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@phelia", target: {player: p1}}]}
+  - p0: {decision: choose_target, slot: 0, answer: "@drc"}
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+  - check:
+      stack: [{kind: triggered, source: "@phelia", controller: p0, text_contains: "return"}]
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@phelia", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - advance: {to: upkeep, of: p1}
+expect:
+  - at: after_script
+    turn: 6
+    phase: upkeep
+    stack: []
+    p0: {battlefield: [{card: "Phelia, Exuberant Shepherd", pt: [2, 2]}]}
+    p1:
+      life: 18
+      exile: ["Dragon's Rage Channeler"]
+      graveyard: [Stifle]
+      battlefield: [{card: Island}]
+notes: >
+  DRC is exiled during combat; at the end step the return trigger is Stifled, so DRC never comes back: it is still in
+  exile at the next turn's upkeep (a delayed trigger triggers only once, 603.7b). Phelia gets no counter. p1's Island
+  untaps in p1's untap step. Bugs caught: the return re-triggering at a later end step, the card returned by a
+  "cleanup" path when the trigger is countered.
+---
+id: stifle-quantum-riddler-etb-no-draw
+title: Stifle on Quantum Riddler's enters trigger means no card is drawn; Riddler stays
+area: card
+cards: [Stifle, Quantum Riddler, Island]
+tags: [stifle, quantum-riddler, etb-trigger, counter-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Quantum Riddler, text: "When this creature enters, draw a card.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Quantum Riddler @qr"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@qr", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@qr", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand_count: 0
+      library_count: 10
+      battlefield_contains: [{card: Quantum Riddler}]
+    p1: {graveyard: [Stifle]}
+notes: >
+  The Riddler's static replacement is irrelevant because no draw happens at all. Bug caught: the replacement (or the
+  draw) applied although the trigger was countered.
+---
+id: stifle-solitude-evoke-sacrifice-trigger-solitude-stays
+title: Stifling Solitude's evoke sacrifice trigger keeps Solitude on the battlefield after its exile trigger resolves
+area: card
+cards: [Stifle, Solitude, Swords to Plowshares, Murktide Regent, Island]
+tags: [stifle, solitude, evoke, sacrifice-trigger, order-triggers, counter-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Solitude, text: "Evoke—Exile a white card from your hand.", verified: true}
+  - {kind: cr, ref: "702.74a", text: "“When this permanent enters, if its evoke cost was paid, its controller sacrifices it.”", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Solitude @sol", "Swords to Plowshares @stp", "Stifle @stifle"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@stp"}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: order_triggers
+      answer:
+        - {source: "@sol", text_contains: "exile"}
+        - {source: "@sol", text_contains: "sacrifice"}
+  - p0: {decision: choose_target, slot: 0, answer: "@murk"}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@stifle", targets: [{trigger_of: "@sol", nth: 0}]}
+  - check:
+      stack:
+        - {kind: triggered, source: "@sol", text_contains: "exile"}
+        - {kind: triggered, source: "@sol", text_contains: "sacrifice"}
+        - {kind: spell, card: "@stifle", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@sol", text_contains: "exile"}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield_contains: [{card: Solitude}]
+      graveyard: [Stifle]
+      exile: [Swords to Plowshares]
+    p1: {life: 23, exile: [Murktide Regent]}
+notes: >
+  p0 puts the exile trigger on the stack first and the sacrifice trigger on top, then Stifles the sacrifice trigger
+  (nth 0 = the topmost ability from Solitude). Solitude stays permanently: the evoke sacrifice is a one-time enters
+  trigger. The exile trigger then resolves (Murktide's controller p1 gains 3). Bugs caught: evoke implemented as a
+  non-counterable state-based sacrifice, Solitude sacrificed anyway.
+---
+id: stifle-lavinia-trigger-free-spell-resolves
+title: Stifle on Lavinia's trigger lets the opponent's free Force of Will resolve
+area: card
+cards: [Stifle, "Lavinia, Azorius Renegade", Force of Will, Brainstorm, Lightning Bolt, Mountain, Island]
+tags: [stifle, lavinia, alternative-cost, counter-ability, force-of-will]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs", "Stifle @stifle"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3", "Island @j4", "Island @j5"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@lav", nth: 0}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt"}
+        - {kind: spell, card: "@fow"}
+        - {kind: triggered, source: "@lav"}
+        - {kind: spell, card: "@stifle", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1:
+      life: 19
+      graveyard: [Force of Will, Stifle]
+      exile: [Brainstorm]
+notes: >
+  Lavinia's trigger goes on the stack above Force of Will before p1 gets priority back. p1 has five lands, so Stifle
+  (mana value 1) and Force of Will (5) are castable under Lavinia's first ability; Stifle is paid with mana, so it does
+  not trigger Lavinia. Stifle resolves first and counters the trigger (p0 then gets priority as the active player),
+  then Force of Will resolves and counters Bolt. p1 loses only the 1 life for Force of Will. Bugs caught: Lavinia's
+  counter implemented as a static "can't cast" (not counterable), Stifle triggering Lavinia.
+---
+id: stifle-triumph-trigger-stays-in-graveyard
+title: Stifle on Triumph of Saint Katherine's trigger leaves it in the graveyard and the library untouched
+area: card
+cards: [Stifle, Triumph of Saint Katherine, Erode, Plains, Island]
+tags: [stifle, triumph-of-saint-katherine, dies-trigger, counter-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Triumph of Saint Katherine, text: "When this creature is put into your graveyard from the battlefield, exile it and the top six cards of your library in a face-down pile.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Triumph of Saint Katherine @tri"]
+    library_pad: 10
+  p1:
+    hand: ["Erode @erode", "Stifle @stifle"]
+    battlefield: ["Plains @ppl", "Island @pis"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@erode", targets: ["@tri"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: may_search, answer: false}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@tri", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Triumph of Saint Katherine]
+      exile: []
+      library_count: 10
+    p1: {graveyard: [Erode, Stifle]}
+notes: >
+  After Erode resolves (p0 declines its land search), Triumph's trigger is on the stack and p0, the active player, has
+  priority; p0 passes and p1 Stifles the trigger. Triumph stays in the graveyard; no cards are exiled.

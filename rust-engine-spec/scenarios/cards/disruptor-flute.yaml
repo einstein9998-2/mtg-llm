@@ -1,0 +1,168 @@
+id: disruptor-flute-taxes-its-own-controller-too
+title: Disruptor Flute's tax applies to its own controller too, so a named Brainstorm costs {3}{U} for them
+area: card
+cards: [Disruptor Flute, Brainstorm, Island]
+tags: [disruptor-flute, cost-increase, choose-name, controller-also-taxed]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Disruptor Flute, text: "Spells with the chosen name cost {3} more to cast.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Disruptor Flute @fl", "Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fl", pay: {tap: ["@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: Brainstorm}
+  - p0: {t: cast, card: "@bs", pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bs", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield:
+        - {card: Disruptor Flute}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  Flute {2} taps two Islands; Brainstorm named by it costs {3}{U} = four more, so all six Islands end tapped (a wrong
+  engine charging only {U} would leave two Islands untapped).
+---
+id: disruptor-flute-named-wasteland-blocks-destroy-but-not-mana
+title: Flute naming Wasteland stops its destroy ability but not its mana ability
+area: card
+cards: [Disruptor Flute, Wasteland, Ancient Tomb, Island]
+tags: [disruptor-flute, wasteland, mana-ability, activated-ability, choose-name, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Disruptor Flute, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}: Add {C}.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn't require a target (see rule 115.6), it could add mana to a player's mana pool when it resolves, and it's not a loyalty ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Disruptor Flute @fl"]
+    battlefield: ["Island @i1", "Island @i2", "Ancient Tomb @tomb"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fl", pay: {tap: ["@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: Wasteland}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: activate, source: "@w", ability: 1, targets: ["@tomb"]}}
+  - p1: {t: activate, source: "@w", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield_contains: [{card: Ancient Tomb, tapped: false}, {card: Disruptor Flute}]
+    p1:
+      mana_pool: {C: 1}
+      battlefield: [{card: Wasteland, tapped: true}]
+notes: >
+  Naming Wasteland forbids activating its sacrifice ability (not a mana ability: it has a target and makes no mana) even
+  though it is untapped and has a legal target. Its {T}: Add {C} mana ability is exempt. After Flute resolves p0 passes
+  with an empty stack and p1 receives priority. The failed probe must not sacrifice Wasteland.
+---
+id: disruptor-flute-named-cori-steel-cutter-blocks-equip
+title: Flute naming Cori-Steel Cutter stops its Equip ability (an activated, non-mana ability)
+area: card
+cards: [Disruptor Flute, Cori-Steel Cutter, Containment Priest, Island, Mountain]
+tags: [disruptor-flute, cori-steel-cutter, equip, activated-ability, choose-name, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Disruptor Flute, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equip {1}{R}", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Disruptor Flute @fl"]
+    battlefield: ["Island @i1", "Island @i2", "Mountain @m1", "Mountain @m2", "Cori-Steel Cutter @cut", "Containment Priest @cp"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fl", pay: {tap: ["@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: "Cori-Steel Cutter"}
+  - expect_illegal: {p0: {t: activate, source: "@cut", ability: 0, targets: ["@cp"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Mountain, tapped: false}, {card: Mountain, tapped: false}, {card: Cori-Steel Cutter}, {card: Disruptor Flute}]
+notes: >
+  Equip {1}{R} would otherwise be payable with the two untapped Mountains at sorcery timing with Containment Priest as the
+  target; naming the Cutter forbids it. Ability index 0 is the Equip ability (the static bonus and the Flurry trigger are not
+  activated abilities). The Cutter's triggered Flurry ability is not affected (only activated abilities are), not tested here.
+---
+id: disruptor-flute-naming-atraxa-does-not-stop-show-and-tell
+title: Naming Atraxa taxes casting her but a Show and Tell put-in is not a cast, so her enters trigger still goes on the stack
+area: card
+cards: [Disruptor Flute, Show and Tell, "Atraxa, Grand Unifier", Island]
+tags: [disruptor-flute, show-and-tell, not-cast, choose-name, etb-trigger, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Disruptor Flute, text: "Spells with the chosen name cost {3} more to cast.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Disruptor Flute @fl", "Show and Tell @snt", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 10
+  p1:
+    hand: ["Island @ph"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fl", pay: {tap: ["@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: "Atraxa, Grand Unifier"}
+  - p0: {t: cast, card: "@snt", pay: {tap: ["@i3", "@i4", "@i5"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@atx"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+expect:
+  - at: after_script
+    stack: [{kind: triggered, source: "@atx", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      spells_cast_this_turn: 2
+      hand: []
+      battlefield_contains: [{card: "Atraxa, Grand Unifier", types: [Creature]}, {card: Disruptor Flute}]
+      graveyard: [Show and Tell]
+notes: >
+  Atraxa would cost {3}{G}{W}{U}{B} + {3} to cast, but Show and Tell puts her onto the battlefield (not a cast), so the
+  Flute's cost increase never applies and her enters trigger goes on the stack (left unresolved here). Two spells were cast
+  this turn: Flute and Show and Tell. The Flute's activated-ability clause only matters for sources named Atraxa (she has
+  none).

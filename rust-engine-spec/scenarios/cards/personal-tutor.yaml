@@ -1,0 +1,48 @@
+id: personal-tutor-reveals-sorcery-and-puts-it-on-top-after-shuffle
+title: Personal Tutor finds only a sorcery, shuffles, and puts the revealed card on top where both players know it
+area: card
+cards: [Personal Tutor, Doomsday, Brainstorm, Island]
+tags: [personal-tutor, search, reveal, shuffle, library-order, hidden-info]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Personal Tutor, text: "Search your library for a sorcery card, reveal it, then shuffle and put that card on top.", verified: true}
+  - {kind: cr, ref: "701.20a", text: "To reveal a card, show that card to all players for a brief time.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Personal Tutor @pt"]
+    battlefield: ["Island @i"]
+    library: ["Island @x", "Brainstorm @bs", "Doomsday @dd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, purpose: tutor, found: "@dd", expect_options: {include: ["@dd"], exclude: ["@bs", "@x"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      library_count: 13
+      library_top: [Doomsday]
+      graveyard: [Personal Tutor]
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: [Doomsday]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {library_known_top: [Doomsday], library_count: 13, hand_count: 0}
+notes: >
+  Only sorcery cards are offered (Brainstorm is an instant, Island a land). The shuffle happens before the card is put
+  on top, so Doomsday ends on top regardless of the shuffle result (random: any). The card was revealed, so p1 also
+  knows the identity and position of p0's top card (design doc 02 section 6 lists Personal Tutor). Wrong engines: put
+  the card on top and then shuffle, put it in hand, hide it from p1, or offer instants.

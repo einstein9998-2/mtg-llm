@@ -1,0 +1,1070 @@
+# Implementer-written regression scenarios for mechanics the spec thread has no scenarios for yet
+# (faces, Adventure, modal lands, Ajani). They are smoke tests of our own reading of the Oracle text,
+# not independent spec; the spec thread's scenarios stay the authority.
+id: own-brazen-borrower-adventure-then-cast-from-exile
+title: Petty Theft bounces a creature, the Borrower waits in exile and can then be cast from there
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brazen Borrower @bor"]
+    battlefield: [Island, Island, Island, Island, Island]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bor", alt_cost: {adventure: true}, targets: ["@ph"], pay: auto}
+  - resolve_top: true
+  - check:
+      p0: {exile: ["Brazen Borrower"], hand: [], graveyard: []}
+      p1: {hand: ["Phelia, Exuberant Shepherd"], battlefield: []}
+  - p0: {t: cast, card: "@bor", pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      exile: []
+      battlefield_contains: [{card: Brazen Borrower, pt: [3, 1], keywords: [flying, flash]}]
+---
+id: own-boggart-trawler-modal-land
+title: Boggart Trawler played as its land face enters tapped unless 3 life is paid
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boggart Trawler @bt", "Boggart Trawler @bt2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@bt", back_face: {pay_life: false}}
+expect:
+  - at: after_script
+    p0:
+      life: 20
+      hand: ["Boggart Trawler"]
+      battlefield: [{card: Boggart Bog, tapped: true, types: [Land]}]
+---
+id: own-boggart-trawler-modal-land-pay-life
+title: Paying 3 life lets the back face land enter untapped
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boggart Trawler @bt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@bt", back_face: {pay_life: true}}
+  - p0: {t: activate, source: "@bt", ability: 0}
+expect:
+  - at: after_script
+    p0:
+      life: 17
+      mana_pool: {B: 1}
+      battlefield: [{card: Boggart Bog, tapped: true}]
+---
+id: own-ajani-transforms-when-a-cat-dies
+title: Ajani exiles and returns transformed when another Cat dies, with 3 loyalty
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Ajani, Nacatl Pariah", as: ajani}
+      - {token: "Cat Warrior Token", as: cat}
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: ["@cat"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, answer: true}
+expect:
+  - at: after_script
+    p0:
+      battlefield: [{card: "Ajani, Nacatl Avenger", types: [Planeswalker], counters: {loyalty: 3}}]
+    p1:
+      graveyard: [Lightning Bolt]
+---
+id: own-ajani-avenger-plus-two-counters-on-cats
+title: Ajani Avenger +2 puts a +1/+1 counter on each Cat you control
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Ajani, Nacatl Avenger", as: ajani, counters: {loyalty: 3}}
+      - {token: "Cat Warrior Token", as: cat}
+      - {token: "Goblin Token", as: gob}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ajani", ability: 0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield:
+        - {card: "Ajani, Nacatl Avenger", counters: {loyalty: 5}}
+        - {token: "Cat Warrior Token", pt: [3, 2]}
+        - {token: "Goblin Token", pt: [1, 1]}
+---
+id: own-ajani-avenger-zero-token-and-damage
+title: Ajani Avenger 0 makes a Cat, then deals damage equal to the creature count if you control another red permanent
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Ajani, Nacatl Avenger", as: ajani, counters: {loyalty: 3}}
+      - {token: "Cat Warrior Token", as: cat}
+      - {token: "Goblin Token", as: gob}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ajani", ability: 1}
+  - resolve_top: true
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p1: {life: 17}
+    p0:
+      battlefield_contains: [{card: "Ajani, Nacatl Avenger", counters: {loyalty: 3}}]
+---
+id: own-ajani-avenger-minus-four-keeps-one-of-each
+title: Ajani Avenger -4 makes the opponent keep one creature, sacrificing the rest
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Ajani, Nacatl Avenger", as: ajani, counters: {loyalty: 4}}
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph", {token: "Goblin Token", as: gob}, {token: "Cat Warrior Token", as: cat}]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ajani", ability: 2}
+  - resolve_top: true
+  - p1: {decision: choose_cards, purpose: keep_one, answer: ["@ph"]}
+expect:
+  - at: after_script
+    p1:
+      battlefield: ["Phelia, Exuberant Shepherd"]
+    p0:
+      battlefield: []
+      graveyard: ["Ajani, Nacatl Pariah"]
+---
+id: own-tamiyo-flips-on-third-card-drawn
+title: Tamiyo, Inquisitive Student transforms after the third card drawn this turn
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1", "Tamiyo, Inquisitive Student @tam"]
+    library: ["Island @l1", "Island @l2", "Island @l3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@l1", "@l2"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@l1", "@l2"]}
+  - check:
+      stack: [{kind: triggered, source: "@tam"}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    p0:
+      battlefield: [{card: Island}, {card: "Tamiyo, Seasoned Scholar", types: [Planeswalker], counters: {loyalty: 2}}]
+---
+id: own-witch-enchanter-destroys-artifact
+title: Witch Enchanter destroys an artifact an opponent controls when it enters
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Witch Enchanter @we"]
+    battlefield: [Plains, Plains, Plains, Plains]
+    library_pad: 10
+  p1:
+    battlefield: ["Lotus Petal @lp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@we", pay: auto}
+  - resolve_top: true
+  - p0: {decision: choose_target, slot: 0, answer: "@lp"}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield_contains: [{card: Witch Enchanter, pt: [2, 2]}]
+    p1:
+      battlefield: []
+      graveyard: [Lotus Petal]
+---
+id: own-quantum-riddler-warp-then-cast-from-exile-later
+title: A warped Quantum Riddler can be cast from exile for its normal cost on a later turn
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Quantum Riddler @qr"]
+    battlefield: [Island, Island, Island, Island, Island]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@qr", alt_cost: {warp: true}, pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+  - resolve_top: true
+  - check:
+      p0: {exile: [Quantum Riddler]}
+  - advance: {to: main1, of: p0}
+  - p0: {t: cast, card: "@qr", pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      exile: []
+      battlefield_contains: [{card: Quantum Riddler, pt: [4, 6]}]
+---
+id: own-voice-of-victory-mobilize-two-warriors
+title: Voice of Victory's Mobilize 2 makes two tapped and attacking Warriors that are sacrificed at the next end step
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Voice of Victory @vv"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@vv", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0:
+        battlefield_contains: [{token: Warrior Token, tapped: true}, {token: Warrior Token, tapped: true}]
+  - advance: {to: end, of: p0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p1: {life: 17}
+    p0:
+      battlefield: [{card: Voice of Victory}]
+---
+id: own-named-land-is-tapped-before-floating-mana
+title: Naming a land to pay with taps it and leaves the floating mana in the pool
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    mana_pool: {R: 1}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@m"]}}
+expect:
+  - at: after_script
+    p0:
+      mana_pool: {R: 1}
+      battlefield: [{card: Mountain, tapped: true}]
+---
+id: own-tamiyo-flips-though-a-fourth-card-is-drawn-before-resolution
+title: Tamiyo's third-draw trigger still transforms her when a fourth card is drawn before it resolves
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Brainstorm @bs2"]
+    battlefield: ["Island @i1", "Island @i2", "Tamiyo, Inquisitive Student @tam"]
+    library: ["Island @l1", "Island @l2", "Island @l3", "Island @l4", "Island @l5"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@l1", "@l2"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@l1", "@l2"]}
+  - p0: {t: cast, card: "@bs2", pay: auto}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@l3", "@l4"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@l3", "@l4"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield_contains: [{card: "Tamiyo, Seasoned Scholar", types: [Planeswalker]}]
+---
+id: own-cage-beats-priest-for-reanimated-creature
+title: With Grafdigger's Cage out, a creature reanimated from the graveyard cannot enter, so Containment Priest does not exile it
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Animate Dead @ad"]
+    battlefield: [Swamp, Swamp]
+    graveyard: ["Griselbrand @gris"]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest", "Grafdigger's Cage"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ad", targets: ["@gris"], pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      graveyard: [Griselbrand, Animate Dead]
+      battlefield_contains: [Swamp]
+      exile: []
+---
+id: own-massacre-kills-ajani-and-cat-together
+title: When Massacre kills Ajani and his Cat token at the same time, Ajani sees the Cat die but is already in the graveyard, so he does not come back
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Massacre @mass"]
+    battlefield:
+      - {card: "Ajani, Nacatl Pariah", as: ajani}
+      - {token: "Cat Warrior Token", as: cat}
+      - Swamp
+      - Swamp
+      - Swamp
+      - Swamp
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mass", pay: auto}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, controller: p0}]
+  - resolve_top: true
+  - p0: {decision: yes_no, answer: true}
+expect:
+  - at: after_script
+    p0:
+      graveyard: ["Ajani, Nacatl Pariah", Massacre]
+      exile: []
+      battlefield_contains: [Swamp]
+---
+id: own-hide-returns-creatures-simultaneously-guide-sees-ocelot
+title: Hide on the Ceiling returns Ocelot Pride and Guide of Souls together, so Guide sees Ocelot enter whichever order they were exiled in
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    hand: ["Hide on the Ceiling @hide"]
+    battlefield: ["Ocelot Pride @oc", "Guide of Souls @gu", "Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hide", x: 2, targets: ["@oc", "@gu"], pay: auto}
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      life: 21
+      energy: 1
+      battlefield_contains: ["Ocelot Pride", "Guide of Souls"]
+---
+id: own-hide-returns-priest-and-creature-together
+title: Containment Priest returning together with Ocelot Pride does not exile it (the Priest was not on the battlefield yet), in either exile order
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    hand: ["Hide on the Ceiling @hide"]
+    battlefield: ["Containment Priest @pr", "Ocelot Pride @oc", "Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hide", x: 2, targets: ["@pr", "@oc"], pay: auto}
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      exile: []
+      battlefield_contains: ["Containment Priest", "Ocelot Pride"]
+---
+id: own-hide-returns-creature-then-priest-together
+title: Same as above with the Priest exiled second
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    hand: ["Hide on the Ceiling @hide"]
+    battlefield: ["Containment Priest @pr", "Ocelot Pride @oc", "Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hide", x: 2, targets: ["@oc", "@pr"], pay: auto}
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      exile: []
+      battlefield_contains: ["Containment Priest", "Ocelot Pride"]
+---
+id: own-raph-mikey-new-attacker-chooses-planeswalker
+title: The creature Raph & Mikey put onto the battlefield attacking can be pointed at a planeswalker rather than the player (508.4)
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Raph & Mikey, Troublemakers @rm"]
+    library: ["Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    battlefield:
+      - {card: "Jace, Wielder of Mysteries", as: jace, counters: {loyalty: 5}}
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@rm", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_attack_target, answer: "@jace"}
+  - check:
+      p0:
+        battlefield_contains: [{card: Ocelot Pride, tapped: true}]
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    p1:
+      life: 13
+      battlefield: [{card: "Jace, Wielder of Mysteries", counters: {loyalty: 4}}]
+---
+id: own-tamiyo-scholar-plus-two-is-a-trigger-on-the-stack
+title: Tamiyo, Seasoned Scholar +2 makes an attack trigger that goes on the stack and shrinks the attacker by 1 power
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Tamiyo, Seasoned Scholar", as: tam, counters: {loyalty: 2}}
+    library_pad: 10
+  p1:
+    battlefield: ["Griselbrand @hoof"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tam", ability: 0}
+  - resolve_top: true
+  - advance: {to: begin_combat, of: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@hoof", target: {player: p0}}]}
+  - check:
+      stack: [{kind: triggered, controller: p0}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    p1:
+      battlefield: [{card: Griselbrand, pt: [6, 7]}]
+---
+id: own-stronghold-gambit-creatures-enter-together
+title: Stronghold Gambit with Containment Priest against Spider-Woman enters both as one event, so neither replaces the other
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stronghold Gambit @sg", "Containment Priest @pr"]
+    battlefield: [Mountain, Mountain]
+    library_pad: 10
+  p1:
+    hand: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sg", pay: auto}
+  - resolve_top: true
+  - p0: {decision: choose_cards, answer: ["@pr"]}
+  - p1: {decision: choose_cards, answer: ["@sw"]}
+expect:
+  - at: after_script
+    p0:
+      exile: []
+      battlefield_contains: [{card: Containment Priest, tapped: false}]
+    p1:
+      exile: []
+      battlefield: [{card: "Spider-Woman, Stunning Savior", tapped: false}]
+---
+id: own-miracle-is-offered-for-triumph-drawn-first
+title: Triumph of Saint Katherine drawn first in the draw step can be cast for its miracle cost, and is cast for it
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  p0:
+    battlefield: ["Plains @p1", "Plains @p2"]
+    library: ["Triumph of Saint Katherine @tri"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: draw, of: p0}
+  - resolve_top: true
+  - p0: {decision: choose_cards, answer: ["@tri"]}
+  - check:
+      stack: [{kind: spell, card: "@tri"}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield_contains: ["Triumph of Saint Katherine"]
+---
+id: own-cutters-on-different-creatures-ask-for-trigger-order
+title: Two Cori-Steel Cutters attached to different creatures do not have their flurry trigger order chosen for the player
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Containment Priest @pr", "Guide of Souls @gu", {card: Cori-Steel Cutter, as: c1, attached_to: "@pr"}, {card: Cori-Steel Cutter, as: c2, attached_to: "@gu"}, "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+  - p0: {decision: order_triggers, answer: [{source: "@c1", text_contains: "Monk"}, {source: "@c2", text_contains: "Monk"}]}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+---
+id: own-quarry-sacrifice-mana-makes-a-spell-castable
+title: Plains and Lazotep Quarry (tap and sacrifice a creature for one mana of any color) make Goblin Bombardment castable, sacrificing the cheapest creature (differential finding E3)
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Goblin Bombardment @gb"]
+    battlefield: ["Plains @pl", "Lazotep Quarry @q", "Containment Priest @pr", "Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@gb", pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield: ["Plains", "Lazotep Quarry", "Containment Priest", "Goblin Bombardment"]
+      graveyard: ["Ocelot Pride"]
+---
+id: own-quarry-not-sacrificed-when-plain-mana-pays
+title: With enough ordinary lands, casting Goblin Bombardment does not sacrifice a creature to Lazotep Quarry
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Goblin Bombardment @gb"]
+    battlefield: ["Plains @pl", "Mountain @mo", "Lazotep Quarry @q", "Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@gb", pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield: ["Plains", "Mountain", "Lazotep Quarry", "Ocelot Pride", "Goblin Bombardment"]
+---
+id: own-wasteland-sacrifice-does-not-trigger-ajani
+title: Sacrificing Wasteland as a cost does not trigger Ajani, Nacatl Pariah (no Cat died); only the Wasteland ability is on the stack (differential E7)
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @w", "Ajani, Nacatl Pariah @aj"]
+    library_pad: 10
+  p1:
+    battlefield: ["Boggart Bog @bb"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@w", ability: 1, targets: ["@bb"]}
+  - check:
+      stack: [{kind: activated, source: "@w"}]
+expect:
+  - at: after_script
+    p0:
+      battlefield: ["Ajani, Nacatl Pariah"]
+---
+id: own-fetchland-crack-does-not-trigger-ajani
+title: Cracking a fetchland does not trigger Ajani, Nacatl Pariah (differential E7)
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Ajani, Nacatl Pariah @aj", "Arid Mesa @mesa"]
+    library: ["Plateau", "Island"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@mesa", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@mesa"}]
+expect:
+  - at: after_script
+    p0:
+      battlefield: ["Ajani, Nacatl Pariah"]
+---
+id: own-two-quarries-one-creature-pay-two-mana
+title: Two Lazotep Quarries and one creature pay {1}{R} for Amped Raptor, one Quarry sacrificing the creature for red and the other tapping for colorless (differential E6)
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Amped Raptor @ar"]
+    battlefield: ["Lazotep Quarry @q1", "Lazotep Quarry @q2", "Sand Scout @ss"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ar", pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield: ["Lazotep Quarry", "Lazotep Quarry", "Amped Raptor"]
+      graveyard: ["Sand Scout"]
+---
+id: own-ajani-avenger-plus-two-with-three-hundred-cats-terminates
+title: Ajani Avenger +2 over 300 Cats finishes (the loop index once wrapped at 256 and the resolution never ended), putting a counter on each (RFC 0003)
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Ajani, Nacatl Avenger", as: ajani, counters: {loyalty: 3}}
+      - {token: "Cat Warrior Token", as: c0}
+      - {token: "Cat Warrior Token", as: c1}
+      - {token: "Cat Warrior Token", as: c2}
+      - {token: "Cat Warrior Token", as: c3}
+      - {token: "Cat Warrior Token", as: c4}
+      - {token: "Cat Warrior Token", as: c5}
+      - {token: "Cat Warrior Token", as: c6}
+      - {token: "Cat Warrior Token", as: c7}
+      - {token: "Cat Warrior Token", as: c8}
+      - {token: "Cat Warrior Token", as: c9}
+      - {token: "Cat Warrior Token", as: c10}
+      - {token: "Cat Warrior Token", as: c11}
+      - {token: "Cat Warrior Token", as: c12}
+      - {token: "Cat Warrior Token", as: c13}
+      - {token: "Cat Warrior Token", as: c14}
+      - {token: "Cat Warrior Token", as: c15}
+      - {token: "Cat Warrior Token", as: c16}
+      - {token: "Cat Warrior Token", as: c17}
+      - {token: "Cat Warrior Token", as: c18}
+      - {token: "Cat Warrior Token", as: c19}
+      - {token: "Cat Warrior Token", as: c20}
+      - {token: "Cat Warrior Token", as: c21}
+      - {token: "Cat Warrior Token", as: c22}
+      - {token: "Cat Warrior Token", as: c23}
+      - {token: "Cat Warrior Token", as: c24}
+      - {token: "Cat Warrior Token", as: c25}
+      - {token: "Cat Warrior Token", as: c26}
+      - {token: "Cat Warrior Token", as: c27}
+      - {token: "Cat Warrior Token", as: c28}
+      - {token: "Cat Warrior Token", as: c29}
+      - {token: "Cat Warrior Token", as: c30}
+      - {token: "Cat Warrior Token", as: c31}
+      - {token: "Cat Warrior Token", as: c32}
+      - {token: "Cat Warrior Token", as: c33}
+      - {token: "Cat Warrior Token", as: c34}
+      - {token: "Cat Warrior Token", as: c35}
+      - {token: "Cat Warrior Token", as: c36}
+      - {token: "Cat Warrior Token", as: c37}
+      - {token: "Cat Warrior Token", as: c38}
+      - {token: "Cat Warrior Token", as: c39}
+      - {token: "Cat Warrior Token", as: c40}
+      - {token: "Cat Warrior Token", as: c41}
+      - {token: "Cat Warrior Token", as: c42}
+      - {token: "Cat Warrior Token", as: c43}
+      - {token: "Cat Warrior Token", as: c44}
+      - {token: "Cat Warrior Token", as: c45}
+      - {token: "Cat Warrior Token", as: c46}
+      - {token: "Cat Warrior Token", as: c47}
+      - {token: "Cat Warrior Token", as: c48}
+      - {token: "Cat Warrior Token", as: c49}
+      - {token: "Cat Warrior Token", as: c50}
+      - {token: "Cat Warrior Token", as: c51}
+      - {token: "Cat Warrior Token", as: c52}
+      - {token: "Cat Warrior Token", as: c53}
+      - {token: "Cat Warrior Token", as: c54}
+      - {token: "Cat Warrior Token", as: c55}
+      - {token: "Cat Warrior Token", as: c56}
+      - {token: "Cat Warrior Token", as: c57}
+      - {token: "Cat Warrior Token", as: c58}
+      - {token: "Cat Warrior Token", as: c59}
+      - {token: "Cat Warrior Token", as: c60}
+      - {token: "Cat Warrior Token", as: c61}
+      - {token: "Cat Warrior Token", as: c62}
+      - {token: "Cat Warrior Token", as: c63}
+      - {token: "Cat Warrior Token", as: c64}
+      - {token: "Cat Warrior Token", as: c65}
+      - {token: "Cat Warrior Token", as: c66}
+      - {token: "Cat Warrior Token", as: c67}
+      - {token: "Cat Warrior Token", as: c68}
+      - {token: "Cat Warrior Token", as: c69}
+      - {token: "Cat Warrior Token", as: c70}
+      - {token: "Cat Warrior Token", as: c71}
+      - {token: "Cat Warrior Token", as: c72}
+      - {token: "Cat Warrior Token", as: c73}
+      - {token: "Cat Warrior Token", as: c74}
+      - {token: "Cat Warrior Token", as: c75}
+      - {token: "Cat Warrior Token", as: c76}
+      - {token: "Cat Warrior Token", as: c77}
+      - {token: "Cat Warrior Token", as: c78}
+      - {token: "Cat Warrior Token", as: c79}
+      - {token: "Cat Warrior Token", as: c80}
+      - {token: "Cat Warrior Token", as: c81}
+      - {token: "Cat Warrior Token", as: c82}
+      - {token: "Cat Warrior Token", as: c83}
+      - {token: "Cat Warrior Token", as: c84}
+      - {token: "Cat Warrior Token", as: c85}
+      - {token: "Cat Warrior Token", as: c86}
+      - {token: "Cat Warrior Token", as: c87}
+      - {token: "Cat Warrior Token", as: c88}
+      - {token: "Cat Warrior Token", as: c89}
+      - {token: "Cat Warrior Token", as: c90}
+      - {token: "Cat Warrior Token", as: c91}
+      - {token: "Cat Warrior Token", as: c92}
+      - {token: "Cat Warrior Token", as: c93}
+      - {token: "Cat Warrior Token", as: c94}
+      - {token: "Cat Warrior Token", as: c95}
+      - {token: "Cat Warrior Token", as: c96}
+      - {token: "Cat Warrior Token", as: c97}
+      - {token: "Cat Warrior Token", as: c98}
+      - {token: "Cat Warrior Token", as: c99}
+      - {token: "Cat Warrior Token", as: c100}
+      - {token: "Cat Warrior Token", as: c101}
+      - {token: "Cat Warrior Token", as: c102}
+      - {token: "Cat Warrior Token", as: c103}
+      - {token: "Cat Warrior Token", as: c104}
+      - {token: "Cat Warrior Token", as: c105}
+      - {token: "Cat Warrior Token", as: c106}
+      - {token: "Cat Warrior Token", as: c107}
+      - {token: "Cat Warrior Token", as: c108}
+      - {token: "Cat Warrior Token", as: c109}
+      - {token: "Cat Warrior Token", as: c110}
+      - {token: "Cat Warrior Token", as: c111}
+      - {token: "Cat Warrior Token", as: c112}
+      - {token: "Cat Warrior Token", as: c113}
+      - {token: "Cat Warrior Token", as: c114}
+      - {token: "Cat Warrior Token", as: c115}
+      - {token: "Cat Warrior Token", as: c116}
+      - {token: "Cat Warrior Token", as: c117}
+      - {token: "Cat Warrior Token", as: c118}
+      - {token: "Cat Warrior Token", as: c119}
+      - {token: "Cat Warrior Token", as: c120}
+      - {token: "Cat Warrior Token", as: c121}
+      - {token: "Cat Warrior Token", as: c122}
+      - {token: "Cat Warrior Token", as: c123}
+      - {token: "Cat Warrior Token", as: c124}
+      - {token: "Cat Warrior Token", as: c125}
+      - {token: "Cat Warrior Token", as: c126}
+      - {token: "Cat Warrior Token", as: c127}
+      - {token: "Cat Warrior Token", as: c128}
+      - {token: "Cat Warrior Token", as: c129}
+      - {token: "Cat Warrior Token", as: c130}
+      - {token: "Cat Warrior Token", as: c131}
+      - {token: "Cat Warrior Token", as: c132}
+      - {token: "Cat Warrior Token", as: c133}
+      - {token: "Cat Warrior Token", as: c134}
+      - {token: "Cat Warrior Token", as: c135}
+      - {token: "Cat Warrior Token", as: c136}
+      - {token: "Cat Warrior Token", as: c137}
+      - {token: "Cat Warrior Token", as: c138}
+      - {token: "Cat Warrior Token", as: c139}
+      - {token: "Cat Warrior Token", as: c140}
+      - {token: "Cat Warrior Token", as: c141}
+      - {token: "Cat Warrior Token", as: c142}
+      - {token: "Cat Warrior Token", as: c143}
+      - {token: "Cat Warrior Token", as: c144}
+      - {token: "Cat Warrior Token", as: c145}
+      - {token: "Cat Warrior Token", as: c146}
+      - {token: "Cat Warrior Token", as: c147}
+      - {token: "Cat Warrior Token", as: c148}
+      - {token: "Cat Warrior Token", as: c149}
+      - {token: "Cat Warrior Token", as: c150}
+      - {token: "Cat Warrior Token", as: c151}
+      - {token: "Cat Warrior Token", as: c152}
+      - {token: "Cat Warrior Token", as: c153}
+      - {token: "Cat Warrior Token", as: c154}
+      - {token: "Cat Warrior Token", as: c155}
+      - {token: "Cat Warrior Token", as: c156}
+      - {token: "Cat Warrior Token", as: c157}
+      - {token: "Cat Warrior Token", as: c158}
+      - {token: "Cat Warrior Token", as: c159}
+      - {token: "Cat Warrior Token", as: c160}
+      - {token: "Cat Warrior Token", as: c161}
+      - {token: "Cat Warrior Token", as: c162}
+      - {token: "Cat Warrior Token", as: c163}
+      - {token: "Cat Warrior Token", as: c164}
+      - {token: "Cat Warrior Token", as: c165}
+      - {token: "Cat Warrior Token", as: c166}
+      - {token: "Cat Warrior Token", as: c167}
+      - {token: "Cat Warrior Token", as: c168}
+      - {token: "Cat Warrior Token", as: c169}
+      - {token: "Cat Warrior Token", as: c170}
+      - {token: "Cat Warrior Token", as: c171}
+      - {token: "Cat Warrior Token", as: c172}
+      - {token: "Cat Warrior Token", as: c173}
+      - {token: "Cat Warrior Token", as: c174}
+      - {token: "Cat Warrior Token", as: c175}
+      - {token: "Cat Warrior Token", as: c176}
+      - {token: "Cat Warrior Token", as: c177}
+      - {token: "Cat Warrior Token", as: c178}
+      - {token: "Cat Warrior Token", as: c179}
+      - {token: "Cat Warrior Token", as: c180}
+      - {token: "Cat Warrior Token", as: c181}
+      - {token: "Cat Warrior Token", as: c182}
+      - {token: "Cat Warrior Token", as: c183}
+      - {token: "Cat Warrior Token", as: c184}
+      - {token: "Cat Warrior Token", as: c185}
+      - {token: "Cat Warrior Token", as: c186}
+      - {token: "Cat Warrior Token", as: c187}
+      - {token: "Cat Warrior Token", as: c188}
+      - {token: "Cat Warrior Token", as: c189}
+      - {token: "Cat Warrior Token", as: c190}
+      - {token: "Cat Warrior Token", as: c191}
+      - {token: "Cat Warrior Token", as: c192}
+      - {token: "Cat Warrior Token", as: c193}
+      - {token: "Cat Warrior Token", as: c194}
+      - {token: "Cat Warrior Token", as: c195}
+      - {token: "Cat Warrior Token", as: c196}
+      - {token: "Cat Warrior Token", as: c197}
+      - {token: "Cat Warrior Token", as: c198}
+      - {token: "Cat Warrior Token", as: c199}
+      - {token: "Cat Warrior Token", as: c200}
+      - {token: "Cat Warrior Token", as: c201}
+      - {token: "Cat Warrior Token", as: c202}
+      - {token: "Cat Warrior Token", as: c203}
+      - {token: "Cat Warrior Token", as: c204}
+      - {token: "Cat Warrior Token", as: c205}
+      - {token: "Cat Warrior Token", as: c206}
+      - {token: "Cat Warrior Token", as: c207}
+      - {token: "Cat Warrior Token", as: c208}
+      - {token: "Cat Warrior Token", as: c209}
+      - {token: "Cat Warrior Token", as: c210}
+      - {token: "Cat Warrior Token", as: c211}
+      - {token: "Cat Warrior Token", as: c212}
+      - {token: "Cat Warrior Token", as: c213}
+      - {token: "Cat Warrior Token", as: c214}
+      - {token: "Cat Warrior Token", as: c215}
+      - {token: "Cat Warrior Token", as: c216}
+      - {token: "Cat Warrior Token", as: c217}
+      - {token: "Cat Warrior Token", as: c218}
+      - {token: "Cat Warrior Token", as: c219}
+      - {token: "Cat Warrior Token", as: c220}
+      - {token: "Cat Warrior Token", as: c221}
+      - {token: "Cat Warrior Token", as: c222}
+      - {token: "Cat Warrior Token", as: c223}
+      - {token: "Cat Warrior Token", as: c224}
+      - {token: "Cat Warrior Token", as: c225}
+      - {token: "Cat Warrior Token", as: c226}
+      - {token: "Cat Warrior Token", as: c227}
+      - {token: "Cat Warrior Token", as: c228}
+      - {token: "Cat Warrior Token", as: c229}
+      - {token: "Cat Warrior Token", as: c230}
+      - {token: "Cat Warrior Token", as: c231}
+      - {token: "Cat Warrior Token", as: c232}
+      - {token: "Cat Warrior Token", as: c233}
+      - {token: "Cat Warrior Token", as: c234}
+      - {token: "Cat Warrior Token", as: c235}
+      - {token: "Cat Warrior Token", as: c236}
+      - {token: "Cat Warrior Token", as: c237}
+      - {token: "Cat Warrior Token", as: c238}
+      - {token: "Cat Warrior Token", as: c239}
+      - {token: "Cat Warrior Token", as: c240}
+      - {token: "Cat Warrior Token", as: c241}
+      - {token: "Cat Warrior Token", as: c242}
+      - {token: "Cat Warrior Token", as: c243}
+      - {token: "Cat Warrior Token", as: c244}
+      - {token: "Cat Warrior Token", as: c245}
+      - {token: "Cat Warrior Token", as: c246}
+      - {token: "Cat Warrior Token", as: c247}
+      - {token: "Cat Warrior Token", as: c248}
+      - {token: "Cat Warrior Token", as: c249}
+      - {token: "Cat Warrior Token", as: c250}
+      - {token: "Cat Warrior Token", as: c251}
+      - {token: "Cat Warrior Token", as: c252}
+      - {token: "Cat Warrior Token", as: c253}
+      - {token: "Cat Warrior Token", as: c254}
+      - {token: "Cat Warrior Token", as: c255}
+      - {token: "Cat Warrior Token", as: c256}
+      - {token: "Cat Warrior Token", as: c257}
+      - {token: "Cat Warrior Token", as: c258}
+      - {token: "Cat Warrior Token", as: c259}
+      - {token: "Cat Warrior Token", as: c260}
+      - {token: "Cat Warrior Token", as: c261}
+      - {token: "Cat Warrior Token", as: c262}
+      - {token: "Cat Warrior Token", as: c263}
+      - {token: "Cat Warrior Token", as: c264}
+      - {token: "Cat Warrior Token", as: c265}
+      - {token: "Cat Warrior Token", as: c266}
+      - {token: "Cat Warrior Token", as: c267}
+      - {token: "Cat Warrior Token", as: c268}
+      - {token: "Cat Warrior Token", as: c269}
+      - {token: "Cat Warrior Token", as: c270}
+      - {token: "Cat Warrior Token", as: c271}
+      - {token: "Cat Warrior Token", as: c272}
+      - {token: "Cat Warrior Token", as: c273}
+      - {token: "Cat Warrior Token", as: c274}
+      - {token: "Cat Warrior Token", as: c275}
+      - {token: "Cat Warrior Token", as: c276}
+      - {token: "Cat Warrior Token", as: c277}
+      - {token: "Cat Warrior Token", as: c278}
+      - {token: "Cat Warrior Token", as: c279}
+      - {token: "Cat Warrior Token", as: c280}
+      - {token: "Cat Warrior Token", as: c281}
+      - {token: "Cat Warrior Token", as: c282}
+      - {token: "Cat Warrior Token", as: c283}
+      - {token: "Cat Warrior Token", as: c284}
+      - {token: "Cat Warrior Token", as: c285}
+      - {token: "Cat Warrior Token", as: c286}
+      - {token: "Cat Warrior Token", as: c287}
+      - {token: "Cat Warrior Token", as: c288}
+      - {token: "Cat Warrior Token", as: c289}
+      - {token: "Cat Warrior Token", as: c290}
+      - {token: "Cat Warrior Token", as: c291}
+      - {token: "Cat Warrior Token", as: c292}
+      - {token: "Cat Warrior Token", as: c293}
+      - {token: "Cat Warrior Token", as: c294}
+      - {token: "Cat Warrior Token", as: c295}
+      - {token: "Cat Warrior Token", as: c296}
+      - {token: "Cat Warrior Token", as: c297}
+      - {token: "Cat Warrior Token", as: c298}
+      - {token: "Cat Warrior Token", as: c299}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ajani", ability: 0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield_contains:
+        - {card: "Ajani, Nacatl Avenger", counters: {loyalty: 5}}
+        - {token: "Cat Warrior Token", counters: {"+1/+1": 1}}
+---
+id: own-quarry-auto-payment-does-not-sacrifice-the-spells-target
+title: Lightning Bolt aimed at my own Cat token, paid for with Lazotep Quarry, so the Quarry sacrifices the other creature, not the target (RFC 0003, Quarry own-target item)
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Lazotep Quarry @q", "Containment Priest @pr", {token: "Cat Warrior Token", as: cat}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: ["@cat"], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield: ["Lazotep Quarry"]
+      graveyard: ["Containment Priest", "Lightning Bolt"]

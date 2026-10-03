@@ -1,0 +1,87 @@
+id: hi-draw-step-opponent-stream-independent-of-drawn-card
+title: The opponent's observation stream is identical whichever card the active player draws
+area: hidden-info
+cards: [Lightning Bolt, Murktide Regent, Ponder, Volcanic Island, Aluren, Island, Tropical Island]
+tags: [hidden-info, draw, non-interference, paired-world]
+derived_from: cr
+source:
+  - {kind: cr, ref: "402.3", text: "A player can't look at the cards in another player's hand but may count those cards at any time.", verified: true}
+  - {kind: cr, ref: "401.2", text: "Each library must be kept in a single face-down pile. Players can't look at or change the order of cards in a library.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  priority: p0
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @v"]
+    library: ["Murktide Regent @top"]
+    library_pad: 10
+  p1:
+    hand: ["Aluren @alu", "Island @i1"]
+    battlefield: ["Tropical Island @t"]
+    library_pad: 10
+world_b:
+  p0: {library: ["Ponder @top"]}
+assert_streams_identical: {observer: p1}
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: draw
+    pending: {actor: p0, kind: priority}
+    p0: {hand_count: 2, library_count: 10}
+notes: >
+  Paired worlds differ only in the identity of p0's top card (Murktide Regent vs Ponder), which p1 is not entitled to know
+  before or after the draw. p1's whole stream (observations, option lists, event text, view ids, view hash) must be
+  byte-identical. Catches draw events carrying names, ViewIds derived from CardIds, and hashes over full state.
+---
+id: hi-cleanup-discard-to-hand-size-is-public
+title: Discarding to hand size in cleanup puts the chosen card in the graveyard where the opponent sees it
+area: hidden-info
+cards: [Brainstorm, Ponder, Preordain, Daze, Lightning Bolt, Unholy Heat, Murktide Regent, Force of Will, Volcanic Island, Tropical Island, Aluren]
+tags: [hidden-info, discard, cleanup, hand-size, public-zone]
+derived_from: cr
+source:
+  - {kind: cr, ref: "514.1", text: "First, if the active player's hand contains more cards than their maximum hand size (normally seven), they discard enough cards to reduce their hand size to that number. This turn-based action doesn't use the stack.", verified: true}
+  - {kind: cr, ref: "402.2", text: "Each player has a maximum hand size, which is normally seven cards.", verified: true}
+  - {kind: cr, ref: "404.2", text: "Each graveyard is kept in a single face-up pile. A player can examine the cards in any graveyard at any time", verified: true}
+  - {kind: cr, ref: "514.3", text: "Normally, no player receives priority during the cleanup step, so no spells can be cast and no abilities can be activated.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: end
+  priority: p0
+  p0:
+    hand: [Brainstorm, Ponder, Preordain, Daze, Lightning Bolt, Unholy Heat, "Murktide Regent @mk", Force of Will]
+    battlefield: [{card: Volcanic Island, tapped: true}]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+    note: "End step ends; cleanup: p0 has 8 cards and must discard one (514.1)."
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@mk"], expect_options: {count: 8}}
+expect:
+  - at: after_script
+    turn: 5
+    active: p1
+    phase: upkeep
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand_count: 7
+      graveyard: [Murktide Regent]
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 7, revealed_hand: []}
+notes: >
+  The discard is a turn-based action in cleanup, decided by p0 among the eight cards in hand. The discarded card goes to a
+  public zone, so p1 sees Murktide Regent in p0's graveyard; p1 still knows none of the seven cards left in hand. Discarding
+  causes no trigger here, so no player gets priority in cleanup (514.3) and the game moves to p1's turn 5; p1 has priority
+  in its upkeep (nothing triggers in untap or upkeep). A wrong engine might auto-pick the discard, leave the card hidden,
+  or reveal the remaining hand.

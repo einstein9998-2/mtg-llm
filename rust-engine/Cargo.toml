@@ -1,0 +1,30 @@
+[workspace]
+resolver = "2"
+members = ["crates/mtg-spec", "crates/mtg-core", "crates/mtg-cards", "crates/mtg-view", "crates/mtg-debug", "crates/mtg-fuzz", "crates/mtg-dsl", "crates/mtg-agent"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+smallvec = { version = "1", features = ["const_generics", "union"] }
+bitflags = { version = "2", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ron = "0.12"
+mtg-core = { path = "crates/mtg-core" }
+mtg-cards = { path = "crates/mtg-cards" }
+mtg-dsl = { path = "crates/mtg-dsl" }
+mtg-view = { path = "crates/mtg-view" }
+mtg-debug = { path = "crates/mtg-debug" }
+mtg-agent = { path = "crates/mtg-agent" }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 4
+debug = 1
+
+[profile.dev]
+opt-level = 1

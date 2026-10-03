@@ -1,0 +1,171 @@
+id: surgical-extraction-pay-two-life-exiles-every-copy-from-three-zones
+title: Surgical Extraction paid with 2 life exiles every copy of the targeted card from its owner's graveyard, hand and library, and then the owner shuffles
+area: card
+cards: [Surgical Extraction, Lightning Bolt, Island]
+tags: [surgical-extraction, search, exile, phyrexian-mana, life-payment, hidden-zones, shuffle]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Surgical Extraction, text: "Search its owner's graveyard, hand, and library for any number of cards with the same name as that card and exile them. Then that player shuffles.", verified: true}
+  - {kind: cr, ref: "107.4f", text: "A Phyrexian mana symbol represents a cost that can be paid either with one mana of its color or by paying 2 life.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it’s a hidden zone) and find a card that matches the given description.", verified: true}
+random:
+  - {kind: shuffle, player: p0, result: [Island, Island]}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @hb", "Island @hi"]
+    graveyard: ["Lightning Bolt @gb"]
+    library: ["Lightning Bolt @lb", "Island", "Island"]
+  p1:
+    hand: ["Surgical Extraction @surg"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@surg", phyrexian: [life], targets: ["@gb"]}
+  - check:
+      stack: [{kind: spell, card: "@surg", targets: ["@gb"]}]
+      pending: {actor: p1, kind: priority}
+      p1: {life: 18}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, purpose: surgical_extraction, found: ["@gb", "@hb", "@lb"], expect_options: {include: ["@gb", "@hb", "@lb"], exclude: ["@hi"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: []
+      exile: [Lightning Bolt, Lightning Bolt, Lightning Bolt]
+      library_count: 2
+    p1: {life: 18, graveyard: [Surgical Extraction]}
+notes: >
+  The caster (p1) pays 2 life for the {B/P} symbol (20 to 18, no mana). The search covers the owner's graveyard, hand and library, finding cards named Lightning
+  Bolt only (the Island in hand is not offered). All three copies are exiled, and p0 shuffles the remaining library (two Islands). The random queue holds exactly one shuffle for p0, so an engine that skips
+  the shuffle (or shuffles twice) fails; no library order is asserted. After resolution the active player p0 gets priority. A wrong engine exiles only the graveyard copy, or lets the owner (p0) decide the search.
+---
+id: surgical-extraction-pay-black-mana-instead-of-life
+title: Surgical Extraction paid with {B} costs no life and taps the Swamp
+area: card
+cards: [Surgical Extraction, Brainstorm, Swamp]
+tags: [surgical-extraction, phyrexian-mana, mana-payment, search, exile]
+derived_from: cr
+source:
+  - {kind: oracle, card: Surgical Extraction, text: "({B/P} can be paid with either {B} or 2 life.)", verified: true}
+  - {kind: cr, ref: "107.4f", text: "A Phyrexian mana symbol represents a cost that can be paid either with one mana of its color or by paying 2 life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @hb"]
+    graveyard: ["Brainstorm @gb"]
+    library_pad: 10
+  p1:
+    hand: ["Surgical Extraction @surg"]
+    battlefield: ["Swamp @sw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@surg", phyrexian: [mana], targets: ["@gb"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@surg"}]
+      p1: {life: 20, battlefield: [{card: Swamp, tapped: true}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, purpose: surgical_extraction, found: ["@gb", "@hb"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [], graveyard: [], exile: [Brainstorm, Brainstorm], library_count: 10}
+    p1: {life: 20, graveyard: [Surgical Extraction], battlefield: [{card: Swamp, tapped: true}]}
+notes: >
+  Paying {B} with the Swamp leaves p1 at 20 life. The hand copy and the graveyard copy of Brainstorm are exiled. A wrong engine charges 2 life as well, or does not
+  let the Phyrexian symbol be paid with mana.
+---
+id: surgical-extraction-caster-may-leave-hidden-zone-copies-unfound
+title: The Surgical Extraction caster may find only the graveyard copy and leave the hand and library copies, and the library is still shuffled
+area: card
+cards: [Surgical Extraction, Lightning Bolt, Island]
+tags: [surgical-extraction, search, hidden-zones, not-required-to-find, shuffle, exile]
+derived_from: cr
+source:
+  - {kind: oracle, card: Surgical Extraction, text: "Search its owner's graveyard, hand, and library for any number of cards with the same name as that card and exile them. Then that player shuffles.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn’t required to find some or all of those cards even if they’re present in that zone.", verified: true, note: "the search is for 'any number of cards' with a name, a quality the caster need not find in full"}
+random:
+  - {kind: shuffle, player: p0, result: [Island, Lightning Bolt, Island]}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @hb"]
+    graveyard: ["Lightning Bolt @gb"]
+    library: ["Lightning Bolt @lb", "Island", "Island"]
+  p1:
+    hand: ["Surgical Extraction @surg"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@surg", phyrexian: [life], targets: ["@gb"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, purpose: surgical_extraction, found: ["@gb"], expect_options: {include: ["@gb", "@hb", "@lb"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: []
+      exile: [Lightning Bolt]
+      library_count: 3
+    p1: {life: 18, graveyard: [Surgical Extraction]}
+notes: >
+  All three copies are offered, but the instruction is "any number", and for the hidden zones (hand, library) 701.23b says the searcher is not obliged to find
+  everything even if it is there. Here the caster finds only the graveyard copy; the hand copy stays in hand and the library copy stays in the library, which is
+  shuffled afterwards (count 3; exactly one scripted shuffle is consumed, and the resulting order is not asserted). Whether a caster may also leave a copy in the public graveyard is not asserted (see the report). A wrong engine forces
+  the exile of every copy.
+---
+id: surgical-extraction-caster-sees-the-whole-hand-it-searches
+title: Searching an opponent's hand with Surgical Extraction shows the caster every card in it
+area: hidden-info
+cards: [Surgical Extraction, Lightning Bolt, Island, Brainstorm]
+tags: [surgical-extraction, hidden-information, search, hand, observation, library-order]
+derived_from: cr
+source:
+  - {kind: oracle, card: Surgical Extraction, text: "Search its owner's graveyard, hand, and library for any number of cards with the same name as that card and exile them.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it’s a hidden zone) and find a card that matches the given description.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @hb", "Island @hi", "Brainstorm @hbs"]
+    graveyard: ["Lightning Bolt @gb"]
+    library_pad: 10
+  p1:
+    hand: ["Surgical Extraction @surg"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@surg", phyrexian: [life], targets: ["@gb"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, purpose: surgical_extraction, found: ["@gb", "@hb"]}
+expect:
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 2, revealed_hand: [Island, Brainstorm], library_known_top: []}
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: []}
+notes: >
+  Searching a hidden zone means looking at all of its cards (701.23a), so the caster has seen p0's whole hand at the moment of the search: the Island and Brainstorm
+  that remain after the Bolt is exiled are known to p1, while p0's shuffled library has no known top card for anyone. This is a consequence of the search rule; how
+  long the knowledge persists, and the exact observation keys, are modelling choices (see the report), so this scenario asserts only the state immediately after resolution.

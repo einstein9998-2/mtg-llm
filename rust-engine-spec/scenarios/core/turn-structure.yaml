@@ -1,0 +1,131 @@
+id: turn-one-first-player-has-no-draw-step
+title: The first player skips the draw step of turn 1, so upkeep leads straight to the first main phase
+area: core
+cards: [Brainstorm, Ponder]
+tags: [turn-structure, draw-step, first-player, priority]
+derived_from: cr
+source:
+  - {kind: cr, ref: "103.8a", text: "In a two-player game, the player who plays first skips the draw step (see rule 504, \"Draw Step\") of their first turn.", verified: true}
+  - {kind: cr, ref: "503.1", text: "The upkeep step has no turn-based actions. Once it begins, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "505.6", text: "Fourth, the active player gets priority.", verified: true}
+setup:
+  turn: 1
+  active: p0
+  phase: upkeep
+  p0:
+    hand: ["Brainstorm @bs"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check: {turn: 1, phase: upkeep, active: p0, priority: p0, p0: {hand: [Brainstorm], library_count: 11}}
+  - p0: {t: pass}
+  - check: {phase: upkeep, priority: p1, stack: []}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    turn: 1
+    phase: main1
+    active: p0
+    priority: p0
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Brainstorm], library_count: 11, library_top: [Ponder]}
+    p1: {hand_count: 0, library_count: 10}
+notes: >
+  Turn 1 belongs to p0 (the first player). Rule 103.8a says that player skips the draw step, so after both players pass
+  with an empty stack in the upkeep, the next step is the first main phase, and nobody draws. A wrong engine would run a
+  draw step and draw (hand 2, library 10), or give priority in a draw step that should not exist. p1 does not draw either
+  (it is not p1's turn).
+---
+id: second-player-draws-on-turn-two
+title: The second player draws normally in the draw step of turn 2
+area: core
+cards: [Island, Lightning Bolt]
+tags: [turn-structure, draw-step, first-player]
+derived_from: cr
+source:
+  - {kind: cr, ref: "103.8a", text: "In a two-player game, the player who plays first skips the draw step (see rule 504, \"Draw Step\") of their first turn.", verified: true}
+  - {kind: cr, ref: "504.1", text: "First, the active player draws a card. This turn-based action doesn't use the stack.", verified: true}
+  - {kind: cr, ref: "504.2", text: "Second, the active player gets priority.", verified: true}
+setup:
+  turn: 1
+  active: p0
+  phase: end
+  p0:
+    hand: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+script:
+  - advance: {to: draw, of: p1}
+expect:
+  - at: after_script
+    turn: 2
+    phase: draw
+    active: p1
+    priority: p1
+    stack: []
+    p1: {hand: [Lightning Bolt], library_count: 10}
+    p0: {hand: [Island], library_count: 10}
+notes: >
+  The skip in 103.8a applies only to the first player's first turn. p1 is the active player on turn 2, draws the top
+  card (Lightning Bolt) as a turn-based action, and then gets priority in the draw step. p0 does not draw on p1's turn.
+  A wrong engine would skip p1's first draw too ("nobody draws on turn 1/2") or let p0 draw as well.
+---
+id: upkeep-and-draw-priority-order
+title: Active player gets priority first in upkeep and draw; both passing on an empty stack moves to the next step
+area: core
+cards: [Island, Lightning Bolt, Mountain]
+tags: [turn-structure, priority, upkeep, draw-step, empty-stack]
+derived_from: cr
+source:
+  - {kind: cr, ref: "503.1", text: "The upkeep step has no turn-based actions. Once it begins, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "504.2", text: "Second, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "117.4", text: "If all players pass in succession (that is, if all players pass without taking any actions in between passing), the spell or ability on top of the stack resolves or, if the stack is empty, the phase or step ends.", verified: true}
+  - {kind: cr, ref: "117.3d", text: "If a player has priority and chooses not to take any actions, that player passes. If any mana is in that player's mana pool, they announce what mana is there. Then the next player in turn order receives priority.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: upkeep
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    library: ["Island @top"]
+    library_pad: 10
+script:
+  - check: {turn: 4, phase: upkeep, active: p1, priority: p1, pending: {actor: p1, kind: priority}, p1: {hand_count: 0}}
+  - p1: {t: pass}
+  - check:
+      phase: upkeep
+      priority: p0
+      stack: []
+      legal: {p0: {include: [{t: pass}, {t: cast, card: "@bolt"}]}}
+      p1: {hand_count: 0}
+  - p0: {t: pass}
+  - label: draw-step-begins
+    check: {phase: draw, priority: p1, p1: {hand: [Island], library_count: 10}, p0: {hand: [Lightning Bolt]}}
+  - p1: {t: pass}
+  - check: {phase: draw, priority: p0}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main1
+    active: p1
+    priority: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {hand: [Island], library_count: 10}
+    p0: {hand: [Lightning Bolt]}
+notes: >
+  Turn 4 is p1's turn, so p1 (active) receives priority first in the upkeep and again first in the draw step, and p0
+  (nonactive) receives it second each time. The draw is a turn-based action performed before p1 receives priority in
+  the draw step (the first check inside the draw step shows the card already in hand), and p0 does not draw. p0 may
+  cast an instant (Lightning Bolt is offered) when it receives priority in p1's upkeep. After p0's pass in the draw step
+  both players have passed in succession with an empty stack, so the main phase begins and the active player p1 has
+  priority. A wrong engine would give p0 the first priority, skip a priority window, or move to main1 after a single pass.

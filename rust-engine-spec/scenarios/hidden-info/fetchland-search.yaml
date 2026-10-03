@@ -1,0 +1,77 @@
+id: hi-fetch-searcher-stream-independent-of-library-order
+title: The searcher's own stream does not depend on the order of its library
+area: hidden-info
+cards: [Scalding Tarn, Lightning Bolt, Volcanic Island, Ponder, Murktide Regent, Island, Aluren, Tropical Island]
+tags: [hidden-info, search, non-interference, paired-world, canonical-order]
+derived_from: cr
+source:
+  - {kind: cr, ref: "401.2", text: "Each library must be kept in a single face-down pile. Players can't look at or change the order of cards in a library.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it's a hidden zone) and find a card that matches the given description.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Scalding Tarn @tarn"]
+    library: ["Lightning Bolt @bolt", "Volcanic Island @volc", "Ponder @pd", "Murktide Regent @mk"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+world_b:
+  p0: {library: ["Murktide Regent @mk", "Ponder @pd", "Island", "Volcanic Island @volc", "Lightning Bolt @bolt"], library_pad: 9}
+assert_streams_identical: {observer: p0}
+random: any
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@volc"}
+expect:
+  - at: after_script
+    stack: []
+    p0: {life: 19, library_count: 13}
+notes: >
+  The two worlds hold the same library multiset (four named cards and ten Islands) in different orders; the setup gives p0
+  no knowledge of its library order, so the search presentation must not reveal it (doc 02 section 9.4: the searcher sees a
+  sorted multiset). p0's stream, including the search option list and its order and view ids, must be byte-identical. The
+  script ends before any later draw, so the random shuffle cannot make the streams differ legitimately.
+---
+id: hi-fetch-opponent-stream-independent-of-library-contents
+title: The opponent's stream during a fetch does not depend on the searcher's hidden library cards
+area: hidden-info
+cards: [Scalding Tarn, Lightning Bolt, Volcanic Island, Ponder, Murktide Regent, Brainstorm, Preordain, Force of Will, Island, Aluren, Tropical Island]
+tags: [hidden-info, search, non-interference, paired-world]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it's a hidden zone) and find a card that matches the given description.", verified: true}
+  - {kind: cr, ref: "400.2", text: "Library and hand are hidden zones, even if all the cards in one such zone happen to be revealed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Scalding Tarn @tarn"]
+    library: ["Lightning Bolt @bolt", "Volcanic Island @volc", "Ponder @pd", "Murktide Regent @mk"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+world_b:
+  p0: {library: ["Brainstorm @bolt", "Volcanic Island @volc", "Preordain @pd", "Force of Will @mk"]}
+assert_streams_identical: {observer: p1}
+random: any
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@volc"}
+expect:
+  - at: after_script
+    stack: []
+    p0: {life: 19, library_count: 13, battlefield: [{card: Volcanic Island}]}
+notes: >
+  Only the identities of p0's non-found library cards differ. p1 sees the activation, the life payment, the found Volcanic
+  Island entering the battlefield, and a shuffle; nothing else. p1's stream must be byte-identical.

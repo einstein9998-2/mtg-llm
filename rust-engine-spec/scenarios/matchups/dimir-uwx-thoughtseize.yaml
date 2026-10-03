@@ -1,0 +1,111 @@
+id: mu-thoughtseize-takes-fow-goyfs-count-different-graveyards
+title: Thoughtseize takes UWx's Force of Will (Tundra not offered); Nethergoyf counts only Dimir's graveyard while Barrowgoyf also counts the discarded Force
+area: matchup
+cards: [Thoughtseize, Nethergoyf, Barrowgoyf, Polluted Delta, Underground Sea, Force of Will, Stifle, Tundra, "Phelia, Exuberant Shepherd"]
+tags: [matchup, dimir-vs-uwx, thoughtseize, hand-disruption, nethergoyf, barrowgoyf, characteristic-defining, graveyard-card-types]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: oracle, card: Barrowgoyf, text: "Barrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thoughtseize @ts"]
+    battlefield: ["Nethergoyf @ng", "Barrowgoyf @bg", "Underground Sea @us1"]
+    graveyard: ["Polluted Delta @gd"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Stifle @st", "Tundra @tun", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: Nethergoyf, pt: [1, 2]}, {card: Barrowgoyf, pt: [1, 2]}]}
+  - p0: {t: cast, card: "@ts", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_cards
+      purpose: discard
+      answer: ["@fow"]
+      expect_options: {include: ["@fow", "@st", "@ph"], exclude: ["@tun"], count: 3}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Polluted Delta, Thoughtseize]
+      battlefield_contains:
+        - {card: Nethergoyf, pt: [2, 3]}
+        - {card: Barrowgoyf, pt: [3, 4]}
+    p1:
+      hand: [Stifle, Tundra, "Phelia, Exuberant Shepherd"]
+      graveyard: [Force of Will]
+notes: >
+  p0 (the caster) chooses; lands are not offered. p0 loses 2. Afterwards p0's graveyard holds a land and a sorcery
+  (Thoughtseize, put there as the last step of its resolution): Nethergoyf 2/3. Barrowgoyf counts all graveyards: land,
+  sorcery, and the instant Force of Will in p1's graveyard: 3/4. Before: both 1/2 (land only). Bugs caught: Nethergoyf
+  counting the opponent's graveyard, Barrowgoyf ignoring it, Thoughtseize letting the target choose.
+---
+id: mu-thoughtseize-forced-daze-paid-no-life-loss
+title: UWx Forces Thoughtseize, Dimir Dazes the Force and UWx pays; Thoughtseize is countered so Dimir loses no life
+area: matchup
+cards: [Thoughtseize, Daze, Force of Will, Brainstorm, Stifle, Underground Sea, Swamp, Tundra]
+tags: [matchup, dimir-vs-uwx, thoughtseize, force-of-will, daze, counter-war, counter-unless-pay, life-loss-is-effect]
+derived_from: cr
+source:
+  - {kind: oracle, card: Thoughtseize, text: "You lose 2 life.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thoughtseize @ts", "Daze @daze"]
+    battlefield: ["Underground Sea @us1", "Swamp @sw1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs", "Stifle @st"]
+    battlefield: ["Tundra @t1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: [{player: p1}], pay: {tap: ["@sw1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@ts"]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@us1"}, targets: ["@fow"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_for_daze, answer: true}
+  - check:
+      stack: [{kind: spell, card: "@ts", controller: p0}, {kind: spell, card: "@fow", controller: p1}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Underground Sea]
+      graveyard: [Thoughtseize, Daze]
+      battlefield: [{card: Swamp, tapped: true}]
+    p1:
+      life: 19
+      hand: [Stifle]
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+      battlefield: [{card: Tundra, tapped: true}]
+notes: >
+  "You lose 2 life" is part of Thoughtseize's effect, so a countered Thoughtseize costs no life (contrast with costs,
+  which are never refunded). p0 had an untapped Underground Sea but chose to return it for Daze; p1 pays Daze's {1}
+  with Tundra. p0 is the active player and gets priority after Daze resolves. Bugs caught: life loss treated as a
+  cost, Daze's pay decision given to the Daze caster.

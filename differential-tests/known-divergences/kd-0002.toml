@@ -1,0 +1,12 @@
+id = "kd-0002"
+title = "Forge: Aluren only works for the first seat of the game's player list"
+status = "accepted"            # proposed | accepted | forge-bug-reported | retired | scope-cut
+who_is_right = "engine"
+cr_citation = "Aluren oracle text: any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash"
+rulings = []
+affected_oracles = ["forge"]
+match = { sides = ["RUST_ONLY"], kinds = ["cast"], zones = ["Hand"], feature_tags = ["aluren-on-bf"], actor_seat = 1 }
+suppress = true
+regression_scenario = "interaction-tests/scenarios (aluren-opponent-may-cast-free, aluren-seat-order-second-seat-controller)"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Already documented as finding 1 of interaction-tests/FINDINGS.md with a two-static fix in interaction-tests/fixes/aluren-any-player.patch. In differential positions the engine offers a free cast (way 'alt') of a creature with mana value 3 or less to the second seat while Aluren is on the battlefield; Forge's menu omits it. Needs Brady's approval (doc 04 section 6.4: a FORGE_BUG verdict is human-approved)."

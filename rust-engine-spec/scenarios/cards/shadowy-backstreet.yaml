@@ -1,0 +1,42 @@
+id: shadowy-backstreet-played-enters-tapped-surveil-keep-on-top
+title: Shadowy Backstreet played as a land enters tapped and its surveil 1 may keep the card on top
+area: card
+cards: [Shadowy Backstreet, Swamp]
+tags: [shadowy-backstreet, enters-tapped, surveil, etb-trigger, land-drop]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Shadowy Backstreet, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Shadowy Backstreet, text: "When this land enters, surveil 1.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 0
+    hand: ["Shadowy Backstreet @sb"]
+    library: ["Swamp @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@sb"}
+  - check:
+      stack: [{kind: triggered, source: "@sb", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@top"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      hand: []
+      graveyard: []
+      library_top: [Swamp]
+      library_count: 11
+      battlefield: [{card: Shadowy Backstreet, tapped: true}]
+notes: >
+  The land play uses the land drop and does not use the stack, but its ETB trigger does (p0 gets priority with it on
+  the stack). Keeping the Swamp on top leaves the library unchanged. A wrong engine plays it untapped or skips the
+  surveil prompt when the player keeps the card.

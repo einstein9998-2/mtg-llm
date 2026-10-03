@@ -1,0 +1,395 @@
+id: magus-fetchland-taps-for-red-and-does-not-fetch
+title: Under Magus of the Moon, Scalding Tarn has no fetch ability but taps for {R}; paying Lightning Bolt with it costs no life and searches nothing
+area: card
+cards: [Magus of the Moon, Scalding Tarn, Lightning Bolt, Mountain]
+tags: [magus-of-the-moon, layers, ability-removing, fetchland, intrinsic-mana-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: Scalding Tarn, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.7", text: "It loses all abilities generated from its rules text, its old land types, and any copiable effects affecting that land, and it gains the appropriate mana ability for each new basic land type.", verified: true}
+  - {kind: cr, ref: "305.6", text: "For Plains, [mana symbol] is {W}; for Islands, {U}; for Swamps, {B}; for Mountains, {R}; and for Forests, {G}.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Scalding Tarn @tarn"]
+    library_pad: 10
+  p1:
+    battlefield: ["Magus of the Moon @magus"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield: [{card: Scalding Tarn, subtypes: [Mountain]}]}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@tarn"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      library_count: 10
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Scalding Tarn, tapped: true}]
+    p1: {life: 17}
+notes: >
+  Scalding Tarn printed has no mana ability at all; under Magus it is a Mountain whose only ability is the intrinsic
+  {T}: Add {R} (305.7 removes the fetch ability, which is generated from its rules text). So the Tarn alone pays for
+  Bolt: it stays on the battlefield tapped, p0 pays no life (20) and the library is untouched (10). An engine that does
+  not apply Magus cannot cast Bolt at all here. The probe that the fetch ability itself is gone is not written (an
+  ability index for a printed ability the permanent no longer has is ambiguous in the scenario format; see report),
+  but magus-wasteland-* and magus-karakas-* probe the same rule on a second printed ability.
+---
+id: magus-ancient-tomb-makes-one-red-and-deals-no-damage
+title: Under Magus of the Moon, Ancient Tomb makes a single {R} and deals no damage, so a {2} artifact is not castable from it
+area: card
+cards: [Magus of the Moon, Ancient Tomb, Null Rod, Lightning Bolt, Mountain]
+tags: [magus-of-the-moon, layers, ability-removing, ancient-tomb, mana-payment, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: cr, ref: "305.7", text: "It loses all abilities generated from its rules text, its old land types, and any copiable effects affecting that land, and it gains the appropriate mana ability for each new basic land type.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Null Rod @rod", "Lightning Bolt @bolt"]
+    battlefield: ["Ancient Tomb @tomb"]
+    library_pad: 10
+  p1:
+    battlefield: ["Magus of the Moon @magus"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@rod"}}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@tomb"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Null Rod]
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Ancient Tomb, tapped: true, subtypes: [Mountain]}]
+    p1: {life: 17}
+notes: >
+  Ancient Tomb's "{T}: Add {C}{C}. This land deals 2 damage to you." is rules text, so Magus removes it; the Tomb only
+  has {T}: Add {R}. With the Tomb as p0's only land, Null Rod ({2}) cannot be paid (one mana) and Bolt can, with no
+  damage to p0 (20, not 18). Wrong engines: the Tomb still makes {C}{C} (Null Rod offered), or deals 2 damage on top
+  of the {R}.
+---
+id: magus-karakas-loses-bounce-stays-legendary
+title: Under Magus of the Moon, Karakas cannot bounce a legendary creature but is still legendary and taps for {R}
+area: card
+cards: [Magus of the Moon, Karakas, Acererak the Archlich, Lightning Bolt, Mountain]
+tags: [magus-of-the-moon, layers, ability-removing, supertypes, karakas]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: Karakas, text: "{T}: Return target legendary creature to its owner's hand.", verified: true}
+  - {kind: cr, ref: "305.7", text: "Setting a land’s subtype doesn’t add or remove any card types (such as creature) or supertypes (such as basic, legendary, and snow) the land may have.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Karakas @kar"]
+    library_pad: 10
+  p1:
+    battlefield: ["Magus of the Moon @magus", "Acererak the Archlich @ace"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield: [{card: Karakas, supertypes: [Legendary], subtypes: [Mountain]}]}
+  - expect_illegal: {p0: {t: activate, source: "@kar", ability: 1, targets: ["@ace"]}}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@kar"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Karakas, tapped: true}]
+    p1:
+      life: 17
+      hand: []
+      battlefield: [{card: Magus of the Moon}, {card: Acererak the Archlich}]
+notes: >
+  Karakas is a legendary nonbasic land, so it becomes a Mountain: its printed {T}: Add {W} and its bounce ability
+  (index 1) are gone and it gains {T}: Add {R}, which pays for Bolt. It keeps the legendary supertype (305.7).
+  Acererak stays on the battlefield. Wrong engines: bounce still offered, Karakas makes {W} (Bolt not castable), or the
+  supertype is dropped.
+---
+id: magus-hedge-maze-enters-untapped-without-surveil
+title: Under Magus of the Moon, a played Hedge Maze enters untapped and its surveil ability does not trigger
+area: card
+cards: [Magus of the Moon, Hedge Maze, Lightning Bolt, Ponder, Mountain]
+tags: [magus-of-the-moon, layers, enters-tapped, replacement-lookahead, triggers, surveil-land]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "614.12", text: "To determine which replacement effects apply and how they apply, check the characteristics of the permanent as it would exist on the battlefield, taking into account replacement effects that have already modified how it enters the battlefield (see rule 616.1), continuous effects from the permanent’s own static abilities that would apply to it once it’s on the battlefield, and continuous effects that already exist and would apply to the permanent.", verified: true}
+  - {kind: cr, ref: "603.10", text: "Normally, objects that exist immediately after an event are checked to see if the event matched any trigger conditions, and continuous effects that exist at that time are used to determine what the trigger conditions are and what the objects involved in the event look like.", verified: true}
+  - {kind: cr, ref: "305.7", text: "It loses all abilities generated from its rules text, its old land types, and any copiable effects affecting that land, and it gains the appropriate mana ability for each new basic land type.", verified: true}
+  - {kind: cr, ref: "603.6d", text: "Some permanents have text that reads “[This permanent] enters with . . . ,” “As [this permanent] enters . . . ,” “[This permanent] enters as . . . ,” or “[This permanent] enters tapped.” Such text is a static ability—not a triggered ability—whose effect occurs as part of the event that puts the permanent onto the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm", "Lightning Bolt @bolt"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    battlefield: ["Magus of the Moon @magus"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [{card: Hedge Maze, tapped: false, subtypes: [Mountain]}], lands_played: 1}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@hm"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_top: [Ponder]
+      library_count: 11
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Hedge Maze, tapped: true}]
+    p1: {life: 17}
+notes: >
+  "This land enters tapped" is a replacement effect of Hedge Maze's own rules text. 614.12 says to look at the land as
+  it would exist on the battlefield with existing continuous effects applied: under Magus it would be a Mountain with
+  no such ability, so it enters untapped. Its enters trigger is checked after the event (603.10, ETB is not a
+  look-back trigger) when the Maze has no such ability, so nothing triggers: no surveil decision, the stack is empty,
+  Ponder stays on top. The untapped Maze makes {R} for Bolt. A wrong engine enters it tapped (Bolt uncastable) or
+  raises a surveil decision.
+---
+id: magus-boseiju-channel-works-and-fetched-dual-is-a-mountain
+title: Magus of the Moon does not stop Boseiju's channel from hand; the Tropical Island the opponent fetches enters as a Mountain that cannot make {U}
+area: card
+cards: [Magus of the Moon, "Boseiju, Who Endures", Forest, Mountain, Volcanic Island, Tropical Island, Brainstorm]
+tags: [magus-of-the-moon, layers, zones, channel, search, static-ability-applies-on-entry]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "Channel — {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "109.2", text: "If a spell or ability uses a description of an object that includes a card type or subtype, but doesn’t refer to a specific zone or include the word “card,” “spell,” “source,” or “scheme,” it means a permanent of that card type or subtype on the battlefield.", verified: true}
+  - {kind: cr, ref: "109.2a", text: "If a spell or ability uses a description of an object that includes the word “card” and the name of a zone, it means a card matching that description in the stated zone.", verified: true}
+  - {kind: cr, ref: "611.3a", text: "A continuous effect generated by a static ability isn’t “locked in”; it applies at any given moment to whatever its text indicates.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Magus of the Moon @magus", "Forest @fo", "Mountain @mt"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Volcanic Island @volc"]
+    library: ["Tropical Island @trop"]
+    library_pad: 10
+script:
+  - p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@volc"], pay: {tap: ["@fo", "@mt"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: true}
+  - p1: {decision: search, found: "@trop", expect_options: {include: ["@trop"]}}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p1: {battlefield: [{card: Tropical Island, tapped: false, subtypes: [Mountain]}], graveyard: [Volcanic Island]}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@bs"}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: ["Boseiju, Who Endures"]
+      battlefield:
+        - {card: Magus of the Moon}
+        - {card: Forest, tapped: true}
+        - {card: Mountain, tapped: true}
+    p1:
+      hand: [Brainstorm]
+      library_count: 10
+      graveyard: [Volcanic Island]
+notes: >
+  "Nonbasic lands" describes permanents on the battlefield (109.2), so Boseiju in hand keeps its channel ability (index
+  1). Volcanic Island, a Mountain under Magus, is still a nonbasic land and a legal target. The search looks for a land
+  CARD in the library (109.2a), where Magus does not apply: Tropical Island (Forest Island) qualifies. As it enters,
+  Magus applies to it immediately (611.3a): it is a Mountain, so p1 cannot cast Brainstorm with it. p0 passes in main1
+  with an empty stack so p1 holds priority for the probe. random: any (the shuffle does not matter; only counts are
+  asserted). Wrong engines: channel blocked in hand, the library card judged as a Mountain (not findable), or the new
+  Tropical Island still making {U}.
+---
+id: magus-own-dual-stops-making-blue-when-magus-resolves
+title: Magus of the Moon on the stack changes nothing; once it resolves, its controller's own Volcanic Island can no longer pay for Brainstorm
+area: card
+cards: [Magus of the Moon, Volcanic Island, Mountain, Brainstorm]
+tags: [magus-of-the-moon, layers, timing, symmetric-effect, static-ability-starts]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: cr, ref: "611.3a", text: "A continuous effect generated by a static ability isn’t “locked in”; it applies at any given moment to whatever its text indicates.", verified: true}
+  - {kind: cr, ref: "305.7", text: "If an effect sets a land’s subtype to one or more of the basic land types, the land no longer has its old land type.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Magus of the Moon @magus", "Brainstorm @bs"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@bs"}]}}
+  - p0: {t: cast, card: "@magus", pay: {tap: ["@m1", "@m2", "@m3"]}}
+  - check:
+      stack: [{kind: spell, card: "@magus", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: cast, card: "@bs"}]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {battlefield_contains: [{card: Magus of the Moon, sick: true}, {card: Volcanic Island, tapped: false, subtypes: [Mountain]}]}
+  - expect_illegal: {p0: {t: cast, card: "@bs"}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      battlefield:
+        - {card: Magus of the Moon}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Volcanic Island, tapped: false}
+notes: >
+  While Magus is a spell on the stack its static ability does nothing, so Brainstorm (an instant) can still be cast
+  with Volcanic Island's {U} (the second check). The effect starts the moment Magus is on the battlefield and it also
+  covers its controller's own lands ("Nonbasic lands", no controller restriction): Brainstorm is no longer castable. No
+  spell is cast in between, so nothing else changes. Wrong engines: Magus applying from the stack, applying only to
+  opponents, or only from the next turn.
+---
+id: magus-daze-cannot-return-a-dual-land
+title: Under Magus of the Moon, Volcanic Island is not an Island, so it cannot pay Daze's alternative cost; a basic Island can
+area: card
+cards: [Magus of the Moon, Daze, Volcanic Island, Island, Brainstorm]
+tags: [magus-of-the-moon, layers, alternative-cost, daze, land-subtypes]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "305.7", text: "If an effect sets a land’s subtype to one or more of the basic land types, the land no longer has its old land type.", verified: true}
+  - {kind: cr, ref: "109.2", text: "If a spell or ability uses a description of an object that includes a card type or subtype, but doesn’t refer to a specific zone or include the word “card,” “spell,” “source,” or “scheme,” it means a permanent of that card type or subtype on the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Magus of the Moon @magus", "Island @i0"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Volcanic Island @volc", "Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: {tap: ["@i0"]}}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@volc"}, targets: ["@bs"]}}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bs"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Brainstorm]
+      hand_count: 0
+      battlefield: [{card: Magus of the Moon}, {card: Island, tapped: true}]
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: [{card: Volcanic Island, tapped: false}]
+notes: >
+  "An Island you control" means a permanent with subtype Island (109.2). Under Magus, Volcanic Island has lost its
+  Island type (305.7), so returning it is not a legal way to pay Daze's alternative cost, while the basic Island
+  (unaffected by Magus) is. p0's only land is tapped for Brainstorm, so Daze's "unless its controller pays {1}" cannot
+  be paid and no pay prompt appears; Brainstorm is countered. Wrong engine: the printed Island type of Volcanic Island
+  still counts.
+---
+id: magus-massacre-free-cast-needs-a-real-plains
+title: Under Magus of the Moon, the opponent's Scrubland is not a Plains, so Massacre cannot be cast for free; once Magus dies it can
+area: card
+cards: [Magus of the Moon, Massacre, Scrubland, Swamp, Mountain, Lightning Bolt, Containment Priest]
+tags: [magus-of-the-moon, layers, alternative-cost, massacre, static-ability-ends]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: Massacre, text: "If an opponent controls a Plains and you control a Swamp, you may cast this spell without paying its mana cost.", verified: true}
+  - {kind: oracle, card: Massacre, text: "All creatures get -2/-2 until end of turn.", verified: true}
+  - {kind: cr, ref: "305.7", text: "If an effect sets a land’s subtype to one or more of the basic land types, the land no longer has its old land type.", verified: true}
+  - {kind: cr, ref: "611.3a", text: "A continuous effect generated by a static ability isn’t “locked in”; it applies at any given moment to whatever its text indicates.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Massacre @mass", "Lightning Bolt @bolt"]
+    battlefield: ["Magus of the Moon @magus", "Swamp @sw", "Mountain @mt"]
+    library_pad: 10
+  p1:
+    battlefield: ["Scrubland @scr", "Containment Priest @cp"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@mass", alt_cost: {free: true}}}
+  - p0: {t: cast, card: "@bolt", targets: ["@magus"], pay: {tap: ["@mt"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {graveyard: [Lightning Bolt, Magus of the Moon]}
+  - p0: {t: cast, card: "@mass", alt_cost: {free: true}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt, Magus of the Moon, Massacre]
+      battlefield: [{card: Swamp, tapped: false}, {card: Mountain, tapped: true}]
+    p1:
+      graveyard: [Containment Priest]
+      battlefield: [{card: Scrubland, tapped: false}]
+notes: >
+  Massacre's condition reads land subtypes on the battlefield. With Magus out, Scrubland (Plains Swamp) is only a
+  Mountain, so p1 controls no Plains and the free cast is not offered (p0's two lands cannot pay {2}{B}{B} either).
+  p0 Bolts its own Magus (2/2, dies to SBA); the effect ends at once (611.3a), Scrubland is a Plains again and Massacre
+  is cast for free: Containment Priest (2/2) gets -2/-2 and dies. Wrong engines: the printed type line of Scrubland
+  counts under Magus, or Scrubland stays a Mountain after Magus leaves.

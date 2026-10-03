@@ -1,0 +1,245 @@
+id: enters-tapped-hedge-maze-no-untapped-window
+title: Hedge Maze played as a land is tapped from the moment it enters, so its mana ability can't be used before the surveil trigger
+area: core
+cards: [Hedge Maze, Lightning Bolt]
+tags: [replacement-effect, enters-tapped, surveil, etb-trigger, land-drop]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hedge Maze, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "614.1d", text: "Continuous effects that read \"[This permanent] enters . . .\" or \"[Objects] enter [the battlefield] . . .\" are replacement effects.", verified: true}
+  - {kind: cr, ref: "614.12", text: "Some replacement effects modify how a permanent enters the battlefield.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    library: ["Lightning Bolt @bl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - check:
+      p0: {battlefield: [{card: Hedge Maze, tapped: true}], lands_played: 1}
+      stack: [{kind: triggered, source: "@hm", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - expect_illegal: {p0: {t: activate, source: "@hm", ability: 0, choose_color: U}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@bl"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Hedge Maze, tapped: true}]
+      graveyard: [Lightning Bolt]
+      library_count: 10
+      lands_played: 1
+      mana_pool: {}
+notes: >
+  "This land enters tapped" is a replacement effect on the entering event, not a trigger: the land is never untapped on
+  the battlefield, so there is no moment to tap it for mana (in response to its own surveil trigger or otherwise). The
+  surveil ability is a real trigger and uses the stack. A wrong engine models enters-tapped as a trigger (letting p0
+  float mana first) or taps it only after p0 gets priority. Ability 0 is the intrinsic {T}: Add {G} or {U}.
+---
+id: enters-tapped-thundering-falls-fetched-by-scalding-tarn
+title: Thundering Falls put onto the battlefield by Scalding Tarn also enters tapped and its surveil trigger follows
+area: core
+cards: [Scalding Tarn, Thundering Falls, Ponder, Island]
+tags: [replacement-effect, enters-tapped, fetchland, surveil, put-onto-battlefield]
+derived_from: cr
+source:
+  - {kind: oracle, card: Scalding Tarn, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Thundering Falls, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Thundering Falls, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "614.1d", text: "Continuous effects that read \"[This permanent] enters . . .\" or \"[Objects] enter [the battlefield] . . .\" are replacement effects.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Each time an event puts one or more permanents onto the battlefield, all permanents on the battlefield (including the newcomers) are checked for any enters-the-battlefield triggers that match the event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Scalding Tarn @tarn"]
+    library: ["Thundering Falls @tf", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Ponder, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island]}
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0}
+  - check:
+      p0: {life: 19, graveyard: [Scalding Tarn], battlefield: []}
+      stack: [{kind: activated, source: "@tarn"}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tf", expect_options: {include: ["@tf"]}}
+  - check:
+      p0: {battlefield: [{card: Thundering Falls, tapped: true}], lands_played: 0, library_count: 11}
+      stack: [{kind: triggered, source: "@tf", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@pd"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      battlefield: [{card: Thundering Falls, tapped: true}]
+      graveyard: [Scalding Tarn]
+      library_top: [Ponder]
+      library_count: 11
+      lands_played: 0
+notes: >
+  The enters-tapped replacement applies to every way the land enters, not only land drops. Putting a land onto the
+  battlefield with an effect is not a land play, so lands_played stays 0. Thundering Falls has the types Island
+  Mountain, so the Tarn can find it. The shuffle outcome is scripted so the surveil decision can name Ponder. Life
+  tally: 20 - 1 (Tarn) = 19.
+---
+id: spider-woman-opponent-flash-creature-enters-tapped
+title: Containment Priest flashed in by the opponent of Spider-Woman's controller enters tapped
+area: core
+cards: ["Spider-Woman, Stunning Savior", Containment Priest, Plains, Island]
+tags: [replacement-effect, enters-tapped, flash, spider-woman]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+  - {kind: oracle, card: Containment Priest, text: "Flash", verified: true}
+  - {kind: cr, ref: "614.1d", text: "Continuous effects that read \"[This permanent] enters . . .\" or \"[Objects] enter [the battlefield] . . .\" are replacement effects.", verified: true}
+  - {kind: cr, ref: "614.12", text: "To determine which replacement effects apply and how they apply, check the characteristics of the permanent as it would exist on the battlefield", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+  p1:
+    hand: ["Containment Priest @cp"]
+    battlefield: ["Plains @pl", "Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@cp", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      battlefield:
+        - {card: Containment Priest, tapped: true, controller: p1}
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  Spider-Woman's static ability is a replacement effect on entering: the Priest enters already tapped. Containment
+  Priest's own replacement does not apply to itself here (it was cast). A wrong engine taps the creature with a trigger
+  afterwards (leaving a window) or applies Spider-Woman to its controller's own permanents.
+---
+id: spider-woman-opponent-artifact-tapped-land-untapped
+title: Under Spider-Woman, the opponent's Lotus Petal enters tapped and can't be used, while the opponent's land enters untapped
+area: core
+cards: ["Spider-Woman, Stunning Savior", Lotus Petal, Island]
+tags: [replacement-effect, enters-tapped, artifact, negative-case, spider-woman, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "614.1d", text: "Continuous effects that read \"[This permanent] enters . . .\" or \"[Objects] enter [the battlefield] . . .\" are replacement effects.", verified: true}
+setup:
+  turn: 5
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+  p1:
+    hand: ["Island @pi", "Lotus Petal @lp"]
+    library_pad: 10
+script:
+  - p1: {t: play_land, card: "@pi"}
+  - check:
+      p1: {battlefield: [{card: Island, tapped: false}]}
+  - p1: {t: cast, card: "@lp", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: activate, source: "@lp", ability: 0, choose_color: R}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      battlefield:
+        - {card: Island, tapped: false}
+        - {card: Lotus Petal, tapped: true}
+notes: >
+  The Petal is an artifact the opponent controls, so it enters tapped and its {T} ability can't be activated. Lands
+  are neither artifacts nor creatures, so the Island enters untapped. A wrong engine taps lands too, or misses
+  artifacts.
+---
+id: spider-woman-opponent-monk-token-enters-tapped
+title: A Monk token created by the opponent's Cori-Steel Cutter enters tapped under Spider-Woman, and the Cutter can still be attached to it
+area: core
+cards: ["Spider-Woman, Stunning Savior", Cori-Steel Cutter, Lightning Bolt, Mountain, Monk Token]
+tags: [replacement-effect, enters-tapped, tokens, flurry, equipment, spider-woman]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Flurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: cr, ref: "614.1d", text: "Continuous effects that read \"[This permanent] enters . . .\" or \"[Objects] enter [the battlefield] . . .\" are replacement effects.", verified: true}
+setup:
+  turn: 5
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Cori-Steel Cutter @cut", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@b1", targets: [{player: p0}], pay: {tap: ["@m1"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p0: {life: 17}
+  - p1: {t: cast, card: "@b2", targets: [{player: p0}], pay: {tap: ["@m2"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@b2", controller: p1}
+        - {kind: triggered, source: "@cut", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: attach_equipment, answer: true}
+  - bind: {as: monk, find: {name: Monk Token, controller: p1}}
+  - check:
+      stack: [{kind: spell, card: "@b2", controller: p1}]
+      p1:
+        battlefield_contains:
+          - {token: Monk Token, alias: monk, tapped: true, pt: [2, 2], keywords: [prowess, trample, haste]}
+          - {card: Cori-Steel Cutter, attached_to: "@monk"}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {life: 14}
+    p1:
+      battlefield_contains:
+        - {token: Monk Token, alias: monk, tapped: true}
+        - {card: Cori-Steel Cutter, attached_to: "@monk"}
+      graveyard: [Lightning Bolt, Lightning Bolt]
+notes: >
+  Tokens enter the battlefield like any permanent, so Spider-Woman's enters-tapped replacement applies to p1's Monk.
+  Attaching the Cutter to a tapped creature is fine. The Monk was created after Bolt #2 was cast, so prowess does not
+  trigger for it. Life tally: p0 20 - 3 - 3 = 14. A wrong engine exempts tokens from enters replacements.

@@ -1,0 +1,81 @@
+id: grafdiggers-cage-stops-reanimate-but-life-is-still-lost
+title: With Grafdigger's Cage out, Reanimate cannot put the creature card onto the battlefield, but its caster still loses life equal to its mana value
+area: card
+cards: ["Grafdigger's Cage", Reanimate, Griselbrand, Swamp]
+tags: [grafdiggers-cage, reanimate, cant-beats-can, partial-resolution, life-loss]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Grafdigger's Cage", text: "Creature cards in graveyards and libraries can't enter the battlefield.", verified: true}
+  - {kind: oracle, card: Reanimate, text: "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to that card's mana value.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+  - {kind: cr, ref: "609.3", text: "If an effect attempts to do something impossible, it does only as much as possible.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Grafdigger's Cage @cage"]
+    library_pad: 10
+  p1:
+    hand: ["Reanimate @rean"]
+    battlefield: ["Swamp @pb"]
+    graveyard: ["Griselbrand @gris"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@rean", targets: ["@gris"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 12
+      battlefield: [{card: Swamp, tapped: true}]
+      graveyard: [Griselbrand, Reanimate]
+    p0:
+      battlefield: [{card: "Grafdigger's Cage"}]
+notes: >
+  Targeting a creature card in a graveyard is still legal (the Cage stops entering, not targeting), so Reanimate
+  resolves. The "put onto the battlefield" instruction cannot happen (101.2), the rest of the spell still happens
+  (608.2c, 609.3): p1 loses 8 (Griselbrand's mana value, {4}{B}{B}{B}{B}). A wrong engine reanimates through the Cage,
+  makes the spell illegal to cast, or skips the life loss.
+---
+id: grafdiggers-cage-stops-flashback-not-casting-from-hand
+title: Grafdigger's Cage stops casting a spell from the graveyard with flashback but not the same card from hand
+area: card
+cards: ["Grafdigger's Cage", Faithless Looting, Mountain]
+tags: [grafdiggers-cage, flashback, casting-restriction, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Grafdigger's Cage", text: "Players can't cast spells from graveyards or libraries.", verified: true}
+  - {kind: oracle, card: Faithless Looting, text: "Flashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Grafdigger's Cage @cage"]
+    library_pad: 10
+  p1:
+    hand: ["Faithless Looting @fl_hand"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3"]
+    graveyard: ["Faithless Looting @fl_gy"]
+    library_pad: 10
+script:
+  - expect_illegal: {p1: {t: cast, card: "@fl_gy", alt_cost: {flashback: true}}}
+  - expect_illegal: {p1: {t: cast, card: "@fl_gy"}}
+  - p1: {t: cast, card: "@fl_hand", pay: {tap: ["@m1"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@fl_hand", controller: p1}]
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: []
+      graveyard: [Faithless Looting]
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: false}, {card: Mountain, tapped: false}]
+notes: >
+  p1 has the {2}{R} for flashback, so only the Cage forbids it. The copy in hand is cast normally for {R}. A wrong
+  engine applies the Cage to every zone or ignores it for alternative-cost casting from the graveyard.

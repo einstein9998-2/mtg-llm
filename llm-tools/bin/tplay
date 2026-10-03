@@ -1,0 +1,6 @@
+#!/bin/sh
+# tplay: wrap llm-player/play.py so every prompt you are shown is also folded into your view (no edits to play.py).
+#   sh bin/tplay start <tag> <seed> ...   |   sh bin/tplay next   |   sh bin/tplay pick 3 note...
+# Env: MTG_VIEW (view file, default ./view.json), PLAY_PY (default /mnt/project-files/llm-player/play.py).
+D="$(cd "$(dirname "$0")/.." && pwd)"
+PYTHONPATH="$D" exec python3 -m mtgtools.tplay "$@"

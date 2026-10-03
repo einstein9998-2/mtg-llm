@@ -1,0 +1,40 @@
+=== smoke-bolt-face
+title: Lightning Bolt to the face
+state:
+  turn=3
+  activeplayer=human
+  activephase=MAIN1
+  humanlife=20
+  ailife=20
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  humanlibrary=Island
+  ailibrary=Island
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: pass
+expect:
+  life p2 == 17
+  zone p1 graveyard has "Lightning Bolt"
+  stack empty
+
+=== smoke-fow-bolt
+title: Force of Will pitching Brainstorm counters Lightning Bolt
+state:
+  turn=3
+  activeplayer=human
+  activephase=MAIN1
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  aihand=Force of Will;Brainstorm
+  aibattlefield=Island
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: pass
+  p2: when-stack Lightning Bolt
+  p2: cast Force of Will ~alt -> Lightning Bolt
+expect:
+  life p2 == 19
+  zone p1 graveyard has "Lightning Bolt"
+  zone p2 graveyard has "Force of Will"
+  zone p2 exile has "Brainstorm"

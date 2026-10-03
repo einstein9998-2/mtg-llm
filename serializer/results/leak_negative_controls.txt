@@ -1,0 +1,7 @@
+Negative controls for the non-interference test (hybrid policy, 2 games, seed 4, leak-test on).
+A deliberate leak is injected into the serializer with -Dsilo.injectLeak=<kind>; the test must fail on (almost) every check.
+  opphand   prints the name of the first card in the opponent's hand      52 checks, 49 failures
+  libtop    prints the name of the top card of your own library           52 checks, 46 failures
+  forgeid   prints Forge ids of the opponent's hand cards                 52 checks, 49 failures
+Without injection: 1964 checks over 30 games, 0 failures (summary_hybrid_leak.json).
+Failures < checks happens when the random perturbation leaves the leaked value unchanged (e.g. empty hand, one-card library).

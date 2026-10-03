@@ -1,0 +1,12 @@
+id = "kd-0007"
+title = "Forge: Aluren lets a modal double-faced card's land face be played at instant speed with a spell on the stack"
+status = "accepted"
+who_is_right = "engine"
+cr_citation = "CR 305.1 (playing a land is a special action, only with an empty stack in your own main phase); Aluren: 'cast creature spells ... as though they had flash', which is about casting, not playing lands"
+rulings = []
+affected_oracles = ["forge"]
+match = { sides = ["FORGE_ONLY"], kinds = ["play"], zones = ["Hand"], feature_tags = ["aluren-on-bf"] }
+suppress = true
+regression_scenario = "none yet: Forge-side behaviour, the engine does not offer the land play"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Found by lockstep lines: with Aluren on the battlefield and a spell on the stack, Forge lists `Play land (Boggart Bog) by Aluren` for Boggart Trawler in hand (and Witch Enchanter), and plays it. The engine correctly offers only the free cast. The line policy skips land plays while the stack is non-empty so lines do not follow Forge into the illegal play. Needs Brady's approval (Forge-bug verdict, doc 04 6.4)."

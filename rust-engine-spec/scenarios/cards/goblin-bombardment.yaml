@@ -1,0 +1,115 @@
+id: bombardment-sacrifice-token-deals-1-to-player
+title: Goblin Bombardment sacrifices a Cat token as a cost and deals 1 damage to the opponent
+area: card
+cards: [Goblin Bombardment, "Cat Token (Ocelot Pride)"]
+tags: [goblin-bombardment, sacrifice-cost, activated-ability, any-target, token]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true}
+  - {kind: cr, ref: "704.5d", text: "If a token is in a zone other than the battlefield, it ceases to exist.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Goblin Bombardment @bomb", {token: "Cat Token (Ocelot Pride)", as: cat}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@cat"], targets: [{player: p1}]}
+  - check:
+      stack: [{kind: activated, source: "@bomb", controller: p0, targets: [{player: p1}]}]
+      p0: {battlefield: [{card: Goblin Bombardment}]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Goblin Bombardment}]
+      graveyard: []
+    p1:
+      life: 19
+notes: >
+  The sacrifice is a cost, so the token is gone before anyone can respond (601.2h) and it ceases to exist rather than
+  sitting in the graveyard (704.5d). The ability needs no mana and no tapping. A wrong engine sacrifices on resolution,
+  leaves the token in the graveyard, or requires mana. The sacrifice choice is written inline in the activate action
+  (`sacrifice: [...]`, format request in REPORT.md).
+---
+id: bombardment-needs-a-creature-you-control
+title: Goblin Bombardment cannot be activated with no creature of your own, even if the opponent has one
+area: card
+cards: [Goblin Bombardment, "Dragon's Rage Channeler"]
+tags: [goblin-bombardment, sacrifice-cost, mask-validity, control]
+derived_from: cr
+source:
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "A player can't sacrifice something that isn't a permanent, or something that's a permanent they don't control.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can't pay a cost without having the necessary resources to pay it fully.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Goblin Bombardment @bomb"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@drc"], targets: [{player: p1}]}}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+    legal: {p0: {include: [{t: pass}], exclude: [{t: activate, source: "@bomb"}]}}
+    p1: {battlefield: [{card: "Dragon's Rage Channeler"}]}
+notes: >
+  The cost "sacrifice a creature" can only be paid with a creature its controller controls (701.21a); p0 has none, so
+  the ability is not in the legal set at all. Positive controls for the same ability are the other scenarios in this
+  file. A wrong engine lets p0 sacrifice the opponent's creature or offers an activation that cannot be completed.
+---
+id: bombardment-any-target-includes-creatures-not-enchantments
+title: Goblin Bombardment can target a creature but not an enchantment, and 1 damage kills a 1/1
+area: card
+cards: [Goblin Bombardment, Ocelot Pride, "Dragon's Rage Channeler", Deafening Silence]
+tags: [goblin-bombardment, any-target, targeting, state-based-actions, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: cr, ref: "115.4", text: "These targets may be creatures, players, planeswalkers, or battles. Other game objects, such as noncreature artifacts or spells, can't be chosen.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Goblin Bombardment @bomb", "Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc", "Deafening Silence @ds"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@oc"], targets: ["@ds"]}}
+  - expect_illegal: {p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@oc"], targets: ["@bomb"]}}
+  - p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@oc"], targets: ["@drc"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Goblin Bombardment}]
+      graveyard: [Ocelot Pride]
+    p1:
+      life: 20
+      battlefield: [{card: Deafening Silence}]
+      graveyard: ["Dragon's Rage Channeler"]
+notes: >
+  "Any target" means a creature, player, planeswalker or battle (115.4); enchantments (Deafening Silence, Bombardment
+  itself) are not legal. The 1/1 Channeler is destroyed by the state-based action for lethal damage. A wrong engine treats
+  "any target" as "any permanent".

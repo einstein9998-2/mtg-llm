@@ -1,0 +1,2264 @@
+{
+ "tool": "split_holdout.py v1",
+ "date": "2026-10-02",
+ "fraction": 0.3,
+ "groups": {
+  "cards/abrade.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "b40066dc0a550033504c232ba1acf350295e8cfce3081cfa32fa1676da8faa04"
+   ]
+  },
+  "cards/acererak-the-archlich.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "4a62f502345c93ba1224504a96767a593640dbec09d1cd0ba76f017b89ab41b4",
+    "c06bd5171b899a72bdcfca3909dfb8fcec379de90418dccff044fa749e934b8e"
+   ]
+  },
+  "cards/aether-vial-spider-woman.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "c291b342a9b150ac632fe0318f50618dd65c24e2013be9633df2e232cd4d23a5"
+   ]
+  },
+  "cards/aether-vial.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "931fcc4643e4fbf141095ffaf3d5321c6ad4c830a71563bb4e247b529defd31c",
+    "e53cd2ff342b50712a5341ca0a42c2404b7c92b6da85cacd4eda6d1b663566ea"
+   ]
+  },
+  "cards/ajani-lki-quarry-fresh.yaml": {
+   "total": 5,
+   "visible": 0,
+   "holdout": 5,
+   "holdout_doc_sha256": [
+    "0722080f70f7c32ba98e93e8032c106bdd3baa9231b3faf055dd8d7ed2787d7f",
+    "34dac91d4bfb8a78784cd7c2c8252bc815bd1d45ecfe353f52f83ffcf7e14a37",
+    "616192d9ce87cc1752c4d0bae66d21a79516425afae68f2727171efe737eecee",
+    "6f8cbb3e10a35816c0ddff16bfe319273bde0de3e9876099ff890ff7baadcdef",
+    "f8d4cf18abe04e15260cc49ea502466e0d5d16d214790f827a1ccf535da43129"
+   ]
+  },
+  "cards/aluren-acererak-loop.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "1fe36ae2561171d0524bf797b1c2f3ea9d14fedb05347802fd7050092df73c68"
+   ]
+  },
+  "cards/aluren-seat-symmetry.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "58d793a6bcd24b1121f451689c96a6555c324936cd818d92e1bc6fea4537a7b4"
+   ]
+  },
+  "cards/aluren.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "b3769d12d52f025dae6e2bfc931b83b5854f4508dc54ddc59b097985e385a1f4",
+    "eab1f38a69c1cb1cd38fe92c342afe81227ff23391efb21ce3ab1cd1f86d26fc"
+   ]
+  },
+  "cards/amped-raptor.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "3ef4d47a7335edc5e8377c3ddafb789e5b6cec2554e791d709ec1dec1d293d73",
+    "ec66483edbdb7acc4a6f3043ea569a1e1a92f0e723bc57e533dd611303da828e"
+   ]
+  },
+  "cards/ancient-tomb.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "bd061a0885e17c74b7bab1b0ad2156184b39bb532a72c2d62730dbe01757b4b5",
+    "cc54b73bab1f470a2d57972fb4864adb71b23652de1b297dac25081cde1ac75c"
+   ]
+  },
+  "cards/animate-dead-cage-fresh.yaml": {
+   "total": 1,
+   "visible": 0,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "277601095f5c49d872f2849fdae0a332558d14b5497a896ae5e21a5c33f9ec56"
+   ]
+  },
+  "cards/animate-dead.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "892c7f197fcf2bde953c1bfd8a106ee01cb6df41705cc709f8c40fd982894358"
+   ]
+  },
+  "cards/archon-of-cruelty.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/arid-mesa-w11.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/arid-mesa.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/atraxa-grand-unifier.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "1b2905714930ac10bb9055c8203ccca7c295a5b9a819a57a1d0942c244632dbb",
+    "c5a03a41e1e460ff91174cc14c15f04f61733d417dac29fd25ec072e46adc635"
+   ]
+  },
+  "cards/barrowgoyf.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "2ba3aa2e77fa04096dbc6b532fface5c9935b29118bdd4dae18b15bc3eca4e21"
+   ]
+  },
+  "cards/bilbo-thief-in-the-night.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "e06a5f62052d5ecc45b49dacb724509ddef516a14c5e82c73bfc8230a19095a2"
+   ]
+  },
+  "cards/bilbo.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "9f05e64a0dda638485a96cd731325e189cf57f531142aadfa3da476b3fa9a55b",
+    "fb6f78bed9f3ed8d9a417102358b29e9e24b9e06f7da47773a9a68b78977de5c"
+   ]
+  },
+  "cards/bloodstained-mire.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/boseiju-who-endures.yaml": {
+   "total": 10,
+   "visible": 7,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "689120927ea30e26582eddfac610017169cfbc115f54cd2fea90c3b19d03da09",
+    "7943bea44b5e6131de7174c22a276ac3038b6f9d34f689d0dcb6625f7dacc314",
+    "c4d658e047b0e4ba8d5d933f5a52bb2bf11b65954529e2429263afad1b3ca4a2"
+   ]
+  },
+  "cards/brainstorm-w5.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/brainstorm.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "996fbe0d8a8fd282f6f62044fb5c44491e3a21290846a124ef1385b519c72997"
+   ]
+  },
+  "cards/cabal-therapy.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "c33f512a561267ea1e95f2bf5a9953402547d7cfb1da68482c3f0d4cc9412913"
+   ]
+  },
+  "cards/carpet-of-flowers.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "adaadc6ac07cc666baba2facdb470a994632fc4edc58fe806296942d805e6737",
+    "e7a96433268d290cf9087643c33aa37dfb95aa523dabf82a315dbec16e9ee406"
+   ]
+  },
+  "cards/cavern-of-souls.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "143c25f1db3a69bece27a1ae9f30ab31907a2cb060f5eb560444628df4d6e9a3"
+   ]
+  },
+  "cards/city-of-traitors.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "6a7bb81310720c26f58cae6ac1e0c5a8d1260dd74b7f816692621d7ce28dd01c",
+    "aff84ee20a41204f667c0017a05d39013e6cb07cc9e4c1b36e97285773e68dfa"
+   ]
+  },
+  "cards/cloak-and-dagger.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "6dc7f3bb46ba7f2178da05ae187da7ecf446e2442fdbe20586a10d830033719b"
+   ]
+  },
+  "cards/collective-brutality.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/consider.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/consign-to-memory.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "67798eba7f14d00a6663f0e1c2fd0305e44180d315fed44089d839e20ca2ca91"
+   ]
+  },
+  "cards/cori-steel-cutter.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "03cdd47d46b8456d1279b5f6e5f6b18264c61d21ed385d11ada8f9b6dbd012fd",
+    "f4d57bcff1eb5f0190d1a66a3c5a56464ace020accb28e65e34dde2026452790"
+   ]
+  },
+  "cards/dark-ritual-fresh.yaml": {
+   "total": 1,
+   "visible": 0,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "f7662a3f24525dc3ed4db4e855e78f7bd4fe20f26da95538d3adfbb90f42a6b2"
+   ]
+  },
+  "cards/dark-ritual.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/daze.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "5f6a42f597699d5c662c414bb6d887adb0d12f1c5968fef9710c2ba5d7036e98",
+    "86b4dc1219a7f240cfd88d493ebe14bc04c6d75c3220c808fcf9187d53815516"
+   ]
+  },
+  "cards/deafening-silence-w13.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "4532ff8df9970504d08df89e76409e2f46e682bbc80089550c2ae7496f70bf45",
+    "a4e30f740944d479b991b473380ac1f5a9ef1dde17994f6e7eab144ea6a1f864"
+   ]
+  },
+  "cards/deafening-silence-w9.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "760a4482a3c7f4ec1c61d47a8d17cb3711f746796f4af109d1021388a0526cfb"
+   ]
+  },
+  "cards/deafening-silence.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "2eea22cfcac866f68130546e6bf92e311fbde2aa978b372389e68aee97c9e93e"
+   ]
+  },
+  "cards/defense-grid.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "71e56e735a9984ac5b81f917f26c68e9ad2c0fbf2bdd23ce0595def5c9abc2ed",
+    "b37864453b83c9ff1631180b7c014c638d47ae10dfb2af6bfdd344669198befe"
+   ]
+  },
+  "cards/dismember.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "e64c773f079d0971549b73c19df4c45f9d164c11ee66f1727ff52d3d8b2b40bf"
+   ]
+  },
+  "cards/disruptor-flute.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "53d6bb5f400a21f100670849e8ecf126fc864335718f1279b208087e902dd45e",
+    "f0e0db8a4c5e4ee09ca3414be1c0bfbfbda07c9df2aab60914eee358f999bac8"
+   ]
+  },
+  "cards/doomsday-w13.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/doomsday.yaml": {
+   "total": 5,
+   "visible": 4,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7690a788d8b768469c7048da789596e0626fa1bc42f0d4b86d226d2862cea756"
+   ]
+  },
+  "cards/dragons-rage-channeler.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "1ae4bdfab01d0eade787d1ccb7de7ac1ad6e816d0fc6724a15cc4baa1d9bd6d4",
+    "f7b635db3ad8626c046c7589bb335e817e89e8160c5cf83aa22d822cebfb0868"
+   ]
+  },
+  "cards/duress.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/edge-of-autumn.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a057562b9fcc781109cde5e9676750677cbc8f6c24a1387f5c9158814b055ef1"
+   ]
+  },
+  "cards/elegant-parlor.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/erode-w11.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "6e379d68acbc140ea9a488e4599c53b0d3c067284241baafc43c4ef79ccac4aa"
+   ]
+  },
+  "cards/erode-w9.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/erode.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "96637b1a6d5f17bac5e2804633933026ba48f518ccc8f3985cd53b3ba7230c46",
+    "d6564f1328f09f73bd57b44a75b6b79f806ad9664149895172a4f76ac7a0b812"
+   ]
+  },
+  "cards/faerie-macabre.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "9ad01ac07a040533e84cff4fb3a01807b38de904615e26d8bbb707f8426b36f8",
+    "db3430f14a92049aaedbb7de54c2baa652bf6ae79cdb90117795d69e4da74a56"
+   ]
+  },
+  "cards/faithless-looting.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "acbfef0446cc720fda7b56833fada056b1559dabf0238501b873822abd8813a1"
+   ]
+  },
+  "cards/fatal-push.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "85a8f890f4ff86c31513b109a2096dc0005abbe703418518243339a96485f87a",
+    "8c86496e8d44d89d818882a48d1cc33b07fa46f12d9ff4bc9bcd4d69e5598218"
+   ]
+  },
+  "cards/flickerwisp.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "12986ad0770c2eb1bf2a5b74b80195d85f86d4f7c70019af5fa9331394af9d86",
+    "6db2981f9fe1200dcb25ff3b50e3b9f8b7dfa38dcc598043afcc6526245931c4"
+   ]
+  },
+  "cards/flooded-strand-w5.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a892a8b395f45eae8f241a36f8466de021b0aa788c98ec088b6b87f8c7c9f78e"
+   ]
+  },
+  "cards/flooded-strand.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "bcc6a50b542c200ab95c60b0c4ce5d391a0d90b353d0c1488522831800158432"
+   ]
+  },
+  "cards/flow-state.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "704d4cc9971bc79ffe067de6fdb0e176bac968e272e435193baf20bd304d4d40"
+   ]
+  },
+  "cards/flusterstorm.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "d7d4568ad5ad8bd7a3d6ea2e844a65f56c11a74470e1f4217bbef049ebcef6d0"
+   ]
+  },
+  "cards/force-of-negation.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "18912c69495bac7a37c05e73c7eedd93faa4368de9fe16236a4bc3e643275805",
+    "a0bf711bb0b5e67fcc95a08800693eacdd6037d40e6bb002c595b66340ee4a3c"
+   ]
+  },
+  "cards/force-of-will-w5.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/force-of-will.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "35d2510b063447e6e864d074bd5350c70d7f5028a5593ebe10635cb68a48b9c7",
+    "5a914cdb3ee47ff70c6ba54f2422cfea1f64f7928e41053d034eb7abc5e3a266"
+   ]
+  },
+  "cards/gaddock-teeg.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/goblin-bombardment.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "c08503a820fb199c417e7fddc9cd4ab785d5da75c02fcc3e70a9d6453c29b160"
+   ]
+  },
+  "cards/grafdigger-cage.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "371e950a7973cb32706496df25de38f516854d438ac6a4fbb6b3f8fcb181711f"
+   ]
+  },
+  "cards/grafdiggers-cage.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7dfdd02c1e907c0907280361110c020d7775929ae6a04eabf82854d5a0c79c32"
+   ]
+  },
+  "cards/griselbrand.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "5395a804e17954dcffd3eb5b85b0a6cf5096bbdd645bd62f469a4b1509d223b2"
+   ]
+  },
+  "cards/guide-of-souls.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "526170fc6c91adf5a9e4c519b8dea26f0d1838463cef17021044102cfc609606",
+    "c76699f21177f0d030a96245f52e4a4626311506d47d030bcddcbd492284dc3f"
+   ]
+  },
+  "cards/hedge-maze.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a68980f7165017bb6baa53e0ba004f7617f279df6a5cbae9093c5adb6bd510c0"
+   ]
+  },
+  "cards/hide-on-the-ceiling.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/hydroblast.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "127c88beed7713bd66216f378f0b69934c3b53dcf7fb2ff1cb29286e2bfc810b",
+    "f2f7d8ae6c343f40b3ffa4789ba8a437c35ed38b57446d93f8a8cd7a1990cd03"
+   ]
+  },
+  "cards/jace-wielder-of-mysteries.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "336aa3dd75558ba40214fac8167c3dfdce5dfb3a7c2b1b2ec1b99e08c39c1c24"
+   ]
+  },
+  "cards/kaito-bane-of-nightmares.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "4bb1b2f2219a9995e4e36a92a19bc47362384325458b91976527f7b129f15f0b",
+    "e0fc527549e9a1e0eb46d463dab20d2d832a581adbadd9007d55702b795effde"
+   ]
+  },
+  "cards/karakas-w9.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "d22ab45ca74669ba9338e81cb27f7407486808bfe1c8c0957a4253b71b4ba623"
+   ]
+  },
+  "cards/karakas.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "579383be50d51360e514f12cd2835baed36e2261d250a88e2367b1c7a132c004"
+   ]
+  },
+  "cards/koma-world-eater.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/lavinia-azorius-renegade.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "26d28e7a5b08b2e918720cb58b193ad2ab74d7dea620c86e08a71c16c4bf9764",
+    "615eb8d89e37153fece103384e079712358337f46394b44bfd696e80995d304b"
+   ]
+  },
+  "cards/lazotep-quarry-sacrifice-mana-fresh.yaml": {
+   "total": 2,
+   "visible": 0,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "22f1e934c054c8ad36b0e8dc846917dacdf51906151de3e6882c1685c02aa377",
+    "8fba645b516d338e911789cdc580f18c99ff4d4dc02f9cb481a4bb261802a31c"
+   ]
+  },
+  "cards/lazotep-quarry.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a29fad316998adadffe35c25cf095ad914d4c99f64a0b5cd95b257696eaa54a2"
+   ]
+  },
+  "cards/lightning-bolt.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "012d208f40600fef95680748f7652ab4457bc267b48dfc4eac0020178373fa0b",
+    "a51835f4649be2a0189930a7ab866680ed6d8b3f43a3746bd665bc41df089a09"
+   ]
+  },
+  "cards/lions-eye-diamond.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "efe9b7b1f1089150cfb136128f1deb5d0184f44f2bc8598afaf20ab667790197"
+   ]
+  },
+  "cards/loran-of-the-third-path.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7bc4bb77aca938335a00e8be8ad7579d4ad657965d4f45bed395f8db23c10ba3"
+   ]
+  },
+  "cards/lotus-petal.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "2fde3c34b6dd4869fd70490756e3de7d7e9d839a630be2f86304744c1d46cac5"
+   ]
+  },
+  "cards/m5-quarry-target-fresh.yaml": {
+   "total": 1,
+   "visible": 0,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "0d2e2367fc68754258876f480085591752390484d7142bf062d4da6471f3851f"
+   ]
+  },
+  "cards/magus-of-the-moon.yaml": {
+   "total": 11,
+   "visible": 8,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "91f2e5a7ff68a7035862feb1fa2341d20677518c2384cc286a001e2c8d6033ba",
+    "c902f9ec2eeb042704d6083d3a02c636b0437e77207970d1f2be3284f50d1306",
+    "e2909d9e6065540fabd2b12e8baef786e58663738a7f756aea9f05c1564838ba"
+   ]
+  },
+  "cards/marsh-flats-w9.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/marsh-flats.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/massacre.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "be5c6e191892a40f02cde7219c5b9035f9786b69f3ce4441800956eea051b478",
+    "d32f9385264368b2b6c0a219237fb43c7607ffbc3635151835987f0f13a144e6"
+   ]
+  },
+  "cards/meltdown.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "0b82bb0ff859dc58e7edc8310bdcdefbda309b22cfbcdef0243393b2343dc479"
+   ]
+  },
+  "cards/meticulous-archive.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/mishras-bauble.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "64cc84acbd4e9d982e1e02f05278b3a8f68fd5aaf26768391cd3b7b5e09cf691",
+    "8a5819a434858fa680ae40acd1491bb44a38c8a2bdd15b2ffa2656cdff41befc"
+   ]
+  },
+  "cards/misty-rainforest-w5.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "383a2357956d8b6aa6e998d77070674483edbdca18e7e797731fdcb7023caf4b"
+   ]
+  },
+  "cards/misty-rainforest.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "b7c86f4592af6b4938593b457b85e086b3be1d38e84f5ad2b04cba23526e734a"
+   ]
+  },
+  "cards/moonshadow.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "763045283deaf635626181b53bb8f2206fd3454ef17ecf3be6e86ee5c37a8b3f",
+    "dd6b5841ef5782eb794c75888876da3ca34be830522cef9acc18e7f1d64ed52b"
+   ]
+  },
+  "cards/murktide-regent.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "416b34d72b09ff775c93ee0204ebdf2f2929e9bdbc97ff8768b47dd94ed52932",
+    "75ecb0729f1abaa77eb177fa6e82a6e722592c30e095b1367fd53535fb25730f"
+   ]
+  },
+  "cards/nethergoyf-w13.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "ad1723700da0f670321327b7a668aa5780c117dd2f13f05d2a7340e16c476c46"
+   ]
+  },
+  "cards/nethergoyf.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "020523d54652f57c5f00067c44ebdc9c0dc76dfdd3824425a714b8657c4219b9",
+    "9c73d03a08d91f18807ea478107dbef7783e9731d1e0182ab5af895a9864b2a1"
+   ]
+  },
+  "cards/nihil-spellbomb.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "ddccd95d3d05cfdf002723c283af86ecdaa4caa1b81d01d0eafe7e105f1e2d15"
+   ]
+  },
+  "cards/null-rod.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "edf879332536dfd3980d58d36953feb8510231666b62860c98a8cede721eae5d"
+   ]
+  },
+  "cards/ocelot-pride.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "3816cbdfd87cdca9c9459646073363f14c0f386da78d9e1a54305b62fb90b33c"
+   ]
+  },
+  "cards/omniscience.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "aec0048634ff9c2b79c9c8e138cb70b6ad429958daa20373453e4a0a4d69c615",
+    "dc66cdd773e9e97ed1f6dcc203a3d6e3f774fffce55158ac00b80c64c5e9493d"
+   ]
+  },
+  "cards/orcish-bowmasters.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "3a7c77be8de4bd40b916b960ce20c27cb40e4e1ba72e29516558dd64bda13b8b",
+    "e93060a7edc48caf7c27d76f42609b54afa8e6b9c72222be12d1e3bfaf4e0362"
+   ]
+  },
+  "cards/overlord-of-the-balemurk.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "9345f0fb3b1988dd68fd1c43afca7aa6e89e84964b63b9677a1fa190f9915d27"
+   ]
+  },
+  "cards/path-to-exile.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/personal-tutor.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/phelia-exuberant-shepherd-w11.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "04e868da97b8be357385c017b328b65886318e88f0ff3f5442c1f8e819bec321",
+    "adbd76c0f0bc12abec7f7b70f0354e140aa23e76da295b63e2b26468e8985b4f"
+   ]
+  },
+  "cards/phelia-exuberant-shepherd.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/phelia.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/phlage-w13.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "4ad7ade0a74b567aa925ec3f93b6e8f22fbdf0dd560e00024ea0610dfe16d3be"
+   ]
+  },
+  "cards/phlage.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "1522e309512844db4b6a9a456ab2200d1c0d46d767709a9bcb035f51ed915428",
+    "346f493401df7da862f006308a37b0871120ba8822ff700bc1b29dc203e87949"
+   ]
+  },
+  "cards/polluted-delta-w5.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "2472a1d20b68f4cee68c1c9e9ca0eb8ba4cd0b1e5dac2e136672388d4de3d2fd"
+   ]
+  },
+  "cards/polluted-delta.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a351704b72fc51f1828431184db882cb1ec3f598b42707a610f169ee25810e25"
+   ]
+  },
+  "cards/ponder-w5.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/ponder.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "2892344b058753f1bae1769c7307e4ce3a8ac5e24e35e601d78bcd68db386702",
+    "2af71f2632868a892eede3aa70ac1e78e5466d69b934674f75467136d1529003"
+   ]
+  },
+  "cards/preordain.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "db6a26e17fa952abff3fac4eeedfef69f9a006725488dc8daebeb3a58c0aacca"
+   ]
+  },
+  "cards/prismari-charm.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "248d3d1218d5103268ccf2932b514dd8c565092e3218095a2f7d1563dd565fd9",
+    "cc283c7fd683de164d70d8ffd2fc05b42ae4865a5ea3eea8145bf14c8e59fd7e"
+   ]
+  },
+  "cards/prismatic-ending.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "621ad68d5fc341e0940b66e29ec6498962951e3f7ebb020151fa314b125b8059",
+    "ec2c17123c8687f8761153a49b0178adfe0d196800fa4419476dede178113740"
+   ]
+  },
+  "cards/prismatic-vista.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "13148d6774e7646a4a8c1f41473db189fae599154f3436738d874f7ecdf15a54"
+   ]
+  },
+  "cards/pyroblast.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "10d2412031b02bf405162bdb5037f7d49402e9dcffbe9c90672642194b8caace",
+    "7add65603c6482a68f9ce4009b03622236be18c9f85a252bc63a0826a719fead"
+   ]
+  },
+  "cards/pyroclasm.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "228535e49420a932cf97471d6ca9910cd48fb62bfbba72bb7f94e8e2b926c121",
+    "3b6d8d108a0cccbf40e60138785419d02647c588e407b1b741c752d0acd6f50d"
+   ]
+  },
+  "cards/quantum-riddler-fresh.yaml": {
+   "total": 1,
+   "visible": 0,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "cad93dc21116cb4497c2c6b3472d2bbcb399a011e9313081d348b724f5e8ffaa"
+   ]
+  },
+  "cards/quantum-riddler.yaml": {
+   "total": 8,
+   "visible": 7,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "88773a5bad36f3d26f5f4c9f50932bfed26d150469919a66bc6ecfa3ee253ee1"
+   ]
+  },
+  "cards/reanimate-w13.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "bf39553095adad7b761731814ac8006c55210eec3016ed90c6b6263ffb2729c3"
+   ]
+  },
+  "cards/reanimate.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "6833add332616e199927336c3ca775038545a4a4961fe24c6f46868e7140df37",
+    "69bf54fc4bab84cded2909726cd7c9e97b0c262bda94ebe79f55693eb2f76046"
+   ]
+  },
+  "cards/recruiter-of-the-guard.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/samwise-the-stouthearted.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/sand-scout.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "405fa769d58addeb574aa2c86bbb87537cdd0b6ce5b794e335ae9b18db3b4635"
+   ]
+  },
+  "cards/scalding-tarn.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "3e805c4b3cdcd883b02c7402383318dbad98bac40f7bf6e51fef818f51c183a5"
+   ]
+  },
+  "cards/shadowy-backstreet.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/shallow-grave.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/show-and-tell.yaml": {
+   "total": 9,
+   "visible": 6,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "2ae77d932e635bf4f2741bc67d898599e790f5e59ef1ccc196d78595fc352d39",
+    "47dc867cc03ed4f0cd970c1f7d4c03dc019d5e7c3bcddce1315df2861a37e34e",
+    "77f7a704a971425142f2bdc5f27e387beec048da97bdc58e6031854dedbe7dcd"
+   ]
+  },
+  "cards/skyclave-apparition.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "698c7fa8f4f790e1c889a243598f804d9ad6a49614d2283d9af173186f146975"
+   ]
+  },
+  "cards/snuff-out-w13.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a9b7436aa380355a60dda4ff594b1ef78967e4b4c3c7aeb673689a2113de5c15"
+   ]
+  },
+  "cards/snuff-out.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "28dcb56a9e318e6cb7b34a2c885ff430ca67561de1a17330bb67aa6275a68da1",
+    "c8c2b19a28dc98e432f2c8ae1443511cf0455c5771f166cbe7a5631215d1af1b"
+   ]
+  },
+  "cards/solitude-w11.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "927fe6a5f64ebdc38212bbef85d97b6853e54fa3776362c39718785c01574679"
+   ]
+  },
+  "cards/solitude-w13.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/solitude-w9.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "45a81b147f5f7505d1fcfbc1837af26d3b652181c1478695dcbf692814f7fc8f",
+    "abcce6d87bb2091454cfb18dc2d6187606e63fc931d909507599583049e42cfb"
+   ]
+  },
+  "cards/solitude.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "06db3ebd5c8f712b6affef3ea293ce73e52eb23e4d7cfb02de8f1019eca36ae4"
+   ]
+  },
+  "cards/stifle.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "bec38e7d8f8e199d57fa3e99eedeca2891e9e7a2275f06cac131886b2a914295",
+    "d0e734c73d580fe03aed1849f3cbf696a488cdcdfbf342e469f8a8b58c22d688"
+   ]
+  },
+  "cards/stock-up.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "1d355c7b125a078bbf6478e9480f2a02ffbce85a9d56d6a2e32bbeacfba98e9a",
+    "6d373f3c3f8edd0202579d0a1e937ba39d8b5e0c8232c0ae6b534fdb383e34d1"
+   ]
+  },
+  "cards/street-wraith.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "6ad65835791341bca9441c5be9b207067a102c4e1c03fe29b03c54f9b4149edc"
+   ]
+  },
+  "cards/stronghold-gambit-fresh.yaml": {
+   "total": 3,
+   "visible": 0,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "4e68534d2df45ace74a9213fec1f797ae8e4112eb9f1709854bbec3c1c78cb22",
+    "54b77857e079ff90bbc15c9a21c4e1507741294535e28bcae0e2b8e725f80870",
+    "78493b9d4ba5516c59f5d679146ab67cb8b4d5495280f4adfbc84a45f8d2a5f1"
+   ]
+  },
+  "cards/surgical-extraction.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "4e2db6d0defa9b9bee4caa6fbabed3010d568809130a3e81bddf69f5edef1114",
+    "bd15023099d8b9f65fcfc6e7e07e7cdc488e87dab17037e7154309a3a490d0ac"
+   ]
+  },
+  "cards/swords-to-plowshares-w11.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "379717a0861ce5c557e18586655204d22a7a955a2fbcc737804d99e84e99989d"
+   ]
+  },
+  "cards/swords-to-plowshares-w9.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/swords-to-plowshares.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "0d9e252bfd39cb09f32ca3303f6b896889bd2144f2cd110a006b52a7075d66d3"
+   ]
+  },
+  "cards/thassas-oracle-w13.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "3e85c0d751f8ef4006d4dc903c4027668f2a435789cc4224b9790a0366823901"
+   ]
+  },
+  "cards/thassas-oracle.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "15a04d39f9ed7430cdc3a9031e0f8373d8fabc2c2cdd2979dbaf8ddb1c41fa53",
+    "7e344b8498dd624cfcd7d55b5cf8c7ae31092d4d9b33e80d947f2aec8de3a427"
+   ]
+  },
+  "cards/thoughtseize-w10.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "0eb01ca1e19c0d0f4b6cbc112f7570160f71f8b749e64a4ecd5ffdff2a2332fb",
+    "99cf73f1292a3ae2b5ae328c34d7c94509fd9917f164c4db90a8ac9542278c5a"
+   ]
+  },
+  "cards/thoughtseize-w12.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/thoughtseize.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "dea051e344e6a60f66dce3658f62db716956684a1391d7a916c942ff4221da84"
+   ]
+  },
+  "cards/thundering-falls.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "83ee674809d39924ffe1e8c98fb603bd32cc88da2498dd5424a640f423a6ce66"
+   ]
+  },
+  "cards/triumph-miracle-fresh.yaml": {
+   "total": 1,
+   "visible": 0,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "f535bae132713c65f995a795bee41cf174b7f0377c24f0ea72872a10ed474606"
+   ]
+  },
+  "cards/triumph-of-saint-katherine.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "5e793c58f429e70996cee6a924c6fe77b020339206742b0bcc68b237d7384789"
+   ]
+  },
+  "cards/tropical-island.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/tundra.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "fac0d2a9626bf734a8f207b2008bff08e23042cc15cb415482076353f7bf4108"
+   ]
+  },
+  "cards/undercity-sewers.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/unholy-heat.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "991288cb6c0f664f9080b125f88f86b8a4c23c98d96fd651689a84e23f862611",
+    "d4065efac89ee08ee3d17f64d73bd3db6b8187582d2ae9cc2bb3e9963a32dfff"
+   ]
+  },
+  "cards/unmask-w13.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/unmask.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "41afaf70882dd9d1ff59097e8f002d50ed737eb809001f5df2fdcd0fa8727a9d"
+   ]
+  },
+  "cards/veil-of-summer.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "dc0af572c5c871878a1981dd95d4b9506c0694faa94ae06b25c1bee51c7d5c8b",
+    "f5ac0cf6c1dd8fecaba999b26765bf553e793144f60436addf7da768ecea8b0c"
+   ]
+  },
+  "cards/venture-dungeon-of-the-mad-mage.yaml": {
+   "total": 9,
+   "visible": 6,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "300e87ab0e4ca90f8e6ac7cc15bf1e902cb3050e288c41042df48ef68b5a3ad8",
+    "3bdf3478b0fbaea70924d7a54232a13ff057e8057a52d34791a986ac68b95969",
+    "d3f8bb46e7384751964f917330e6b33acf1053ad45316c484cb1423cb0c04284"
+   ]
+  },
+  "cards/venture-lost-mine-of-phandelver.yaml": {
+   "total": 9,
+   "visible": 6,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "16d2d1d25009f7d2223a2f41c14009eca765c8decec5f8bdd5e034b184e5b618",
+    "1f495ea79dbd1cedd0ce3bcfbbbc6324bd7933c1430f1a853b207c359e4f9b0b",
+    "7706e8f00a93a537c2d5d16e369021cd3ed1a7939137c6a744ad91c81280368c"
+   ]
+  },
+  "cards/venture-tomb-of-annihilation.yaml": {
+   "total": 9,
+   "visible": 6,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "3c648984541f75addbb7e91492841312e75b2c76d4d9a97c38545ff371ea136e",
+    "5320045fc383df2286f8a6c9b094e1d6f0a3118c7ecd35bca8084baa8ea083e8",
+    "efb45166e5bdedc3cfc7484d2854f8c63601d2d2fc634bb54fed271d06ca9917"
+   ]
+  },
+  "cards/voice-of-victory-fresh.yaml": {
+   "total": 1,
+   "visible": 0,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "8ef2bbf076c36c33bcee7dd7c3cc607a9eb86f8a5070721bebe4ce8195e2da93"
+   ]
+  },
+  "cards/voice-of-victory-w13.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "b6c5541c0be1aab3c5d0fcb95313f519b3a1c5fad4165b54b0e0a3d126a1fbc5"
+   ]
+  },
+  "cards/voice-of-victory.yaml": {
+   "total": 3,
+   "visible": 3,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/volcanic-island.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "1ba8af7f2bea4440fac56b284bfbca910cd966f05084149a94fc54ad6ffea1aa"
+   ]
+  },
+  "cards/wasteland.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "ac4143ef4e96e5e5122b60735f994f09008e4c23833d90e0f981b4be2ccd79e0"
+   ]
+  },
+  "cards/white-orchid-phantom.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7574ece3e5811ecf580b42ed2c68738ef7d2cc3f47cf73e755902c93e75bda1a"
+   ]
+  },
+  "cards/windswept-heath.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "cards/wrath-of-the-skies-w11.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "ddc4bf3269a7c3fe0d38eadfde8d25a436a7359c36aaade4de9696baa78e6288"
+   ]
+  },
+  "cards/wrath-of-the-skies.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "61f21c916f49c4aa351146801e63ba4a4365aaba8235358920ee6c081532aecf"
+   ]
+  },
+  "core/acererak-attack-trigger-w3.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "core/acererak-attack-trigger.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "f357282ad698c41247fb74e71d46c6ebc39b97ebf6911c08dea70aefcb767784"
+   ]
+  },
+  "core/acererak-intervening-if.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a94a7b59da16a2845ddbd569c5663218058d99958e85b856cf7ccef75bcddae2"
+   ]
+  },
+  "core/activated-abilities-on-the-stack.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a0b6cf9d706b4ec312c8cd4ee40dbdfb91f2f33a6086e980ca0d4b8e20cf9d79"
+   ]
+  },
+  "core/alternative-costs-as-actions.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "b555ee3219e3855f707bd2313ecdca3ea6834d3bf13379064932ebc87761f4e5"
+   ]
+  },
+  "core/apnap-and-trigger-ordering.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "89f4e8be1589a26ce84fd0b0647d008e41de0d6feae6476010ced3302b340319",
+    "d55302ce696dee10fb4dbc00b46a8f51367cc6376f689ea960b7d6e4478d0a1c"
+   ]
+  },
+  "core/casting-timing.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "core/cleanup-step.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a66dd83d351e32e231fc079bf00adb2cbd397d781783dc39f98a300e54307e74"
+   ]
+  },
+  "core/combat-blocking.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "ae911b122159692aa117f1efc4ad4b93afb9b84314d9bc95f78d8ba9c7b7165d",
+    "d0401d95408bf293614cbd79c7ebc9c98d741e1d7a1715e0b92818dd840caa34"
+   ]
+  },
+  "core/combat-damage.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "833fa8c311ed6f0edcb6352bfff2206784a5bad0709f6d3d8145637dc4331ad8",
+    "9ba3b528914d99a40087961a4cdeba8a2aa92169e70c6fc50aa8c06e9a37aa97"
+   ]
+  },
+  "core/combat-first-strike.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "5f020a7985a1bb90095629cb9fdc9d51d951eee852bfa21bbe8e4b7748d98b9b",
+    "e9d1f705c88d5f9e4af196524c8cf6f702b82d3c73c1610d8f22e2bc65ae9f53"
+   ]
+  },
+  "core/combat-haste-and-timing.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "0930c60a889891720c9de1ca6cfc4655e67614c7165de19c87df3b7d59ed3082",
+    "145dbd6b77cd93d8b7eec2bd1aa6dfa361acadae8846cc633d460bd4d6604131"
+   ]
+  },
+  "core/combat-keywords.yaml": {
+   "total": 12,
+   "visible": 8,
+   "holdout": 4,
+   "holdout_doc_sha256": [
+    "17a4efee97d8d7894dfc20091b356bd6f94258a6e3441bb5134e980925586ab9",
+    "1827c4030f134499b6a6752d880831641a0147cc143abb2854b30033a3fef289",
+    "caee9b7e9bff192494b26d57d76502b4a7c68a7b4d95e930813430258804231d",
+    "ee101fbf81d9c79e02008546577145b207839b36a00c701e07e7556f73c95178"
+   ]
+  },
+  "core/combat-multiblock.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "3af185cf9dfbce6a516d3ac71a3693bbb1a43047f751b5a4e046ca9afa2eee67"
+   ]
+  },
+  "core/combat-structure.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "c2b592919d9681260dedf34c116a13345e108c9c6541ba28934e3e8603b14f52",
+    "e425c9b61b4419505342e0d51defbb56c2f5cfec67a667d9104851e05e76769e"
+   ]
+  },
+  "core/consign-and-stifle.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "519f967346729a59acb32135548cb021c2b7fae1c71c0589b34c36111a23f717",
+    "b5d54614bd315fa87a9a3404d97c62a7bb27511f87c980e40d351ee08ba01f36"
+   ]
+  },
+  "core/consign-to-memory.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "057dd965639f59193f92a6ad62272133d33637e76c4936f3ab611ba4014a73df",
+    "7ba2af09daa84b86c66477474f3425d18a61dbcedf5c0c8479d5e3f9b9adfaa3"
+   ]
+  },
+  "core/containment-priest-reanimate-vs-cast.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "0f58892e76cc76ef0e90815890f540d9724d1c314996ee5e805a04744121cafb"
+   ]
+  },
+  "core/copies-and-tokens.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "73d8da8bf3179cc4a2ac36890165390abb3ca877aef9738cefef7c09e426e97d"
+   ]
+  },
+  "core/cori-steel-cutter-flurry.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "03b663704e0358b8a3734902b6b7a219a9b7bdec86ee7e76212f6a687969341b",
+    "b24c10cac2cb75d6696b1f16fe1fe38743a29847eb1ca60626939d6559c75ccb"
+   ]
+  },
+  "core/daze.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "3bbb8b8a6fac8f7c7c4498bfc43ea7fcaf7913bf6192deea808f4aacee9ad60a",
+    "b21ab11374363631978634139f624500843b79ebe2110702918ed5078b135c85"
+   ]
+  },
+  "core/delayed-triggers-mishras-bauble.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "bb97d9c422791599baf150a5ec0f7ca6e54dc10eb8816049dd191b3752320ee7"
+   ]
+  },
+  "core/delve-murktide.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "a299b9f5737953352b60ef0c54f4fa045f3991cd342b0b742336bef8842698af",
+    "ee133f6c272b8dfd43af7cfa8dce5910962bc6660ad609929d74ec2bc0dbe6eb"
+   ]
+  },
+  "core/drc-surveil-trigger.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "521cf21f3dd2b32e1ecaff6e0e1865880c6e2ffe2962cadbce3c5c9474e53fc5",
+    "f8d9957ad31cb789916514a21b8f863825e3683a6ea5d3990abcab92a6df7d62"
+   ]
+  },
+  "core/fetchlands.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "61467b98cfdee2581e5a251fb7d933abbcc9d0809ae63b4ec980800b4c2af32b",
+    "985bdd200700210fdb6cf839c7dc86e3d01836a0717a856319d65d48d80e0635"
+   ]
+  },
+  "core/force-of-negation.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "b096b22f0dc7fd0317129ca0d666d7c043cb8ba90e1971c864b8fb94a7fbf7b6"
+   ]
+  },
+  "core/force-of-will.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "d9ffbe995464255cc0ae07d9ca46fe017dabe33d4f4dd970ce9ae55b2ab90fec",
+    "ef2141f119459a772a13be30ed6530a899dcead90b4605963cd6dff7a91de281"
+   ]
+  },
+  "core/game-end.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "aec01b879f824fc61089c3e7febf503f2f7664680c0de33f73f3b1c416c55152",
+    "fe0b7afb9186e759124ffebd6c25d22ea2d90ed0fd8689435c85748f4f22ec00"
+   ]
+  },
+  "core/lands.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "3f905b4ad77837387140ad943109322c91ab07251cfe5bb97c04717e657881cc",
+    "661d753c45f0d565e66f0133b86d5e6ec51b4aebf3fa05f4b8efb0f0200f1d01"
+   ]
+  },
+  "core/layers-delirium.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "aa071ec37524686569245a878caeaf671d89bbdf8c36838c63bdf8c113cb6ab9",
+    "f7ad9a249069b358adbfce1ba9f2d22cd36f45f4edd11bc3c7e7d40fd6c8687d"
+   ]
+  },
+  "core/layers-duration-until-next-turn.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "core/layers-equipment-and-pt.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "bbef9cf16353ee418d2ff8d5b2cf7c47cb23033261763fe4a9046a7b5f031cb3"
+   ]
+  },
+  "core/layers-pt-sublayers.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "d7f00e692a7459bd9bad5fc0c5d11f523047f25aad15b92a68aecd96418c399d",
+    "febec2a4e98a683122ee30944737778df99c2a89222b5a8b188a8c53d9514e6e"
+   ]
+  },
+  "core/m5-many-creatures-fresh.yaml": {
+   "total": 1,
+   "visible": 0,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "d69de83e43c94f0c58b50a2e77e3b495c49b661325e8902c31ae8b559cf145cc"
+   ]
+  },
+  "core/mana.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "3fd2cb2348905d24370cd15f17f5d2d7fb9e5d9d932b9908b0d1873b84edea9c",
+    "aeb58bfccbafacec0697061f60e02b8001e62e214b88ff88aec3d7cdba0c65ab"
+   ]
+  },
+  "core/meltdown-x.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "9fec224cf4ed2979ff752998918653fdc8751fe990377a8510a30f82bde534d6"
+   ]
+  },
+  "core/opponent-turn-windows.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "9d0b58da8ce49a68e702c99d25cffe2db1a5731ecbdf624074545b6b1d435b47",
+    "f7e7c3f931e812a2df19229fb8f5d67db9aec6c0c7341933d60966b04e2a33fb"
+   ]
+  },
+  "core/phyrexian-mana.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "e71e43a48dc19f68166510e84b5e787975a5e07f70ae4bef450f22916f6a2c87"
+   ]
+  },
+  "core/priority.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "1405cd856243a0e37f8d3576df0d3dc2159149243e3aef308c52b87e766b0d05"
+   ]
+  },
+  "core/prismari-charm-modes.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "5b3de6e2e6ddf6fb9b8a46037c8a0d02d5caeb59f261e7a2df7f35697280068f"
+   ]
+  },
+  "core/pyroblast-hydroblast.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "5d4c403512394f81aebd6d3130c50a9f164b8abd608a6450317c2ac8e218f376",
+    "97caa5bcc81c082a6480f520a6f95f3d874d559fa292f3e71248af3eef17d1a1"
+   ]
+  },
+  "core/replacement-containment-priest.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "194207c7db3f856f766a2e65fecf00e38647ef3e24b2f2b994a2de287906dea0",
+    "6fc32de0c21fd59ce68429c64477f19c32473699a805f87fe02b8d822f4ce3c0"
+   ]
+  },
+  "core/replacement-counters-and-exile-instead.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "bcbc1a6fbc0dfe484d787ddfe8ddb329dde2b53e5a2418311a056ce8f230b608"
+   ]
+  },
+  "core/replacement-enters-tapped.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "284566d521e02953a4f0c2bbb9883d88105ff02124201545a19b2496cb540827",
+    "ddc98db2fceecd95a763c463baaf3fc4b61dc071954ebaac4abacea6203a7d35"
+   ]
+  },
+  "core/sba-creature-death.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "b7be3f992bd9f3984268820b2327890a7a67f2de9ebf4d4ee98f5e03803ea740"
+   ]
+  },
+  "core/sba-dungeon-completion.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "core/sba-game-loss.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "33fda0193c7720a83a59de4e9d37887ee747c94f213dd21789eafc66e6c58d4d",
+    "a19ef0dc28ed46929acb5e5e7b95757dcbdde5fa36c62ba60854d8a5eb3eb2d5"
+   ]
+  },
+  "core/sba-legend-rule.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "6ed5b34372e93ebaf54e88e3a5dcb1d7fda56eb0374f2410f1a7f61e0178f57e",
+    "6fa9135c0c201338943426e8e4c1327b040b8a34530984bb45c4e694bf9a55d2"
+   ]
+  },
+  "core/sba-mid-resolution-and-simultaneity.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "613fb178fd1cb1b53d106df9cc0aada02b3e16e46ad82d9ff6ecd18e2dd8c964"
+   ]
+  },
+  "core/sba-tokens-and-equipment.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "ac84c909c97aeab603568113e9599a27aef5e1fb2e7f3ce04df1b2510ffba48a"
+   ]
+  },
+  "core/spell-timing.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "d317a14ed7a5b4673ecd8e9bd7afc031cf8e9e69c5daa164f680acad332fbfc6",
+    "fdf39cba372cea084b9963b12f4e64c663ef74b95da2061a322584ff30c06995"
+   ]
+  },
+  "core/stack-lifo.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "2dd53d932cd059cce2ee83fd168abf0e910763fe2643db35d37b7861e1e1d2ba",
+    "8926413e7a4258ce5743ff9969f0468bbc39b048cec983300ce641aeed44e4a7"
+   ]
+  },
+  "core/stack-priority-sequences.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "e48bcf1ee3573677013e764c61ec37d26bf3bddf88f223af88e5b76961aa305d"
+   ]
+  },
+  "core/stifle-triggers-and-abilities.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "b703ca446da6a707dfb44cbff0622871620e4943dbb802d4855fc82b11ece95a",
+    "f035e048e29945adf7790a7691bdb5f9079335054f40ca465206b8d42ee08070"
+   ]
+  },
+  "core/stifle.yaml": {
+   "total": 7,
+   "visible": 5,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "6090d2c5c81b1a0f0fbdacf38e8f68e89a07788a2199f8a5a76623abc9d40247",
+    "f01f269c799348e6520ace40312951153152937d255414bc89da38a85fa77870"
+   ]
+  },
+  "core/summoning-sickness.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "4f39c81c0d8a7505fa78c00365c6ffa6d680baaa99e657ffe1459a1ff50ad3d2"
+   ]
+  },
+  "core/targets-and-fizzle.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "51ce529b440082255dd6c18f4f50ccc6201a06f937689903b0f338b50def362d"
+   ]
+  },
+  "core/triggered-ability-lifecycle.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7b274a4de8637610255c53b6cc8f85f16f21a7bbaf43c33789192e7c6eaf0bd1"
+   ]
+  },
+  "core/turn-structure-edges.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "core/turn-structure.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "090279566c06a4362651ae05f81977a5ead9ad6dac8c8346a1fcfc4b858ad945",
+    "4033ccc9abde1f5fbee297f64690cabfbf0cff267b9c6b82b72a7361a1831d00"
+   ]
+  },
+  "core/veil-of-summer-uncounterable-and-hexproof.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "ac09a23cfcf873b1a04c6b8818dd85ed459c32ae729722228ef3c2342cb9528f"
+   ]
+  },
+  "core/veil-of-summer.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "2c504de4c0dcb97ed5118dd42a2be324ef3ebe0644cee3c7d9622d72adfaf618",
+    "6869d046d78c9c678bb3656e79f1aabf960b0ef4215e22f91e6d2eb979d7a5f9"
+   ]
+  },
+  "exemplars/daze-and-wasteland.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a73a7d5ab3972dd117a15215af3e3a265fadbeb0323e69bcbbf82f90e1e43dc9"
+   ]
+  },
+  "exemplars/show-and-tell-apnap-triggers.yaml": {
+   "total": 1,
+   "visible": 1,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "hidden-info/action-masks.yaml": {
+   "total": 9,
+   "visible": 6,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "5c73c1d7dde364c88a13c717b3369c258f6ef34312ee2a4b335583012be22718",
+    "cd21a50dd4d01d3e964fa44358de42a6f8445af9766287dbc286b10582119e37",
+    "e34d5b917da89561c639ea1e4c5b874605fd9f141ef40e1ce8e7912f2afbaa34"
+   ]
+  },
+  "hidden-info/atraxa-reveal.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "146e4232a4b024ceba5f60abd4d61ee4f51532b234337f988ba330173ceb2b96"
+   ]
+  },
+  "hidden-info/brainstorm.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "871faa26867e5ff8dc87f6efb51bcac21fe8e8e35a4ae3ff4dea7c561826e82f"
+   ]
+  },
+  "hidden-info/costs-and-bounces.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "97a181b5765427684d40ec5403929b266d2e5a182953770cb279c544477923e8"
+   ]
+  },
+  "hidden-info/draw-and-discard.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "947ca815aeed1719dfa43aa465b5881ca3ac0053cfbc3fa38687ea79b7607de0"
+   ]
+  },
+  "hidden-info/fetchland-search.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "945e61f026d398feaf85ac4f070f038357a645cd17727a10193199dc009c386f"
+   ]
+  },
+  "hidden-info/mishras-bauble.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "06f69779576d336246de217c577e60f334d32603390d17e12473fd081ca32e01"
+   ]
+  },
+  "hidden-info/ponder-preordain.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "420f594e80285c39a12a143c75cd65f49610a3b0be77b4750ca4644c022af525",
+    "8bbeef0b9a92e9e4417467d9ff26a98d5dc8dd71f8cabd2fc6c8739e17673295"
+   ]
+  },
+  "hidden-info/show-and-tell.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "117abcbe3dbf361d5b9240458c866d74c8ce4196a7c4b4a9a4d53a18726ce182"
+   ]
+  },
+  "hidden-info/stock-up.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "hidden-info/surveil.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7c6a7370033d6ab9df1dcda24e05de680161c21ffe4e7612b4d8f42db21c8abf"
+   ]
+  },
+  "matchups/acererak-tax-and-tomb-line.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7c78d4a835a31e076e017524b6d7cda66ff2cf6fcb133b99783a6b82cbf6c0c5"
+   ]
+  },
+  "matchups/aluren-acererak-opponent-interaction.yaml": {
+   "total": 9,
+   "visible": 6,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "14604eac6467069867802791d501a4047b3534c5c94c8bd2ee2be8818d26eb74",
+    "8d83b9101f74fcd5e4dd120a845f61608932ffe21c63714b5490d302a21d528d",
+    "f8a25ef01ec1d65c56b1f1d5fd186bbcfe02426a72d5a840577447876c1bbe13"
+   ]
+  },
+  "matchups/aluren.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "matchups/bdt-combat-race.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "63b54ee6edd844247aa5f2c6fd2cbb9003e0329fd8c81ca4e82a4ba74652cb76",
+    "d15e40ca7e50abc87f85c563805c24499e39c4b264ba92c555202c76c8118e50"
+   ]
+  },
+  "matchups/bdt-flicker-priest-vial.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "e49df9463deeb503eaa442df6e3da539ccb6c65bc59bde18d07e95d68561d7b8",
+    "f38077bb7ecca47bccccb280a7a6128d0f671013e22cf123b285f60bd22e936f"
+   ]
+  },
+  "matchups/bdt-karakas.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "b1b56947bcc0c3113b69914b3062528a87ee8d9dd09dc29d1ee4a1dc7af1d8e4"
+   ]
+  },
+  "matchups/bdt-lands.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "a7eb1e4c37d38bc70bced25ac48d8d8e2dd6402b62f30d91c7f32d63f3eb5543",
+    "c1a8f43610e782c1a63800df66b81541bdb43daeb188d45de6f39977df798ca9"
+   ]
+  },
+  "matchups/bdt-phlage-escape.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "219fde037c83336be78f168dce43ac113db76881936507469c38272147a2b954",
+    "492e416d3b3d84c67a516b686506773b14f11f99015c1a5b2525726f9ec761d2"
+   ]
+  },
+  "matchups/bdt-removal-and-sacrifice-responses.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "1e6c931e89824ad5360ff67e7d0e78d077bd0ecc83f811015046847a08b82713",
+    "94c37aecc391950af1d44684e64fe04cfbf5ede06b6c39c0485ad35083e922d7"
+   ]
+  },
+  "matchups/bdt-silence-and-flute.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "cac95da65fcd1cc10289352597f7b3310174172e2a558f3b79ccbcc2474e1950"
+   ]
+  },
+  "matchups/bdt-skyclave.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "matchups/bdt-solitude.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "061ef6e7fce5e21471833c1f098f9ba44a565e39bd1732b833c092220e784327"
+   ]
+  },
+  "matchups/bdt-voice-of-victory.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "67166ceaf468456fc0440e772a501716edc78005d7557037aec63438be38735d"
+   ]
+  },
+  "matchups/charm-and-veil.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7633aee511b973fd3ea7a8332ba4c8934c0e1f73d9254cc470671f2dd44c4b7a"
+   ]
+  },
+  "matchups/cutter.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "matchups/daze.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "d7f9582750914bfa96d7f67e8e3b94339a692d3f198891d0aff57aa064284df3"
+   ]
+  },
+  "matchups/dimir-uwx-bowmasters-draws.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "7f183788b0a514885cb1d11ac8c67cecd683018371b1ef86d89a9b70e5e00f7c",
+    "d24caa38b07919e2fa19de6ac3ef09afa2a1691d59160edc0ea3766975a519f2"
+   ]
+  },
+  "matchups/dimir-uwx-counter-wars.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "1fea8cc1e1cb558148fa64cd8a52f681a02be4fd096d615e25b5b0ea5b258eed",
+    "a05d25162947acb8ef406bd1a64020cdec6fda736395a9754c8919fa210991ab"
+   ]
+  },
+  "matchups/dimir-uwx-kaito.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "2826c113652ba6d6633bdafb8d156035f2a462c1066ab0e9d397e80f0efb798e"
+   ]
+  },
+  "matchups/dimir-uwx-lavinia.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "35d72910859d4da294ff627a2999fedd5db6ab1e6ff32fa1bc37a178db7b0b18",
+    "c2030e8752a8ad99ce59bd790e5430a117070b4c30e433b5abb1795e8ee450e7"
+   ]
+  },
+  "matchups/dimir-uwx-phelia-flicker.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "a306a263c8d5b81b8ef055e2328421e3f54c4b2dc1d40fc30d89a9a27f9dec4f"
+   ]
+  },
+  "matchups/dimir-uwx-removal-and-goyf-sizes.yaml": {
+   "total": 9,
+   "visible": 6,
+   "holdout": 3,
+   "holdout_doc_sha256": [
+    "597f41b6b2b780a7d1a5835c7e8b2fe9f30e40f95a53fbc08e4912129844b39a",
+    "a25586fdb80a5406e293e6490cf3f5e5a11b6427d74ae704ebf73d26744f39c5",
+    "dc11146faaececae0157c1cad2a4b251c6ef33b1d042640484c3eb1c8eeeb92c"
+   ]
+  },
+  "matchups/dimir-uwx-stifle.yaml": {
+   "total": 5,
+   "visible": 3,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "1bdae2bf62b28dcf31bc1823d614c5aa045a24259d8b26a956bbb6fbc420cd21",
+    "26a2618903ee435241db6bd978e80b141eb0859d47ca1da0e902e6a08787e2d9"
+   ]
+  },
+  "matchups/dimir-uwx-thoughtseize.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "706e867d56b16b4b01a998e8dd717a9309c132d1326d05c31c19f29f917da9ba"
+   ]
+  },
+  "matchups/dimir-uwx-wasteland-fetch.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "7a1a943564666f8089ff2f2185f7468deaeeba99d6b289d8fafd9e3832b73866"
+   ]
+  },
+  "matchups/force-of-will.yaml": {
+   "total": 4,
+   "visible": 3,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "72e12894ea4d2e300f359cca7a8ad1c9e545b19df01b05045cdb80067e9b95f9"
+   ]
+  },
+  "matchups/murktide.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "59036bb3fce042d6ea0b743ef336764140a6d6f815c78dfd4af56bdf3ee08c95"
+   ]
+  },
+  "matchups/removal.yaml": {
+   "total": 2,
+   "visible": 2,
+   "holdout": 0,
+   "holdout_doc_sha256": []
+  },
+  "matchups/show-and-tell.yaml": {
+   "total": 3,
+   "visible": 2,
+   "holdout": 1,
+   "holdout_doc_sha256": [
+    "b84dc5d5e564cdba6b71d9bdf323bea9000fdda8b61420f872f88077505ecec0"
+   ]
+  },
+  "matchups/sideboard.yaml": {
+   "total": 8,
+   "visible": 6,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "79ce1f9c8c715c34f6f51bb960284b97b3015906cfe816bcdc43c03380cbd0d7",
+    "f6df87125d147e8ac392a722474f2b7aefb7d4bbc9d9e3b912aeaf4ab7cf4bae"
+   ]
+  },
+  "matchups/wasteland.yaml": {
+   "total": 6,
+   "visible": 4,
+   "holdout": 2,
+   "holdout_doc_sha256": [
+    "92d4db26e69113227bd126110f6c64e317a8ae835f65c508f73af88dde0ee5b8",
+    "aaa5c89529af3d2853ed34bbe7b3c879155fb0f77164add93a3c245a4c961fc7"
+   ]
+  }
+ },
+ "totals": {
+  "scenarios": 1158,
+  "visible": 806,
+  "holdout": 352
+ },
+ "sealed_archive_sha256": "dfa77c2d23d85a48bfa9f35e3e462d070c72aceb3ba812ec648601c1bac8d5dc"
+}

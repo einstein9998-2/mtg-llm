@@ -1,0 +1,121 @@
+id: faithless-looting-draw-two-then-discard-two
+title: Faithless Looting draws two cards, then its caster discards two cards of their choice from the whole hand
+area: card
+cards: [Faithless Looting, Griselbrand, Archon of Cruelty, Swamp, Badlands, Island]
+tags: [faithless-looting, draw, discard, sequencing]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Faithless Looting, text: "Draw two cards, then discard two cards.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Faithless Looting @fl", "Griselbrand @g"]
+    battlefield: ["Badlands @b"]
+    library: ["Archon of Cruelty @a", "Swamp @s"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fl", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@g", "@a"], expect_options: {include: ["@g", "@a", "@s"], count: 3}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Swamp]
+      library_count: 10
+      graveyard: [Faithless Looting, Griselbrand, Archon of Cruelty]
+      battlefield: [{card: Badlands, tapped: true}]
+notes: >
+  The draws happen first, so the discard choice covers the two drawn cards and the card already in hand (three
+  options). p0 discards both creatures, a typical Reanimator setup. Wrong engines: discard before drawing, discard at
+  random, or let the opponent choose.
+---
+id: faithless-looting-flashback-countered-is-exiled
+title: A flashed-back Faithless Looting countered by Daze is exiled rather than put into the graveyard
+area: card
+cards: [Faithless Looting, Daze, Island, Badlands, Swamp]
+tags: [faithless-looting, flashback, daze, counterspell, exile]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.34a", text: "“If the flashback cost was paid, exile this card instead of putting it anywhere else any time it would leave the stack.”", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Badlands @b", "Swamp @s1", "Swamp @s2"]
+    graveyard: ["Faithless Looting @fl"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @dz"]
+    battlefield: ["Island @j"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fl", alt_cost: {flashback: true}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@dz", alt_cost: {return_island: "@j"}, targets: ["@fl"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand_count: 0
+      graveyard: []
+      exile: [Faithless Looting]
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: []
+notes: >
+  All three of p0's lands paid the flashback cost, so p0 cannot pay Daze's {1} and no pay prompt is raised (exemplar
+  convention). Looting is countered, and because its flashback cost was paid it is exiled on leaving the stack, not put
+  into the graveyard. Wrong engine: graveyard on counter, letting p0 flash it back again.
+---
+id: faithless-looting-grafdiggers-cage-stops-flashback-not-hand-cast
+title: Grafdigger's Cage forbids casting Faithless Looting from the graveyard but not from the hand
+area: card
+cards: [Faithless Looting, "Grafdigger's Cage", Badlands, Island]
+tags: [faithless-looting, grafdiggers-cage, flashback, casting-restriction, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Grafdigger's Cage", text: "Players can't cast spells from graveyards or libraries.", verified: true}
+  - {kind: oracle, card: Faithless Looting, text: "Flashback {2}{R}", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Faithless Looting @hfl"]
+    battlefield: ["Badlands @b1", "Badlands @b2", "Badlands @b3"]
+    graveyard: ["Faithless Looting @gfl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Grafdigger's Cage @cage"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@gfl", alt_cost: {flashback: true}}}
+  - p0: {t: cast, card: "@hfl", pay: {tap: ["@b1"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@hfl", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Faithless Looting]
+      battlefield:
+        - {card: Badlands, tapped: true}
+        - {card: Badlands, tapped: false}
+        - {card: Badlands, tapped: false}
+notes: >
+  Three untapped Badlands could pay {2}{R}, so only the Cage stops the flashback; the graveyard copy must not be in the
+  legal set. The hand copy is cast normally. The Cage is controlled by p1 and still binds p0 ("Players"). Wrong
+  engines: enumerate the flashback (a Forge enumerator gap noted in the interaction tests) or forbid the hand cast too.

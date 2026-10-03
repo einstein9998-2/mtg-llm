@@ -1,0 +1,85 @@
+id: lions-eye-diamond-in-response-keeps-the-spell-on-the-stack
+title: Activating Lion's Eye Diamond while holding priority over Dark Ritual discards the hand but not the spell, and the floating mana survives the pass
+area: card
+cards: ["Lion's Eye Diamond", Dark Ritual, Griselbrand, Island, Swamp]
+tags: [lions-eye-diamond, dark-ritual, mana-ability, priority, mana-pool, stack]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Lion's Eye Diamond", text: "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+  - {kind: cr, ref: "106.4", text: "Each player’s mana pool empties at the end of each step and phase, and the player is said to lose this mana.", verified: true}
+  - {kind: oracle, card: Dark Ritual, text: "Add {B}{B}{B}.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @dr", "Griselbrand @g", "Island @i"]
+    battlefield: ["Swamp @s", "Lion's Eye Diamond @led"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dr", pay: {tap: ["@s"]}}
+  - p0: {t: activate, source: "@led", ability: 0, choose_color: B}
+  - check:
+      stack: [{kind: spell, card: "@dr", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [], mana_pool: {B: 3}, graveyard: ["Lion's Eye Diamond", Griselbrand, Island]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {B: 6}
+      hand: []
+      graveyard: ["Lion's Eye Diamond", Griselbrand, Island, Dark Ritual]
+      battlefield: [{card: Swamp, tapped: true}]
+notes: >
+  After casting Ritual p0 keeps priority (117.3c) and may activate LED as an instant. Dark Ritual is already on the
+  stack, so it is not in the hand and is not discarded. The {B}{B}{B} from LED stays in the pool while both players
+  pass (the pool empties only at the end of a step or phase, 106.4), and Ritual then adds three more: six black. Wrong
+  engines: discard the spell, empty the pool on a priority pass, or forbid LED with a non-empty stack.
+---
+id: lions-eye-diamond-mana-pays-faithless-looting-flashback
+title: Lion's Eye Diamond's red mana pays Faithless Looting's flashback from the graveyard after the hand is discarded
+area: card
+cards: ["Lion's Eye Diamond", Faithless Looting, Griselbrand, Archon of Cruelty, Island]
+tags: [lions-eye-diamond, faithless-looting, flashback, mana-pool, graveyard-cast]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Lion's Eye Diamond", text: "Discard your hand, Sacrifice this artifact: Add three mana of any one color.", verified: true}
+  - {kind: oracle, card: Faithless Looting, text: "Flashback {2}{R}", verified: true}
+  - {kind: cr, ref: "702.34a", text: "“Flashback [cost]” means “You may cast this card from your graveyard if the resulting spell is an instant or sorcery spell by paying [cost] rather than paying its mana cost”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Griselbrand @g", "Archon of Cruelty @a"]
+    battlefield: ["Lion's Eye Diamond @led"]
+    graveyard: ["Faithless Looting @fl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@led", ability: 0, choose_color: R}
+  - check:
+      p0: {mana_pool: {R: 3}, hand: [], graveyard: [Faithless Looting, "Lion's Eye Diamond", Griselbrand, Archon of Cruelty]}
+  - p0: {t: cast, card: "@fl", alt_cost: {flashback: true}, pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@fl", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      hand: []
+      graveyard: ["Lion's Eye Diamond", Griselbrand, Archon of Cruelty]
+      battlefield: []
+notes: >
+  The classic Reanimator line: LED for {R}{R}{R} puts both creatures in the graveyard and leaves Looting (already in the
+  graveyard) castable by flashback for {2}{R}, paid entirely from the pool. The script stops with Looting on the stack;
+  its resolution (draw two, discard two) is covered in faithless-looting.yaml. Wrong engines: refuse a graveyard cast,
+  or require lands for the flashback cost.

@@ -1,0 +1,9 @@
+[package]
+name = "mtg-dsl"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+mtg-core.workspace = true
+serde.workspace = true
+ron.workspace = true

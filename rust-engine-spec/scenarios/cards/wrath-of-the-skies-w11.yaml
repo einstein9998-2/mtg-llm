@@ -1,0 +1,87 @@
+id: wrath-of-the-skies-x2-pay-two-destroys-mana-value-two-or-less
+title: Wrath of the Skies with X=2, paying 2 energy, destroys each artifact, creature and enchantment with mana value 2 or less on both sides
+area: card
+cards: [Wrath of the Skies, Plains, "Phelia, Exuberant Shepherd", Quantum Riddler, "Dragon's Rage Channeler", Cori-Steel Cutter, Aluren, Murktide Regent, Island]
+tags: [wrath-of-the-skies, energy, x-cost, mana-value, board-wipe, choose-number]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wrath of the Skies, text: "You get X {E} (energy counters), then you may pay any amount of {E}. Destroy each artifact, creature, and enchantment with mana value less than or equal to the amount of {E} paid this way.", verified: true}
+  - {kind: cr, ref: "107.14", text: "The energy symbol is {E}. It represents one energy counter. To pay {E}, a player removes one energy counter from themselves.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Wrath of the Skies @wrath"]
+    battlefield: ["Plains @pl1", "Plains @pl2", "Plains @pl3", "Plains @pl4", "Phelia, Exuberant Shepherd @phelia", "Quantum Riddler @qr"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc", "Cori-Steel Cutter @cutter", "Aluren @aluren", "Murktide Regent @murk", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wrath", x: 2, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_number, purpose: pay_energy, answer: 2}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 0
+      graveyard: [Wrath of the Skies, "Phelia, Exuberant Shepherd"]
+      battlefield:
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Quantum Riddler}
+    p1:
+      graveyard: ["Dragon's Rage Channeler", Cori-Steel Cutter]
+      battlefield: [{card: Aluren}, {card: Murktide Regent}, {card: Island}]
+notes: >
+  X=2: {2}{W}{W}, four Plains. p0 gets 2 energy and pays 2 (the decision is p0's, the caster). Mana values: Phelia 2,
+  DRC 1, Cutter 2 (destroyed); Riddler 5, Aluren 4, Murktide 7 (survive); lands are never affected. Both players'
+  permanents are destroyed (each). Bugs caught: comparing with X instead of energy paid, sparing the caster's permanents,
+  destroying lands, energy left over.
+---
+id: wrath-of-the-skies-existing-energy-partial-payment
+title: Wrath of the Skies can use energy the caster already had and pay only part of it; the rest stays
+area: card
+cards: [Wrath of the Skies, Plains, "Dragon's Rage Channeler", "Phelia, Exuberant Shepherd", Island]
+tags: [wrath-of-the-skies, energy, partial-payment, mana-value]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wrath of the Skies, text: "You get X {E} (energy counters), then you may pay any amount of {E}.", verified: true}
+  - {kind: cr, ref: "107.14", text: "To pay {E}, a player removes one energy counter from themselves.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    energy: 3
+    hand: ["Wrath of the Skies @wrath"]
+    battlefield: ["Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc", "Phelia, Exuberant Shepherd @phelia", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wrath", x: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_number, purpose: pay_energy, answer: 1}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {energy: 2, graveyard: [Wrath of the Skies]}
+    p1:
+      graveyard: ["Dragon's Rage Channeler"]
+      battlefield: [{card: "Phelia, Exuberant Shepherd"}, {card: Island}]
+notes: >
+  X=0 gives no new energy, but p0 already has 3 and may pay any amount of it. Paying 1 destroys DRC (mana value 1) and
+  spares Phelia (2); p0 keeps 2 energy. Bugs caught: only energy from this spell being payable, forcing payment of all
+  energy.

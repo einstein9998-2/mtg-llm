@@ -1,0 +1,223 @@
+id: aluren-free-cast-during-opponents-end-step
+title: Aluren lets its controller cast a creature for free during the opponent's end step
+area: card
+cards: [Aluren, Faerie Macabre]
+tags: [aluren, alternative-cost, flash, free-cast, opponents-turn]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 5
+  active: p1
+  phase: end
+  priority: p1
+  p0:
+    hand: ["Faerie Macabre @fm"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fm", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    phase: end
+    active: p1
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: []
+      battlefield: [{card: Aluren}, {card: Faerie Macabre}]
+notes: >
+  After the creature resolves the active player (p1) receives priority. Bug caught: Aluren's flash honoured only on the
+  controller's own turn, or a mana payment demanded.
+---
+id: no-aluren-creature-cannot-be-cast-at-instant-speed
+title: Without Aluren, a creature without flash cannot be cast in the opponent's end step even with the mana available
+area: card
+cards: [Faerie Macabre, Swamp]
+tags: [aluren, flash, timing, negative]
+derived_from: cr
+source:
+  - {kind: cr, ref: "302.1", text: "A player who has priority may cast a creature card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+setup:
+  turn: 5
+  active: p1
+  phase: end
+  priority: p1
+  p0:
+    hand: ["Faerie Macabre @fm"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@fm", pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@fm", alt_cost: {free: aluren}}}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Faerie Macabre]
+      battlefield: [{card: Swamp, tapped: false}, {card: Swamp, tapped: false}, {card: Swamp, tapped: false}]
+notes: >
+  Control for the Aluren scenarios: the instant-speed creature cast comes from Aluren only. Bug caught: an engine that lets
+  any creature be cast at any time, or offers the Aluren option without Aluren on the battlefield.
+---
+id: aluren-noncreature-spells-not-free
+title: Aluren covers creature spells only; Show and Tell, Brainstorm and Lotus Petal cannot use it
+area: card
+cards: [Aluren, Show and Tell, Brainstorm, Lotus Petal]
+tags: [aluren, alternative-cost, card-type, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Brainstorm @bs", "Lotus Petal @petal"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@snt", alt_cost: {free: aluren}}}
+  - expect_illegal: {p0: {t: cast, card: "@bs", alt_cost: {free: aluren}}}
+  - expect_illegal: {p0: {t: cast, card: "@petal", alt_cost: {free: aluren}}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Show and Tell, Brainstorm, Lotus Petal]}
+    legal: {p0: {exclude: [{t: cast, card: "@snt"}, {t: cast, card: "@bs"}]}}
+notes: >
+  Mana value 3 or less is not enough; the spell must be a creature spell. Show and Tell and Brainstorm have no castable
+  option at all here (no mana). Lotus Petal can still be cast for its normal cost {0} (not asserted either way), but not
+  through Aluren.
+---
+id: aluren-hybrid-mana-value-two-creature-free
+title: Spider-Woman ({1}{W/U}, mana value 2) is cast free through Aluren with no mana available
+area: card
+cards: [Aluren, "Spider-Woman, Stunning Savior"]
+tags: [aluren, mana-value, hybrid-mana, free-cast]
+derived_from: cr
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "202.3f", text: "When calculating the mana value of an object with a hybrid mana symbol in its mana cost, use the largest component of each hybrid symbol.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Spider-Woman, Stunning Savior @sw"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sw", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Aluren}, {card: "Spider-Woman, Stunning Savior", pt: [2, 2], keywords: [flying]}]
+notes: >
+  {W/U} counts 1, so the mana value is 2. A wrong mana-value computation (hybrid counted as 2, or 0) would not change this
+  result, so the scenario mainly checks that the hybrid cost is not demanded.
+---
+id: aluren-defense-grid-taxes-free-cast-on-opponents-turn
+title: Defense Grid adds {3} to an Aluren cast made on the opponent's turn; with three lands p0 casts one creature, then cannot cast another
+area: card
+cards: [Aluren, Defense Grid, Faerie Macabre, "Spider-Woman, Stunning Savior", Swamp]
+tags: [aluren, defense-grid, cost-increase, alternative-cost, opponents-turn]
+derived_from: cr
+source:
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can't pay a cost without having the necessary resources to pay it fully.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: end
+  priority: p1
+  p0:
+    hand: ["Faerie Macabre @fm", "Spider-Woman, Stunning Savior @sw"]
+    battlefield: ["Aluren @alu", "Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Defense Grid @dg"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fm", alt_cost: {free: aluren}, pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@fm", controller: p0}]
+      p0: {battlefield: [{card: Aluren}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}], mana_pool: {}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@sw", alt_cost: {free: aluren}, pay: auto}}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+    stack: []
+    p0:
+      hand: ["Spider-Woman, Stunning Savior"]
+      battlefield:
+        - {card: Aluren}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Faerie Macabre}
+notes: >
+  Aluren's "without paying their mana costs" is an alternative cost; the cost increase still applies on top (118.9d,
+  601.2f), so each free cast costs {3} on p1's turn. Three Swamps pay for one; the second cast is not offered. After the
+  Faerie resolves, p1 (active) gets priority and passes, so p0 gets priority again in the end step. Bugs caught: the tax
+  skipped because the spell is "free", the tax paid but the cast also demanding the mana cost.
+---
+id: aluren-defense-grid-no-tax-on-own-turn
+title: Defense Grid does not tax p0's Aluren cast during p0's own turn
+area: card
+cards: [Aluren, Defense Grid, Faerie Macabre]
+tags: [aluren, defense-grid, cost-increase, own-turn, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Faerie Macabre @fm"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+  p1:
+    battlefield: ["Defense Grid @dg"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fm", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {battlefield: [{card: Aluren}, {card: Faerie Macabre}], hand: []}
+notes: >
+  p0 has no mana source at all; the cast is legal only because it is p0's turn. Bug caught: Defense Grid applied based on
+  its controller's turn rather than the spell controller's turn.

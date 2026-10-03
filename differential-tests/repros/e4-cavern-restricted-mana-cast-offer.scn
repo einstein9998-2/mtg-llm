@@ -1,0 +1,12 @@
+# Finding E4 (differential testing, lockstep lines): the engine does not offer a cast that needs Cavern of Souls' restricted mana.
+# Cavern of Souls (naming Merfolk) taps for one mana of any color, spendable only on a Merfolk creature spell. Thassa's Oracle is a Merfolk Wizard
+# costing {U}{U}: Island + Cavern pays it. Forge offers `cast|Hand|Thassa's Oracle|` at this state; the engine offers only the land plays and
+# mana abilities until the player taps Cavern by hand. Check with:  scnmenu e4-cavern-restricted-mana-cast-offer.scn
+# Expected (Forge, and the rules): the menu contains cast|Hand|Thassa's Oracle|
+=== cavern-restricted-mana-cast-offer
+title: Island + Cavern of Souls (Merfolk) pay for Thassa's Oracle: the cast is offered
+state:
+  humanhand=Thassa's Oracle
+  humanbattlefield=Cavern of Souls|ChosenType:Merfolk;Island
+  humanlibrary=
+  aihand=Force of Will;Brainstorm

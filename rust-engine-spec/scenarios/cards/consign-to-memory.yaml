@@ -1,0 +1,145 @@
+id: consign-to-memory-cannot-target-colored-spell-or-activated-ability
+title: Consign to Memory cannot target a blue spell or an activated ability, only triggered abilities and colorless spells
+area: card
+cards: [Consign to Memory, Brainstorm, Misty Rainforest, Island]
+tags: [consign-to-memory, targeting, mask-validity, activated-ability, spell-color]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @isl", "Misty Rainforest @misty"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @cm"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: {tap: ["@isl"]}}
+  - p0: {t: activate, source: "@misty", ability: 0}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@cm", targets: ["@bs"]}}
+  - expect_illegal: {p1: {t: cast, card: "@cm", targets: [{ability_of: "@misty", nth: 0}]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bs", controller: p0}, {kind: activated, source: "@misty"}]
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 19
+    p1:
+      hand: [Consign to Memory]
+      battlefield: [{card: Island, tapped: false}]
+notes: >
+  Brainstorm ({U}) is blue, not colorless; Misty Rainforest's fetch is an activated ability, not a triggered one. Neither
+  is a legal target for Consign, so with only those two objects on the stack the cast is not offered. The probes must not
+  tap p1's Island.
+---
+id: consign-to-memory-counters-hedge-maze-surveil-trigger
+title: Consign to Memory counters Hedge Maze's enters trigger; the land stays but no surveil happens
+area: card
+cards: [Consign to Memory, Hedge Maze, Lightning Bolt, Island]
+tags: [consign-to-memory, counter-ability, triggered-ability, hedge-maze, surveil]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @cm"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@cm", targets: [{trigger_of: "@hm", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Hedge Maze, tapped: true}]
+      library_count: 11
+      library_top: [Lightning Bolt]
+      graveyard: []
+    p1:
+      graveyard: [Consign to Memory]
+notes: >
+  The ETB surveil trigger is countered; no surveil decision is raised, the library is unchanged (Bolt still on top,
+  11 cards), and Hedge Maze stays on the battlefield tapped.
+---
+id: consign-to-memory-replicate-copy-retargeted-counters-two-triggers
+title: Replicate copies Consign to Memory; the copy is retargeted so one Consign counters both City of Traitors' and Hedge Maze's triggers
+area: card
+cards: [Consign to Memory, City of Traitors, Hedge Maze, Lightning Bolt, Island]
+tags: [consign-to-memory, replicate, copy, retarget, counter-ability, city-of-traitors, hedge-maze, order-triggers]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.56a", text: "\"Replicate [cost]\" means \"As an additional cost to cast this spell, you may pay [cost] any number of times\" and \"When you cast this spell, if a replicate cost was paid for it, copy it for each time its replicate cost was paid. If the spell has any targets, you may choose new targets for any of the copies.\"", verified: true}
+  - {kind: oracle, card: Consign to Memory, text: "Replicate {1}", verified: true}
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+  - {kind: cr, ref: "603.3b", text: "each player, in APNAP order, puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    battlefield: ["City of Traitors @city"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @cm"]
+    battlefield: ["Island @pi1", "Island @pi2"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - p0: {decision: order_triggers, answer: ["@city", "@hm"]}
+  - check:
+      stack: [{kind: triggered, source: "@city", controller: p0}, {kind: triggered, source: "@hm", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@cm", replicate: 1, targets: [{trigger_of: "@hm", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: change_targets, answer: true}
+  - p1: {decision: choose_target, slot: 0, answer: {trigger_of: "@city", nth: 0}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: City of Traitors}, {card: Hedge Maze, tapped: true}]
+      graveyard: []
+      library_count: 11
+    p1:
+      graveyard: [Consign to Memory]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Playing Hedge Maze triggers both City of Traitors (another land played) and Hedge Maze's surveil; both are p0's, so p0
+  orders them (the first listed goes on the stack first: City at the bottom, Hedge Maze on top). Consign with replicate
+  {1} costs {U}{1} (both Islands). The replicate trigger goes above Consign; p1 passes, p0 passes, it resolves and creates
+  a copy, whose new target p1 may choose (CR 707.10c; per the SCHEMA addenda: yes_no "change targets?" answered true, then
+  choose_target answering with City's trigger). Stack then (bottom to top): City
+  trigger, Hedge Maze trigger, Consign (targeting Hedge Maze trigger), copy (targeting City trigger). The copy resolves first,
+  then the original: both triggers are countered, so City stays and no surveil happens. The copy ceases to exist
+  (it is not a card), so only the original Consign card is in p1's graveyard. Priority flow after the copy is created: the
+  active player p0 gets priority (117.3b), so the script has p0 pass, p1 pass for each resolution.

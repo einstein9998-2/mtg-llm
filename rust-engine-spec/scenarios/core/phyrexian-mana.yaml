@@ -1,0 +1,121 @@
+id: dismember-phyrexian-both-symbols-paid-with-life
+title: "Dismember paid with 4 life and one generic mana kills Dragon's Rage Channeler"
+area: core
+cards: [Dismember, Island, Dragon's Rage Channeler]
+tags: [phyrexian-mana, life-payment, dismember, casting, mana-payment]
+derived_from: cr
+source:
+  - {kind: oracle, card: Dismember, text: "({B/P} can be paid with either {B} or 2 life.)", verified: true}
+  - {kind: oracle, card: Dismember, text: "Target creature gets -5/-5 until end of turn.", verified: true}
+  - {kind: cr, ref: "107.4f", text: "A Phyrexian mana symbol represents a cost that can be paid either with one mana of its color or by paying 2 life.", verified: true}
+  - {kind: cr, ref: "601.2b", text: "If a cost that will be paid as the spell is being cast includes Phyrexian mana symbols, the player announces whether they intend to pay 2 life or a corresponding colored mana cost for each of those symbols.", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dismember @dis"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dis", phyrexian: [life, life], targets: ["@drc"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@dis", controller: p0, targets: ["@drc"]}
+      p0: {life: 16, battlefield: [{card: Island, tapped: true}], hand: []}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 16, graveyard: [Dismember], battlefield: [{card: Island, tapped: true}]}
+    p1: {life: 20, battlefield: [], graveyard: [Dragon's Rage Channeler]}
+notes: >
+  Dismember costs {1}{B/P}{B/P}. Paying both Phyrexian symbols with life costs 2 + 2 = 4 life (20 -> 16) and the
+  remaining {1} is paid with the Island. The life is paid at cast time. At resolution the Channeler (printed 1/1) gets
+  -5/-5 and dies as a state-based action. A wrong engine could charge life per symbol incorrectly, forget the generic
+  {1}, or require black mana.
+---
+id: dismember-cannot-pay-life-at-one-life
+title: "With 1 life Dismember cannot pay a Phyrexian symbol with life; paying all three costs in mana is still legal"
+area: core
+cards: [Dismember, Island, Swamp, Dragon's Rage Channeler]
+tags: [phyrexian-mana, life-payment, dismember, mask-validity, life-total-limit]
+derived_from: cr
+source:
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can’t pay a cost without having the necessary resources to pay it fully. For example, a player with only 1 life can’t pay a cost of 2 life, and a permanent that’s already tapped can’t be tapped to pay a cost.", verified: true}
+  - {kind: oracle, card: Dismember, text: "({B/P} can be paid with either {B} or 2 life.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    hand: ["Dismember @dis"]
+    battlefield: ["Island @i1", "Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@dis", phyrexian: [life, life], targets: ["@drc"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@dis", phyrexian: [life, mana], targets: ["@drc"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@dis", phyrexian: [mana, life], targets: ["@drc"], pay: auto}}
+  - p0: {t: cast, card: "@dis", phyrexian: [mana, mana], targets: ["@drc"], pay: auto}
+  - check:
+      p0:
+        life: 1
+        battlefield: [{card: Island, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 1, graveyard: [Dismember]}
+    p1: {battlefield: [], graveyard: [Dragon's Rage Channeler]}
+notes: >
+  At 1 life the player cannot pay 2 life, so each Phyrexian symbol must be paid with {B}. The three lands (Island +
+  two Swamps) can pay {1}{B}{B}, so only the all-mana cast is offered and the player stays at 1 life. A wrong engine that
+  lets life go negative (or treats the payment as legal and then loses the game) fails the first three probes.
+---
+id: dismember-pay-two-life-at-exactly-two-life
+title: "At exactly 2 life a player may pay 2 life for a Phyrexian symbol and loses the game when state-based actions are checked"
+area: core
+cards: [Dismember, Island, Swamp, Dragon's Rage Channeler]
+tags: [phyrexian-mana, life-payment, dismember, state-based-actions, game-over]
+derived_from: cr
+source:
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment. If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 2
+    hand: ["Dismember @dis"]
+    battlefield: ["Island @i1", "Swamp @s1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@dis", phyrexian: [life, life], targets: ["@drc"], pay: auto}}
+  - p0: {t: cast, card: "@dis", phyrexian: [life, mana], targets: ["@drc"], pay: auto}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0: {life: 0}
+notes: >
+  Paying 4 life (both symbols) is not possible with 2 life, but paying 2 life for one symbol and {B} for the other is:
+  the life total (2) is greater than or equal to the payment (119.4). The result is 0 life, so p0 loses at the next
+  state-based action check (704.5a). The scenario guards against engines that demand strictly more life than the
+  payment, and against engines that let the cast through with a bigger payment.

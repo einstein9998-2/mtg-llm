@@ -1,0 +1,24 @@
+# Finding E6 (lockstep lines, random game boros-aggro vs reanimator seed 700529): same family as E3, still open on m3h.
+# Two Lazotep Quarries and one creature: Quarry A taps with the creature sacrificed for {R}, Quarry B taps for {C}: that pays Amped Raptor ({1}{R}).
+# Forge offers and plays it. The engine offers no cast: with sacrifice sources allowed (legal.rs mana_sources_ex) every Quarry is turned into
+# a sacrifice source ("one tap per permanent", comment in the code) and only as many are kept as there are victims, so the second Quarry is dropped
+# instead of staying a colorless source. One Quarry plus a Mountain works (control scenario). Activating the Quarries by hand works.
+=== two-quarries-one-creature-pay-raptor
+title: Quarry (sacrificing Voice of Victory) plus a second Quarry pay {1}{R} for Amped Raptor: the cast is offered
+state:
+  humanhand=Amped Raptor
+  humanbattlefield=Lazotep Quarry;Lazotep Quarry;Sand Scout
+script:
+  p1: cast Amped Raptor
+expect:
+  controls p1 "Amped Raptor"
+
+=== one-quarry-mountain-control
+title: control: Quarry plus Mountain pay for Amped Raptor, sacrificing the creature
+state:
+  humanhand=Amped Raptor
+  humanbattlefield=Lazotep Quarry;Mountain;Sand Scout
+script:
+  p1: cast Amped Raptor
+expect:
+  controls p1 "Amped Raptor"

@@ -1,0 +1,139 @@
+id: quarry-sacrifice-creature-for-white-mana
+title: Lazotep Quarry's second ability sacrifices a creature as a mana ability for one mana of any color, used to cast Swords to Plowshares
+area: card
+cards: [Lazotep Quarry, Ocelot Pride, Swords to Plowshares, "Dragon's Rage Channeler"]
+tags: [lazotep-quarry, mana-ability, sacrifice-cost, any-color]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Lazotep Quarry, text: "{T}, Sacrifice a creature: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "106.4", text: "When an effect instructs a player to add mana, that mana goes into a player's mana pool. From there, it can be used to pay costs immediately, or it can stay in the player's mana pool as unspent mana.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Lazotep Quarry @q", "Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@q", ability: 1, sacrifice: ["@oc"], choose_color: W}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        mana_pool: {W: 1}
+        graveyard: [Ocelot Pride]
+        battlefield: [{card: Lazotep Quarry, tapped: true}]
+  - p0: {t: cast, card: "@stp", targets: ["@drc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      graveyard: [Ocelot Pride, Swords to Plowshares]
+    p1:
+      life: 21
+      exile: ["Dragon's Rage Channeler"]
+      battlefield: []
+notes: >
+  Ability index 1 ({T}: Add {C} is 0). It is a mana ability: no stack object, p0 keeps priority with {W} floating, then
+  spends it on Swords (p1 gains DRC's power 1). A wrong engine puts the mana ability on the stack, offers only colorless,
+  or lets a land be sacrificed in place of the creature.
+---
+id: quarry-graveyard-creature-returns-as-4-4-zombie-token-copy
+title: Lazotep Quarry's third ability (X=2) exiles Amped Raptor from the graveyard and creates a 4/4 token copy that has its abilities but was not cast
+area: card
+cards: [Lazotep Quarry, Plains, Amped Raptor]
+tags: [lazotep-quarry, token-copy, copy-exception, sorcery-speed, sacrifice-cost, amped-raptor, energy]
+derived_from: cr
+source:
+  - {kind: oracle, card: Lazotep Quarry, text: "{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery.", verified: true}
+  - {kind: oracle, card: Amped Raptor, text: "When this creature enters, you get {E}{E} (two energy counters). Then if you cast it from your hand, exile cards from the top of your library until you exile a nonland card.", verified: true}
+  - {kind: cr, ref: "707.9b", text: "Some copy effects modify a characteristic as part of the copying process. The final set of values for that characteristic becomes part of the copiable values of the copy.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    graveyard: ["Amped Raptor @gyr"]
+    battlefield: ["Lazotep Quarry @q", "Plains @l1", "Plains @l2", "Plains @l3", "Plains @l4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@q", ability: 2, x: 2, sacrifice: ["@q"], targets: ["@gyr"], pay: auto}
+  - check:
+      stack: [{kind: activated, source: "@q", controller: p0, targets: ["@gyr"]}]
+      p0: {graveyard: [Amped Raptor, Lazotep Quarry]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "two energy"}]
+      p0: {exile: [Amped Raptor], graveyard: [Lazotep Quarry]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 2
+      exile: [Amped Raptor]
+      graveyard: [Lazotep Quarry]
+      library_count: 10
+      battlefield:
+        - {card: Amped Raptor, token: true, pt: [4, 4], keywords: [first strike], sick: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  X=2 matches the Raptor's mana value 2; {X}{2} is paid with four Plains, and the Quarry is both tapped and sacrificed
+  as the Desert (it is a Desert itself). The token copies the Raptor except for being a 4/4 black Zombie (707.9b), so it
+  has first strike and the Raptor's enters ability, which triggers: p0 gets two energy, but the token was not cast from
+  hand, so nothing is exiled from the library (10 cards remain). Color and creature type are not asserted (no SCHEMA
+  key). A wrong engine creates a 2/1, a vanilla 4/4 Zombie, or runs the "cast from hand" part.
+---
+id: quarry-graveyard-ability-only-at-sorcery-speed
+title: Lazotep Quarry's graveyard ability cannot be activated on the opponent's turn, while its mana ability can
+area: card
+cards: [Lazotep Quarry, Plains, Guide of Souls]
+tags: [lazotep-quarry, sorcery-speed, mask-validity, mana-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Lazotep Quarry, text: "Activate only as a sorcery.", verified: true}
+  - {kind: cr, ref: "602.5d", text: "Activated abilities that read \"Activate only as a sorcery\" mean the player must follow the timing rules for casting a sorcery spell, though the ability isn't actually a sorcery.", verified: true}
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    graveyard: ["Guide of Souls @gyg"]
+    battlefield: ["Lazotep Quarry @q", "Plains @l1", "Plains @l2", "Plains @l3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: activate, source: "@q", ability: 2, x: 1, sacrifice: ["@q"], targets: ["@gyg"]}}
+  - p0: {t: activate, source: "@q", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 1}
+      graveyard: [Guide of Souls]
+      battlefield_contains: [{card: Lazotep Quarry, tapped: true}]
+notes: >
+  It is p1's turn, so sorcery timing fails for p0 even with an empty stack and enough mana (X=1 plus {2} from three
+  Plains). The mana ability {T}: Add {C} is usable at any time p0 has priority (positive control); it does not use the
+  stack and p0 keeps priority.

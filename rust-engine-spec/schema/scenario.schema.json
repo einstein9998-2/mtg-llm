@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MTG engine spec scenario v1",
+  "type": "object",
+  "required": ["id", "title", "area", "cards", "tags", "derived_from", "source", "setup", "script", "expect"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "maxLength": 100},
+    "title": {"type": "string", "minLength": 5},
+    "area": {"enum": ["core", "card", "matchup", "hidden-info"]},
+    "cards": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "tags": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}, "minItems": 1},
+    "derived_from": {"enum": ["ruling", "cr", "oracle"]},
+    "symmetric": {"type": "boolean"},
+    "source": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["kind", "text", "verified"],
+        "properties": {
+          "kind": {"enum": ["oracle", "cr", "ruling"]},
+          "card": {"type": "string"},
+          "ref": {"type": "string"},
+          "date": {"type": "string"},
+          "text": {"type": "string", "minLength": 3},
+          "verified": {"type": "boolean"},
+          "note": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "setup": {"type": "object"},
+    "random": {},
+    "script": {"type": "array", "items": {"type": "object"}},
+    "expect": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["at"]}},
+    "observer": {"enum": ["p0", "p1"]},
+    "world_b": {"type": "object"},
+    "assert_streams_identical": {"type": "object"},
+    "sideboard": {},
+    "notes": {"type": "string"},
+    "supersedes": {"type": "string"},
+    "history": {"type": "array"}
+  }
+}

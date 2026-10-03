@@ -1,0 +1,170 @@
+id: hi-fow-exiled-blue-card-is-public
+title: The blue card exiled to pay for Force of Will becomes public, while the rest of the hand stays hidden
+area: hidden-info
+cards: [Force of Will, Brainstorm, Lightning Bolt, Show and Tell, Omniscience, Island, Tropical Island, Hedge Maze, Volcanic Island]
+tags: [hidden-info, alternative-cost, exile-face-up, counterspell, redaction]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "406.3", text: "Exiled cards are, by default, kept face up and may be examined by any player at any time.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner's graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Omniscience @omni"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@st"]}
+  - label: fow-cast
+    check:
+      stack:
+        - {kind: spell, card: "@st", controller: p1}
+        - {kind: spell, card: "@fow", controller: p0, targets: ["@st"]}
+      pending: {actor: p0, kind: priority}
+      p0: {life: 19, exile: [{card: Brainstorm, face_up: true}], hand: [Lightning Bolt]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: fow-cast
+    observer: p1
+    obs:
+      opp: {hand_count: 1, revealed_hand: []}
+      option_labels_exclude_names: [Lightning Bolt]
+      events_text_exclude: [Lightning Bolt]
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {life: 19, graveyard: [Force of Will], exile: [Brainstorm], hand: [Lightning Bolt]}
+    p1: {graveyard: [Show and Tell], hand: [Omniscience], battlefield: [{card: Island}, {card: Tropical Island}, {card: Hedge Maze}]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 1}
+      events_text_exclude: [Lightning Bolt]
+notes: >
+  The exiled Brainstorm is in a public zone, face up (406.3), so p1 sees it (asserted on the true state). The caster gets
+  priority after casting (117.3c); both pass, Force of Will counters Show and Tell, and the active player p1 gets priority.
+  No Show and Tell choice is ever raised. Lightning Bolt never leaves p0's hand and must not appear in p1's view.
+---
+id: hi-daze-returned-island-known-to-both
+title: An Island returned to hand by Daze stays known to the opponent until it leaves the hand
+area: hidden-info
+cards: [Daze, Volcanic Island, Lightning Bolt, Murktide Regent, Aluren, Island, Tropical Island, Hedge Maze]
+tags: [hidden-info, alternative-cost, bounce-to-hand, revealed-hand, counter-unless-pay, turn-advance]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "400.2", text: "Library and hand are hidden zones, even if all the cards in one such zone happen to be revealed.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Daze @daze", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @volc"]
+    library: ["Murktide Regent @mk"]
+    library_pad: 10
+  p1:
+    hand: ["Aluren @alu"]
+    battlefield: ["Island", "Island", "Tropical Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@alu", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@volc"}, targets: ["@alu"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_for_daze, answer: true}
+  - label: daze-resolved
+    check:
+      stack: [{kind: spell, card: "@alu", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p0: {hand: [Volcanic Island, Lightning Bolt], battlefield: [], graveyard: [Daze]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - advance: {to: main1, of: p0}
+  - p0: {t: play_land, card: "@volc"}
+expect:
+  - at: daze-resolved
+    observer: p1
+    obs:
+      opp: {hand_count: 2, revealed_hand: [Volcanic Island]}
+      option_labels_exclude_names: [Lightning Bolt]
+      events_text_exclude: [Lightning Bolt]
+  - at: after_script
+    turn: 5
+    active: p0
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Lightning Bolt, Murktide Regent], battlefield: [{card: Volcanic Island, tapped: false}], lands_played: 1}
+    p1: {battlefield_contains: [{card: Aluren}]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 2, revealed_hand: []}
+      option_labels_exclude_names: [Lightning Bolt, Murktide Regent]
+      events_text_exclude: [Lightning Bolt, Murktide Regent]
+notes: >
+  Daze's cost moves Volcanic Island (an Island by subtype) from the battlefield to p0's hand; both players saw it, so p1's
+  view lists it as a known card in p0's hand (doc 02 section 6: a card moving from a public zone to a hidden zone keeps
+  known_to = both). p1 pays {1} with its spare land, so Daze does nothing and Aluren resolves. p1 has no creatures, so the
+  advance raises no attack decision; p0 untaps, draws Murktide (hidden from p1), and replays Volcanic Island, after which
+  p1's known-hand list is empty again. p1's 8-card limit is not reached (hand 0).
+---
+id: hi-force-of-negation-pitch-and-exile-are-public
+title: Force of Negation's pitched card and the spell it exiles are both public
+area: hidden-info
+cards: [Force of Negation, Stock Up, Aluren, Brainstorm, Lightning Bolt, Volcanic Island, Island, Tropical Island]
+tags: [hidden-info, alternative-cost, exile-face-up, counterspell, not-your-turn]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "406.3", text: "Exiled cards are, by default, kept face up and may be examined by any player at any time.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "Counter target spell. If that spell is countered this way, put it on top of its owner's library instead of into its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Stock Up @su", "Aluren @alu"]
+    battlefield: ["Island", "Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@su"}, targets: ["@bs"]}
+  - check:
+      p1: {life: 20, exile: [{card: Stock Up, face_up: true}], hand: [Aluren]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Lightning Bolt], graveyard: [], exile: [Brainstorm], library_count: 10}
+    p1: {graveyard: [Force of Negation], exile: [Stock Up], hand: [Aluren]}
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 1, revealed_hand: []}
+      option_labels_exclude_names: [Aluren]
+      events_text_exclude: [Aluren]
+notes: >
+  It is p0's turn, so p1 may use the alternative cost; Stock Up is blue ({U} in its cost) and is exiled face up. Force of
+  Negation counters Brainstorm and exiles it instead of putting it into the graveyard; Brainstorm draws nothing, so p0's
+  library is unchanged. No life is paid (this alternative cost has none). Aluren stays hidden.

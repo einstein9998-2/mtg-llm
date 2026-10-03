@@ -1,0 +1,110 @@
+id: reanimate-fizzles-when-target-exiled-by-faerie-macabre
+title: Reanimate whose target is exiled in response by Faerie Macabre does not resolve, so its caster loses no life
+area: card
+cards: [Reanimate, Griselbrand, Faerie Macabre, Swamp]
+tags: [reanimate, fizzle, illegal-target, activate-from-hand, no-life-loss]
+derived_from: cr
+source:
+  - {kind: oracle, card: Reanimate, text: "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to that card's mana value.", verified: true}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "A target that's no longer in the zone it was in when it was targeted is illegal.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve. It's removed from the stack and, if it's a spell, put into its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Reanimate @rean"]
+    battlefield: ["Swamp @sw"]
+    graveyard: ["Griselbrand @gris"]
+    library_pad: 10
+  p1:
+    hand: ["Faerie Macabre @fm"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rean", targets: ["@gris"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@gris"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@rean", controller: p0}
+        - {kind: activated, source: "@fm", controller: p1}
+      p1: {graveyard: [Faerie Macabre], hand: []}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@rean", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [Griselbrand], graveyard: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Reanimate]
+      exile: [Griselbrand]
+      battlefield: [{card: Swamp, tapped: true}]
+    p1:
+      graveyard: [Faerie Macabre]
+notes: >
+  Discarding Faerie Macabre is the cost, so it is in the graveyard while its ability is on the stack. The ability
+  resolves first and exiles Griselbrand. Reanimate's only target is gone, so Reanimate does not resolve at all: no
+  creature, and none of its effects, including the life loss (p0 stays at 20). A wrong engine resolves Reanimate with
+  the life loss but no creature (the "impossible effect" path, which is right only when the target is still legal).
+---
+id: reanimate-fizzles-when-target-exiled-by-surgical-extraction
+title: Reanimate fizzles after Surgical Extraction exiles its target in response; Surgical's caster pays 2 life
+area: card
+cards: [Reanimate, Griselbrand, Surgical Extraction, Swamp]
+tags: [reanimate, fizzle, illegal-target, surgical-extraction, phyrexian-mana, shuffle]
+derived_from: cr
+source:
+  - {kind: oracle, card: Reanimate, text: "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to that card's mana value.", verified: true}
+  - {kind: oracle, card: Surgical Extraction, text: "Choose target card in a graveyard other than a basic land card. Search its owner's graveyard, hand, and library for any number of cards with the same name as that card and exile them. Then that player shuffles.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Reanimate @rean"]
+    battlefield: ["Swamp @sw"]
+    graveyard: ["Griselbrand @gris"]
+    library_pad: 10
+  p1:
+    hand: ["Surgical Extraction @se"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@rean", targets: ["@gris"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@se", phyrexian: [life], targets: ["@gris"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, found: ["@gris"]}
+  - check:
+      stack: [{kind: spell, card: "@rean", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [Griselbrand]}
+      p1: {life: 18}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Reanimate]
+      exile: [Griselbrand]
+      library_count: 10
+    p1:
+      life: 18
+      graveyard: [Surgical Extraction]
+notes: >
+  Surgical Extraction's {B/P} is paid with 2 life (p1 18). Its controller p1 searches p0's zones and exiles Griselbrand;
+  p0 then shuffles (an all-Island library, so any shuffle outcome gives the asserted state). Reanimate's target left
+  the graveyard, so Reanimate is removed without resolving and p0 loses no life.

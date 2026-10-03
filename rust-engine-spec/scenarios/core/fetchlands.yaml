@@ -1,0 +1,272 @@
+id: fetchland-costs-paid-on-activation-search-on-resolution
+title: "Scalding Tarn: tap, 1 life and sacrifice are paid when the ability goes on the stack; the search and the new land happen only on resolution"
+area: core
+cards: [Scalding Tarn, Island, Volcanic Island, Mountain]
+tags: [fetchland, activated-ability, costs, stack, search, shuffle, life-payment]
+derived_from: cr
+source:
+  - {kind: oracle, card: Scalding Tarn, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "602.2", text: "To activate an ability is to put it onto the stack and pay its costs, so that it will eventually resolve and have its effect.", verified: true}
+  - {kind: cr, ref: "602.2b", text: "The remainder of the process for activating an ability is identical to the process for casting a spell listed in rules 601.2b-i.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+  - {kind: cr, ref: "305.6", text: "An object with the land card type and a basic land type has the intrinsic ability \"{T}: Add [mana symbol],\"", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Scalding Tarn @tarn"]
+    library: ["Island @isl", "Volcanic Island @volc", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0, targets: []}
+  - check:
+      stack:
+        - {kind: activated, source: "@tarn", controller: p0}
+      pending: {actor: p0, kind: priority}
+      p0:
+        life: 19
+        graveyard: [Scalding Tarn]
+        battlefield: []
+        library_count: 13
+  - resolve_top: true
+  - p0: {decision: search, found: "@volc", expect_options: {include: ["@isl", "@volc", "@mtn"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Scalding Tarn]
+      battlefield: [{card: Volcanic Island, tapped: false}]
+      library_count: 12
+      lands_played: 0
+notes: >
+  Costs are paid at activation: the Tarn is already in the graveyard, p0 is already at 19 and the library has not been
+  touched (13 cards) while the ability sits on the stack. On resolution p0 searches, finds Volcanic Island (it has the
+  Island subtype and the Mountain subtype), puts it onto the battlefield untapped and shuffles (12 cards left). Fetching a land
+  is not a land play. Catches an engine that searches during activation, pays life on resolution, or keeps the source
+  until resolution. Shuffle order is random: only counts are asserted.
+---
+id: fetchland-fail-to-find-is-allowed
+title: "Scalding Tarn: p0 may decline to find a land even though legal targets are in the library; costs stay paid"
+area: core
+cards: [Scalding Tarn, Island, Volcanic Island]
+tags: [fetchland, search, fail-to-find, shuffle, life-payment]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn't required to find some or all of those cards even if they're present in that zone.", verified: true}
+  - {kind: oracle, card: Scalding Tarn, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Scalding Tarn @tarn"]
+    library: ["Island @isl", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0, targets: []}
+  - resolve_top: true
+  - p0: {decision: search, found: null, expect_options: {include: ["@isl", "@volc"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Scalding Tarn]
+      battlefield: []
+      library_count: 12
+notes: >
+  The search decision must offer a "find nothing" answer (701.23b: a search for cards with a stated quality need not find
+  them). The library keeps all 12 cards (it is shuffled anyway). The sacrifice and the life payment are not refunded.
+  Catches an engine that forces a find whenever a legal card exists.
+---
+id: prismatic-vista-finds-basic-lands-only
+title: "Prismatic Vista may fetch only basic land cards, not Volcanic Island, Tropical Island, Hedge Maze or Wasteland"
+area: core
+cards: [Prismatic Vista, Island, Mountain, Forest, Volcanic Island, Tropical Island, Hedge Maze, Wasteland]
+tags: [fetchland, search, basic-land, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Vista, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.8", text: "Any land with the supertype \"basic\" is a basic land. Any land that doesn't have this supertype is a nonbasic land, even if it has a basic land type.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Prismatic Vista @vista"]
+    library: ["Island @isl", "Mountain @mtn", "Forest @for", "Volcanic Island @volc", "Tropical Island @trop", "Hedge Maze @hm", "Wasteland @wl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: activate, source: "@vista", ability: 0, targets: []}
+  - resolve_top: true
+  - p0:
+      decision: search
+      found: "@for"
+      expect_options:
+        include: ["@isl", "@mtn", "@for"]
+        exclude: ["@volc", "@trop", "@hm", "@wl"]
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 19
+      graveyard: [Prismatic Vista]
+      battlefield: [{card: Forest, tapped: false}]
+notes: >
+  Contrast with the Scalding Tarn candidate scenario: "basic land card" is about the basic supertype, not land types. Dual lands
+  with basic land types are not basic. Catches an engine that implements Prismatic Vista as "any land with a basic land type".
+---
+id: fetchland-finds-surveil-land-trigger-follows
+title: "Misty Rainforest fetches Hedge Maze: it enters tapped, its surveil trigger goes on the stack after the shuffle"
+area: core
+cards: [Misty Rainforest, Hedge Maze, Lightning Bolt, Island]
+tags: [fetchland, search, shuffle, etb, surveil, enters-tapped, triggers]
+derived_from: cr
+source:
+  - {kind: oracle, card: Misty Rainforest, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+  - {kind: cr, ref: "701.24b", text: "In such cases, the found cards aren't included in the shuffle, even though they remain in the library at that time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Misty Rainforest @mist"]
+    library: ["Hedge Maze @hm", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Lightning Bolt, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island]}
+script:
+  - p0: {t: activate, source: "@mist", ability: 0, targets: []}
+  - resolve_top: true
+  - p0: {decision: search, found: "@hm"}
+  - check:
+      stack:
+        - {kind: triggered, source: "@hm", controller: p0}
+      pending: {actor: p0, kind: priority}
+      p0:
+        battlefield: [{card: Hedge Maze, tapped: true}]
+        life: 19
+        library_top: [Lightning Bolt]
+        library_count: 11
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: ["@bolt"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Misty Rainforest, Lightning Bolt]
+      battlefield: [{card: Hedge Maze, tapped: true}]
+      library_count: 10
+      lands_played: 0
+notes: >
+  Hedge Maze (Forest Island) is a legal find for "a Forest or Island card". It enters tapped, which is a replacement
+  effect on entering, and its enters trigger goes on the stack when p0 next would receive priority, after the ability has
+  finished resolving (including the shuffle). The scripted shuffle puts Lightning Bolt on top of the 11 remaining cards, so
+  the surveil sees Bolt and sends it to the graveyard. The found card is not part of the shuffle (701.24b), so the 11-name
+  result list excludes Hedge Maze.
+---
+id: fetchland-stifled-sacrificed-life-paid-no-search
+title: "Stifle on a fetchland ability: the land is already sacrificed and the life already paid, no search and no shuffle happen"
+area: core
+cards: [Scalding Tarn, Stifle, Island, Volcanic Island, Mountain]
+tags: [fetchland, stifle, counter-ability, costs, no-refund, shuffle]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn't get a \"refund\" of any costs that were paid.", verified: true}
+  - {kind: cr, ref: "602.2", text: "To activate an ability is to put it onto the stack and pay its costs, so that it will eventually resolve and have its effect.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Scalding Tarn @tarn"]
+    library: ["Volcanic Island @volc", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+random: []
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0, targets: []}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@tarn", nth: 0}], pay: auto}
+  - check:
+      stack:
+        - {kind: activated, source: "@tarn", controller: p0}
+        - {kind: spell, card: "@stifle", controller: p1, targets: [{ability_of: "@tarn", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Scalding Tarn]
+      battlefield: []
+      library_count: 12
+      library_top: [Volcanic Island, Mountain]
+    p1:
+      graveyard: [Stifle]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  The costs (tap, 1 life, sacrifice) were paid at activation and are not refunded (701.6b). The ability never resolves
+  (701.6a), so there is no search decision and, with the empty random queue, no shuffle either: the library stays in its
+  original order (Volcanic Island and Mountain still on top, 12 cards). Catches an engine that fetches anyway, refunds the land
+  or life, or shuffles the library without a search.
+---
+id: fetchland-at-one-life-can-pay-and-loses
+title: "Paying 1 life with exactly 1 life is allowed; p0 drops to 0 and loses as a state-based action"
+area: core
+cards: [Scalding Tarn, Island]
+tags: [fetchland, life-payment, state-based-actions, game-over]
+derived_from: cr
+source:
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: oracle, card: Scalding Tarn, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    battlefield: ["Scalding Tarn @tarn"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0, targets: []}
+expect:
+  - at: after_script
+    game: {over: true}
+    p0:
+      life: 0
+      graveyard: [Scalding Tarn]
+notes: >
+  With life total 1 the payment of 1 life is legal (119.4 requires life total at least the amount), so the activation is
+  offered and completes. The player is then at 0 and loses (704.5a) the next time state-based actions are checked, before
+  anyone receives priority. The scenario ends as soon as the activation is done; the game is over. Catches an engine that
+  refuses the payment at 1 life (that rule only forbids paying more than you have) or that lets the player keep playing at 0.

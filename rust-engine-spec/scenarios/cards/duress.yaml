@@ -1,0 +1,38 @@
+id: duress-targets-an-opponent-and-takes-a-noncreature-nonland-card
+title: Duress must target an opponent and offers only noncreature, nonland cards from the revealed hand
+area: card
+cards: [Duress, Griselbrand, Brainstorm, Island, Swamp]
+tags: [duress, hand-disruption, targeting, mask-validity, hidden-info]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Duress, text: "Target opponent reveals their hand. You choose a noncreature, nonland card from it. That player discards that card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Duress @du"]
+    battlefield: ["Swamp @s"]
+    library_pad: 10
+  p1:
+    hand: ["Griselbrand @g", "Brainstorm @bs", "Island @i"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@du", targets: [{player: p0}]}}
+  - p0: {t: cast, card: "@du", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@bs"], expect_options: {include: ["@bs"], exclude: ["@g", "@i"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, graveyard: [Duress]}
+    p1: {hand: [Griselbrand, Island], graveyard: [Brainstorm]}
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 2, revealed_hand: [Griselbrand, Island]}
+notes: >
+  "Target opponent" excludes the caster. Griselbrand (creature) and Island (land) are not offered; Brainstorm is. No
+  life is lost (contrast Thoughtseize). p0 knows the rest of the hand after the reveal.

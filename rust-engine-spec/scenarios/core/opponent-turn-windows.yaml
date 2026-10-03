@@ -1,0 +1,149 @@
+id: instant-in-opponents-upkeep
+title: The nonactive player may cast an instant in the active player's upkeep, before the draw
+area: core
+cards: [Lightning Bolt, Mountain]
+tags: [timing, instant-speed, upkeep, nonactive-player, priority]
+derived_from: cr
+source:
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+  - {kind: cr, ref: "503.1", text: "The upkeep step has no turn-based actions. Once it begins, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  p0:
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - check: {phase: upkeep, active: p0, priority: p1, legal: {p1: {include: [{t: cast, card: "@bolt"}, {t: pass}]}}}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - check: {priority: p1, stack: [{kind: spell, card: "@bolt", controller: p1}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    turn: 3
+    phase: upkeep
+    active: p0
+    priority: p0
+    pending: {actor: p0, kind: priority}
+    stack: []
+    p0: {life: 17, hand_count: 0, library_count: 10}
+    p1: {graveyard: [Lightning Bolt], battlefield: [{card: Mountain, tapped: true}]}
+notes: >
+  p0 passes with an empty stack in its own upkeep; p1 receives priority and casts Bolt at p0. After resolution the
+  active player p0 receives priority (117.3b) and the step is still the upkeep: p0's draw has not happened (hand 0,
+  library untouched). A wrong engine would not offer p1 any priority in the opponent's upkeep, or would run the draw
+  step before the response resolved.
+---
+id: instant-in-opponents-draw-step
+title: The nonactive player may cast an instant in the active player's draw step, after the draw has happened
+area: core
+cards: [Lightning Bolt, Mountain, Island]
+tags: [timing, instant-speed, draw-step, nonactive-player, priority]
+derived_from: cr
+source:
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+  - {kind: cr, ref: "504.1", text: "First, the active player draws a card. This turn-based action doesn't use the stack.", verified: true}
+  - {kind: cr, ref: "504.2", text: "Second, the active player gets priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  p0:
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - advance: {to: draw, of: p0}
+  - check: {phase: draw, priority: p0, p0: {hand: [Island]}}
+  - p0: {t: pass}
+  - check: {phase: draw, priority: p1, legal: {p1: {include: [{t: cast, card: "@bolt"}]}}}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    turn: 3
+    phase: draw
+    active: p0
+    priority: p0
+    stack: []
+    p0: {life: 17, hand: [Island]}
+    p1: {graveyard: [Lightning Bolt]}
+notes: >
+  The draw is a turn-based action done before anyone has priority in the draw step, so the card is in p0's hand when p1
+  gets its window. Bolt resolves in the draw step and p0 (active) receives priority again. A wrong engine could skip
+  the nonactive player's priority in the draw step.
+---
+id: mishra-bauble-own-turn-draws-at-opponents-upkeep
+title: Mishra's Bauble used in your own main phase draws a card at the beginning of the opponent's next upkeep, not immediately
+area: core
+cards: [Mishra's Bauble, Lightning Bolt, Ponder]
+tags: [mishras-bauble, delayed-trigger, upkeep, timing, draw]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "603.7e", text: "If an activated or triggered ability creates a delayed triggered ability, the source of that delayed triggered ability is the same as the source of that other ability. The controller of that delayed triggered ability is the player who controlled that other ability as it resolved.", verified: true}
+  - {kind: cr, ref: "603.7b", text: "A delayed triggered ability will trigger only once—the next time its trigger event occurs—unless it has a stated duration, such as \"this turn.\"", verified: true}
+  - {kind: cr, ref: "503.1a", text: "Any abilities that triggered during the untap step and any abilities that triggered at the beginning of the upkeep are put onto the stack before the active player gets priority", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @bauble"]
+    library: ["Lightning Bolt @bolt", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bauble", ability: 0, targets: [{player: p1}]}
+  - label: bauble-on-stack
+    check:
+      stack: [{kind: activated, source: "@bauble", controller: p0}]
+      priority: p0
+      p0: {battlefield: [], graveyard: ["Mishra's Bauble"], hand_count: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: bauble-resolved
+    check:
+      stack: []
+      priority: p0
+      p0: {hand_count: 0, library_top: [Lightning Bolt, Ponder], library_count: 12}
+  - advance: {to: upkeep, of: p1}
+  - label: delayed-trigger-waiting
+    check:
+      turn: 4
+      phase: upkeep
+      active: p1
+      priority: p1
+      stack: [{kind: triggered, source: "@bauble", controller: p0, text_contains: "draw"}]
+      p0: {hand_count: 0}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    turn: 4
+    phase: upkeep
+    active: p1
+    priority: p1
+    stack: []
+    p0: {hand: [Lightning Bolt], library_top: [Ponder], library_count: 11}
+    p1: {hand_count: 0}
+notes: >
+  Bauble's ability is an activated ability, not a mana ability, so it uses the stack: the sacrifice is a cost (Bauble is
+  already in the graveyard while the ability is on the stack), p0 keeps priority (117.3c). On resolution p0 only LOOKS at
+  p1's top card (no decision, no zone change). The delayed trigger "at the beginning of the next turn's upkeep" is
+  created by that resolution; the next turn is turn 4 (p1's), so the trigger waits until p1's upkeep begins and is put
+  on the stack before p1 receives priority (503.1a). It is controlled by p0 (603.7e): p0 draws the top card of p0's
+  library (Lightning Bolt), p1 draws nothing from it (p1's own draw step comes later). Wrong engines: draw
+  immediately; draw at p0's own next upkeep (turn 5); let p1 draw; fire the trigger twice.

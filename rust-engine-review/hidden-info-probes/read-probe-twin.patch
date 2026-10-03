@@ -1,0 +1,25 @@
+--- /home/claude/rust-engine/crates/mtg-core/src/read.rs	2026-10-01 16:58:03.100878557 +0000
++++ crates/mtg-core/src/read.rs	2026-10-01 17:44:57.930979370 +0000
+@@ -262,6 +262,22 @@
+         self.derived_dirty = true;
+     }
+ 
++    /// REVIEW PROBE: an observer-indistinguishable twin: shuffle the true order of `owner`'s library
++    /// positions the observer does not know (what a different shuffle would have produced).
++    #[cfg(feature = "diff-harness")]
++    pub fn review_shuffle_unknown_order(&mut self, observer: Seat, owner: Seat, seed: u64) {
++        let mut rng = Pcg64::from_seed(seed);
++        let bit = 1u8 << observer.idx();
++        let lib = self.players[owner.idx()].library.clone();
++        let free: Vec<usize> = (0..lib.len()).filter(|&i| self.knowledge[lib[i].slot as usize].pos_known_to & bit == 0).collect();
++        let mut objs: Vec<ObjRef> = free.iter().map(|&i| lib[i]).collect();
++        rng.shuffle(&mut objs);
++        let l = &mut self.players[owner.idx()].library;
++        for (&i, r) in free.iter().zip(objs) {
++            l[i] = r;
++        }
++    }
++
+     #[cfg(feature = "diff-harness")]
+     pub fn frame_depth(&self) -> usize {
+         self.frames.len()

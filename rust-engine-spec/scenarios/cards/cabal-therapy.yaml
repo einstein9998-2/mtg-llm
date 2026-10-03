@@ -1,0 +1,113 @@
+id: cabal-therapy-named-card-all-copies-discarded
+title: Cabal Therapy naming Force of Will makes the target discard every copy; a land name is not offered
+area: card
+cards: [Cabal Therapy, Force of Will, Brainstorm, Island, Swamp]
+tags: [cabal-therapy, choose-name, hand-disruption, discard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cabal Therapy, text: "Choose a nonland card name. Target player reveals their hand and discards all cards with that name.", verified: true}
+  - {kind: cr, ref: "201.4", text: "If an effect instructs a player to choose a card name, the player must choose the name of a card in the Oracle card reference.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Cabal Therapy @ct"]
+    battlefield: ["Swamp @s"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @f1", "Force of Will @f2", "Brainstorm @bs", "Island @i"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ct", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: "Force of Will", expect_options: {exclude: [Island, Swamp]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Cabal Therapy]}
+    p1: {hand: [Brainstorm, Island], graveyard: [Force of Will, Force of Will]}
+notes: >
+  The name is chosen on resolution (no "as you cast" wording), by the caster. Both copies of the named card are
+  discarded, not just one. Land names (Island, Swamp) are not legal choices. Wrong engines: discard one copy only,
+  allow land names, or ask for the name at cast time.
+---
+id: cabal-therapy-names-blind-then-sees-the-hand
+title: Cabal Therapy's caster names a card before seeing the hand; a miss discards nothing but reveals the hand to the caster
+area: card
+cards: [Cabal Therapy, Force of Will, Brainstorm, Daze, Island, Swamp]
+tags: [cabal-therapy, choose-name, hidden-info, reveal, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cabal Therapy, text: "Choose a nonland card name. Target player reveals their hand and discards all cards with that name.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Cabal Therapy @ct"]
+    battlefield: ["Swamp @s"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @f1", "Brainstorm @bs", "Island @i"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ct", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      pending: {actor: p0, kind: choose_name}
+      observer: p0
+      obs:
+        opp: {hand_count: 3, revealed_hand: []}
+  - p0: {decision: choose_name, answer: Daze}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {hand: [Force of Will, Brainstorm, Island], graveyard: []}
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 3, revealed_hand: [Force of Will, Brainstorm, Island]}
+notes: >
+  The instructions run in order: name first, reveal second. While the name decision is pending, p0's observation must
+  not contain p1's hand (an engine that reveals first, or leaks the hand into the option labels, fails the check).
+  Daze is not in the hand, so nothing is discarded, but the hand was revealed and p0 knows it afterwards.
+---
+id: cabal-therapy-flashback-needs-a-creature
+title: Without a creature to sacrifice, Cabal Therapy cannot be flashed back
+area: card
+cards: [Cabal Therapy, Swamp, Lotus Petal, Island]
+tags: [cabal-therapy, flashback, sacrifice-cost, negative, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Cabal Therapy, text: "Flashback—Sacrifice a creature.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can’t pay a cost without having the necessary resources to pay it fully.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Swamp @s", "Lotus Petal @lp"]
+    graveyard: ["Cabal Therapy @ct"]
+    library_pad: 10
+  p1:
+    hand: [Island]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ct", alt_cost: {flashback: {sacrifice: "@lp"}}, targets: [{player: p1}]}}
+  - expect_illegal: {p0: {t: cast, card: "@ct", targets: [{player: p1}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Cabal Therapy], battlefield: [{card: Swamp, tapped: false}, {card: Lotus Petal}]}
+    legal: {p0: {exclude: [{t: cast, card: "@ct"}]}}
+notes: >
+  p0 controls a land and an artifact but no creature, so the flashback cost cannot be paid. Paying Therapy's normal {B}
+  is not an option from the graveyard either (only flashback permits a graveyard cast), even though the Swamp is
+  untapped. Pairs with the positive flashback scenario above.

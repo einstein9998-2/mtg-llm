@@ -1,0 +1,105 @@
+id: bolt-three-damage-to-a-player
+title: Lightning Bolt deals 3 damage to a player, who loses 3 life
+area: card
+cards: [Lightning Bolt, Mountain]
+tags: [lightning-bolt, damage, player-target]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: cr, ref: "120.3a", text: "Damage dealt to a player by a source without infect causes that player to lose that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, graveyard: [Lightning Bolt], battlefield: [{card: Mountain, tapped: true}]}
+    p1: {life: 17}
+notes: >
+  Baseline: cast with the stack, both pass, Bolt resolves and goes to its owner's graveyard; the active player receives priority afterwards.
+---
+id: bolt-fizzles-when-its-only-target-is-bounced-in-response
+title: Lightning Bolt does not resolve when Prismari Charm bounces its only target in response; Bolt goes to the graveyard and nothing is damaged
+area: card
+cards: [Lightning Bolt, Prismari Charm, Murktide Regent, Mountain, Volcanic Island]
+tags: [lightning-bolt, prismari-charm, fizzle, target-legality, stack, response]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve. It's removed from the stack and, if it's a spell, put into its owner's graveyard.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "Return target nonland permanent to its owner's hand.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Murktide Regent @mur", "Volcanic Island @v1", "Volcanic Island @v2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: ["@mur"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@charm", modes: [3], targets: ["@mur"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}]
+      pending: {actor: p0, kind: priority}
+      p1: {hand: [Murktide Regent], graveyard: [Prismari Charm]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt], life: 20}
+    p1: {hand: [Murktide Regent], life: 20, battlefield: [{card: Volcanic Island, tapped: true}, {card: Volcanic Island, tapped: true}]}
+notes: >
+  The Murktide left the battlefield, so the Murktide that returns to hand is a new object and Bolt's target is illegal (608.2b). Bolt is removed from
+  the stack without resolving and put into its owner's graveyard. Nothing is damaged: p1's life stays 20. A wrong engine redirects the damage to the player or leaves Bolt on the stack.
+---
+id: bolt-lethal-to-a-player-at-three-life
+title: Lightning Bolt to the face of a player at 3 life ends the game
+area: card
+cards: [Lightning Bolt, Mountain]
+tags: [lightning-bolt, damage, state-based-actions, game-over]
+derived_from: cr
+source:
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    life: 3
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p1: {life: 0}
+notes: >
+  3 damage takes p1 from 3 to 0; the state-based action check that follows resolution ends the game before any player receives priority.

@@ -1,0 +1,71 @@
+id: flow-state-one-card-when-graveyard-lacks-a-sorcery
+title: With only an instant in the graveyard, Flow State puts one of the top three into hand and two on the bottom in a chosen order
+area: card
+cards: [Flow State, Brainstorm, Island, Ponder, Swamp]
+tags: [flow-state, library-manipulation, bottom-order, conditional-effect]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Flow State, text: "Look at the top three cards of your library. Put one of them into your hand and the rest on the bottom of your library in any order. If there is an instant card and a sorcery card in your graveyard, instead put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell's resolution, the spell is put into its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Flow State @fs"]
+    battlefield: ["Island @i1", "Island @i2"]
+    graveyard: [Brainstorm]
+    library: ["Ponder @a", "Island @b", "Swamp @c"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: to_hand, answer: ["@a"], expect_options: {include: ["@a", "@b", "@c"]}}
+  - p0: {decision: order_cards, purpose: bottom, answer: ["@b", "@c"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Brainstorm, Flow State]
+      library_count: 12
+      library_bottom: [Island, Swamp]
+notes: >
+  The graveyard has an instant but no sorcery while Flow State resolves; Flow State itself is on the stack and only
+  reaches the graveyard as the last step (608.2n), so it does not satisfy its own condition. One card to hand; the other
+  two go to the bottom in the order p0 chooses (answer is top first, so Swamp is bottom-most). A wrong engine counts Flow
+  State as the sorcery and gives two cards.
+---
+id: flow-state-sorcery-timing-not-while-stack-nonempty
+title: Flow State cannot be cast while the caster's own Brainstorm is on the stack
+area: card
+cards: [Flow State, Brainstorm, Island]
+tags: [flow-state, sorcery-timing, mask-validity, negative-case]
+derived_from: cr
+source:
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Flow State @fs", "Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - expect_illegal: {p0: {t: cast, card: "@fs"}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bs", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Flow State]}
+notes: >
+  p0 holds priority after casting Brainstorm (117.3c) in its own main phase with two untapped Islands, but the stack is
+  not empty, so the sorcery is not offered. Paired with the castable scenarios above.

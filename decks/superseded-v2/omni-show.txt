@@ -1,0 +1,41 @@
+# Omni-Show (Show and Tell / Omniscience) | Combo (cheat big permanents)
+# Source: Riccardo Saino, 5th-8th, 1 Tappa Tigullio League 2026/27, 2026-09-27 (23 players)
+# https://mtgtop8.com/event?e=91360&d=893866&f=LE
+# Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.
+
+4 Ancient Tomb
+1 Forest
+1 Hedge Maze
+3 Island
+1 Mistrise Village
+4 Misty Rainforest
+2 Scalding Tarn
+2 Tropical Island
+1 Atraxa, Grand Unifier
+2 Emrakul, the Aeons Torn
+1 Auroral Procession
+4 Brainstorm
+3 Cunning Wish
+4 Force of Will
+1 Intuition
+1 Planar Genesis
+4 Ponder
+4 Show and Tell
+1 Sink into Stupor
+2 Spell Pierce
+4 Stock Up
+4 Veil of Summer
+2 Lotus Petal
+4 Omniscience
+
+3 Carpet of Flowers
+2 Consign to Memory
+2 Disruptor Flute
+1 Dress Down
+1 Echoing Truth
+1 Firemind's Foresight
+1 Grafdigger's Cage
+1 Heritage Reclamation
+1 Shared Summons
+1 Sublime Epiphany
+1 Surgical Extraction

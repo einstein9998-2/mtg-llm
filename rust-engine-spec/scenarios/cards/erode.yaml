@@ -1,0 +1,106 @@
+id: erode-controller-declines-no-search-no-shuffle
+title: If Erode's target's controller declines the search, no land enters and the creature is still destroyed
+area: card
+cards: [Erode, Plains, "Dragon's Rage Channeler", Mountain]
+tags: [erode, opponent-decision, may-search, shuffle]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Erode, text: "Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Erode @er"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library: ["Mountain @mtn"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@er", targets: ["@drc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: search_basic_land, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      graveyard: ["Dragon's Rage Channeler"]
+      battlefield: []
+      library_count: 11
+notes: >
+  Declining the may-search means no land is put onto the battlefield; the creature is still destroyed. Whether the
+  library is shuffled when the search is declined is an open project question (OPEN-QUESTIONS.md: "Does declining a
+  'may search ... then shuffle' still shuffle?"; CR 701.23 does not say), so this scenario asserts only the library
+  count (11) and allows any shuffle outcome (random: any). Reviewer W8 removed `random: []` and `library_top`.
+---
+id: erode-search-offers-only-basic-lands
+title: Erode's search offers basic lands only, not dual lands with basic land types
+area: card
+cards: [Erode, Plains, "Dragon's Rage Channeler", Mountain, Volcanic Island, Plateau]
+tags: [erode, search, basic-land, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Erode, text: "Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Erode @er"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library: ["Volcanic Island @vi", "Mountain @mtn", "Plateau @plat"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@er", targets: ["@drc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: search_basic_land, answer: true}
+  - p1: {decision: search, found: "@mtn", expect_options: {include: ["@mtn"], exclude: ["@vi", "@plat"]}}
+expect:
+  - at: after_script
+    stack: []
+    p1:
+      battlefield: [{card: Mountain, tapped: true}]
+      library_count: 12
+notes: >
+  Volcanic Island (Land - Island Mountain) and Plateau (Land - Mountain Plains) have basic land types but are not basic
+  lands (no basic supertype in oracle.json), so they are not offered. The padding Islands are basic and may be offered.
+  Library 13 -> 12.
+---
+id: erode-targets-creature-not-land-or-player
+title: Erode cannot target a land or a player, only a creature (or planeswalker)
+area: card
+cards: [Erode, Plains, "Dragon's Rage Channeler", Plateau]
+tags: [erode, targeting, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Erode, text: "Destroy target creature or planeswalker.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Erode @er"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc", "Plateau @plat"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@er", targets: ["@plat"]}}
+  - expect_illegal: {p0: {t: cast, card: "@er", targets: [{player: p1}]}}
+  - p0: {t: cast, card: "@er", targets: ["@drc"], pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@er", controller: p0, targets: ["@drc"]}]
+    pending: {actor: p0, kind: priority}
+notes: >
+  Lands and players are not legal targets; the creature is (positive control). Planeswalkers are not in this scenario
+  because no planeswalker loyalty values are available.

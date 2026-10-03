@@ -1,0 +1,161 @@
+id: legend-rule-second-spider-woman-keep-old
+title: Casting a second Spider-Woman makes its controller choose one to keep; keeping the original puts the new one into the graveyard
+area: core
+cards: ["Spider-Woman, Stunning Savior", Island]
+tags: [state-based-actions, legend-rule, decision]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners' graveyards. This is called the \"legend rule.\"", verified: true}
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Spider-Woman, Stunning Savior @sw2"]
+    battlefield: ["Spider-Woman, Stunning Savior @sw1", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sw2", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: legend_rule, keep: "@sw1", expect_options: {include: ["@sw1", "@sw2"], count: 2}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: "Spider-Woman, Stunning Savior", alias: sw1, sick: false}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+      graveyard: ["Spider-Woman, Stunning Savior"]
+notes: >
+  Both copies are legendary with the same name under one controller, so the legend rule makes p0 choose one before p0
+  receives priority. The {W/U} hybrid symbol is paid with blue from an Island. A wrong engine always keeps the newest
+  (or oldest) copy without asking, or sacrifices the spell before it resolves. The kept permanent is the original object
+  (not summoning sick).
+---
+id: legend-rule-second-spider-woman-keep-new
+title: The legend rule lets the controller keep the newly entered copy, which stays summoning sick
+area: core
+cards: ["Spider-Woman, Stunning Savior", Island]
+tags: [state-based-actions, legend-rule, decision, object-identity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners' graveyards.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Spider-Woman, Stunning Savior @sw2"]
+    battlefield: ["Spider-Woman, Stunning Savior @sw1", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sw2", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: legend_rule, keep: "@sw2", expect_options: {include: ["@sw1", "@sw2"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: "Spider-Woman, Stunning Savior", alias: sw2, sick: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+      graveyard: ["Spider-Woman, Stunning Savior"]
+notes: >
+  Companion to the keep-old case: the choice is the controller's, and the engine must keep exactly the chosen object.
+  A wrong engine that collapses "identical" copies would lose the distinction between the summoning-sick new copy and
+  the old one (doc 01 section 8 allows collapsing only identical-state permanents; these differ in summoning sickness).
+---
+id: legend-rule-atraxa-show-and-tell-etb-still-triggers
+title: A second Atraxa put onto the battlefield by Show and Tell is put into the graveyard by the legend rule but its enters trigger still goes on the stack
+area: core
+cards: ["Atraxa, Grand Unifier", Show and Tell, Island]
+tags: [state-based-actions, legend-rule, etb-trigger, show-and-tell, simultaneous-secret-choice]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners' graveyards.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+  - {kind: cr, ref: "704.3", text: "If any state-based actions are performed as a result of a check, the check is repeated; otherwise all triggered abilities that are waiting to be put on the stack are put on the stack", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "When Atraxa enters, reveal the top ten cards of your library.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @a2"]
+    battlefield: ["Atraxa, Grand Unifier @a1", "Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 15
+  p1:
+    hand: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@a2"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - p0: {decision: legend_rule, keep: "@a1", expect_options: {include: ["@a1", "@a2"]}}
+expect:
+  - at: after_script
+    stack: [{kind: triggered, source: "@a2", controller: p0, text_contains: "reveal the top ten"}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: "Atraxa, Grand Unifier", alias: a1}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+      graveyard: [Show and Tell, "Atraxa, Grand Unifier"]
+    p1: {hand: [Island], battlefield: []}
+notes: >
+  The new Atraxa entered, so its enters ability triggered (603.6a). Before any player gets priority the SBA check runs
+  (704.3); the legend rule puts the new Atraxa into the graveyard; then the waiting trigger goes on the stack anyway. A
+  wrong engine drops the trigger because its source left, or puts the trigger on the stack before the legend rule so
+  p0 could respond in between. Only the new Atraxa's trigger exists (the old one did not enter). The scenario stops with
+  the trigger on the stack; its resolution is the Atraxa card batch's job. p1 holds an eligible card and declines, so
+  p1's secret choice is a real decision.
+---
+id: legend-rule-boseiju-land-drop
+title: Playing a second Boseiju makes its controller choose which legendary land to keep
+area: core
+cards: ["Boseiju, Who Endures"]
+tags: [state-based-actions, legend-rule, land-drop]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners' graveyards.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @b2"]
+    battlefield: ["Boseiju, Who Endures @b1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@b2"}
+  - p0: {decision: legend_rule, keep: "@b1", expect_options: {include: ["@b1", "@b2"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: "Boseiju, Who Endures", alias: b1}]
+      graveyard: ["Boseiju, Who Endures"]
+      lands_played: 1
+notes: >
+  The legend rule applies to all legendary permanents, lands included. The land play is a special action; p0 would
+  receive priority afterward, so the SBA check runs first. The land drop is used up even though the new land is gone.

@@ -1,0 +1,76 @@
+id: bloodstained-mire-fetches-nonbasic-swamp-untapped
+title: Bloodstained Mire can find Underground Sea (a Swamp) but not an Island, and it enters untapped
+area: card
+cards: [Bloodstained Mire, Underground Sea, Island]
+tags: [bloodstained-mire, fetchland, search, land-subtypes, life-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Bloodstained Mire, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.6", text: "The basic land types are Plains, Island, Swamp, Mountain, and Forest.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Bloodstained Mire @mire"]
+    library: ["Island @isl", "Underground Sea @sea"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: activate, source: "@mire", ability: 0}
+  - check: {p0: {life: 19, graveyard: [Bloodstained Mire], battlefield: []}, stack: [{kind: activated, source: "@mire"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@sea", expect_options: {include: ["@sea"], exclude: ["@isl"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Bloodstained Mire]
+      library_count: 11
+      battlefield: [{card: Underground Sea, tapped: false}]
+notes: >
+  "Swamp card" means a card with the Swamp subtype, so the nonbasic Underground Sea (Land — Island Swamp) qualifies and
+  the Island does not. The land is put onto the battlefield untapped (no enters-tapped text) and this is not a land drop.
+  Life and sacrifice are costs paid on activation.
+---
+id: bloodstained-mire-search-with-no-swamp-finds-nothing-but-costs-are-paid
+title: With no Swamp or Mountain in the library, Mire's search finds nothing, yet the life and the land are already gone
+area: card
+cards: [Bloodstained Mire, Island]
+tags: [bloodstained-mire, fetchland, fail-to-find, costs]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Bloodstained Mire, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Bloodstained Mire @mire"]
+    library: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: activate, source: "@mire", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: null, expect_options: {exclude: ["@isl"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Bloodstained Mire]
+      library_count: 11
+      battlefield: []
+notes: >
+  The library holds only Islands, so the search fails (SCHEMA addenda: a search decision is raised even when nothing
+  legal can be found; answer null). The costs were paid on activation and are not refunded.

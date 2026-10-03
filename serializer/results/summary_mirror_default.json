@@ -1,0 +1,15 @@
+{
+"policy":"mirror","stops":"default","seatA_deck":"dnt.dck","seatB_deck(ForgeAI)":"jund75.dck",
+"games":30,"seatA_wins":10,"forgeAI_wins":20,"draws":0,"seatA_games_on_play":14,"seatA_wins_on_play":5,"wall_ms":68346,
+"prompts":1700,"prompt_chars":1164387,"prompt_tokens_est":323441,"prompts_per_game":56.7,
+"asked_by_kind":{"BottomCards":5,"Mulligan":35,"Priority":1646,"YesNo":14},
+"chars_by_kind":{"BottomCards":899,"Mulligan":6590,"Priority":1155722,"YesNo":1176},"chars_if_every_prompt_carried_full_state":{"BottomCards":4666,"Mulligan":27945,"Priority":1544537,"YesNo":3276},
+"menu_enumeration_ms_avg":1.04,"menu_calls":6944,"prompt_render_ms_avg":0.12,
+"forced_no_prompt":{"Priority":2703},
+"auto_pass_by_rule":{"stack:only-own-items":349,"stop-rule:my:COMBAT_BEGIN":197,"stop-rule:my:COMBAT_DAMAGE":55,"stop-rule:my:COMBAT_DECLARE_ATTACKERS":192,"stop-rule:my:COMBAT_END":187,"stop-rule:my:COMBAT_FIRST_STRIKE_DAMAGE":35,"stop-rule:my:DRAW":221,"stop-rule:my:END_OF_TURN":190,"stop-rule:my:UPKEEP":213,"stop-rule:opp:COMBAT_BEGIN":150,"stop-rule:opp:COMBAT_DAMAGE":55,"stop-rule:opp:COMBAT_END":140,"stop-rule:opp:COMBAT_FIRST_STRIKE_DAMAGE":5,"stop-rule:opp:DRAW":154,"stop-rule:opp:MAIN1":151,"stop-rule:opp:MAIN2":143,"stop-rule:opp:UPKEEP":158},
+"delegated_to_forge_ai":{"assignCombatDamage":30,"chooseCardName":5,"chooseCardsPile":4,"chooseCardsToDiscardFrom":38,"chooseCounterType":47,"chooseModeForAbility":16,"chooseNumber":4,"choosePermanentsToSacrifice":24,"chooseProtectionType":19,"chooseSingleCardForZoneChange":68,"chooseSingleEntityForEffect":44,"chooseSingleReplacementEffect":9,"chooseSpellAbilityToPlay":6944,"chooseStartingPlayer":14,"confirmAction":21,"confirmTrigger":145,"declareAttackers":112,"declareBlockers":31,"mulliganKeepHand":35,"orderAndPlaySimultaneousSa":192,"orderMoveToZoneList":7,"orderSimultaneousSa":192,"payManaCost":1234,"playChosenSpellAbility":512,"playSpellAbilityNoStack":153,"policy:BottomCards":5,"policy:Mulligan":35,"policy:Priority":1646,"policy:YesNo":14,"tuckCardsViaMulligan":5,"vote":4,"willPutCardOnTop":5},
+"problems":{},
+"leak_checks":0,"leak_failures":0,
+"mirror_ai_priority_pick_on_menu":1646,"mirror_ai_priority_pick_missing":0,
+"problem_samples":[]
+}

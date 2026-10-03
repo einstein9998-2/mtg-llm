@@ -1,0 +1,230 @@
+id: mu-lavinia-counters-daze-and-blocks-force-of-will-by-mana-value
+title: Under Lavinia, Dimir with three lands cannot cast Force of Will (mana value 5) at all, and its Daze cast by returning an Island is countered by Lavinia's trigger
+area: matchup
+cards: ["Lavinia, Azorius Renegade", Daze, Force of Will, Ponder, Swords to Plowshares, Orcish Bowmasters, Underground Sea, Swamp, Tundra]
+tags: [matchup, dimir-vs-uwx, lavinia, mana-value-cap, free-spells, daze, force-of-will, intervening-if, illegal-action]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Each opponent can't cast noncreature spells with mana value greater than the number of lands that player controls.", verified: true}
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing. If the ability triggers, it checks the stated condition again as it resolves.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Daze @daze", "Force of Will @fow", "Ponder @pd"]
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1", "Underground Sea @us2", "Swamp @sw1"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Tundra @t1"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@stp", targets: ["@bow"], pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pd", pay_life: 1}, targets: ["@stp"]}}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@us1"}, targets: ["@stp"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@stp", controller: p1}
+        - {kind: spell, card: "@daze", controller: p0}
+        - {kind: triggered, source: "@lav", controller: p1}
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [Force of Will, Ponder, Underground Sea], life: 20}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {stack: [{kind: spell, card: "@stp", controller: p1}], pending: {actor: p1, kind: priority}, p0: {graveyard: [Daze]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 21
+      hand: [Force of Will, Ponder, Underground Sea]
+      graveyard: [Daze]
+      exile: [Orcish Bowmasters]
+      battlefield: [{card: Underground Sea}, {card: Swamp}]
+    p1:
+      graveyard: [Swords to Plowshares]
+      battlefield_contains: [{card: "Lavinia, Azorius Renegade"}]
+notes: >
+  p0 controls three lands. Force of Will has mana value 5 (its mana cost, whatever cost is paid), above 3, so Lavinia's
+  static forbids casting it by either cost: the probe must be rejected and nothing changes (no life paid, Ponder stays).
+  Daze (mana value 2) may be cast; returning the Island spends no mana, so Lavinia's intervening-if trigger fires
+  (controlled by p1) and goes on the stack above Daze, resolving first and countering it. The returned Island stays in
+  p0's hand. Swords then resolves: Bowmasters exiled, p0 gains 1. Bugs caught: the cap compared with the cost paid
+  instead of mana value, the trigger missing for an alternative cost that is not "free", the land refunded.
+---
+id: mu-lavinia-counters-zero-cost-bauble-but-not-paid-thoughtseize
+title: Under Lavinia, Mishra's Bauble cast for {0} spends no mana and is countered; Thoughtseize paid with {B} is not, and resolves
+area: matchup
+cards: ["Lavinia, Azorius Renegade", "Mishra's Bauble", Thoughtseize, Swords to Plowshares, Underground Sea, Tundra]
+tags: [matchup, dimir-vs-uwx, lavinia, zero-mana-value, no-mana-spent, thoughtseize, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", verified: true}
+  - {kind: oracle, card: "Mishra's Bauble", text: "{T}, Sacrifice this artifact: Look at the top card of target player's library.", verified: true}
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+  - {kind: cr, ref: "603.4", text: "The ability triggers only if it is; otherwise it does nothing.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mishra's Bauble @bb", "Thoughtseize @ts"]
+    battlefield: ["Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp", "Tundra @tun"]
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Tundra @t1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bb", controller: p0}, {kind: triggered, source: "@lav", controller: p1}]
+      p0: {battlefield: [{card: Underground Sea, tapped: false}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {stack: [], pending: {actor: p0, kind: priority}, p0: {graveyard: ["Mishra's Bauble"]}}
+  - p0: {t: cast, card: "@ts", targets: [{player: p1}], pay: auto}
+  - check: {stack: [{kind: spell, card: "@ts", controller: p0}], pending: {actor: p0, kind: priority}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@stp"], expect_options: {include: ["@stp"], exclude: ["@tun"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: ["Mishra's Bauble", Thoughtseize]
+      battlefield: [{card: Underground Sea, tapped: true}]
+    p1:
+      hand: [Tundra]
+      graveyard: [Swords to Plowshares]
+notes: >
+  Mishra's Bauble has mana value 0 (not above p0's one land) so it can be cast, but casting it spends no mana, so
+  Lavinia's trigger counters it (Bauble goes to the graveyard; it never enters). Thoughtseize (mana value 1, one land)
+  is paid with {B}: mana was spent, the trigger does not trigger, and the stack holds only Thoughtseize. Bugs caught:
+  treating a {0} spell as "mana spent", triggering on every spell.
+---
+id: mu-dimir-consigns-lavinia-trigger-to-save-free-force-of-negation
+title: Dimir's free Force of Negation triggers Lavinia; Dimir counters that trigger with a hard-cast Consign to Memory (mana spent, no trigger) and the Force of Negation resolves
+area: matchup
+cards: ["Lavinia, Azorius Renegade", Force of Negation, Consign to Memory, Brainstorm, Prismatic Ending, Nethergoyf, Underground Sea, Swamp, Island, Tundra]
+tags: [matchup, dimir-vs-uwx, lavinia, force-of-negation, consign-to-memory, counter-ability, stack-lifo, exile-instead]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Negation @fon", "Brainstorm @bs", "Consign to Memory @cm"]
+    battlefield: ["Nethergoyf @ng", "Underground Sea @us1", "Swamp @sw1", "Island @is1"]
+    library_pad: 10
+  p1:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Tundra @t1", "Tundra @t2"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pe", x: 1, targets: ["@ng"], pay: {tap: ["@t1", "@t2"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@pe"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@pe", controller: p1}
+        - {kind: spell, card: "@fon", controller: p0}
+        - {kind: triggered, source: "@lav", controller: p1}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: cast, card: "@cm", targets: [{trigger_of: "@lav"}], pay: {tap: ["@us1"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@pe", controller: p1}
+        - {kind: spell, card: "@fon", controller: p0}
+        - {kind: triggered, source: "@lav", controller: p1}
+        - {kind: spell, card: "@cm", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {stack: [{kind: spell, card: "@pe"}, {kind: spell, card: "@fon"}], pending: {actor: p1, kind: priority}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Consign to Memory, Force of Negation]
+      exile: [Brainstorm]
+      battlefield_contains: [{card: Nethergoyf, pt: [1, 2]}]
+    p1:
+      exile: [Prismatic Ending]
+      graveyard: []
+      battlefield_contains: [{card: "Lavinia, Azorius Renegade"}]
+notes: >
+  p0 controls three lands: Force of Negation (mana value 3) and Consign (1) are within Lavinia's cap. FoN by its
+  alternative cost spends no mana, so Lavinia's trigger goes on the stack above it; p0 keeps priority (117.3c) and
+  Consigns the trigger, paying {U}: mana was spent, so Consign itself triggers nothing. Consign resolves first and
+  counters the trigger; then FoN resolves and exiles Prismatic Ending. Nethergoyf ends 1/2 (one instant type). Bugs
+  caught: Lavinia's trigger not targetable as a triggered ability, Lavinia triggering on the paid Consign.
+---
+id: mu-lavinia-blocks-free-massacre-until-fourth-land-then-counters-it
+title: Under Lavinia, Massacre (mana value 4) cannot be cast with three lands even for free; after a fourth land drop it can be cast free, and Lavinia's trigger counters it
+area: matchup
+cards: ["Lavinia, Azorius Renegade", Massacre, Polluted Delta, Underground Sea, Swamp, Island, Tundra, "Phelia, Exuberant Shepherd"]
+tags: [matchup, dimir-vs-uwx, lavinia, massacre, mana-value-cap, alternative-cost, land-count, illegal-action]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Each opponent can't cast noncreature spells with mana value greater than the number of lands that player controls.", verified: true}
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", verified: true}
+  - {kind: oracle, card: Massacre, text: "If an opponent controls a Plains and you control a Swamp, you may cast this spell without paying its mana cost.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Massacre @ma", "Polluted Delta @pd"]
+    battlefield: ["Underground Sea @us1", "Swamp @sw1", "Island @is1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Tundra @t1", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ma", alt_cost: {free: true}}}
+  - p0: {t: play_land, card: "@pd"}
+  - p0: {t: cast, card: "@ma", alt_cost: {free: true}}
+  - check:
+      stack: [{kind: spell, card: "@ma", controller: p0}, {kind: triggered, source: "@lav", controller: p1}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Massacre]
+      lands_played: 1
+      battlefield: [{card: Underground Sea, tapped: false}, {card: Swamp, tapped: false}, {card: Island, tapped: false}, {card: Polluted Delta, tapped: false}]
+    p1:
+      battlefield_contains: [{card: "Lavinia, Azorius Renegade", pt: [2, 2]}, {card: "Phelia, Exuberant Shepherd", pt: [2, 2]}]
+notes: >
+  Massacre's free-cast condition holds (Tundra is a Plains, p0 has a Swamp), but with three lands its mana value 4 is
+  above p0's land count, so it cannot be cast at all. After the Delta is played (four lands) it can be cast for free;
+  no mana is spent, so Lavinia's trigger counters it and the creatures keep their size. Bugs caught: the cap checked
+  against the cost paid (0) instead of mana value, the cap not updated after a land drop, the trigger missing for a
+  card-granted free cast.

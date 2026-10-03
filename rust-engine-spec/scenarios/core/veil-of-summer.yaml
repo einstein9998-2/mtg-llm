@@ -1,0 +1,157 @@
+id: veil-of-summer-no-draw-without-blue-or-black-spell-and-red-bolt-still-hits
+title: "Veil of Summer draws nothing if the opponent cast only a red spell, and hexproof from blue and black does not stop a red Lightning Bolt"
+area: core
+cards: [Lightning Bolt, Mountain, Forest, Veil of Summer, Island]
+tags: [veil-of-summer, hexproof-from-quality, conditional-draw, color, targeting]
+derived_from: cr
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: cr, ref: "702.11d", text: "“Hexproof from [quality]” on a permanent means “This permanent can’t be the target of [quality] spells your opponents control or abilities your opponents control from [quality] sources.”", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil"]
+    battlefield: ["Forest @f"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@veil", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1, targets: [{player: p0}]}
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [], library_count: 11, graveyard: [Veil of Summer]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 17, hand: [], library_count: 11, graveyard: [Veil of Summer]}
+    p1: {life: 20, graveyard: [Lightning Bolt]}
+notes: >
+  The only spell p1 cast this turn is the red Lightning Bolt, so Veil's "draw a card if an opponent has cast a blue or
+  black spell" condition is false and p0's library stays at 11. Hexproof from blue and from black applies only to blue or
+  black spells and sources; the Bolt was already targeting p0 anyway, was red, and so still resolves normally for 3
+  damage (20 -> 17). A wrong engine that gives full hexproof would fizzle the Bolt, or draws unconditionally.
+---
+id: veil-of-summer-hexproof-blocks-opponents-blue-spells-but-not-red
+title: "After Veil of Summer, the opponent cannot target the player or permanents with blue spells (even multicolor blue-red), but a red Lightning Bolt can still target the player"
+area: core
+cards: [Veil of Summer, Forest, Cori-Steel Cutter, Hydroblast, Prismari Charm, Lightning Bolt, Island, Mountain]
+tags: [veil-of-summer, hexproof-from-quality, targeting, mask-validity, multicolor, color]
+derived_from: cr
+source:
+  - {kind: oracle, card: Veil of Summer, text: "You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "(You and they can't be the targets of blue or black spells or abilities your opponents control.)", verified: true}
+  - {kind: cr, ref: "702.11d", text: "“Hexproof from [quality]” on a permanent means “This permanent can’t be the target of [quality] spells your opponents control or abilities your opponents control from [quality] sources.”", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil"]
+    battlefield: ["Forest @f", "Cori-Steel Cutter @cutter"]
+    library_pad: 10
+  p1:
+    hand: ["Hydroblast @hb", "Prismari Charm @charm", "Lightning Bolt @bolt"]
+    battlefield: ["Island @i1", "Island @i2", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@veil", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@hb", modes: [2], targets: ["@cutter"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@hb", modes: [2], targets: ["@f"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@charm", modes: [2], targets: [{player: p0}], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@charm", modes: [2], targets: ["@cutter"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@charm", modes: [3], targets: ["@cutter"], pay: auto}}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1, targets: [{player: p0}]}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      battlefield: [{card: Forest, tapped: true}, {card: Cori-Steel Cutter}]
+      graveyard: [Veil of Summer]
+      hand: []
+    p1:
+      graveyard: [Lightning Bolt]
+      hand: [Hydroblast, Prismari Charm]
+notes: >
+  Veil of Summer resolves (p1 cast no blue or black spell, so p0 does not draw), then p0 passes with an empty stack and p1
+  gets priority in p0's main phase. Hydroblast ({U}) and Prismari Charm ({U}{R}: blue as well as red, 202.2c) are blue
+  spells controlled by an opponent, so neither may target p0, p0's Cori-Steel Cutter (a red artifact), or p0's Forest.
+  The red Lightning Bolt may target p0 and deals 3 (20 -> 17). A wrong engine ignores the second color of Prismari Charm, applies hexproof to
+  every spell, or lets blue spells through.
+---
+id: veil-of-summer-in-response-fizzles-blue-spell
+title: "Veil of Summer cast in response to Hydroblast makes its target illegal, so Hydroblast does not resolve and Veil draws"
+area: core
+cards: [Hydroblast, Island, Veil of Summer, Forest, Cori-Steel Cutter]
+tags: [veil-of-summer, hexproof-from-quality, fizzle, target-becomes-illegal, conditional-draw, hydroblast]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "702.11d", text: "“Hexproof from [quality]” on a permanent means “This permanent can’t be the target of [quality] spells your opponents control or abilities your opponents control from [quality] sources.”", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn.", verified: true}
+  - {kind: oracle, card: Hydroblast, text: "Destroy target permanent if it's red.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hydroblast @hb"]
+    battlefield: ["Island @i"]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil"]
+    battlefield: ["Forest @f", "Cori-Steel Cutter @cutter"]
+    library: ["Island @drawn"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hb", modes: [2], targets: ["@cutter"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@hb", controller: p0, modes: [2], targets: ["@cutter"]}]
+      pending: {actor: p0, kind: priority}
+      p1: {hand: [Island], graveyard: [Veil of Summer]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Hydroblast], hand: []}
+    p1:
+      hand: [Island]
+      graveyard: [Veil of Summer]
+      battlefield: [{card: Forest, tapped: true}, {card: Cori-Steel Cutter}]
+notes: >
+  Hydroblast targets p1's red Cori-Steel Cutter legally, but Veil of Summer, resolved in response, gives that permanent hexproof
+  from blue. The blue Hydroblast then has no legal target on resolution (608.2b "other changes to the game state
+  may cause a target to no longer be legal"), so it does not resolve and goes to its owner's graveyard; the Cutter lives.
+  Veil's draw happens because p0 cast a blue spell this turn. A wrong engine only checks target legality on cast.

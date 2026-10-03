@@ -1,0 +1,130 @@
+// Test pool: simple cards used by the fuzzer and the engine's own tests. Names that start with a
+// real card's name behave like it; invented cards say so.
+[
+  (name: "Plains", types: "LAND", supertypes: "BASIC", subtypes: ["Plains"]),
+  (name: "Island", types: "LAND", supertypes: "BASIC", subtypes: ["Island"]),
+  (name: "Swamp", types: "LAND", supertypes: "BASIC", subtypes: ["Swamp"]),
+  (name: "Mountain", types: "LAND", supertypes: "BASIC", subtypes: ["Mountain"]),
+  (name: "Forest", types: "LAND", supertypes: "BASIC", subtypes: ["Forest"]),
+
+  (name: "Grizzly Bears", cost: "{1}{G}", types: "CREATURE", pt: (2, 2)),
+  (name: "Hill Giant", cost: "{3}{R}", types: "CREATURE", pt: (3, 3)),
+  (name: "Serra Angel", cost: "{3}{W}{W}", types: "CREATURE", pt: (4, 4), keywords: "FLYING | VIGILANCE"),
+  (name: "White Knight", cost: "{W}{W}", types: "CREATURE", pt: (2, 2), keywords: "FIRST_STRIKE"),
+  (name: "Typhoid Rats", cost: "{B}", types: "CREATURE", pt: (1, 1), keywords: "DEATHTOUCH"),
+  (name: "Vampire Nighthawk", cost: "{1}{B}{B}", types: "CREATURE", pt: (2, 3), keywords: "FLYING | DEATHTOUCH | LIFELINK"),
+  (name: "Craw Wurm", cost: "{4}{G}{G}", types: "CREATURE", pt: (6, 4)),
+  (name: "Giant Spider", cost: "{3}{G}", types: "CREATURE", pt: (2, 4), keywords: "REACH"),
+  (name: "Rhox", cost: "{2}{G}{G}", types: "CREATURE", pt: (4, 4), keywords: "TRAMPLE"),
+  (name: "Fencing Ace", cost: "{1}{W}", types: "CREATURE", pt: (1, 1), keywords: "DOUBLE_STRIKE"),
+  (name: "Goblin Piker", cost: "{1}{R}", types: "CREATURE", pt: (2, 1)),
+  (name: "Raging Goblin", cost: "{R}", types: "CREATURE", pt: (1, 1), keywords: "HASTE"),
+  (name: "Wall of Stone", cost: "{1}{R}{R}", types: "CREATURE", pt: (0, 8), keywords: "DEFENDER"),
+  (name: "Gigapede-ish Menace", cost: "{2}{B}", types: "CREATURE", pt: (3, 2), keywords: "MENACE"),
+  (name: "Invisible Stalker", cost: "{1}{U}", types: "CREATURE", pt: (1, 1), keywords: "HEXPROOF"),
+  (name: "Wind Drake", cost: "{2}{U}", types: "CREATURE", pt: (2, 2), keywords: "FLYING"),
+  (name: "Looter Bear", cost: "{2}{U}", types: "CREATURE", pt: (2, 2)),
+
+  (name: "Lightning Bolt", cost: "{R}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)],
+          effect: Damage(amount: Const(3), to: Target(0))),
+  ]),
+  (name: "Counterspell", cost: "{U}{U}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (zone: Stack))], effect: CounterSpell(0)),
+  ]),
+  (name: "Doom Blade", cost: "{1}{B}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE", colors_not: "B"))], effect: Destroy(One(Target(0)))),
+  ]),
+  (name: "Divination", cost: "{2}{U}", types: "SORCERY", abilities: [
+    Spell(effect: Draw(who: You, n: Const(2))),
+  ]),
+  (name: "Mind Rot", cost: "{2}{B}", types: "SORCERY", abilities: [
+    Spell(targets: [(players: Any)], effect: Discard(who: Target(0), n: Const(2))),
+  ]),
+  (name: "Unsummon", cost: "{U}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"))], effect: Bounce(One(Target(0)))),
+  ]),
+  (name: "Healing Salve", cost: "{W}", types: "INSTANT", abilities: [
+    Spell(targets: [(players: Any)], effect: GainLife(who: Target(0), n: Const(3))),
+  ]),
+  (name: "Prey Upon-ish Strike", cost: "{1}{R}", types: "SORCERY", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"))], effect: Damage(amount: Const(2), to: Target(0))),
+  ]),
+  (name: "Soldier", types: "CREATURE", colors: "W", pt: (1, 1), is_token: true),
+  (name: "Raise the Alarm", cost: "{1}{W}", types: "INSTANT", abilities: [
+    Spell(effect: CreateToken(token: "Soldier", n: Const(2), who: You)),
+  ]),
+
+  (name: "Prodigal Sorcerer", cost: "{2}{U}", types: "CREATURE", pt: (1, 1), abilities: [
+    Activated(cost: [TapSelf], targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)],
+              effect: Damage(amount: Const(1), to: Target(0))),
+  ]),
+  (name: "Anthem Banner", cost: "{1}{W}{W}", types: "ENCHANTMENT", abilities: [
+    Static(layer: L7c, applies_to: (types_any: "CREATURE", controller: You), effect: ModifyPT(1, 1)),
+  ]),
+  (name: "Llanowar Elves", cost: "{G}", types: "CREATURE", pt: (1, 1), abilities: [
+    Activated(cost: [TapSelf], is_mana: true, effect: AddMana(color: G, n: 1)),
+  ]),
+  (name: "Wasteland Stand-in", types: "LAND", abilities: [
+    Activated(cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
+  ]),
+  (name: "Test Charm", cost: "{1}{R}", types: "INSTANT", abilities: [
+    Spell(choose: (1, 2), modes: [
+      (label: "Deal 2 damage to any target", targets: [(objects: (types_any: "CREATURE"), players: Any)], effect: Damage(amount: Const(2), to: Target(0))),
+      (label: "Draw a card", effect: Draw(who: You, n: Const(1))),
+      (label: "Gain 3 life", effect: GainLife(who: You, n: Const(3))),
+    ]),
+  ]),
+  (name: "Fireball Stand-in", cost: "{X}{R}", types: "SORCERY", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"), players: Any)], effect: Damage(amount: X, to: Target(0))),
+  ]),
+  (name: "Daze Stand-in", cost: "{1}{U}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (zone: Stack))], effect: CounterUnless(target: 0, pays: "{1}")),
+    Alt(label: "return an Island", cost: [ReturnToHand(names: ["Island"])]),
+  ]),
+  (name: "Force Stand-in", cost: "{3}{U}{U}", types: "INSTANT", colors: "U", abilities: [
+    Spell(targets: [(objects: (zone: Stack))], effect: CounterSpell(0)),
+    Alt(label: "exile a blue card, pay 1 life", cost: [ExileFromHand(zone: Hand, colors_any: "U"), PayLife(1)]),
+  ]),
+  (name: "Triumph Stand-in", cost: "{1}{B}", types: "INSTANT", abilities: [
+    AddCost(options: [[Discard(zone: Hand)], [PayLife(3)]], optional: false),
+    Spell(targets: [(objects: (types_any: "CREATURE"))], effect: Destroy(One(Target(0)))),
+  ]),
+  (name: "Dismember Stand-in", cost: "{1}{B/P}{B/P}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"))], effect: Destroy(One(Target(0)))),
+  ]),
+  (name: "Tax Collector", cost: "{1}{W}", types: "CREATURE", pt: (1, 1), abilities: [
+    CostMod(applies: (types_not: "LAND"), who: Opp, generic: 1),
+  ]),
+  (name: "Flash Burn", cost: "{R}", types: "SORCERY", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"), players: Any)], effect: Damage(amount: Const(2), to: Target(0))),
+    Alt(label: "flashback", cost: [Mana("{2}{R}")], zone: Graveyard, exile_after: true),
+  ]),
+  (name: "Soul Warden Stand-in", cost: "{W}", types: "CREATURE", pt: (1, 1), abilities: [
+    Triggered(on: Enters(filter: (types_any: "CREATURE")), effect: GainLife(who: You, n: Const(1))),
+  ]),
+  (name: "Mulldrifter Stand-in", cost: "{3}{U}", types: "CREATURE", pt: (2, 2), abilities: [
+    Triggered(on: Enters(filter: (self_only: true)), effect: Draw(who: You, n: Const(2))),
+  ]),
+  (name: "Ping Elemental", cost: "{2}{R}", types: "CREATURE", pt: (2, 2), abilities: [
+    Triggered(on: Enters(filter: (self_only: true)), targets: [(objects: (types_any: "CREATURE"))], effect: Damage(amount: Const(2), to: Target(0))),
+  ]),
+  (name: "Blood Artist Stand-in", cost: "{1}{B}", types: "CREATURE", pt: (0, 1), abilities: [
+    Triggered(on: ZoneChange(filter: (types_any: "CREATURE"), from: Battlefield, to: Graveyard), effect: Seq([LoseLife(who: Opp, n: Const(1)), GainLife(who: You, n: Const(1))])),
+  ]),
+  (name: "Pyromancer Stand-in", cost: "{1}{R}", types: "CREATURE", pt: (2, 1), abilities: [
+    Triggered(on: SpellCast(caster: You, filter: (types_any: "INSTANT | SORCERY")), effect: CreateToken(token: "Soldier", n: Const(1), who: You)),
+  ]),
+  (name: "Arena Stand-in", cost: "{3}{B}", types: "ENCHANTMENT", abilities: [
+    Triggered(on: BeginStep(step: Upkeep, whose: You), effect: Seq([Draw(who: You, n: Const(1)), LoseLife(who: You, n: Const(1))])),
+  ]),
+  (name: "Crowd Pleaser", cost: "{2}{W}", types: "ENCHANTMENT", abilities: [
+    Triggered(on: Enters(filter: (types_any: "CREATURE", controller: You)),
+              cond: Controls(who: You, filter: (types_any: "CREATURE"), at_least: 3),
+              effect: Draw(who: You, n: Const(1))),
+  ]),
+  (name: "Grave Warden", cost: "{1}{B}", types: "CREATURE", pt: (1, 1), abilities: [
+    Triggered(on: ZoneChange(filter: (self_only: true), from: Battlefield, to: Graveyard), zone: Graveyard,
+              effect: GainLife(who: You, n: Const(3))),
+  ]),
+]

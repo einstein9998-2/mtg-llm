@@ -1,0 +1,12 @@
+id = "kd-0009"
+title = "Forge: lists a flashback cast from the graveyard while Grafdigger's Cage is on the battlefield, then refuses to play it"
+status = "accepted"
+who_is_right = "engine"
+cr_citation = "Grafdigger's Cage: 'Players can't cast spells from graveyards or libraries'"
+rulings = []
+affected_oracles = ["forge"]
+match = { sides = ["FORGE_ONLY"], kinds = ["cast"], zones = ["Graveyard"], feature_tags = ["grafdigger-on-bf"] }
+suppress = true
+regression_scenario = "scenario grafdigger-cage-stops-flashback (passes on the engine)"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Found by lockstep lines on grafdigger-cage-stops-flashback: Forge's menu lists Faithless Looting's flashback with the Cage in play; the play fails with 'checkRestrictions refused'. The engine does not offer it. Same class as kd-0003 and kd-0008. Needs Brady's approval (Forge-bug verdict, doc 04 6.4)."

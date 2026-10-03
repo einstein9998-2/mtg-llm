@@ -1,0 +1,5 @@
+{'complete': 2594, 'diverged': 4, 'forge_play_failed': 2, 'unaligned': 8, 'game_over': 32}
+    7  unaligned  payment    the engines paid a cost from different lands (or a damage source differs): later windows are not comparable   e.g. scn:combos.scn:show-and-tell-07:l0
+    3  diverged   window     priority: rust seat N stack N, forge seat N stack N   e.g. scn:combos.scn:reanimator-02:l3
+    1  diverged   chosen_not_offered forge chose play|Graveyard|Boggart Trawler| which the engine does not offer   e.g. scn:combos.scn:aluren-chain-02:l2
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Archon of Cruelty{}", "done"]   e.g. scn:combos.scn:show-and-tell-17:l18

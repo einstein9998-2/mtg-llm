@@ -1,0 +1,76 @@
+id: polluted-delta-fetch-tropical-island-untapped
+title: Polluted Delta can find Tropical Island, which enters untapped and has both basic land types
+area: card
+cards: [Polluted Delta, Tropical Island, Forest, Island]
+tags: [polluted-delta, tropical-island, fetchland, search, enters-untapped]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Tropical Island, text: "({T}: Add {G} or {U}.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Polluted Delta @delta"]
+    library: ["Tropical Island @ti"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@delta", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@ti"}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 19
+      battlefield: [{card: Tropical Island, tapped: false, subtypes: [Forest, Island]}]
+      graveyard: [Polluted Delta]
+notes: The Alurentell deck uses Polluted Delta to find Tropical Island; no enters-tapped effect applies, so it can tap right away.
+---
+id: polluted-delta-stifle-no-search-costs-stay-paid
+title: Stifle on Polluted Delta's ability leaves the land sacrificed and the life paid but finds no land
+area: card
+cards: [Polluted Delta, Stifle, Island]
+tags: [polluted-delta, stifle, fetchland, counter-ability, costs-paid]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn't get a \"refund\" of any costs that were paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Polluted Delta @delta"]
+    library: ["Island @isl"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @pisl"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@delta", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@delta", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      battlefield: []
+      graveyard: [Polluted Delta]
+      library_count: 11
+    p1:
+      graveyard: [Stifle]
+notes: >
+  Stifle targets the ability on the stack, not the land (which is already in the graveyard as a cost). The ability never
+  resolves: no search (no decision is raised) and the library keeps its 11 cards. The 1 life is not refunded. Whether a
+  shuffle happens is not asserted (it should not, since the ability did not resolve).

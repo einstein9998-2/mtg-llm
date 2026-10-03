@@ -1,0 +1,182 @@
+id: mu-phelia-flickers-bowmasters-new-object-enters-again
+title: Phelia exiles Dimir's Bowmasters on attack; at the end step it returns under Dimir's control as a new object, its enter trigger fires again and Phelia gets no counter
+area: matchup
+cards: ["Phelia, Exuberant Shepherd", Orcish Bowmasters, Tundra, Underground Sea]
+tags: [matchup, dimir-vs-uwx, phelia, bowmasters, flicker, new-object, etb-trigger, delayed-trigger, end-step, amass]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "Whenever Phelia attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Each time an event puts one or more permanents onto the battlefield, all permanents on the battlefield (including the newcomers) are checked for any enters-the-battlefield triggers that match the event.", verified: true}
+  - {kind: cr, ref: "603.3a", text: "A triggered ability is controlled by the player who controlled its source at the time it triggered, unless it's a delayed triggered ability.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: begin_combat
+  p0:
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph", "Tundra @t1"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@ph", target: {player: p0}}]}
+  - p1: {decision: choose_target, slot: 0, answer: "@bow"}
+  - check: {stack: [{kind: triggered, source: "@ph", controller: p1, targets: ["@bow"]}], pending: {actor: p1, kind: priority}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [], p0: {exile: [Orcish Bowmasters], battlefield: [{card: Underground Sea}]}}
+  - advance: {to: end, of: p1}
+  - check:
+      stack: [{kind: triggered, source: "@ph", controller: p1, text_contains: "return"}]
+      pending: {actor: p1, kind: priority}
+      p0: {life: 18}
+  - resolve_top: true
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack: [{kind: triggered, source: "@bow", controller: p0}]
+      pending: {actor: p1, kind: priority}
+      p0: {exile: [], battlefield_contains: [{card: Orcish Bowmasters, controller: p0, sick: true}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 18
+      exile: []
+      battlefield:
+        - {card: Orcish Bowmasters, controller: p0}
+        - {card: Underground Sea}
+        - {token: Orc Army Token, controller: p0, counters: {"+1/+1": 1}, pt: [1, 1]}
+    p1:
+      life: 19
+      battlefield: [{card: "Phelia, Exuberant Shepherd", pt: [2, 2], tapped: true}, {card: Tundra}]
+notes: >
+  p0's only creature is exiled during the declare attackers step, so p0 has no blocker and no block decision; Phelia
+  deals 2 (p0 18). At p1's end step the delayed trigger returns Bowmasters under its owner's (p0's) control. It is a new
+  object (400.7) and its enter trigger fires again, controlled by p0 (603.3a), who targets p1 (19) and gets an Orc
+  Army. Bowmasters entered under p0's control, not Phelia's controller's, so Phelia gets no counter. Bugs caught: the
+  card returning under Phelia's controller, no second enter trigger, the counter on Phelia.
+---
+id: mu-phelia-flickers-escaped-nethergoyf-under-containment-priest
+title: An escaped Nethergoyf was cast, so UWx's Containment Priest lets it enter; after Phelia flickers it, the returning new object was not cast and Priest exiles it
+area: matchup
+cards: [Nethergoyf, "Phelia, Exuberant Shepherd", Containment Priest, Polluted Delta, Brainstorm, Thoughtseize, "Mishra's Bauble", Underground Sea, Swamp, Island, Tundra]
+tags: [matchup, dimir-vs-uwx, phelia, nethergoyf, escape, containment-priest, replacement-effect, new-object, flicker]
+derived_from: cr
+source:
+  - {kind: oracle, card: Nethergoyf, text: "Escape—{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them.", verified: true}
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.", verified: true}
+  - {kind: cr, ref: "702.138a", text: "“Escape [cost]” means “You may cast this card from your graveyard by paying [cost] rather than paying its mana cost.”", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence.", verified: true}
+  - {kind: cr, ref: "614.6", text: "If an event is replaced, it never happens.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main2
+  p0:
+    battlefield: ["Underground Sea @u1", "Swamp @s1", "Island @i1"]
+    graveyard: ["Nethergoyf @ng", "Polluted Delta @g1", "Brainstorm @g2", "Thoughtseize @g3", "Mishra's Bauble @g4"]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp", "Phelia, Exuberant Shepherd @ph", "Tundra @t1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ng", alt_cost: {escape: {exile: ["@g1", "@g2", "@g3", "@g4"]}}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0:
+        battlefield_contains: [{card: Nethergoyf, pt: [0, 1]}]
+        exile: [Polluted Delta, Brainstorm, Thoughtseize, "Mishra's Bauble"]
+        graveyard: []
+  - advance: {to: begin_combat, of: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@ph", target: {player: p0}}]}
+  - p1: {decision: choose_target, slot: 0, answer: "@ng"}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [], p0: {exile: [Nethergoyf, Polluted Delta, Brainstorm, Thoughtseize, "Mishra's Bauble"]}}
+  - advance: {to: end, of: p1}
+  - check: {stack: [{kind: triggered, source: "@ph", controller: p1, text_contains: "return"}], p0: {life: 18}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 6
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 18
+      exile: [Nethergoyf, Polluted Delta, Brainstorm, Thoughtseize, "Mishra's Bauble"]
+      battlefield: [{card: Underground Sea}, {card: Swamp}, {card: Island}]
+      graveyard: []
+    p1:
+      battlefield_contains: [{card: "Phelia, Exuberant Shepherd", pt: [2, 2]}, {card: Containment Priest}]
+notes: >
+  The escape cast is a cast, so Priest's replacement does not apply and Nethergoyf enters (0/1: the four other cards
+  were exiled for escape, leaving the graveyard empty). On p1's turn Phelia exiles it; at the end step it would return,
+  but the returning object is a new object that was not cast (400.7), so Priest exiles it instead and it never enters:
+  Phelia gets no counter (it did not enter at all). p0 takes 2 from Phelia. Bugs caught: the "was cast" status carried
+  across the flicker, Priest ignoring escape casts (wrongly exiling on the first entry), a counter on Phelia.
+---
+id: mu-uwx-stifles-bowmasters-reentry-trigger-after-phelia-return
+title: After Phelia returns Dimir's Bowmasters at the end step, UWx Stifles its new enter trigger; no ping and no Orc Army
+area: matchup
+cards: ["Phelia, Exuberant Shepherd", Orcish Bowmasters, Stifle, Tundra, Underground Sea]
+tags: [matchup, dimir-vs-uwx, phelia, bowmasters, stifle, flicker, etb-trigger, end-step, counter-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "At the beginning of the next end step, return that card to the battlefield under its owner's control.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: begin_combat
+  p0:
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @st"]
+    battlefield: ["Phelia, Exuberant Shepherd @ph", "Tundra @t1"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@ph", target: {player: p0}}]}
+  - p1: {decision: choose_target, slot: 0, answer: "@bow"}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - advance: {to: end, of: p1}
+  - resolve_top: true
+  - p0: {decision: choose_target, slot: 0, answer: "@ph"}
+  - p1: {t: cast, card: "@st", targets: [{trigger_of: "@bow"}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 18
+      battlefield: [{card: Orcish Bowmasters, controller: p0}, {card: Underground Sea}]
+    p1:
+      life: 20
+      graveyard: [Stifle]
+      battlefield: [{card: "Phelia, Exuberant Shepherd", pt: [2, 2], damage: 0, tapped: true}, {card: Tundra, tapped: true}]
+notes: >
+  Same flicker as mu-phelia-flickers-bowmasters-new-object-enters-again; the returned Bowmasters' enter trigger (p0
+  targets Phelia) is Stifled by p1, who as the active player has priority with it on the stack. Phelia takes no damage
+  and p0 gets no Army: p0's battlefield is exactly Bowmasters and the land. Bugs caught: the re-entry trigger not
+  offered as a Stifle target (for example if the engine resolved it as part of the return), amass happening anyway.

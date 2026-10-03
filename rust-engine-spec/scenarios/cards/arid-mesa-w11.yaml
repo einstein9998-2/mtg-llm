@@ -1,0 +1,100 @@
+id: arid-mesa-finds-mountain-or-plains-cards-including-duals
+title: Arid Mesa can find any Mountain or Plains card (basics, Tundra, Meticulous Archive, Volcanic Island, Plateau), not an Island, Underground Sea or a fetchland
+area: card
+cards: [Arid Mesa, Tundra, Meticulous Archive, Volcanic Island, Plateau, Plains, Mountain, Island, Flooded Strand, Underground Sea]
+tags: [arid-mesa, fetchland, search, basic-land-types, life-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Arid Mesa, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.6", text: "The basic land types are Plains, Island, Swamp, Mountain, and Forest.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 1
+    battlefield: ["Arid Mesa @mesa"]
+    library: ["Tundra @tun", "Meticulous Archive @ma", "Volcanic Island @vi", "Plateau @plat", "Plains @pl", "Mountain @mo", "Island @isl", "Flooded Strand @fs", "Underground Sea @us"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@mesa", ability: 0}
+  - check:
+      p0: {life: 19, graveyard: [Arid Mesa], battlefield: []}
+      stack: [{kind: activated, source: "@mesa"}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: search
+      found: "@tun"
+      expect_options:
+        include: ["@tun", "@ma", "@vi", "@plat", "@pl", "@mo"]
+        exclude: ["@isl", "@fs", "@us"]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 1
+      battlefield: [{card: Tundra, tapped: false, subtypes: [Plains, Island]}]
+      graveyard: [Arid Mesa]
+      library_count: 18
+notes: >
+  Life and sacrifice are costs, paid on activation (19 life, Mesa in the graveyard while the ability is on the stack).
+  Any card with the Mountain or Plains subtype qualifies; Tundra (Plains Island) is found and enters untapped (no
+  enters-tapped text). Island, Underground Sea (Island Swamp) and Flooded Strand (no subtypes) are excluded. A land put
+  onto the battlefield is not a land play (lands_played stays 1). Library 19 -> 18, then shuffled.
+---
+id: arid-mesa-fetches-meticulous-archive-tapped-with-surveil
+title: Arid Mesa fetching Meticulous Archive puts it onto the battlefield tapped and its surveil trigger goes on the stack
+area: card
+cards: [Arid Mesa, Meticulous Archive, Ponder, Island]
+tags: [arid-mesa, meticulous-archive, fetchland, enters-tapped, etb-trigger, surveil, shuffle]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Arid Mesa, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Meticulous Archive, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Meticulous Archive, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Arid Mesa @mesa"]
+    library: ["Meticulous Archive @ma", "Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Ponder, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island]}
+script:
+  - p0: {t: play_land, card: "@mesa"}
+  - p0: {t: activate, source: "@mesa", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@ma"}
+  - check:
+      stack: [{kind: triggered, source: "@ma", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [{card: Meticulous Archive, tapped: true}], lands_played: 1, life: 19}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@pond"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 1
+      graveyard: [Arid Mesa, Ponder]
+      library_count: 10
+      battlefield: [{card: Meticulous Archive, tapped: true}]
+notes: >
+  The enters-tapped replacement applies to any entry, not only to a land play. The enters trigger waits until the search
+  ability has finished resolving (including the shuffle) and goes on the stack when p0 would receive priority. The shuffle
+  outcome is scripted so the surveil sees Ponder. Only the Mesa was played (lands_played 1). Library 12 -> 11 after the
+  search -> 10 after surveilling Ponder away.

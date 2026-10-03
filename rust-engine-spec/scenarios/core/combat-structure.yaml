@@ -1,0 +1,198 @@
+id: combat-steps-and-priority-unblocked-attack
+title: A combat with one unblocked attacker runs beginning of combat, declare attackers, declare blockers, combat damage and end of combat, with priority in each step
+area: core
+cards: ["Dragon's Rage Channeler", "Goblin Token"]
+tags: [combat, combat-steps, priority, declare-attackers, declare-blockers, combat-damage, end-of-combat, attack-target]
+derived_from: cr
+source:
+  - {kind: cr, ref: "506.1", text: "The combat phase has five steps, which proceed in order: beginning of combat, declare attackers, declare blockers, combat damage, and end of combat.", verified: true}
+  - {kind: cr, ref: "506.2", text: "During the combat phase of a two-player game, the nonactive player is the defending player; that player, planeswalkers they control, and battles they protect may be attacked.", verified: true}
+  - {kind: cr, ref: "507.2", text: "Second, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "508.1f", text: "The active player taps the chosen creatures. Tapping a creature when it’s declared as an attacker isn’t a cost; attacking simply causes creatures to become tapped.", verified: true}
+  - {kind: cr, ref: "508.2", text: "Second, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "509.2", text: "Second, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "510.1b", text: "An unblocked creature assigns its combat damage to the player, planeswalker, or battle it’s attacking.", verified: true}
+  - {kind: cr, ref: "510.3", text: "Third, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "511.1", text: "The end of combat step has no turn-based actions. Once it begins, the active player gets priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - check: {phase: begin_combat, active: p0, priority: p0, stack: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {decision: declare_attackers, attacks: [{creature: "@drc", target: {player: p0}}]}}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@drc", target: {player: p1}}], expect_options: {include: ["@drc"]}}
+  - check:
+      phase: declare_attackers
+      priority: p0
+      stack: []
+      p0: {battlefield: [{card: "Dragon's Rage Channeler", tapped: true}]}
+      p1: {life: 20}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [], expect_options: {include: ["@gob"]}}
+  - check: {phase: declare_blockers, priority: p0, p1: {life: 20}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {phase: combat_damage, priority: p0, p1: {life: 19}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {phase: end_combat, priority: p0, p1: {life: 19}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: main2
+    active: p0
+    priority: p0
+    stack: []
+    p0:
+      life: 20
+      battlefield: [{card: "Dragon's Rage Channeler", tapped: true, damage: 0}]
+    p1:
+      life: 19
+      battlefield: [{token: Goblin Token, tapped: false, damage: 0}]
+notes: >
+  Walks every combat step with explicit passes. The active player receives priority first in each step after the turn-based
+  action (507.2, 508.2, 509.2, 510.3, 511.1); both players must pass in succession with an empty stack to leave a step.
+  Attackers are tapped by declaring them (508.1f), and the attack is aimed at the defending player (506.2); attacking
+  the attacker's own controller is not offered. p1 controls an untapped creature that could block, so the declare_blockers
+  decision is raised even though p1 declines to block. A wrong engine skips a priority round in some step, taps the attacker
+  late, deals damage in the declare_blockers step, or lets the creature attack its own controller.
+---
+id: combat-no-attackers-skips-blockers-and-damage
+title: When no creatures are declared as attackers the declare blockers and combat damage steps are skipped
+area: core
+cards: ["Goblin Token", "Zombie Token"]
+tags: [combat, combat-steps, declare-attackers, skipped-steps]
+derived_from: cr
+source:
+  - {kind: cr, ref: "508.8", text: "If no creatures are declared as attackers or put onto the battlefield attacking, skip the declare blockers and combat damage steps.", verified: true}
+  - {kind: cr, ref: "506.1", text: "The combat phase has five steps, which proceed in order: beginning of combat, declare attackers, declare blockers, combat damage, and end of combat.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Zombie Token, as: zomb}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: []}
+  - advance: {to: end_combat, of: p0}
+expect:
+  - at: after_script
+    phase: end_combat
+    active: p0
+    priority: p0
+    stack: []
+    p0:
+      life: 20
+      battlefield: [{token: Goblin Token, tapped: false}]
+    p1:
+      life: 20
+      battlefield: [{token: Zombie Token, tapped: false, damage: 0}]
+notes: >
+  p0 declares no attackers. The advance step passes priority for both players until p0 has priority in the end of combat
+  step and fails if any other decision is raised on the way, so it fails for an engine that still asks p1 to declare blockers
+  (p1 has an untapped creature, so a declare_blockers decision would be raised if the step were not skipped) or runs a
+  combat damage step. The declare_attackers decision is raised because the Goblin could attack; the empty declaration is
+  legal because nothing requires an attack.
+---
+id: vigilance-attacker-does-not-tap-others-do
+title: Attacking with Atraxa (vigilance) leaves it untapped while Dragon's Rage Channeler taps to attack
+area: core
+cards: ["Atraxa, Grand Unifier", "Dragon's Rage Channeler", "Spider-Woman, Stunning Savior"]
+tags: [combat, vigilance, declare-attackers, tap-on-attack]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.20b", text: "Attacking doesn’t cause creatures with vigilance to tap.", verified: true}
+  - {kind: cr, ref: "508.1f", text: "The active player taps the chosen creatures. Tapping a creature when it’s declared as an attacker isn’t a cost; attacking simply causes creatures to become tapped.", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "Flying, vigilance, deathtouch, lifelink", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Atraxa, Grand Unifier @atraxa", "Dragon's Rage Channeler @drc"]
+    library_pad: 10
+  p1:
+    battlefield: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks:
+        - {creature: "@atraxa", target: {player: p1}}
+        - {creature: "@drc", target: {player: p1}}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    priority: p0
+    stack: []
+    p0:
+      battlefield:
+        - {card: "Atraxa, Grand Unifier", tapped: false, keywords: [vigilance, flying, deathtouch, lifelink], pt: [7, 7]}
+        - {card: "Dragon's Rage Channeler", tapped: true}
+notes: >
+  Vigilance only changes the tap that comes with declaring an attacker (702.20b, 508.1f). The Dragon's Rage Channeler,
+  attacking in the same declaration, becomes tapped, so the scenario also catches an engine that never taps attackers or
+  taps all of them. No damage is checked here, only the declared state.
+---
+id: summoning-sick-creature-cannot-attack-w3
+title: A creature that has not been under its controller's control since the turn began cannot be declared as an attacker
+area: core
+cards: ["Dragon's Rage Channeler", "Goblin Token", "Skeleton Token"]
+tags: [combat, summoning-sickness, declare-attackers, mask-validity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "302.6", text: "A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.", verified: true}
+  - {kind: cr, ref: "508.1a", text: "The chosen creatures must be untapped, they can’t also be battles, and each one must either have haste or have been controlled by the active player continuously since the turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield:
+      - {card: "Dragon's Rage Channeler", as: drc, sick: true}
+      - {token: Goblin Token, as: gob}
+    library_pad: 10
+  p1:
+    battlefield: [{token: Skeleton Token, as: skel}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {decision: declare_attackers, attacks: [{creature: "@drc", target: {player: p1}}]}}
+  - expect_illegal: {p0: {decision: declare_attackers, attacks: [{creature: "@drc", target: {player: p1}}, {creature: "@gob", target: {player: p1}}]}}
+  - p0:
+      decision: declare_attackers
+      attacks: [{creature: "@gob", target: {player: p1}}]
+      expect_options: {include: ["@gob"], exclude: ["@drc"]}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    priority: p0
+    p0:
+      battlefield:
+        - {card: "Dragon's Rage Channeler", tapped: false}
+        - {token: Goblin Token, tapped: true}
+notes: >
+  The Dragon's Rage Channeler came under p0's control this turn (sick: true) and has no haste, so it is not a legal attacker
+  alone or together with the Goblin. The Goblin has been there since the turn began and attacks. A wrong engine offers the
+  sick creature in the attack mask. The Goblin is present so that the declare_attackers decision is raised (a legal attacker
+  exists).

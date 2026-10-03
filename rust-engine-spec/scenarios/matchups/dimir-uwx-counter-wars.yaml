@@ -1,0 +1,237 @@
+id: mu-dimir-uwx-fon-war-exiles-prismatic-ending-nethergoyf-grows
+title: Dimir's free Force of Negation on UWx's Prismatic Ending survives a Force of Will war; Ending is exiled and Nethergoyf grows from the instants
+area: matchup
+cards: [Force of Negation, Force of Will, Prismatic Ending, Nethergoyf, Brainstorm, Daze, Ponder, Polluted Delta, Underground Sea, Swamp, Tundra]
+tags: [matchup, dimir-vs-uwx, counter-war, force-of-negation, force-of-will, alternative-cost, exile-instead, nethergoyf, characteristic-defining]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Negation @fon", "Brainstorm @bs0", "Force of Will @fow0", "Daze @daze0"]
+    battlefield: ["Nethergoyf @goyf", "Underground Sea @us1", "Swamp @sw1"]
+    graveyard: ["Polluted Delta @gd"]
+    library_pad: 10
+  p1:
+    hand: ["Prismatic Ending @pe", "Force of Will @fow1", "Ponder @pd1"]
+    battlefield: ["Tundra @t1", "Tundra @t2"]
+    library_pad: 10
+script:
+  - check: {p0: {battlefield_contains: [{card: Nethergoyf, pt: [1, 2]}]}}
+  - p1: {t: cast, card: "@pe", x: 1, targets: ["@goyf"], pay: {tap: ["@t1", "@t2"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs0"}, targets: ["@pe"]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow1", alt_cost: {exile_blue_card: "@pd1", pay_life: 1}, targets: ["@fon"]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow0", alt_cost: {exile_blue_card: "@daze0", pay_life: 1}, targets: ["@fow1"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@pe", controller: p1}
+        - {kind: spell, card: "@fon", controller: p0, targets: ["@pe"]}
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: [Polluted Delta, Force of Will], battlefield_contains: [{card: Nethergoyf, pt: [2, 3]}]}
+      p1: {graveyard: [Force of Will]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 19
+      hand: []
+      graveyard: [Polluted Delta, Force of Will, Force of Negation]
+      exile: [Brainstorm, Daze]
+      battlefield_contains: [{card: Nethergoyf, pt: [2, 3]}]
+    p1:
+      life: 19
+      hand: []
+      graveyard: [Force of Will]
+      exile: [Ponder, Prismatic Ending]
+notes: >
+  It is p1's turn, so p0 may cast Force of Negation by exiling a blue card (no life). p1 Forces it (1 life), p0 Forces
+  back pitching Daze (blue; 1 life). p0's Force resolves first: p1's Force goes to p1's graveyard, and p0's resolved Force
+  goes to p0's graveyard (608.2n), adding the instant type: Nethergoyf goes from 1/2 (land only) to 2/3 mid-war. Then
+  Force of Negation resolves and Prismatic Ending is exiled, not put into the graveyard. Nethergoyf ends 2/3 (land,
+  instant; both Forces and FoN are instants). Bugs caught: FoN refused on the opponent's turn, FoN's replacement putting
+  Ending into the graveyard, Nethergoyf not updating while the stack is non-empty.
+---
+id: mu-dimir-uwx-fon-alt-cost-unavailable-on-own-turn-hardcast-works
+title: On Dimir's own turn Force of Negation cannot be cast by exiling a blue card, but hard-cast for {1}{U}{U} it counters UWx's Swords and exiles it
+area: matchup
+cards: [Force of Negation, Swords to Plowshares, Nethergoyf, Brainstorm, Underground Sea, Island, Swamp, Tundra]
+tags: [matchup, dimir-vs-uwx, force-of-negation, alternative-cost, turn-condition, illegal-action, exile-instead]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Force of Negation @fon", "Brainstorm @bs"]
+    battlefield: ["Nethergoyf @goyf", "Underground Sea @us1", "Island @is1", "Swamp @sw1"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Tundra @t1"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@goyf"], pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@stp"]}}
+  - p0: {t: cast, card: "@fon", targets: ["@stp"], pay: {tap: ["@us1", "@is1", "@sw1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Brainstorm]
+      graveyard: [Force of Negation]
+      exile: []
+      battlefield_contains: [{card: Nethergoyf}]
+    p1:
+      graveyard: []
+      exile: [Swords to Plowshares]
+notes: >
+  p0 passes in its own main phase and p1 casts Swords at instant speed. Because it is p0's turn, FoN's alternative cost
+  is not available (the probe must be rejected and nothing must change: Brainstorm stays in hand). Paying {1}{U}{U}
+  works: Swords is exiled and Nethergoyf survives, so p0 gains no life. The active player p0 gets priority after FoN
+  resolves. Bugs caught: "not your turn" read as "not the caster's priority" or ignored, FoN's exile clause skipped on a
+  hard cast.
+---
+id: mu-dimir-uwx-daze-counters-warped-riddler-fon-cannot
+title: Force of Negation cannot target a warped Quantum Riddler (a creature spell); Daze can, the tapped-out UWx player cannot pay, and the countered Riddler goes to the graveyard with no warp exile later
+area: matchup
+cards: [Quantum Riddler, Force of Negation, Daze, Brainstorm, Ponder, Underground Sea, Tundra, Volcanic Island]
+tags: [matchup, dimir-vs-uwx, warp, daze, force-of-negation, creature-spell, illegal-target, delayed-trigger-not-created]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell.", verified: true}
+  - {kind: oracle, card: Quantum Riddler, text: "Warp {1}{U}", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "702.185a", text: "“Warp [cost]” means “You may cast this card from your hand by paying [cost] rather than its mana cost” and “If this spell’s warp cost was paid, exile the permanent this spell becomes at the beginning of the next end step.", verified: true}
+  - {kind: cr, ref: "608.3g", text: "If the object that’s resolving has a static ability that functions on the stack and creates a delayed triggered ability, that delayed triggered ability is created as that permanent is put onto the battlefield", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Negation @fon", "Brainstorm @bs", "Daze @daze"]
+    battlefield: ["Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Quantum Riddler @qr", "Ponder @pd"]
+    battlefield: ["Tundra @t1", "Volcanic Island @v1"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@qr", alt_cost: {warp: true}, pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@qr"]}}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@us1"}, targets: ["@qr"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      p1: {graveyard: [Quantum Riddler], exile: []}
+  - advance: {to: end, of: p1}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Force of Negation, Brainstorm, Underground Sea]
+      graveyard: [Daze]
+      battlefield: []
+    p1:
+      hand: [Ponder]
+      graveyard: [Quantum Riddler]
+      exile: []
+      battlefield: [{card: Tundra, tapped: true}, {card: Volcanic Island, tapped: true}]
+notes: >
+  The warp cost {1}{U} taps both of p1's lands. FoN only targets noncreature spells, so the probe is rejected. Daze
+  resolves with p1 unable to pay (no prompt) and Riddler goes to its owner's graveyard: warp exiles "the permanent this
+  spell becomes", and the delayed trigger is only created as the permanent enters (608.3g), so a countered warped spell
+  is neither exiled now nor later. The advance into p1's end step must find an empty stack there (no warp trigger).
+  Bugs caught: FoN targeting creatures, warp exiling the countered card, a warp delayed trigger created on cast.
+---
+id: mu-uwx-consign-counters-bowmasters-enter-trigger
+title: UWx's Consign to Memory counters Orcish Bowmasters' enter trigger; Bowmasters stays but no damage is dealt and no Orc Army is created
+area: matchup
+cards: [Consign to Memory, Orcish Bowmasters, "Phelia, Exuberant Shepherd", Tundra, Underground Sea, Swamp]
+tags: [matchup, dimir-vs-uwx, consign-to-memory, counter-ability, etb-trigger, bowmasters, amass]
+derived_from: cr
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+  - {kind: cr, ref: "702.56a", text: "When you cast this spell, if a replicate cost was paid for it, copy it for each time its replicate cost was paid.", verified: true}
+  - {kind: cr, ref: "115.1d", text: "The target(s) are chosen as the ability is put on the stack", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: end
+  p0:
+    hand: ["Orcish Bowmasters @bow"]
+    battlefield: ["Underground Sea @us1", "Swamp @sw1"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @cm"]
+    battlefield: ["Tundra @t1", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bow", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@ph"}
+  - check: {stack: [{kind: triggered, source: "@bow", controller: p0, targets: ["@ph"]}], pending: {actor: p1, kind: priority}}
+  - p1: {t: cast, card: "@cm", targets: [{trigger_of: "@bow"}], pay: auto}
+  - check:
+      stack:
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: spell, card: "@cm", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield:
+        - {card: Orcish Bowmasters, pt: [1, 1]}
+        - {card: Underground Sea, tapped: true}
+        - {card: Swamp, tapped: true}
+    p1:
+      life: 20
+      graveyard: [Consign to Memory]
+      battlefield: [{card: Tundra, tapped: true}, {card: "Phelia, Exuberant Shepherd", damage: 0}]
+notes: >
+  The trigger's target (Phelia) is chosen by p0 as it goes on the stack. Consign counters the whole ability, including
+  "Then amass Orcs 1", so p0's battlefield is exactly Bowmasters plus two tapped lands (no Orc Army token) and Phelia
+  has no damage. No replicate cost was paid, so the replicate trigger does not trigger (its "if" fails) and the stack
+  holds only the Bowmasters trigger and Consign. Bugs caught: amass happening anyway, the creature leaving with its
+  trigger, a phantom replicate trigger.

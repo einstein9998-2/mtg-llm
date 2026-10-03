@@ -1,0 +1,159 @@
+id: containment-priest-affects-its-controllers-own-creatures
+title: Containment Priest also exiles its own controller's creature put onto the battlefield by Show and Tell
+area: core
+cards: [Containment Priest, Show and Tell, Acererak the Archlich, "Atraxa, Grand Unifier", Island]
+tags: [replacement-effect, containment-priest, show-and-tell, symmetric-effect]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "603.2g", text: "An ability triggers only if its trigger event actually occurs. An event that's prevented or replaced won't trigger anything.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Acererak the Archlich @ac"]
+    battlefield: ["Containment Priest @cp", "Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Atraxa, Grand Unifier @atx"]
+    library_pad: 15
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@ac"}
+  - p1: {decision: simultaneous_secret_choice, answer: "@atx"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: [Acererak the Archlich]
+      battlefield_contains: [{card: Containment Priest}]
+      command: []
+    p1:
+      exile: ["Atraxa, Grand Unifier"]
+      battlefield: []
+notes: >
+  The Priest's text says "a nontoken creature", not "a creature an opponent controls": it is symmetric. Both creatures
+  are exiled to their owners' exile zones, neither enters, no trigger (Acererak's venture does not happen, so p0's
+  command zone stays empty). A wrong engine protects the Priest's controller.
+---
+id: containment-priest-cast-creature-enters-normally
+title: A creature that was cast enters normally under Containment Priest and its enters ability triggers
+area: core
+cards: [Containment Priest, Acererak the Archlich, Swamp, Island]
+tags: [replacement-effect, containment-priest, negative-case, etb-trigger]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "400.7d", text: "An ability of a permanent can reference information about the spell that became that permanent as it resolved, including what costs were paid to cast that spell", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @ac"]
+    battlefield: ["Swamp @s", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ac", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: triggered, source: "@ac", controller: p0, text_contains: "venture"}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Acererak the Archlich, alias: ac}]
+      exile: []
+notes: >
+  Negative case: the spell resolving into a permanent is "cast", so the Priest does not apply. Acererak enters and its
+  ability triggers (p0 has completed no dungeon). The scenario stops with the trigger on the stack. A wrong engine
+  exiles every nontoken creature entering, or forgets the cast record when the spell becomes a permanent.
+---
+id: containment-priest-and-spider-woman-same-creature-is-exiled
+title: When Containment Priest and Spider-Woman both apply to a creature entering from Show and Tell, it ends up exiled either way
+area: core
+cards: [Containment Priest, "Spider-Woman, Stunning Savior", Show and Tell, "Atraxa, Grand Unifier", Island]
+tags: [replacement-effect, replacement-ordering, containment-priest, spider-woman, show-and-tell]
+derived_from: cr
+source:
+  - {kind: cr, ref: "616.1", text: "If two or more replacement and/or prevention effects are attempting to modify the way an event affects an object or player, the affected object's controller (or its owner if it has no controller) or the affected player chooses one to apply", verified: true}
+  - {kind: cr, ref: "616.1e", text: "Any of the applicable replacement and/or prevention effects may be chosen.", verified: true}
+  - {kind: cr, ref: "616.1f", text: "Once the chosen effect has been applied, this process is repeated (taking into account only replacement or prevention effects that would now be applicable) until there are no more left to apply.", verified: true}
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 15
+  p1:
+    hand: ["Island @pi"]
+    battlefield: ["Containment Priest @cp", "Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@atx"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: ["Atraxa, Grand Unifier"]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Both effects want to modify Atraxa's entry. Per 616.1 the affected object's controller, or its owner if it has no
+  controller (Atraxa is a card in hand, so its owner p0), chooses which applies first. If Spider-Woman's applies first (enter tapped), the Priest's still applies to the
+  modified event and exiles Atraxa; if the Priest's applies first, the event becomes an exile and Spider-Woman's no
+  longer applies (616.1f). Both orders give the same result, so per the SCHEMA addenda (trivial order_replacements is
+  not raised when every order gives the same final state) the script has no ordering step and asserts only the final
+  state.
+---
+id: containment-priest-and-spider-woman-cast-creature-only-tapped
+title: A cast creature under the opponent's Containment Priest and Spider-Woman is not exiled but enters tapped
+area: core
+cards: [Containment Priest, "Spider-Woman, Stunning Savior", "Dragon's Rage Channeler", Mountain]
+tags: [replacement-effect, containment-priest, spider-woman, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Venom Blast — Artifacts and creatures your opponents control enter tapped.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dragon's Rage Channeler @drc"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp", "Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@drc", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: "Dragon's Rage Channeler", tapped: true}]
+      exile: []
+notes: >
+  Only Spider-Woman's replacement applies (DRC was cast), so there is a single applicable effect and no ordering
+  decision. A wrong engine exiles the cast creature, or applies neither.

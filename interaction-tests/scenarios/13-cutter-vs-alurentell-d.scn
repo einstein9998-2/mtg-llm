@@ -1,0 +1,411 @@
+# UR Cutter vs Alurentell. Part D: Cori-Steel Cutter, Murktide Regent, Dragon's Rage Channeler, lands, cantrips, removal.
+
+=== cutter-flurry-second-spell-makes-monk
+title: Cori-Steel Cutter: the second spell each turn creates a 1/1 Monk with prowess (first and third spells do not)
+ref: Cori-Steel Cutter Oracle (flurry)
+state:
+  humanbattlefield=Cori-Steel Cutter;Mountain;Mountain;Island;Island
+  humanhand=Lightning Bolt;Brainstorm;Ponder
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: wait-empty
+  p1: check zone p1 battlefield count "Monk Token" == 0
+  p1: cast Brainstorm
+  p1: pick Monk Token
+  p1: pick no
+  p1: wait-empty
+  p1: check zone p1 battlefield count "Monk Token" == 1
+  p1: cast Ponder
+  p1: wait-empty
+expect:
+  zone p1 battlefield count "Monk Token" == 1
+  spells p1 == 3
+
+=== cutter-flurry-attach-optional
+title: Cori-Steel Cutter flurry: the Cutter may be attached to the new Monk, making it 2/2 with trample and haste
+ref: Cori-Steel Cutter Oracle
+state:
+  humanbattlefield=Cori-Steel Cutter;Mountain;Island
+  humanhand=Lightning Bolt;Brainstorm
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: wait-empty
+  p1: cast Brainstorm
+  p1: pick Monk Token
+  p1: pick yes
+  p1: wait-empty
+expect:
+  pt p1 "Monk Token" 2/2
+
+=== cutter-flurry-counts-countered-spells
+title: Flurry triggers on cast, so a countered second spell still makes a Monk
+ref: Cori-Steel Cutter Oracle; CR 603.2 (cast triggers)
+state:
+  humanbattlefield=Cori-Steel Cutter;Mountain;Island;Island
+  humanhand=Lightning Bolt;Brainstorm
+  aihand=Force of Will;Brainstorm
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: wait-empty
+  p1: cast Brainstorm
+  p1: pick Monk Token
+  p1: pick no
+  p1: pass
+  p2: when-stack Brainstorm
+  p2: cast Force of Will ~alt -> Brainstorm
+  p2: pick Brainstorm
+expect:
+  zone p1 battlefield count "Monk Token" == 1
+  zone p1 graveyard has "Brainstorm"
+
+=== cutter-flurry-opponent-turn-spells-count
+title: Flurry counts spells cast in the opponent's turn: two instants during p2's turn create a Monk
+ref: Cori-Steel Cutter Oracle ("each turn")
+state:
+  activeplayer=p2
+  activephase=UPKEEP
+  humanbattlefield=Cori-Steel Cutter;Mountain;Island;Island
+  humanhand=Lightning Bolt;Brainstorm
+script:
+  p1: at p2:UPKEEP
+  p1: cast Lightning Bolt -> p2
+  p1: wait-empty
+  p1: cast Brainstorm
+  p1: pick Monk Token
+  p1: pick no
+  p1: wait-empty
+expect:
+  zone p1 battlefield count "Monk Token" == 1
+
+=== murktide-delve-counters
+title: Murktide Regent: delving away five cards with three instants/sorceries gives three +1/+1 counters (6/6)
+ref: Murktide Regent Oracle; CR 702.66 (delve)
+state:
+  humanhand=Murktide Regent
+  humanbattlefield=Volcanic Island;Volcanic Island
+  humangraveyard=Brainstorm;Ponder;Lightning Bolt;Island;Dragon's Rage Channeler
+script:
+  p1: cast Murktide Regent
+  p1: pick Brainstorm; Ponder; Lightning Bolt; Island; Dragon's Rage Channeler
+expect:
+  pt p1 "Murktide Regent" 6/6
+  counters p1 "Murktide Regent" P1P1 == 3
+  zone p1 graveyard size == 0
+  zone p1 exile size == 5
+
+=== murktide-delve-only-nonspells-no-counters
+title: Murktide Regent: delving a land and a creature gives no counters (3/3)
+ref: Murktide Regent Oracle
+state:
+  humanhand=Murktide Regent
+  humanbattlefield=Volcanic Island;Volcanic Island;Island;Island;Island
+  humangraveyard=Island;Dragon's Rage Channeler
+script:
+  p1: cast Murktide Regent
+  p1: pick Island; Dragon's Rage Channeler
+expect:
+  pt p1 "Murktide Regent" 3/3
+
+=== murktide-grows-when-instant-leaves-graveyard
+title: Murktide Regent on the battlefield gets a counter whenever an instant or sorcery card leaves your graveyard (second Murktide delving a Bolt)
+ref: Murktide Regent Oracle
+state:
+  humanhand=Murktide Regent
+  humanbattlefield=Murktide Regent;Volcanic Island;Volcanic Island
+  humangraveyard=Lightning Bolt;Island;Island;Island;Island
+script:
+  p1: cast Murktide Regent
+  p1: pick Lightning Bolt; Island; Island; Island; Island
+expect:
+  counters p1 "Murktide Regent" P1P1 >= 1
+
+=== murktide-needs-colored-mana
+title: Delve cannot pay for {U}{U}: Murktide Regent cannot be cast with one blue source and a full graveyard
+ref: CR 702.66a (delve pays generic mana only)
+state:
+  humanhand=Murktide Regent
+  humanbattlefield=Island
+  humangraveyard=Island;Island;Island;Island;Island;Island;Island;Island
+script:
+  p1: try cast Murktide Regent
+  p1: pick all
+expect:
+  zone p1 hand has "Murktide Regent"
+
+=== drc-delirium-needs-four-types
+title: Dragon's Rage Channeler: 4 card types in the graveyard make it 3/3 flying; only 3 types do not
+ref: Dragon's Rage Channeler Oracle (delirium)
+state:
+  humanbattlefield=Dragon's Rage Channeler
+  humangraveyard=Island;Lightning Bolt;Dragon's Rage Channeler;Lotus Petal
+script:
+  p1: pass
+expect:
+  pt p1 "Dragon's Rage Channeler" 3/3
+  creature p1 "Dragon's Rage Channeler"
+
+=== drc-three-types-no-delirium
+title: Dragon's Rage Channeler with only three card types in the graveyard stays 1/1
+ref: Dragon's Rage Channeler Oracle
+state:
+  humanbattlefield=Dragon's Rage Channeler
+  humangraveyard=Island;Lightning Bolt;Dragon's Rage Channeler
+script:
+  p1: pass
+expect:
+  pt p1 "Dragon's Rage Channeler" 1/1
+
+=== drc-surveil-on-noncreature-spell
+title: Dragon's Rage Channeler surveils 1 when you cast a noncreature spell, not a creature spell
+ref: Dragon's Rage Channeler Oracle
+state:
+  humanbattlefield=Dragon's Rage Channeler;Mountain;Island
+  humanhand=Lightning Bolt;Acererak the Archlich
+  humanlibrary=Brainstorm;Island;Island
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: pick Brainstorm
+  p1: wait-empty
+expect:
+  zone p1 graveyard has "Brainstorm"
+  zone p1 graveyard has "Lightning Bolt"
+
+=== unholy-heat-delirium
+title: Unholy Heat deals 6 with delirium (kills Acererak 5/5) and only 2 without
+ref: Unholy Heat Oracle
+state:
+  humanhand=Unholy Heat
+  humanbattlefield=Mountain
+  humangraveyard=Island;Lightning Bolt;Dragon's Rage Channeler;Lotus Petal
+  aibattlefield=Acererak the Archlich
+script:
+  p1: cast Unholy Heat -> Acererak the Archlich
+expect:
+  zone p2 graveyard has "Acererak the Archlich"
+
+=== unholy-heat-no-delirium
+title: Unholy Heat without delirium deals only 2 damage (Acererak survives)
+ref: Unholy Heat Oracle
+state:
+  humanhand=Unholy Heat
+  humanbattlefield=Mountain
+  humangraveyard=Island;Lightning Bolt
+  aibattlefield=Acererak the Archlich
+script:
+  p1: cast Unholy Heat -> Acererak the Archlich
+  p1: wait-empty
+expect:
+  zone p2 battlefield has "Acererak the Archlich"
+
+=== prismari-charm-two-targets-damage
+title: Prismari Charm mode 2: 1 damage to each of two targets (a Dragon's Rage Channeler and a Recruiter of the Guard, both 1/1, die)
+ref: Prismari Charm Oracle
+state:
+  humanhand=Prismari Charm
+  humanbattlefield=Volcanic Island;Mountain
+  aibattlefield=Dragon's Rage Channeler;Recruiter of the Guard
+script:
+  p1: cast Prismari Charm -> Dragon's Rage Channeler; Recruiter of the Guard
+  p1: pick deals 1 damage
+expect:
+  zone p2 graveyard has "Dragon's Rage Channeler"
+  zone p2 graveyard has "Recruiter of the Guard"
+
+=== prismari-charm-bounce
+title: Prismari Charm mode 3: bounce target nonland permanent
+ref: Prismari Charm Oracle
+state:
+  humanhand=Prismari Charm
+  humanbattlefield=Volcanic Island;Mountain
+  aibattlefield=Atraxa, Grand Unifier
+script:
+  p1: cast Prismari Charm -> Atraxa, Grand Unifier
+  p1: pick Return target nonland
+expect:
+  zone p2 hand has "Atraxa, Grand Unifier"
+
+=== prismari-charm-surveil-draw
+title: Prismari Charm mode 1: surveil 2 then draw a card
+ref: Prismari Charm Oracle
+state:
+  humanhand=Prismari Charm
+  humanbattlefield=Volcanic Island;Mountain
+  humanlibrary=Island;Brainstorm;Stock Up;Ponder
+script:
+  p1: cast Prismari Charm
+  p1: pick Surveil 2
+  p1: pick Island
+expect:
+  zone p1 graveyard has "Island"
+  zone p1 hand has "Brainstorm"
+
+=== wasteland-kills-ancient-tomb
+title: Wasteland destroys a nonbasic land (Ancient Tomb)
+ref: Wasteland Oracle
+state:
+  humanbattlefield=Wasteland
+  aibattlefield=Ancient Tomb;Island
+script:
+  p1: activate Wasteland ~destroy -> Ancient Tomb
+  p1: wait-empty
+expect:
+  zone p2 graveyard has "Ancient Tomb"
+  zone p1 graveyard has "Wasteland"
+  zone p2 battlefield has "Island"
+
+=== wasteland-cannot-target-basic
+title: Wasteland cannot target a basic land (Island, and Snow-Covered Island)
+ref: Wasteland Oracle; CR 305.6 (basic = supertype Basic)
+state:
+  humanbattlefield=Wasteland
+  aibattlefield=Island;Snow-Covered Island
+script:
+  p1: try activate Wasteland ~destroy -> Island
+  p1: try activate Wasteland ~destroy -> Snow-Covered Island
+expect:
+  zone p1 battlefield has "Wasteland"
+  untapped p1 "Wasteland"
+
+=== wasteland-hits-dual-with-basic-types
+title: Wasteland can destroy Tropical Island (nonbasic, though it has basic land types)
+ref: Wasteland Oracle
+state:
+  humanbattlefield=Wasteland
+  aibattlefield=Tropical Island
+script:
+  p1: activate Wasteland ~destroy -> Tropical Island
+  p1: wait-empty
+expect:
+  zone p2 graveyard has "Tropical Island"
+
+=== wasteland-in-response-tomb-still-taps
+title: In response to Wasteland, the target land can still be tapped for mana; the mana is usable
+ref: CR 605.3b (mana abilities resolve immediately); Wasteland Oracle
+state:
+  humanbattlefield=Wasteland
+  aibattlefield=Volcanic Island
+  aihand=Brainstorm
+script:
+  p1: activate Wasteland ~destroy -> Volcanic Island
+  p1: pass
+  p2: when-stack Wasteland
+  p2: cast Brainstorm
+expect:
+  zone p2 graveyard has "Volcanic Island"
+  zone p2 graveyard has "Brainstorm"
+
+=== ancient-tomb-damage
+title: Ancient Tomb deals 2 damage to its controller when tapped for mana (Stock Up paid with Tomb + Island)
+ref: Ancient Tomb Oracle
+state:
+  humanhand=Stock Up
+  humanbattlefield=Ancient Tomb;Island
+script:
+  p1: cast Stock Up
+  p1: wait-empty
+expect:
+  life p1 == 18
+  zone p1 graveyard has "Stock Up"
+
+=== ancient-tomb-lethal-tap
+title: Tapping Ancient Tomb at 2 life is legal (the controller dies); Forge's AI payment code refuses to do it
+ref: Ancient Tomb Oracle; CR 605 (mana abilities can always be activated; the cost is not a life payment)
+xfail: FORGE AI LIMITATION, not a rules bug. ComputerUtilMana will not tap a damaging land when the damage would kill, so the enumerator/auto-payer used by the LLM seat cannot offer the line. Rules-wise the player may do it (and lose).
+state:
+  humanlife=2
+  humanhand=Stock Up
+  humanbattlefield=Ancient Tomb;Island
+script:
+  p1: cast Stock Up
+  p1: wait-empty
+expect:
+  lost p1
+
+=== city-of-traitors-played-land
+title: City of Traitors is sacrificed when you play another land
+ref: City of Traitors Oracle
+state:
+  humanbattlefield=City of Traitors
+  humanhand=Island
+script:
+  p1: play Island
+  p1: wait-empty
+expect:
+  zone p1 graveyard has "City of Traitors"
+  zone p1 battlefield has "Island"
+
+=== city-of-traitors-fetch-is-not-play
+title: A fetchland putting a land onto the battlefield is not "playing" a land: City of Traitors stays
+ref: City of Traitors Oracle; CR 305.1 (play vs put)
+state:
+  humanbattlefield=City of Traitors;Flooded Strand
+  humanlibrary=Island;Island
+script:
+  p1: activate Flooded Strand
+  p1: pick Island
+  p1: wait-empty
+expect:
+  zone p1 battlefield has "City of Traitors"
+  zone p1 battlefield has "Island"
+  life p1 == 19
+
+=== lotus-petal-mana
+title: Lotus Petal sacrificed for blue mana pays for Brainstorm
+ref: Lotus Petal Oracle
+state:
+  humanhand=Brainstorm
+  humanbattlefield=Lotus Petal
+script:
+  p1: cast Brainstorm
+  p1: wait-empty
+expect:
+  zone p1 graveyard has "Lotus Petal"
+  zone p1 graveyard has "Brainstorm"
+
+=== mishra-bauble-delayed-draw
+title: Mishra's Bauble: look at the top card now, draw at the beginning of the next turn's upkeep (opponent's upkeep)
+ref: Mishra's Bauble Oracle
+state:
+  humanbattlefield=Mishra's Bauble
+  humanlibrary=Brainstorm;Island;Island
+script:
+  p1: activate Mishra's Bauble -> p2
+  p1: at p2:UPKEEP
+  p1: wait-empty
+expect:
+  zone p1 hand has "Brainstorm"
+  zone p1 graveyard has "Mishra's Bauble"
+
+=== brainstorm-put-back-two
+title: Brainstorm: draw three, put two on top of library
+ref: Brainstorm Oracle
+state:
+  humanhand=Brainstorm
+  humanbattlefield=Island
+  humanlibrary=Lightning Bolt;Ponder;Stock Up;Island;Island
+script:
+  p1: cast Brainstorm
+  p1: pick Ponder
+  p1: pick Stock Up
+  p1: wait-empty
+expect:
+  zone p1 hand has "Lightning Bolt"
+  zone p1 hand size == 1
+  zone p1 library size == 4
+
+=== stock-up-chooses-two-of-five
+title: Stock Up: look at the top five, put two into hand, the rest on the bottom
+ref: Stock Up Oracle
+state:
+  humanhand=Stock Up
+  humanbattlefield=Island;Island;Island
+  humanlibrary=Lightning Bolt;Ponder;Brainstorm;Island;Force of Will;Aluren;Show and Tell
+script:
+  p1: cast Stock Up
+  p1: pick Force of Will; Brainstorm
+  p1: wait-empty
+expect:
+  zone p1 hand has "Force of Will"
+  zone p1 hand has "Brainstorm"
+  zone p1 hand size == 2
+  zone p1 library size == 5

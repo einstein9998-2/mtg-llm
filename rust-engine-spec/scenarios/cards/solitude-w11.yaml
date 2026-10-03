@@ -1,0 +1,159 @@
+id: solitude-flash-hardcast-exiles-other-creature-controller-gains
+title: Solitude cast with flash in the opponent's turn exiles another target creature and that creature's controller gains life equal to its power
+area: card
+cards: [Solitude, Plains, Island, Murktide Regent]
+tags: [solitude, flash, etb-trigger, exile, life-gain, targeting]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Solitude, text: "When this creature enters, exile up to one other target creature. That creature's controller gains life equal to its power.", verified: true}
+  - {kind: oracle, card: Solitude, text: "Flash", verified: true}
+  - {kind: cr, ref: "702.8a", text: "Flash is a static ability that functions in any zone from which you could play the card it's on.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Solitude @sol"]
+    battlefield: ["Plains @pl1", "Plains @pl2", "Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@sol", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_target
+      slot: 0
+      answer: "@murk"
+      expect_options: {include: ["@murk"], exclude: ["@sol"]}
+  - check:
+      stack: [{kind: triggered, source: "@sol", controller: p0, targets: ["@murk"]}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      battlefield_contains: [{card: Solitude, pt: [3, 2], keywords: [lifelink]}]
+    p1:
+      life: 23
+      exile: [Murktide Regent]
+      battlefield: []
+notes: >
+  Solitude has flash, so p0 casts it in p1's main phase. On resolution the enters trigger is put on the stack with its
+  target (Solitude itself is excluded, "other"); then the active player p1 receives priority (117.3b). Murktide (3/3,
+  no counters) is exiled and its controller p1 gains 3. Bugs caught: Solitude's controller gaining the life, Solitude
+  able to target itself, priority going to the caster after resolution.
+---
+id: solitude-evoke-exile-white-card-exiles-then-sacrificed
+title: Solitude evoked by exiling a white card enters, exiles the target creature, and is sacrificed by its evoke trigger; a blue card cannot pay the evoke cost
+area: card
+cards: [Solitude, Swords to Plowshares, Brainstorm, Murktide Regent, Island]
+tags: [solitude, evoke, alternative-cost, pitch, order-triggers, intervening-if, sacrifice]
+derived_from: cr
+source:
+  - {kind: oracle, card: Solitude, text: "Evoke—Exile a white card from your hand.", verified: true}
+  - {kind: oracle, card: Solitude, text: "When this creature enters, exile up to one other target creature. That creature's controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "702.74a", text: "“Evoke [cost]” means “You may cast this card by paying [cost] rather than paying its mana cost” and “When this permanent enters, if its evoke cost was paid, its controller sacrifices it.”", verified: true}
+  - {kind: cr, ref: "603.3b", text: "puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Solitude @sol", "Swords to Plowshares @stp", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk", "Island @isl"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@bs"}}}}
+  - expect_illegal: {p0: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@sol"}}}}
+  - p0: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@stp"}}}
+  - check:
+      stack: [{kind: spell, card: "@sol", controller: p0}]
+      p0: {exile: [Swords to Plowshares], hand: [Brainstorm]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: order_triggers
+      answer:
+        - {source: "@sol", text_contains: "sacrifice"}
+        - {source: "@sol", text_contains: "exile"}
+  - p0: {decision: choose_target, slot: 0, answer: "@murk"}
+  - check:
+      stack:
+        - {kind: triggered, source: "@sol", controller: p0, text_contains: "sacrifice"}
+        - {kind: triggered, source: "@sol", controller: p0, text_contains: "exile", targets: ["@murk"]}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p1: {life: 23, exile: [Murktide Regent]}
+      p0: {battlefield: [{card: Solitude}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: []
+      graveyard: [Solitude]
+      exile: [Swords to Plowshares]
+      hand: [Brainstorm]
+      life: 20
+    p1:
+      life: 23
+      exile: [Murktide Regent]
+notes: >
+  Evoke is an alternative cost (no mana; p0 has no lands). Brainstorm is blue, not white, and Solitude cannot exile itself
+  to pay (it is on the stack, not in hand, once casting begins), so both probes are illegal. Solitude enters and two of
+  p0's triggered abilities trigger: the enters exile and the evoke sacrifice (its intervening-if is true). p0 orders them;
+  here the sacrifice goes on the stack first so the exile resolves first (either order exiles Murktide, because the exile
+  trigger does not need Solitude on the battlefield). Murktide's controller gains 3. Then the sacrifice trigger
+  resolves. p1 is the active player and receives priority after each resolution. The order_triggers answer uses the SCHEMA
+  addenda form for two triggers from one source ({source, text_contains}).
+---
+id: solitude-lifelink-combat-damage-gains-life
+title: Solitude's lifelink gains its controller 3 life when it deals combat damage
+area: card
+cards: [Solitude, Island]
+tags: [solitude, lifelink, combat-damage, life-gain]
+derived_from: cr
+source:
+  - {kind: oracle, card: Solitude, text: "Lifelink", verified: true}
+  - {kind: cr, ref: "702.15b", text: "Damage dealt by a source with lifelink causes that source’s controller, or its owner if it has no controller, to gain that much life (in addition to any other results that damage causes).", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: begin_combat
+  p0:
+    life: 10
+    battlefield: ["Solitude @sol"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@sol", target: {player: p1}}]}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    phase: main2
+    stack: []
+    p0: {life: 13}
+    p1: {life: 17}
+notes: >
+  p1 has no creatures, so no block decision. Solitude deals 3 combat damage; lifelink makes p0 gain 3 at the same time
+  (10 -> 13). Bug caught: lifelink missing or applied as a trigger that could be responded to.

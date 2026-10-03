@@ -1,0 +1,1 @@
+windows with menu differences 62; differing keys 69; suppressed {'kd-0005': 36, 'kd-0011': 2, 'kd-0002': 22, 'history-activated': 4, 'kd-0006': 4, 'kd-0003': 1}; unexplained 0

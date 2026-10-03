@@ -1,0 +1,350 @@
+# UR Cutter (p2 side when the Forge AI plays) vs Alurentell. Part A: counterspells, Veil of Summer, Show and Tell.
+# Conventions: p1 = first seat (Forge's "human" key), p2 = second seat ("ai"). Both are scripted; see ../README.md.
+# Library defaults to ten Islands, life to 20, turn 3, p1 Main 1.
+
+=== fow-alt-pitch-counters-stock-up
+title: Force of Will pitching a blue card counters Stock Up (alt cost: 1 life + exile a blue card)
+ref: Force of Will Oracle; CR 118.9 (alternative costs), 601.2b
+state:
+  humanhand=Stock Up
+  humanbattlefield=Island;Island;Island
+  aihand=Force of Will;Brainstorm;Mountain
+script:
+  p1: cast Stock Up
+  p1: pass
+  p2: when-stack Stock Up
+  p2: cast Force of Will ~alt -> Stock Up
+  p2: pick Brainstorm
+expect:
+  life p2 == 19
+  zone p2 exile has "Brainstorm"
+  zone p2 graveyard has "Force of Will"
+  zone p1 graveyard has "Stock Up"
+  zone p1 hand size == 0
+  zone p2 hand has "Mountain"
+
+=== fow-alt-needs-other-blue-card
+title: Force of Will alt cost is unavailable if the only blue card in hand is itself
+ref: Force of Will Oracle ("exile a blue card from your hand" - the card being cast is on the stack, not in hand)
+state:
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  aihand=Force of Will;Mountain
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: pass
+  p2: when-stack Lightning Bolt
+  p2: try cast Force of Will ~alt -> Lightning Bolt
+expect:
+  life p2 == 17
+  zone p2 hand has "Force of Will"
+  zone p2 exile size == 0
+
+=== fow-alt-cannot-pitch-nonblue
+title: Force of Will cannot exile a non-blue card as its alternative cost
+ref: Force of Will Oracle
+state:
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  aihand=Force of Will;Lightning Bolt
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: pass
+  p2: when-stack Lightning Bolt
+  p2: try cast Force of Will ~alt -> Lightning Bolt
+expect:
+  life p2 == 17
+  zone p2 hand has "Lightning Bolt"
+  zone p2 hand has "Force of Will"
+
+=== fow-alt-at-one-life
+title: Force of Will alt cost can be paid at exactly 1 life (the player then loses)
+ref: CR 119.4 (can pay life only if life >= amount), CR 704.5a
+state:
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  ailife=1
+  aihand=Force of Will;Brainstorm
+script:
+  p1: cast Lightning Bolt -> p1
+  p1: pass
+  p2: when-stack Lightning Bolt
+  p2: cast Force of Will ~alt -> Lightning Bolt
+  p2: pick Brainstorm
+expect:
+  lost p2
+  zone p2 exile has "Brainstorm"
+
+=== fow-hard-cast
+title: Force of Will cast for its mana cost does not cost life or a card
+ref: Force of Will Oracle
+state:
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  aihand=Force of Will;Brainstorm
+  aibattlefield=Island;Island;Island;Island;Island
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: pass
+  p2: when-stack Lightning Bolt
+  p2: cast Force of Will ~hard -> Lightning Bolt
+expect:
+  life p2 == 20
+  zone p2 hand has "Brainstorm"
+  zone p2 graveyard has "Force of Will"
+
+=== daze-return-island-counters
+title: Daze returning an Island counters a spell whose controller cannot pay {1}
+ref: Daze Oracle; CR 118.9
+state:
+  humanhand=Stock Up
+  humanbattlefield=Island;Island;Island
+  aihand=Daze
+  aibattlefield=Island;Mountain
+script:
+  p1: cast Stock Up
+  p1: pass
+  p2: when-stack Stock Up
+  p2: cast Daze ~alt -> Stock Up
+  p2: pick Island
+  p1: pick no
+expect:
+  zone p1 graveyard has "Stock Up"
+  zone p2 hand has "Island"
+  zone p2 battlefield has "Mountain"
+  zone p2 graveyard has "Daze"
+
+=== daze-paid-resolves
+title: Daze does nothing if the spell's controller pays {1}
+ref: Daze Oracle
+state:
+  humanhand=Brainstorm
+  humanbattlefield=Island;Island
+  aihand=Daze
+  aibattlefield=Island
+script:
+  p1: cast Brainstorm
+  p1: pass
+  p2: when-stack Brainstorm
+  p2: cast Daze ~alt -> Brainstorm
+  p2: pick Island
+  p1: pick yes
+expect:
+  zone p2 hand has "Island"
+  zone p2 graveyard has "Daze"
+  zone p1 graveyard has "Brainstorm"
+  zone p1 hand size == 1
+  tapped p1 "Island"
+
+=== daze-returns-tapped-island
+title: Daze can return a tapped Island
+ref: Daze Oracle (returning is a cost, tapped state is irrelevant)
+state:
+  humanhand=Stock Up
+  humanbattlefield=Island;Island;Island
+  aihand=Daze
+  aibattlefield=Island|Tapped
+script:
+  p1: cast Stock Up
+  p1: pass
+  p2: when-stack Stock Up
+  p2: cast Daze ~alt -> Stock Up
+  p2: pick Island
+  p1: pick no
+expect:
+  zone p2 hand has "Island"
+  zone p1 graveyard has "Stock Up"
+
+=== daze-returns-dual-with-island-type
+title: Daze can return Volcanic Island (it has the Island subtype)
+ref: Daze Oracle; CR 305.6 (basic land types)
+state:
+  humanhand=Stock Up
+  humanbattlefield=Island;Island;Island
+  aihand=Daze
+  aibattlefield=Volcanic Island
+script:
+  p1: cast Stock Up
+  p1: pass
+  p2: when-stack Stock Up
+  p2: cast Daze ~alt -> Stock Up
+  p1: pick no
+expect:
+  zone p2 hand has "Volcanic Island"
+  zone p1 graveyard has "Stock Up"
+
+=== daze-needs-an-island
+title: Daze alt cost unavailable when the only lands are not Islands
+ref: Daze Oracle
+state:
+  humanhand=Stock Up
+  humanbattlefield=Island;Island;Island
+  aihand=Daze
+  aibattlefield=Mountain;Wasteland
+script:
+  p1: cast Stock Up
+  p1: pass
+  p2: when-stack Stock Up
+  p2: try cast Daze ~alt -> Stock Up
+expect:
+  zone p2 hand has "Daze"
+  zone p1 hand size == 2
+
+=== daze-vs-aluren-free-creature
+title: Daze can counter a creature cast for free with Aluren; unpayable, so the creature is countered
+ref: Daze, Aluren Oracle (free spells are still cast spells)
+state:
+  humanhand=Acererak the Archlich
+  humanbattlefield=Aluren
+  aihand=Daze
+  aibattlefield=Island
+script:
+  p1: cast Acererak the Archlich ~free
+  p1: pass
+  p2: when-stack Acererak the Archlich
+  p2: cast Daze ~alt -> Acererak the Archlich
+  p2: pick Island
+  p1: pick no
+expect:
+  zone p1 graveyard has "Acererak the Archlich"
+  zone p1 battlefield lacks "Acererak the Archlich"
+  zone p2 hand has "Island"
+
+=== veil-of-summer-uncounterable
+title: Veil of Summer in response to Force of Will: Stock Up resolves and Veil draws a card (opponent cast a blue spell)
+ref: Veil of Summer Oracle
+state:
+  humanhand=Stock Up;Veil of Summer
+  humanbattlefield=Island;Island;Island;Forest
+  aihand=Force of Will;Brainstorm
+script:
+  p1: cast Stock Up
+  p1: pass
+  p2: when-stack Stock Up
+  p2: cast Force of Will ~alt -> Stock Up
+  p2: pick Brainstorm
+  p1: when-stack Force of Will
+  p1: cast Veil of Summer
+  p1: pass
+expect:
+  zone p1 graveyard has "Veil of Summer"
+  zone p2 graveyard has "Force of Will"
+  zone p1 graveyard has "Stock Up"
+  zone p1 hand size == 3
+  zone p1 library size == 7
+
+=== veil-of-summer-no-draw-without-blue-or-black-spell
+title: Veil of Summer draws no card if the opponent cast no blue or black spell this turn
+ref: Veil of Summer Oracle
+state:
+  humanhand=Veil of Summer
+  humanbattlefield=Forest
+script:
+  p1: cast Veil of Summer
+  p1: pass
+expect:
+  zone p1 hand size == 0
+  zone p1 library size == 10
+
+=== veil-of-summer-hexproof-from-blue-not-red
+title: Veil of Summer gives hexproof from blue: a blue spell cannot target Atraxa but a red spell can
+ref: Veil of Summer Oracle; CR 702.11d (hexproof from a quality)
+state:
+  humanhand=Veil of Summer
+  humanbattlefield=Forest;Atraxa, Grand Unifier
+  aihand=Brainstorm;Lightning Bolt;Prismari Charm
+  aibattlefield=Volcanic Island;Mountain;Volcanic Island
+script:
+  p1: cast Veil of Summer
+  p1: pass
+  p2: wait-empty
+  p2: try cast Prismari Charm -> Atraxa, Grand Unifier
+  p2: pick !Return target nonland
+  p2: try cast Lightning Bolt -> Atraxa, Grand Unifier
+expect:
+  zone p1 battlefield has "Atraxa, Grand Unifier"
+  zone p2 graveyard has "Lightning Bolt"
+
+=== show-and-tell-both-put-in
+title: Show and Tell: both players put a permanent from hand onto the battlefield (Atraxa vs Murktide Regent)
+ref: Show and Tell Oracle
+state:
+  humanhand=Show and Tell;Atraxa, Grand Unifier
+  humanbattlefield=Island;Island;Island
+  aihand=Murktide Regent
+script:
+  p1: cast Show and Tell
+  p1: pass
+  p2: pick Murktide Regent
+  p1: pick Atraxa, Grand Unifier
+expect:
+  zone p1 battlefield has "Atraxa, Grand Unifier"
+  zone p2 battlefield has "Murktide Regent"
+  pt p2 "Murktide Regent" 3/3
+  zone p1 graveyard has "Show and Tell"
+
+=== show-and-tell-only-legal-types
+title: Show and Tell: instants and sorceries cannot be put onto the battlefield (only artifact, creature, enchantment, land)
+ref: Show and Tell Oracle
+state:
+  humanhand=Show and Tell;Brainstorm;Stock Up;Island;Lotus Petal;Aluren;Acererak the Archlich
+  humanbattlefield=Island;Island;Island
+  aihand=Lightning Bolt
+script:
+  p1: cast Show and Tell
+  p1: pass
+expect:
+  trace has "options=[Aluren, Acererak the Archlich, Lotus Petal, Island]"
+  trace has "options=[] -> none"
+
+=== show-and-tell-land
+title: Show and Tell may put a land card (Ancient Tomb) onto the battlefield
+ref: Show and Tell Oracle
+state:
+  humanhand=Show and Tell;Ancient Tomb
+  humanbattlefield=Island;Island;Island
+script:
+  p1: cast Show and Tell
+  p1: pass
+  p1: pick Ancient Tomb
+expect:
+  zone p1 battlefield has "Ancient Tomb"
+
+=== show-and-tell-veil-protects-vs-fow
+title: Veil of Summer makes Show and Tell uncounterable; both players still put a permanent in
+ref: Veil of Summer, Show and Tell Oracle
+state:
+  humanhand=Show and Tell;Veil of Summer;Atraxa, Grand Unifier
+  humanbattlefield=Forest
+  humanmanapool=U U U
+  aihand=Force of Will;Brainstorm;Murktide Regent
+script:
+  p1: cast Show and Tell
+  p1: pass
+  p2: when-stack Show and Tell
+  p2: cast Force of Will ~alt -> Show and Tell
+  p2: pick Brainstorm
+  p1: when-stack Force of Will
+  p1: cast Veil of Summer
+  p1: pass
+  p2: pick Murktide Regent
+  p1: pick Atraxa, Grand Unifier
+expect:
+  zone p1 battlefield has "Atraxa, Grand Unifier"
+  zone p2 battlefield has "Murktide Regent"
+  zone p1 graveyard has "Show and Tell"
+
+=== show-and-tell-omniscience-then-free-spells
+title: Show and Tell puts Omniscience in; afterwards a spell from hand is cast for free
+ref: Omniscience Oracle
+state:
+  humanhand=Show and Tell;Omniscience;Atraxa, Grand Unifier
+  humanbattlefield=Island;Island;Island
+script:
+  p1: cast Show and Tell
+  p1: pass
+  p1: pick Omniscience
+  p1: cast Atraxa, Grand Unifier ~free
+expect:
+  zone p1 battlefield has "Omniscience"
+  zone p1 battlefield has "Atraxa, Grand Unifier"

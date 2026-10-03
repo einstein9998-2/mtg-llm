@@ -1,0 +1,69 @@
+--- /tmp/review-hidden/fork.rs.orig	2026-10-01 18:30:30.409299169 +0000
++++ crates/mtg-core/src/fork.rs	2026-10-01 18:30:30.427555626 +0000
+@@ -79,28 +79,49 @@
+                 return Err(ForkError::Inconsistent(format!("seat {p}: {} hidden cards but {} identities", unknown[p].len(), asg.defs[p].len())));
+             }
+         }
+-        for p in 0..2 {
+-            for (&slot, &def) in unknown[p].iter().zip(asg.defs[p].iter()) {
+-                let o = &mut self.objs[slot as usize];
+-                o.def = def;
+-                // Card ids equal the arena slot (doc 02 section 5.3): the sampled world carries
+-                // no trace of which card the true identity travelled with.
+-                o.card = Some(CardId(slot));
+-            }
+-        }
+-        // Positions: the observer's knowledge fixes some library positions; the rest are a random
+-        // permutation of the objects that sit in them (identities, known or sampled, travel with
+-        // their object, so view ids and knowledge stay attached).
++        // REVIEW PROTOTYPE: position-based dealing. Nothing about which slot (object) sits where may
++        // influence what the fork shows: known-identity objects with unknown position are re-placed at
++        // random free positions, and sampled identities are dealt by position within zone.
+         let bit = 1u8 << observer.idx();
+         let mut rng = Pcg64::from_seed(seed ^ 0x6A09_E667_F3BC_C908);
+         for p in 0..2 {
+             let lib = self.players[p].library.clone();
+             let free: Vec<usize> = (0..lib.len()).filter(|&i| self.knowledge[lib[i].slot as usize].pos_known_to & bit == 0).collect();
+-            let mut objs: Vec<ObjRef> = free.iter().map(|&i| lib[i]).collect();
+-            rng.shuffle(&mut objs);
+-            let l = &mut self.players[p].library;
+-            for (&i, r) in free.iter().zip(objs) {
+-                l[i] = r;
++            let is_known = |s: &State, r: ObjRef| s.knowledge[r.slot as usize].known_to & bit != 0;
++            let mut kn: Vec<ObjRef> = free.iter().map(|&i| lib[i]).filter(|&r| is_known(self, r)).collect();
++            kn.sort_by_key(|r| (self.objs[r.slot as usize].def, self.vids[r.slot as usize][observer.idx()]));
++            let un: Vec<ObjRef> = free.iter().map(|&i| lib[i]).filter(|&r| !is_known(self, r)).collect();
++            let mut pos: Vec<usize> = free.clone();
++            rng.shuffle(&mut pos);
++            let mut kpos: Vec<usize> = pos[..kn.len()].to_vec();
++            kpos.sort();
++            let mut l = self.players[p].library.clone();
++            let mut ui = un.iter();
++            let kset: std::collections::BTreeSet<usize> = kpos.iter().copied().collect();
++            let mut ki = kn.iter();
++            for &i in &free {
++                l[i] = if kset.contains(&i) { *ki.next().unwrap() } else { *ui.next().unwrap() };
++            }
++            self.players[p].library = l;
++        }
++        for p in 0..2 {
++            let mut order: Vec<u16> = Vec::new();
++            let hand = self.players[p].hand.clone();
++            for r in hand.iter().filter(|r| self.knowledge[r.slot as usize].known_to & bit == 0) {
++                order.push(r.slot);
++            }
++            let lib = self.players[p].library.clone();
++            for r in lib.iter().filter(|r| self.knowledge[r.slot as usize].known_to & bit == 0) {
++                order.push(r.slot);
++            }
++            let mut rest: Vec<u16> = unknown[p].iter().copied().filter(|s| !order.contains(s)).collect();
++            rest.sort();
++            order.extend(rest);
++            assert_eq!(order.len(), asg.defs[p].len());
++            for (&slot, &def) in order.iter().zip(asg.defs[p].iter()) {
++                let o = &mut self.objs[slot as usize];
++                o.def = def;
++                o.card = Some(CardId(slot));
+             }
+         }
+         self.players[observer.other().idx()].sideboard.clear();

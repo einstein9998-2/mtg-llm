@@ -1,0 +1,6 @@
+seed 3000: sim winner=ForgeAI-B turns~20  mirror winner=ForgeAI-B turns=20  OK
+seed 3002: sim winner=Seat-A turns~24  mirror winner=Seat-A turns=24  OK
+seed 3004: sim winner=Seat-A turns~24  mirror winner=Seat-A turns=24  OK
+seed 3006: sim winner=ForgeAI-B turns~16  mirror winner=ForgeAI-B turns=15  OK
+seed 3008: sim winner=ForgeAI-B turns~12  mirror winner=ForgeAI-B turns=12  OK
+EQUIVALENT

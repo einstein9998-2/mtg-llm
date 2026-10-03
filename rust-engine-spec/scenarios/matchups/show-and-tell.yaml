@@ -1,0 +1,101 @@
+id: mu-snt-acererak-and-cutter-venture-scry
+title: Show and Tell puts in Acererak and Cori-Steel Cutter; Acererak returns to hand and ventures into Lost Mine
+area: matchup
+cards: [Show and Tell, Acererak the Archlich, Cori-Steel Cutter, Lightning Bolt, Ponder, Island, Tropical Island, Hedge Maze, Volcanic Island]
+tags: [matchup, show-and-tell, acererak, venture, dungeon, intervening-if, scry]
+derived_from: cr
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "701.49a", text: "If a player is instructed to venture into the dungeon while they don't own a dungeon card in the command zone, they choose a dungeon card they own from outside the game and put it into the command zone. They put their venture marker on the topmost room.", verified: true}
+  - {kind: cr, ref: "309.4c", text: "The full text of each room ability is \"When you move your venture marker into this room, [effect.]\"", verified: true}
+  - {kind: cr, ref: "603.4", text: "A triggered ability may read \"When/Whenever/At [trigger event], if [condition], [effect].\" When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: cr, ref: "301.5b", text: "Equipment enter the battlefield like other artifacts. They don't enter the battlefield attached to a creature.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Cori-Steel Cutter @cut", "Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Acererak the Archlich @ace"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library: ["Ponder @x"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: simultaneous_secret_choice, answer: "@ace"}
+  - p0: {decision: simultaneous_secret_choice, answer: "@cut"}
+  - check:
+      stack: [{kind: triggered, source: "@ace", controller: p1}]
+      p0: {battlefield_contains: [{card: Cori-Steel Cutter, controller: p0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_dungeon, answer: Lost Mine of Phandelver}
+  - check:
+      stack: [{kind: triggered, controller: p1, text_contains: "Scry 1"}]
+      pending: {actor: p1, kind: priority}
+      p1: {hand: [Acererak the Archlich], command: [{dungeon: Lost Mine of Phandelver, room: Cave Entrance}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: scry, to_bottom: [], on_top_order: ["@x"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: [Acererak the Archlich]
+      graveyard: [Show and Tell]
+      command: [{dungeon: Lost Mine of Phandelver, room: Cave Entrance}]
+      completed_dungeons: []
+      library_top: [Ponder]
+      battlefield: [{card: Island}, {card: Tropical Island}, {card: Hedge Maze}]
+    p0: {hand: [Lightning Bolt], battlefield: [{card: Volcanic Island}, {card: Cori-Steel Cutter}]}
+notes: >
+  Acererak's intervening-if condition holds (p1 has not completed Tomb of Annihilation), so it triggers and, on resolution,
+  returns Acererak to hand and ventures. With no dungeon in the command zone, p1 chooses one (Lost Mine) and enters Cave
+  Entrance, whose room ability (scry 1) triggers. Cutter enters unattached and its Flurry needs a cast, so it does nothing.
+  701.49a covers the first venture.
+---
+id: mu-snt-land-put-in-is-not-land-drop
+title: A land put onto the battlefield with Show and Tell does not use the active player's land drop
+area: matchup
+cards: [Show and Tell, Ancient Tomb, Tropical Island, Volcanic Island, Lightning Bolt, Island, Hedge Maze]
+tags: [matchup, show-and-tell, land-drop, put-onto-battlefield]
+derived_from: cr
+source:
+  - {kind: cr, ref: "305.4", text: "Effects may also allow players to \"put\" lands onto the battlefield. This isn't the same as \"playing a land\" and doesn't count as a land played during the current turn.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Volcanic Island @pv", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    lands_played: 0
+    hand: ["Show and Tell @st", "Ancient Tomb @tomb", "Tropical Island @trop"]
+    battlefield: ["Island", "Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: simultaneous_secret_choice, answer: "@tomb"}
+  - p0: {decision: simultaneous_secret_choice, answer: null, expect_options: {include: ["@pv", null], exclude: ["@bolt"]}}
+  - check:
+      stack: []
+      p1: {lands_played: 0, battlefield_contains: [{card: Ancient Tomb, tapped: false}]}
+  - p1: {t: play_land, card: "@trop"}
+expect:
+  - at: after_script
+    pending: {actor: p1, kind: priority}
+    p1: {lands_played: 1, hand: [], battlefield_contains: [{card: Ancient Tomb}, {card: Tropical Island}]}
+    p0: {hand: [Volcanic Island, Lightning Bolt], battlefield: []}
+notes: >
+  Ancient Tomb is put onto the battlefield, not played (305.4), so p1 can still play Tropical Island. p0 could have put in
+  its Volcanic Island but chose nothing.

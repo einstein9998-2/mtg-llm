@@ -1,0 +1,462 @@
+# Manabases (fetch and surveil lands), Preordain, Erode, Bilbo, Koma, and the common sideboard hate cards against Reanimator and Doomsday.
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see ../README.md.
+
+=== fetch-delta-finds-underground-sea
+title: Polluted Delta pays 1 life, is sacrificed, and fetches an untapped Underground Sea (dual land with basic land types)
+ref: Polluted Delta Oracle (Island or Swamp card)
+state:
+  humanbattlefield=Polluted Delta
+  humanlibrary=Underground Sea;Plateau;Island
+script:
+  p1: activate Polluted Delta
+  p1: pick Underground Sea
+  p1: pass
+  p2: pass
+expect:
+  life p1 == 19
+  controls p1 "Underground Sea"
+  untapped p1 "Underground Sea"
+  zone p1 graveyard has "Polluted Delta"
+
+=== fetch-delta-cannot-find-plateau
+title: Polluted Delta cannot fetch Plateau (Mountain Plains has neither Island nor Swamp type)
+ref: Polluted Delta Oracle
+state:
+  humanbattlefield=Polluted Delta
+  humanlibrary=Plateau;Underground Sea
+script:
+  p1: activate Polluted Delta
+  p1: pick !Plateau
+  p1: pass
+  p2: pass
+expect:
+  not controls p1 "Plateau"
+
+=== fetch-arid-mesa-finds-plateau
+title: Arid Mesa (Mountain or Plains) fetches Plateau
+ref: Arid Mesa Oracle
+state:
+  humanbattlefield=Arid Mesa
+  humanlibrary=Plateau;Island
+script:
+  p1: activate Arid Mesa
+  p1: pick Plateau
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Plateau"
+
+=== fetch-marsh-flats-finds-scrubland
+title: Marsh Flats (Plains or Swamp) fetches Scrubland
+ref: Marsh Flats Oracle
+state:
+  humanbattlefield=Marsh Flats
+  humanlibrary=Scrubland;Island
+script:
+  p1: activate Marsh Flats
+  p1: pick Scrubland
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Scrubland"
+
+=== fetch-windswept-heath-finds-savannah
+title: Windswept Heath (Forest or Plains) fetches Savannah
+ref: Windswept Heath Oracle
+state:
+  humanbattlefield=Windswept Heath
+  humanlibrary=Savannah;Island
+script:
+  p1: activate Windswept Heath
+  p1: pick Savannah
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Savannah"
+
+=== fetch-bloodstained-mire-finds-badlands
+title: Bloodstained Mire (Swamp or Mountain) fetches Badlands
+ref: Bloodstained Mire Oracle
+state:
+  humanbattlefield=Bloodstained Mire
+  humanlibrary=Badlands;Island
+script:
+  p1: activate Bloodstained Mire
+  p1: pick Badlands
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Badlands"
+
+=== fetch-scalding-tarn-finds-volcanic
+title: Scalding Tarn (Island or Mountain) fetches Volcanic Island
+ref: Scalding Tarn Oracle
+state:
+  humanbattlefield=Scalding Tarn
+  humanlibrary=Volcanic Island;Plains
+script:
+  p1: activate Scalding Tarn
+  p1: pick Volcanic Island
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Volcanic Island"
+
+=== fetch-verdant-catacombs-finds-sea
+title: Verdant Catacombs (Swamp or Forest) fetches Underground Sea
+ref: Verdant Catacombs Oracle
+state:
+  humanbattlefield=Verdant Catacombs
+  humanlibrary=Underground Sea;Plains
+script:
+  p1: activate Verdant Catacombs
+  p1: pick Underground Sea
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Underground Sea"
+
+=== fetch-misty-rainforest-finds-surveil-land
+title: Misty Rainforest (Forest or Island) fetches Hedge Maze, which enters tapped and surveils
+ref: Misty Rainforest Oracle; Hedge Maze Oracle
+state:
+  humanbattlefield=Misty Rainforest
+  humanlibrary=Hedge Maze;Island;Island
+script:
+  p1: activate Misty Rainforest
+  p1: pick Hedge Maze
+  p1: pick Island
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Hedge Maze"
+  tapped p1 "Hedge Maze"
+  zone p1 graveyard has "Island"
+
+=== prismatic-vista-fetches-basic
+title: Prismatic Vista fetches a basic land (battlefield, untapped) for 1 life
+ref: Prismatic Vista Oracle
+state:
+  humanbattlefield=Prismatic Vista
+  humanlibrary=Swamp;Island
+script:
+  p1: activate Prismatic Vista
+  p1: pick Swamp
+  p1: pass
+  p2: pass
+expect:
+  life p1 == 19
+  controls p1 "Swamp"
+  untapped p1 "Swamp"
+
+=== surveil-land-undercity-sewers
+title: Undercity Sewers enters tapped and surveils 1
+ref: Undercity Sewers Oracle
+state:
+  humanhand=Undercity Sewers
+  humanlibrary=Brainstorm;Island
+script:
+  p1: play Undercity Sewers
+  p1: pick Brainstorm
+expect:
+  tapped p1 "Undercity Sewers"
+  zone p1 graveyard has "Brainstorm"
+
+=== surveil-land-thundering-falls
+title: Thundering Falls (Island Mountain) enters tapped, surveils 1, and keeps the card on top when declined
+ref: Thundering Falls Oracle
+state:
+  humanhand=Thundering Falls
+  humanlibrary=Brainstorm;Island
+script:
+  p1: play Thundering Falls
+  p1: pick none
+expect:
+  tapped p1 "Thundering Falls"
+  top p1 1 "Brainstorm"
+
+=== surveil-land-meticulous-archive
+title: Meticulous Archive (Plains Island) enters tapped and surveils 1
+ref: Meticulous Archive Oracle
+state:
+  humanhand=Meticulous Archive
+  humanlibrary=Brainstorm;Island
+script:
+  p1: play Meticulous Archive
+  p1: pick Brainstorm
+expect:
+  tapped p1 "Meticulous Archive"
+  zone p1 graveyard has "Brainstorm"
+
+=== surveil-land-shadowy-backstreet
+title: Shadowy Backstreet (Plains Swamp) enters tapped and surveils 1
+ref: Shadowy Backstreet Oracle
+state:
+  humanhand=Shadowy Backstreet
+  humanlibrary=Brainstorm;Island
+script:
+  p1: play Shadowy Backstreet
+  p1: pick Brainstorm
+expect:
+  tapped p1 "Shadowy Backstreet"
+  zone p1 graveyard has "Brainstorm"
+
+=== surveil-land-raucous-theater
+title: Raucous Theater enters tapped and surveils 1
+ref: Raucous Theater Oracle
+state:
+  humanhand=Raucous Theater
+  humanlibrary=Brainstorm;Island
+script:
+  p1: play Raucous Theater
+  p1: pick Brainstorm
+expect:
+  tapped p1 "Raucous Theater"
+  zone p1 graveyard has "Brainstorm"
+
+=== preordain-scry-two-draw-one
+title: Preordain scries 2 (one to the bottom) then draws a card
+ref: Preordain Oracle
+state:
+  humanhand=Preordain
+  humanbattlefield=Island
+  humanlibrary=Island;Brainstorm;Ponder;Island
+script:
+  p1: cast Preordain
+  p1: pass
+  p2: pass
+  p1: pick Island
+expect:
+  zone p1 hand has "Brainstorm"
+  zone p1 hand size == 1
+
+=== erode-destroys-and-gives-basic
+title: Erode destroys a creature and its controller may search for a basic land, put onto the battlefield tapped
+ref: Erode Oracle
+state:
+  humanhand=Erode
+  humanbattlefield=Plains
+  aibattlefield=Phelia, Exuberant Shepherd
+  ailibrary=Island;Island;Island
+script:
+  p1: cast Erode -> Phelia, Exuberant Shepherd
+  p1: pass
+  p2: pass
+expect:
+  zone p2 graveyard has "Phelia, Exuberant Shepherd"
+  zone p2 battlefield count "Island" == 1
+  tapped p2 "Island"
+
+=== bilbo-escape-costs-one-less
+title: Bilbo makes spells cast from outside your hand cost {1} less: Nethergoyf escape costs {1}{B}
+ref: Bilbo, Thief in the Night Oracle
+state:
+  humanbattlefield=Bilbo, Thief in the Night;Swamp;Swamp
+  humangraveyard=Nethergoyf;Island;Fatal Push;Orcish Bowmasters;Mishra's Bauble
+script:
+  p1: cast Nethergoyf ~escape
+  p1: pick Island;Fatal Push;Orcish Bowmasters;Mishra's Bauble
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Nethergoyf"
+
+=== bilbo-attack-casts-instant-from-graveyard
+title: Bilbo attacking lets you cast an instant from the graveyard (reduced by 1) and exile it afterwards
+ref: Bilbo, Thief in the Night Oracle
+state:
+  humanbattlefield=Bilbo, Thief in the Night;Island
+  humangraveyard=Flow State
+  humanlibrary=Brainstorm;Ponder;Island;Island;Island
+script:
+  p1: at COMBAT_BEGIN
+  p1: attack Bilbo, Thief in the Night -> p2
+  p1: pick yes
+  p1: pick Flow State
+  p1: pick play
+  p1: pick Brainstorm
+expect:
+  zone p1 exile has "Flow State"
+  zone p1 hand has "Brainstorm"
+
+=== koma-cannot-be-countered
+title: Koma, World-Eater cannot be countered (Force of Will does nothing)
+ref: Koma, World-Eater Oracle
+state:
+  humanhand=Koma, World-Eater
+  humanbattlefield=Forest;Forest;Island;Island;Island;Island;Island
+  aihand=Force of Will;Brainstorm
+script:
+  p1: cast Koma, World-Eater
+  p1: pass
+  p2: when-stack Koma
+  p2: cast Force of Will ~alt -> Koma, World-Eater
+  p2: pick Brainstorm
+expect:
+  controls p1 "Koma, World-Eater"
+
+=== koma-ward-four
+title: Koma's ward {4}: an opponent who cannot pay {4} has Swords to Plowshares countered
+ref: Koma, World-Eater Oracle; CR 702.21 (ward)
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Koma, World-Eater
+  aihand=Swords to Plowshares
+  aibattlefield=Plains
+script:
+  p2: cast Swords to Plowshares -> Koma, World-Eater
+  p2: pass
+  p1: pass
+expect:
+  controls p1 "Koma, World-Eater"
+  zone p2 graveyard has "Swords to Plowshares"
+
+=== pyroblast-counters-blue-spell
+title: Pyroblast counters a blue spell
+ref: Pyroblast Oracle
+state:
+  humanhand=Brainstorm
+  humanbattlefield=Island
+  aihand=Pyroblast
+  aibattlefield=Mountain
+script:
+  p1: cast Brainstorm
+  p1: pass
+  p2: when-stack Brainstorm
+  p2: cast Pyroblast ~Counter -> Brainstorm
+  p2: pick Counter target spell
+expect:
+  zone p1 graveyard has "Brainstorm"
+  zone p1 hand size == 0
+
+=== pyroblast-cannot-counter-nonblue
+title: Pyroblast's counter mode can target any spell but does nothing to a nonblue one (Lightning Bolt still resolves)
+ref: Pyroblast Oracle ("Counter target spell if it's blue": the target is legal, the effect checks color on resolution)
+state:
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  aihand=Pyroblast
+  aibattlefield=Mountain
+script:
+  p1: cast Lightning Bolt -> p2
+  p1: pass
+  p2: when-stack Lightning Bolt
+  p2: cast Pyroblast ~Counter -> Lightning Bolt
+  p2: pick Counter target spell
+expect:
+  life p2 == 17
+  zone p2 graveyard has "Pyroblast"
+
+=== grafdigger-cage-stops-reanimate
+title: With Grafdigger's Cage out, Reanimate cannot put the creature onto the battlefield (the life loss still happens)
+ref: Grafdigger's Cage Oracle; Reanimate Oracle
+state:
+  humanhand=Reanimate
+  humanbattlefield=Swamp
+  humangraveyard=Griselbrand
+  aibattlefield=Grafdigger's Cage
+script:
+  p1: cast Reanimate -> Griselbrand
+  p1: pass
+  p2: pass
+expect:
+  not controls p1 "Griselbrand"
+  zone p1 graveyard has "Griselbrand"
+
+=== grafdigger-cage-stops-flashback
+title: With Grafdigger's Cage out, Faithless Looting cannot be flashed back from the graveyard
+ref: Grafdigger's Cage Oracle
+state:
+  humangraveyard=Faithless Looting
+  humanbattlefield=Mountain;Mountain;Mountain
+  humanlibrary=Island;Island;Island;Island
+  aibattlefield=Grafdigger's Cage
+script:
+  p1: try cast Faithless Looting ~alt
+  p1: pass
+expect:
+  zone p1 graveyard has "Faithless Looting"
+
+=== containment-priest-exiles-reanimated-creature
+title: Containment Priest exiles a creature put onto the battlefield without being cast (Reanimate), but not one that was cast
+ref: Containment Priest Oracle
+state:
+  humanhand=Reanimate
+  humanbattlefield=Swamp
+  humangraveyard=Griselbrand
+  aibattlefield=Containment Priest
+script:
+  p1: cast Reanimate -> Griselbrand
+  p1: pass
+  p2: pass
+expect:
+  zone p1 exile has "Griselbrand"
+  not controls p1 "Griselbrand"
+  life p1 == 12
+
+=== containment-priest-allows-cast-creature
+title: Containment Priest does not exile a creature that was cast from hand
+ref: Containment Priest Oracle
+state:
+  humanhand=Ocelot Pride
+  humanbattlefield=Plains
+  aibattlefield=Containment Priest
+script:
+  p1: cast Ocelot Pride
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Ocelot Pride"
+
+=== faerie-macabre-fizzles-reanimate
+title: Discarding Faerie Macabre (free) to exile Griselbrand in response makes Reanimate fizzle with no life loss
+ref: Faerie Macabre Oracle; Reanimate Oracle
+state:
+  humanhand=Reanimate
+  humanbattlefield=Swamp
+  humangraveyard=Griselbrand
+  aihand=Faerie Macabre
+script:
+  p1: cast Reanimate -> Griselbrand
+  p1: pass
+  p2: when-stack Reanimate
+  p2: activate Faerie Macabre -> Griselbrand
+expect:
+  life p1 == 20
+  zone p1 exile has "Griselbrand"
+  zone p2 graveyard has "Faerie Macabre"
+
+=== surgical-extraction-hits-hand-and-library
+title: Surgical Extraction exiles every copy from graveyard, hand and library
+ref: Surgical Extraction Oracle
+state:
+  humangraveyard=Dark Ritual
+  humanhand=Dark Ritual
+  humanlibrary=Dark Ritual;Island;Island
+  aihand=Surgical Extraction
+  aibattlefield=Swamp
+script:
+  p2: cast Surgical Extraction -> Dark Ritual
+expect:
+  zone p1 exile count "Dark Ritual" == 3
+  zone p1 hand size == 0
+
+=== deafening-silence-one-noncreature-spell
+title: Deafening Silence: a player cannot cast a second noncreature spell in a turn
+ref: Deafening Silence Oracle
+state:
+  humanhand=Brainstorm;Ponder
+  humanbattlefield=Island;Island
+  aibattlefield=Deafening Silence
+script:
+  p1: cast Brainstorm
+  p1: pass
+  p2: pass
+  p1: pick Island;Island
+  p1: try cast Ponder
+  p1: pass
+expect:
+  zone p1 hand has "Ponder"
+  spells p1 == 1

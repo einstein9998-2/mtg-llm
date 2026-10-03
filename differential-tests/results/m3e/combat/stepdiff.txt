@@ -1,0 +1,3 @@
+same 8127  mismatch 38  forge-errors 0  forge-play-failed 0  payment-noise-suppressed 0  no-forge-result 0
+mismatches by action:
+    38 / 8165  combat|

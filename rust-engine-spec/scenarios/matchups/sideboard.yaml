@@ -1,0 +1,260 @@
+id: mu-pyroblast-destroys-omniscience
+title: Pyroblast's second mode destroys Omniscience, a blue permanent
+area: matchup
+cards: [Pyroblast, Omniscience, "Atraxa, Grand Unifier", Volcanic Island, Island, Tropical Island]
+tags: [matchup, pyroblast, sideboard, modal, destroy, color-check]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyroblast, text: "Destroy target permanent if it's blue.", verified: true}
+  - {kind: cr, ref: "701.8a", text: "To destroy a permanent, move it from the battlefield to its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Atraxa, Grand Unifier"]
+    battlefield: ["Omniscience @omni", "Island", "Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", modes: [2], targets: ["@omni"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {graveyard: [Omniscience], battlefield: [{card: Island}, {card: Tropical Island}]}
+    p0: {graveyard: [Pyroblast]}
+notes: >
+  Omniscience ({7}{U}{U}{U}) is blue. Destroyed on p0's turn, before p1 can use it for a free Atraxa.
+---
+id: mu-pyroblast-on-aluren-does-nothing
+title: Pyroblast can target Aluren but does nothing to it because Aluren is not blue
+area: matchup
+cards: [Pyroblast, Aluren, Volcanic Island, Island, Tropical Island]
+tags: [matchup, pyroblast, sideboard, modal, color-check, resolution-condition]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyroblast, text: "Destroy target permanent if it's blue.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+  - {kind: cr, ref: "115.1a", text: "An instant or sorcery spell is targeted if its spell ability identifies something it will affect by using the phrase \"target [something],\" where the \"something\" is a phrase that describes an object and/or player.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "The player announces their choice of an appropriate object or player for each target the spell requires.", verified: true}
+  - {kind: ruling, card: Pyroblast, text: "Pyroblast can target any spell or permanent, not just a blue one; it checks whether the target is blue only as it resolves.", verified: false, note: "recalled, not retrieved"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aluren @alu", "Island", "Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", modes: [2], targets: ["@alu"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@pyro", controller: p0, targets: ["@alu"], modes: [2]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {graveyard: [], battlefield_contains: [{card: Aluren}]}
+    p0: {graveyard: [Pyroblast]}
+notes: >
+  The target is "target permanent", with "if it's blue" checked as the spell resolves, so Aluren (green) is a legal target
+  and nothing happens. A wrong engine either refuses the target (Red Elemental Blast's wording, not Pyroblast's) or
+  destroys Aluren. Determined by Oracle + CR without the ruling: the targeting phrase is "target permanent" (115.1a), so
+  any permanent is an appropriate target (601.2c); "if it's blue" is an instruction followed on resolution (608.2c). The
+  recalled ruling only agrees.
+---
+id: mu-hydroblast-on-show-and-tell-does-nothing
+title: Hydroblast targeting Show and Tell does nothing because Show and Tell is not red, and Show and Tell resolves
+area: matchup
+cards: [Hydroblast, "Mishra's Bauble", Show and Tell, Omniscience, Volcanic Island, Island, Tropical Island, Hedge Maze]
+tags: [matchup, hydroblast, sideboard, modal, color-check, resolution-condition]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hydroblast, text: "Counter target spell if it's red.", verified: true}
+  - {kind: cr, ref: "115.1a", text: "An instant or sorcery spell is targeted if its spell ability identifies something it will affect by using the phrase \"target [something],\" where the \"something\" is a phrase that describes an object and/or player.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+  - {kind: ruling, card: Hydroblast, text: "Hydroblast can target any spell or permanent; it checks whether the target is red only as it resolves.", verified: false, note: "recalled, not retrieved"}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Hydroblast @hydro", "Mishra's Bauble @bb"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Omniscience @omni"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@hydro", modes: [1], targets: ["@st"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@st", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: [Hydroblast]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: simultaneous_secret_choice, answer: "@omni"}
+  - p0: {decision: simultaneous_secret_choice, answer: "@bb"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {graveyard: [Show and Tell], battlefield_contains: [{card: Omniscience}]}
+    p0: {hand: [], graveyard: [Hydroblast], battlefield_contains: [{card: "Mishra's Bauble"}]}
+notes: >
+  Show and Tell is blue, not red; Hydroblast resolves with no effect and Show and Tell resolves afterward. This is the
+  wrong-blast mistake an agent can make; the engine must still allow the cast: the targeting phrase is "target spell"
+  (115.1a), and "if it's red" is followed on resolution (608.2c). The recalled ruling only agrees.
+---
+id: mu-null-rod-stops-lotus-petal-daze-not-payable
+title: With Null Rod out, Lotus Petal cannot pay for Daze, so there is no pay prompt and Aluren is countered
+area: matchup
+cards: [Null Rod, Daze, Volcanic Island, Aluren, Lotus Petal, Island, Tropical Island, Hedge Maze]
+tags: [matchup, null-rod, sideboard, mana-ability, daze, counter-unless-pay, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Null Rod, text: "Activated abilities of artifacts can't be activated.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn't require a target (see rule 115.6), it could add mana to a player's mana pool when it resolves, and it's not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "602.5", text: "A player can't begin to activate an ability that's prohibited from being activated.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Daze @daze"]
+    battlefield: ["Null Rod", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    hand: ["Aluren @alu"]
+    battlefield: ["Island @i", "Tropical Island @t1", "Tropical Island @t2", "Hedge Maze @hm", "Lotus Petal @lp"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@alu", pay: {tap: ["@i", "@t1", "@t2", "@hm"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@volc"}, targets: ["@alu"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {graveyard: [Aluren], battlefield_contains: [{card: Lotus Petal}]}
+    p0: {hand: [Volcanic Island], graveyard: [Daze]}
+notes: >
+  Lotus Petal's ability is an activated (mana) ability of an artifact, so Null Rod forbids it (602.5). p1 has no other
+  source, so payment is impossible: no pay prompt, Aluren countered, Petal stays. Compare mu-daze-aluren-paid-with-lotus-petal,
+  the same position without Null Rod.
+---
+id: mu-boseiju-channel-cutter-cost-reduced-by-atraxa
+title: Boseiju's channel costs only {G} with Atraxa out, destroys Cori-Steel Cutter, and the UR player searches for a land with a basic land type
+area: matchup
+cards: ["Boseiju, Who Endures", "Atraxa, Grand Unifier", Cori-Steel Cutter, Volcanic Island, Wasteland, Scalding Tarn, Island, Tropical Island]
+tags: [matchup, boseiju, channel, ability-from-hand, cost-reduction, search, basic-land-type]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "Channel — {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.", verified: true}
+  - {kind: cr, ref: "602.2b", text: "An activated ability's analog to a spell's mana cost (as referenced in rule 601.2f) is its activation cost.", verified: true}
+  - {kind: cr, ref: "207.2c", text: "An ability word appears in italics at the beginning of some abilities. Ability words are similar to keywords in that they tie together cards that have similar functionality, but they have no special rules meaning and no individual entries in the Comprehensive Rules.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn't required to find some or all of those cards even if they're present in that zone.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Cori-Steel Cutter @cut", "Volcanic Island"]
+    library: ["Wasteland @w", "Volcanic Island @v", "Scalding Tarn @t"]
+    library_pad: 10
+  p1:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Atraxa, Grand Unifier", "Tropical Island @trop"]
+    library_pad: 10
+random: any
+script:
+  - p1: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@cut"], pay: auto}
+  - check:
+      stack: [{kind: activated, source: "@bos", controller: p1}]
+      p1: {hand: [], graveyard: ["Boseiju, Who Endures"], battlefield_contains: [{card: Tropical Island, tapped: true}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: boseiju_may_search, answer: true}
+  - p0:
+      decision: search
+      found: "@v"
+      expect_options: {include: [Volcanic Island, Island, null], exclude: [Wasteland, Scalding Tarn]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Cori-Steel Cutter]
+      battlefield: [{card: Volcanic Island}, {card: Volcanic Island, tapped: false}]
+      library_count: 12
+notes: >
+  Atraxa is a legendary creature, so {1}{G} becomes {G}, paid by the one Tropical Island (with no reduction this would be
+  unpayable). The ability resolves: Cutter is destroyed; p0 may search for a land card with a basic land type: Volcanic
+  Island (Island Mountain) and the padding Islands qualify, Wasteland and Scalding Tarn do not. Library 13 -> 12, then
+  shuffled. "ability: 1": the index counts mana abilities ({T}: Add {G} is 0, channel is 1; SCHEMA addenda). The "may
+  search" is p0's yes_no, then the search (SCHEMA addenda); both decisions belong to p0, the player whose permanent was
+  destroyed, not to Boseiju's controller.
+---
+id: mu-boseiju-channel-bauble-sacrificed-in-response-no-search
+title: If the targeted Mishra's Bauble is sacrificed in response, Boseiju's ability does not resolve and no search happens
+area: matchup
+cards: ["Boseiju, Who Endures", "Mishra's Bauble", Volcanic Island, Island, Tropical Island]
+tags: [matchup, boseiju, channel, target-illegal, sacrifice-in-response, no-shuffle]
+derived_from: cr
+source:
+  - {kind: cr, ref: "608.2b", text: "If the spell or ability specifies targets, it checks whether the targets are still legal. A target that's no longer in the zone it was in when it was targeted is illegal.", verified: true}
+  - {kind: oracle, card: "Mishra's Bauble", text: "{T}, Sacrifice this artifact: Look at the top card of target player's library.", verified: true}
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @bb", "Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Tropical Island", "Island"]
+    library_pad: 10
+random: []
+script:
+  - p1: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@bb"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@bb", ability: 0, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: activated, source: "@bos", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: ["Mishra's Bauble"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {library_count: 10, battlefield: [{card: Volcanic Island}], graveyard: ["Mishra's Bauble"]}
+    p1: {graveyard: ["Boseiju, Who Endures"], battlefield: [{card: Tropical Island, tapped: true}, {card: Island, tapped: true}]}
+notes: >
+  Boseiju's only target left the battlefield, so the ability doesn't resolve (608.2b) and none of its effect happens: no
+  search and no shuffle. "random: []" is an empty queue, so an engine that shuffles anyway fails. p1 paid {1}{G} (no
+  legendary creature). p0's look with the Bauble happens before; p0's delayed draw is for the next upkeep.

@@ -1,0 +1,32 @@
+# Mono-White Death and Taxes | Aggro / taxes (non-combo) | Pipeline pair A
+# Legacy, banlist as of 2026-08-10. Format: N Card Name. Blank line then sideboard.
+
+4 Mother of Runes
+4 Stoneforge Mystic
+4 Thalia, Guardian of Thraben
+3 Flickerwisp
+2 Recruiter of the Guard
+2 Phyrexian Revoker
+2 Mirran Crusader
+1 Brimaz, King of Oreskos
+4 Aether Vial
+4 Swords to Plowshares
+2 Batterskull
+1 Umezawa's Jitte
+1 Sword of Fire and Ice
+1 Council's Judgment
+1 Oblivion Ring
+1 Armageddon
+4 Wasteland
+1 Karakas
+18 Plains
+
+2 Rest in Peace
+2 Containment Priest
+2 Kataki, War's Wage
+2 Pithing Needle
+2 Wear // Tear
+2 Ethersworn Canonist
+1 Elspeth, Sun's Champion
+1 Disenchant
+1 Mana Tithe

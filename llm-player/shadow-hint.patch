@@ -1,0 +1,52 @@
+diff -ru ser-orig/src/silo/Policy.java ser-new/src/silo/Policy.java
+--- ser-orig/src/silo/Policy.java	2026-10-01 01:44:46.636141937 +0000
++++ ser-new/src/silo/Policy.java	2026-10-01 01:44:47.113414185 +0000
+@@ -64,6 +64,9 @@
+      */
+     final class External implements Policy, java.io.Closeable {
+         private final java.io.PrintWriter out; private final java.io.BufferedReader in; public int game;
++        /** Post-hoc evaluation only: compute the Forge AI's priority pick and write it to the decision log. Never sent to the driver. */
++        public boolean shadowHint;
++        @Override public boolean wantsAiHint() { return shadowHint; }
+         public External(String toDriverPipe, String fromDriverPipe) throws java.io.IOException {
+             out = new java.io.PrintWriter(new java.io.FileWriter(toDriverPipe), true);   // blocks until the driver opens it for reading
+             in = new java.io.BufferedReader(new java.io.FileReader(fromDriverPipe));      // blocks until the driver opens it for writing
+diff -ru ser-orig/src/silo/Run.java ser-new/src/silo/Run.java
+--- ser-orig/src/silo/Run.java	2026-10-01 01:44:46.636832726 +0000
++++ ser-new/src/silo/Run.java	2026-10-01 01:44:47.113522010 +0000
+@@ -52,6 +52,7 @@
+ 
+         Stats stats = new Stats();
+         final Policy.External ext = policyName.equals("external") ? new Policy.External(o.get("pipe-out"), o.get("pipe-in")) : null; // --pipe-out: engine->driver, --pipe-in: driver->engine
++        if (ext != null) ext.shadowHint = Boolean.parseBoolean(o.getOrDefault("shadow-hint", "false"));
+         long wins = 0, aiWins = 0, draws = 0, onPlayWins = 0, onPlayGames = 0;
+         long totalMs = 0;
+         try (Jsonl dec = new Jsonl(new File(out, "decisions.jsonl")); Jsonl gl = new Jsonl(new File(out, "games.jsonl"))) {
+diff -ru ser-orig/src/silo/SeatController.java ser-new/src/silo/SeatController.java
+--- ser-orig/src/silo/SeatController.java	2026-10-01 01:44:46.637383041 +0000
++++ ser-new/src/silo/SeatController.java	2026-10-01 01:44:47.114693970 +0000
+@@ -82,13 +82,23 @@
+         } else h.stats.delegated("policy:" + d.kind);
+         if (h.log != null) {
+             if (h.logPrompts) h.log.write("g", h.gameNo, "d", d.id, "turn", game.getPhaseHandler().getTurn(), "kind", d.kind, "n", d.opts.size(),
+-                    "pick", pick, "labels", labels(d, pick), "hint", d.aiHint, "chars", d.prompt.length(), "prompt", d.prompt);
++                    "pick", pick, "labels", labels(d, pick), "hint", d.aiHint, "chars", d.prompt.length(), "prompt", d.prompt, "truth", truth());
+             else h.log.write("g", h.gameNo, "d", d.id, "turn", game.getPhaseHandler().getTurn(), "kind", d.kind, "n", d.opts.size(),
+                     "pick", pick, "labels", labels(d, pick), "hint", d.aiHint, "chars", d.prompt.length());
+         }
+         return pick;
+     }
+ 
++    /** Ground truth for post-hoc blunder review (opponent hand, own library top). Only written when the policy asked for shadow hints; never shown to a player. */
++    private String truth() {
++        if (!(h.policy instanceof Policy.External ex) || !ex.shadowHint) return null;
++        StringBuilder sb = new StringBuilder("oppHand=");
++        for (forge.game.player.Player p : game.getPlayers()) if (p != player) { for (forge.game.card.Card c : p.getCardsIn(forge.game.zone.ZoneType.Hand)) sb.append(c.getName()).append(','); }
++        sb.append(" myLibTop=");
++        int n = 0; for (forge.game.card.Card c : player.getCardsIn(forge.game.zone.ZoneType.Library)) { if (n++ >= 4) break; sb.append(c.getName()).append(','); }
++        return sb.toString();
++    }
++
+     private static String labels(Decision d, int[] pick) {
+         if (pick == null) return null;
+         StringBuilder sb = new StringBuilder();

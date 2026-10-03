@@ -1,0 +1,198 @@
+id: layers-kaito-set-three-four-then-massacre-modifies
+title: On its controller's turn Kaito is set to 3/4 (layer 7b) and Massacre's -2/-2 applies after it (layer 7c), leaving a 1/2
+area: core
+cards: ["Kaito, Bane of Nightmares", Massacre, Swamp, Containment Priest, Island]
+tags: [layers, layer-7b, layer-7c, kaito, massacre, sublayer-order]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Kaito, Bane of Nightmares", text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has hexproof.", verified: true}
+  - {kind: oracle, card: Massacre, text: "All creatures get -2/-2 until end of turn.", verified: true}
+  - {kind: cr, ref: "613.4b", text: "Layer 7b: Effects that set power and/or toughness to a specific number or value are applied.", verified: true}
+  - {kind: cr, ref: "613.4c", text: "Layer 7c: Effects and counters that modify power and/or toughness (but don’t set power and/or toughness to a specific number or value) are applied.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Massacre @mass"]
+    battlefield:
+      - {card: "Kaito, Bane of Nightmares", as: kaito, counters: {loyalty: 3}}
+      - "Swamp @s1"
+      - "Swamp @s2"
+      - "Swamp @s3"
+      - "Swamp @s4"
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp", "Island @j1"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: "Kaito, Bane of Nightmares", pt: [3, 4], subtypes: [Ninja]}]}
+  - p0: {t: cast, card: "@mass", pay: {tap: ["@s1", "@s2", "@s3", "@s4"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Massacre]
+      battlefield_contains: [{card: "Kaito, Bane of Nightmares", pt: [1, 2], counters: {loyalty: 3}}]
+    p1:
+      graveyard: [Containment Priest]
+      battlefield: [{card: Island}]
+notes: >
+  Kaito's own static ability sets his P/T to 3/4 (layer 7b). Massacre's -2/-2 is a modification (layer 7c), applied
+  after every 7b effect regardless of timestamp, so Kaito is 1/2 and survives; Containment Priest (2/2) dies. p1
+  controls no Plains, so Massacre is paid with four Swamps. Massacre has no target, so Kaito's hexproof is irrelevant.
+  A wrong engine applies the set-to-3/4 after the -2/-2 (Kaito stays 3/4) or lets the newer timestamp win across
+  sublayers.
+---
+id: layers-kaito-emblem-and-massacre-both-modify-after-the-set
+title: "Kaito with his +1 emblem (\"Ninjas you control get +1/+1\") and Massacre's -2/-2: 3/4 set, then +1/+1 and -2/-2, ends 2/3"
+area: core
+cards: ["Kaito, Bane of Nightmares", Massacre, Swamp]
+tags: [layers, layer-7b, layer-7c, kaito, emblem, massacre, timestamps]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Kaito, Bane of Nightmares", text: "+1: You get an emblem with \"Ninjas you control get +1/+1.\"", verified: true}
+  - {kind: oracle, card: "Kaito, Bane of Nightmares", text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has hexproof.", verified: true}
+  - {kind: oracle, card: Massacre, text: "All creatures get -2/-2 until end of turn.", verified: true}
+  - {kind: cr, ref: "613.4", text: "Within layer 7, apply effects in a series of sublayers in the order described below. Within each sublayer, apply effects in timestamp order.", verified: true}
+  - {kind: cr, ref: "613.4b", text: "Layer 7b: Effects that set power and/or toughness to a specific number or value are applied.", verified: true}
+  - {kind: cr, ref: "613.4c", text: "Layer 7c: Effects and counters that modify power and/or toughness (but don’t set power and/or toughness to a specific number or value) are applied.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Massacre @mass"]
+    battlefield:
+      - {card: "Kaito, Bane of Nightmares", as: kaito, counters: {loyalty: 3}}
+      - "Swamp @s1"
+      - "Swamp @s2"
+      - "Swamp @s3"
+      - "Swamp @s4"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@kaito", ability: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0:
+        battlefield_contains: [{card: "Kaito, Bane of Nightmares", pt: [4, 5], counters: {loyalty: 4}}]
+        command: [{emblem: "Ninjas you control get +1/+1"}]
+  - p0: {t: cast, card: "@mass", pay: {tap: ["@s1", "@s2", "@s3", "@s4"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Massacre]
+      battlefield_contains: [{card: "Kaito, Bane of Nightmares", pt: [2, 3], counters: {loyalty: 4}}]
+notes: >
+  The emblem's +1/+1 (static, from the command zone) and Massacre's -2/-2 are both layer 7c; they apply after Kaito's
+  own 3/4 setting (7b) whatever their timestamps, giving 3+1-2 / 4+1-2 = 2/3. Within 7c the order does not change the
+  sum. Ability index 1 is the +1 (index 0 is ninjutsu); the loyalty cost raises 3 to 4 (only the change is asserted,
+  printed loyalty is not in oracle.json). Wrong engines: the later-timestamp Massacre or emblem overwritten by the 3/4
+  setting (3/4), or Kaito not counted as a Ninja (1/2).
+---
+id: layers-counters-equipment-and-dismember-all-modify-and-dismember-wears-off
+title: Murktide with two +1/+1 counters and Cori-Steel Cutter is 6/6; Dismember makes it 1/1; at the next turn the -5/-5 is gone and it is 6/6 again
+area: core
+cards: [Murktide Regent, Cori-Steel Cutter, Dismember, Swamp]
+tags: [layers, layer-7c, counters, equipment, dismember, until-end-of-turn, cleanup]
+derived_from: cr
+source:
+  - {kind: oracle, card: Dismember, text: "Target creature gets -5/-5 until end of turn.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: cr, ref: "613.4c", text: "Layer 7c: Effects and counters that modify power and/or toughness (but don’t set power and/or toughness to a specific number or value) are applied.", verified: true}
+  - {kind: cr, ref: "514.2", text: "Second, the following actions happen simultaneously: all damage marked on permanents (including phased-out permanents) is removed and all “until end of turn” and “this turn” effects end.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main2
+  p0:
+    battlefield:
+      - {card: Murktide Regent, as: murk, counters: {"+1/+1": 2}}
+      - {card: Cori-Steel Cutter, as: cut, attached_to: "@murk"}
+    library_pad: 10
+  p1:
+    hand: ["Dismember @dis"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: Murktide Regent, pt: [6, 6]}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@dis", targets: ["@murk"], phyrexian: [mana, mana], pay: {tap: ["@s1", "@s2", "@s3"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: Murktide Regent, pt: [1, 1], counters: {"+1/+1": 2}}]}
+      p1: {life: 20, graveyard: [Dismember]}
+  - advance: {to: upkeep, of: p1}
+expect:
+  - at: after_script
+    turn: 5
+    phase: upkeep
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield:
+        - {card: Murktide Regent, pt: [6, 6], counters: {"+1/+1": 2}}
+        - {card: Cori-Steel Cutter, attached_to: "@murk"}
+notes: >
+  Base 3/3, two +1/+1 counters and the Cutter's +1/+1 are all layer 7c: 6/6. Dismember (all three symbols paid with
+  mana, so p1 stays at 20) adds -5/-5 in the same sublayer: 1/1, alive. In p0's cleanup step the "until end of turn"
+  effect ends (514.2); the counters and the Equipment stay, so at p1's upkeep Murktide is 6/6 again. Cast in main2 so
+  no attack declaration intervenes; p0 passes priority with an empty stack so p1 can cast Dismember. Wrong engines:
+  counters dropped or treated as a later sublayer that mis-adds, or the -5/-5 still applied on the next turn.
+---
+id: layers-barrowgoyf-dies-to-dismember-with-three-types
+title: With only three card types in graveyards, Barrowgoyf (3/4) still dies to Dismember even after Dismember adds the instant type
+area: core
+cards: [Barrowgoyf, Dismember, Swamp, Island, Ponder, Containment Priest]
+tags: [layers, layer-7a, layer-7c, characteristic-defining-ability, sba-timing, dismember, barrowgoyf]
+derived_from: cr
+source:
+  - {kind: oracle, card: Barrowgoyf, text: "Barrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: oracle, card: Dismember, text: "Target creature gets -5/-5 until end of turn.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "704.5f", text: "If a creature has toughness 0 or less, it’s put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dismember @dis"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    graveyard: ["Island @gi"]
+    library_pad: 10
+  p1:
+    battlefield: ["Barrowgoyf @goyf"]
+    graveyard: ["Ponder @gp", "Containment Priest @gc"]
+    library_pad: 10
+script:
+  - check:
+      p1: {battlefield: [{card: Barrowgoyf, pt: [3, 4]}]}
+  - p0: {t: cast, card: "@dis", targets: ["@goyf"], phyrexian: [mana, mana], pay: {tap: ["@s1", "@s2", "@s3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Island, Dismember]}
+    p1:
+      battlefield: []
+      graveyard: [Ponder, Containment Priest, Barrowgoyf]
+notes: >
+  Three types (land, sorcery, creature): 3/4. After Dismember joins p0's graveyard there are four types, Barrowgoyf
+  would be 4/5, minus 5/5 = -1/0: toughness 0, put into the graveyard by SBA (704.5f). Pairs with the survival
+  scenario above so an engine that simply never kills a goyf, or always kills it, fails one of the two.

@@ -1,0 +1,66 @@
+id: jace-wielder-draw-step-with-empty-library-wins
+title: With Jace, Wielder of Mysteries on the battlefield, the draw-step draw from an empty library wins the game instead
+area: card
+cards: ["Jace, Wielder of Mysteries"]
+tags: [jace-wielder-of-mysteries, replacement-effect, draw, win-the-game, empty-library]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Jace, Wielder of Mysteries", text: "If you would draw a card while your library has no cards in it, you win the game instead.", verified: true}
+  - {kind: cr, ref: "614.1a", text: "Effects that use the word “instead” are replacement effects.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: upkeep
+  p0:
+    battlefield: [{card: "Jace, Wielder of Mysteries", as: jace, counters: {loyalty: 3}}]
+    library: []
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+notes: >
+  Both players pass in p0's upkeep; in the draw step p0 would draw from an empty library, and Jace's replacement makes
+  p0 win instead. The loyalty counters in setup only make the planeswalker a legal permanent (no loyalty ability is used
+  and no loyalty number is asserted). Pairs with the next scenario, where the same draw without Jace loses.
+---
+id: jace-wielder-griselbrand-draw-seven-from-three-card-library-wins
+title: With Jace out and three cards in library, Griselbrand's draw seven draws three, then the fourth draw wins the game
+area: card
+cards: ["Jace, Wielder of Mysteries", Griselbrand, Island]
+tags: [jace-wielder-of-mysteries, griselbrand, replacement-effect, draw, win-the-game]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Jace, Wielder of Mysteries", text: "If you would draw a card while your library has no cards in it, you win the game instead.", verified: true}
+  - {kind: oracle, card: Griselbrand, text: "Pay 7 life: Draw seven cards.", verified: true}
+  - {kind: cr, ref: "121.2", text: "Cards may only be drawn one at a time. If a player is instructed to draw multiple cards, that player performs that many individual card draws.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    battlefield:
+      - {card: "Jace, Wielder of Mysteries", as: jace, counters: {loyalty: 3}}
+      - {card: Griselbrand, as: gris}
+    library: [Island, Island, Island]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@gris", ability: 0}
+  - check:
+      p0: {life: 13}
+      stack: [{kind: activated, source: "@gris", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+notes: >
+  Draws are individual (121.2): the first three draws empty the library, and the fourth would-be draw happens while the
+  library has no cards, so Jace replaces it with a win. Wrong engines: apply Jace's check once to the whole "draw seven"
+  (library not empty at the start, so no win, then p0 loses for drawing from an empty library), or let p0 lose via
+  104.3c before the replacement applies. Life 20 - 7 = 13 is paid as the cost.

@@ -1,0 +1,12 @@
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see interaction-tests/README.md.
+
+=== quarry-sac-creature-pays-red
+title: Lazotep Quarry tapped with a sacrificed creature adds one mana of any color, so Goblin Bombardment ({1}{R}) is castable with Plains + Quarry (differential-testing finding)
+ref: Lazotep Quarry Oracle
+state:
+  humanbattlefield=Plains;Lazotep Quarry;Ocelot Pride
+  humanhand=Goblin Bombardment
+script:
+  p1: cast Goblin Bombardment
+expect:
+  controls p1 "Goblin Bombardment"

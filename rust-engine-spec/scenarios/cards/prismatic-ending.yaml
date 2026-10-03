@@ -1,0 +1,112 @@
+id: prismatic-ending-one-color-does-not-exile-mana-value-two
+title: Prismatic Ending with X=1 paid with white only can target a mana value 2 permanent but does not exile it
+area: card
+cards: [Prismatic Ending, Plains, "Phelia, Exuberant Shepherd"]
+tags: [prismatic-ending, converge, mana-value, condition-on-resolution, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @phelia"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pe", x: 1, targets: ["@phelia"], pay: {tap: ["@pl1", "@pl2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismatic Ending]}
+    p1:
+      exile: []
+      battlefield: [{card: "Phelia, Exuberant Shepherd"}]
+notes: >
+  The mana value test is part of the effect, not of the targeting requirement, so Phelia (mana value 2) is a legal
+  target; on resolution only one color (white) was spent, 2 > 1, so nothing is exiled and the spell still goes to the
+  graveyard. Bugs caught: counting mana spent (2) instead of colors (1), treating the condition as a target restriction
+  (which would make the cast illegal).
+---
+id: prismatic-ending-two-colors-exiles-mana-value-two
+title: Prismatic Ending with X=1 paid with white and blue (two colors) exiles a mana value 2 permanent
+area: card
+cards: [Prismatic Ending, Plains, Island, "Phelia, Exuberant Shepherd"]
+tags: [prismatic-ending, converge, mana-value, colors-of-mana-spent]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: cr, ref: "107.4a", text: "There are five primary colored mana symbols: {W} is white, {U} blue, {B} black, {R} red, and {G} green.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Plains @pl1", "Island @is1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @phelia"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pe", x: 1, targets: ["@phelia"], pay: {tap: ["@pl1", "@is1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismatic Ending]}
+    p1:
+      exile: ["Phelia, Exuberant Shepherd"]
+      battlefield: []
+notes: >
+  Same X as the previous scenario, but the generic {1} (the X) is paid with blue mana, so two colors were spent and
+  Phelia (mana value 2) is exiled. Mana spent on X counts toward converge. Bug caught: counting only the colors of the
+  printed colored symbols ({W}).
+---
+id: prismatic-ending-x2-three-colors-exiles-mana-value-three
+title: Prismatic Ending with X=2 paid with white, blue and red exiles a mana value 3 creature
+area: card
+cards: [Prismatic Ending, Plains, Island, Mountain, Magus of the Moon]
+tags: [prismatic-ending, converge, x-cost, mana-value]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: cr, ref: "107.3a", text: "the controller of that spell or ability chooses and announces the value of X as part of casting the spell or activating the ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Plains @pl1", "Island @is1", "Mountain @mo1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Magus of the Moon @magus"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pe", x: 2, targets: ["@magus"], pay: {tap: ["@pl1", "@is1", "@mo1"]}}
+  - check:
+      stack: [{kind: spell, card: "@pe", x: 2}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismatic Ending]}
+    p1:
+      exile: [Magus of the Moon]
+      battlefield: []
+notes: >
+  {2}{W} paid with W, U and R: three colors spent, Magus of the Moon has mana value 3 ({2}{R}), so it is exiled. The
+  setup has only basic lands so Magus's static ability changes nothing here.

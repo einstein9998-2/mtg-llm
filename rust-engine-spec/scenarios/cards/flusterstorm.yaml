@@ -1,0 +1,94 @@
+id: flusterstorm-copy-and-original-each-demand-payment
+title: Flusterstorm with one storm copy makes the caster pay {1} twice to keep Lightning Bolt
+area: card
+cards: [Flusterstorm, Lightning Bolt, Mountain, Island]
+tags: [flusterstorm, storm, copy, counter-unless-pay, mana-payment]
+derived_from: cr
+source:
+  - {kind: oracle, card: Flusterstorm, text: "Counter target instant or sorcery spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "707.10", text: "A copy of a spell or ability copies both the characteristics of the spell or ability and all decisions made for it, including modes, targets, the value of X, and additional or alternative costs.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    hand: ["Flusterstorm @flu"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@mtn"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@flu", targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@flu", controller: p1}
+        - {kind: spell, card: Flusterstorm, copy: true, controller: p1, targets: ["@bolt"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_flusterstorm, answer: true}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_flusterstorm, answer: true}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+    p1: {life: 17, graveyard: [Flusterstorm]}
+notes: >
+  Only Bolt was cast before Flusterstorm: one copy. The copy resolves first: p0 pays {1} (one Island). Then the original
+  resolves: p0 pays {1} again (the other Island). Bolt resolves: p1 20 -> 17. Each "unless pays" is asked of Bolt's
+  controller. Bugs caught: copies not created, the payment made once covering both, the copy asking the wrong player.
+---
+id: flusterstorm-cannot-target-creature-spell
+title: Flusterstorm cannot target a creature spell, only an instant or sorcery spell
+area: card
+cards: [Flusterstorm, "Phelia, Exuberant Shepherd", Plains, Island]
+tags: [flusterstorm, targeting, creature-spell, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Flusterstorm, text: "Counter target instant or sorcery spell unless its controller pays {1}.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Phelia, Exuberant Shepherd @phelia"]
+    battlefield: ["Plains @p1", "Plains @p2"]
+    library_pad: 10
+  p1:
+    hand: ["Flusterstorm @flu"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@phelia", pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@flu", targets: ["@phelia"]}}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {battlefield_contains: [{card: "Phelia, Exuberant Shepherd"}]}
+    p1: {hand: [Flusterstorm]}
+notes: >
+  Phelia is a creature spell; Flusterstorm has no legal target and is not castable. Positive targeting is covered by the
+  two scenarios above.

@@ -1,0 +1,93 @@
+id: parlor-played-enters-tapped-and-surveils
+title: Elegant Parlor played as a land enters tapped and its enter trigger surveils 1
+area: card
+cards: [Elegant Parlor, Lightning Bolt]
+tags: [elegant-parlor, enters-tapped, surveil, etb-trigger, land-drop]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Elegant Parlor, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Elegant Parlor, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Elegant Parlor @ep"]
+    library: ["Lightning Bolt @lb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@ep"}
+  - check:
+      stack: [{kind: triggered, source: "@ep", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {lands_played: 1, battlefield: [{card: Elegant Parlor, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@lb"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      graveyard: [Lightning Bolt]
+      library_count: 10
+      battlefield: [{card: Elegant Parlor, tapped: true}]
+notes: >
+  "Enters tapped" is a replacement on the entry, so the Parlor is never untapped and cannot pay for anything while its
+  trigger is on the stack. Playing a land is a special action (no stack), but the trigger uses the stack and p0 gets
+  priority with it there.
+---
+id: parlor-fetched-by-arid-mesa-enters-tapped-and-surveils
+title: Elegant Parlor fetched by Arid Mesa (it is a Mountain Plains) enters tapped and surveils, and is not a land drop
+area: card
+cards: [Elegant Parlor, Arid Mesa, Ponder, Island]
+tags: [elegant-parlor, arid-mesa, fetchland, enters-tapped, surveil, not-a-land-drop]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Arid Mesa, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Elegant Parlor, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Elegant Parlor, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "614.12", text: "Some replacement effects modify how a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 0
+    battlefield: ["Arid Mesa @mesa"]
+    library: ["Elegant Parlor @ep", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Ponder, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island]}
+script:
+  - p0: {t: activate, source: "@mesa", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@ep", expect_options: {include: ["@ep"]}}
+  - check:
+      stack: [{kind: triggered, source: "@ep", controller: p0}]
+      p0: {battlefield: [{card: Elegant Parlor, tapped: true}], lands_played: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@pd"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 0
+      graveyard: [Arid Mesa]
+      library_top: [Ponder]
+      library_count: 11
+      battlefield: [{card: Elegant Parlor, tapped: true}]
+notes: >
+  Elegant Parlor has the Mountain and Plains types, so Arid Mesa can find it. A land put onto the battlefield by an
+  effect is not a land play (lands_played stays 0) but its "enters tapped" replacement and enter trigger still apply.
+  The shuffle result is scripted so the surveil sees Ponder; p0 keeps it on top. Library 12 -> 11.

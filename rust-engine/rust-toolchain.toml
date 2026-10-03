@@ -1,0 +1,4 @@
+# Hashes use std's derived `Hash`, which Rust does not promise stable across compiler versions:
+# pin the toolchain so a compiler bump is a deliberate, reviewed change (regenerate goldens then).
+[toolchain]
+channel = "1.97.0"

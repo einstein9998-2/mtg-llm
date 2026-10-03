@@ -1,0 +1,6 @@
+lines 2640  windows 21923  actions played 19316  windows with menu differences 1319
+  complete             2594
+  diverged             4
+  forge_play_failed    2
+  game_over            32
+  unaligned            8

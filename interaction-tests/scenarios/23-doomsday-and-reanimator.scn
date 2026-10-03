@@ -1,0 +1,616 @@
+# Doomsday (p1) and Reanimator (p1 or p2): pile mechanics, library-out wins, reanimation spells, graveyard interaction.
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see ../README.md.
+
+=== doomsday-keeps-five-exiles-rest
+title: Doomsday lets you choose five cards from library and graveyard, exiles the rest, and you lose half your life rounded up
+ref: Doomsday Oracle
+state:
+  humanhand=Doomsday
+  humanbattlefield=Swamp;Swamp;Swamp
+  humanlibrary=Brainstorm;Ponder;Lotus Petal;Thoughtseize;Force of Will;Island;Island;Island
+  humangraveyard=Dark Ritual;Daze
+script:
+  p1: cast Doomsday
+  p1: pass
+  p2: pass
+  p1: pick Brainstorm
+  p1: pick Lotus Petal
+  p1: pick Force of Will
+  p1: pick Dark Ritual
+  p1: pick Daze
+expect:
+  life p1 == 10
+  zone p1 library size == 5
+  zone p1 library has "Daze"
+  zone p1 graveyard size == 1
+  zone p1 exile size == 5
+  zone p1 exile has "Ponder"
+
+=== doomsday-pile-order
+title: Doomsday puts the chosen five on top in the order chosen
+ref: Doomsday Oracle
+state:
+  humanhand=Doomsday
+  humanbattlefield=Swamp;Swamp;Swamp
+  humanlibrary=Brainstorm;Ponder;Lotus Petal;Thoughtseize;Force of Will;Island;Island;Island
+script:
+  p1: cast Doomsday
+  p1: pass
+  p2: pass
+  p1: pick Brainstorm
+  p1: pick Lotus Petal
+  p1: pick Force of Will
+  p1: pick Ponder
+  p1: pick Thoughtseize
+  p1: pick Force of Will;Brainstorm;Lotus Petal;Ponder;Thoughtseize
+expect:
+  top p1 1 "Force of Will"
+  top p1 2 "Brainstorm"
+  top p1 5 "Thoughtseize"
+
+=== doomsday-life-rounds-up
+title: Doomsday at 7 life costs 4 (half rounded up), leaving 3
+ref: Doomsday Oracle
+state:
+  humanlife=7
+  humanhand=Doomsday
+  humanbattlefield=Swamp;Swamp;Swamp
+  humanlibrary=Brainstorm;Ponder;Lotus Petal;Thoughtseize;Force of Will;Island
+script:
+  p1: cast Doomsday
+  p1: pass
+  p2: pass
+  p1: pick Brainstorm
+  p1: pick Lotus Petal
+  p1: pick Force of Will
+  p1: pick Ponder
+  p1: pick Thoughtseize
+expect:
+  life p1 == 3
+
+=== doomsday-fewer-than-five-cards
+title: Doomsday with a four-card library and graveyard total keeps all of them
+ref: Doomsday Oracle ("five cards" means up to five if fewer exist)
+state:
+  humanhand=Doomsday
+  humanbattlefield=Swamp;Swamp;Swamp
+  humanlibrary=Brainstorm;Ponder
+  humangraveyard=Dark Ritual;Daze
+script:
+  p1: cast Doomsday
+  p1: pass
+  p2: pass
+  p1: pick all
+expect:
+  zone p1 library size == 4
+  life p1 == 10
+
+=== doomsday-countered-by-fow-no-life-loss
+title: A countered Doomsday costs no life and exiles nothing
+ref: Doomsday Oracle; Force of Will Oracle
+state:
+  humanhand=Doomsday
+  humanbattlefield=Swamp;Swamp;Swamp
+  humanlibrary=Brainstorm;Ponder;Island
+  aihand=Force of Will;Brainstorm
+script:
+  p1: cast Doomsday
+  p1: pass
+  p2: when-stack Doomsday
+  p2: cast Force of Will ~alt -> Doomsday
+  p2: pick Brainstorm
+expect:
+  life p1 == 20
+  zone p1 library size == 3
+  zone p1 graveyard has "Doomsday"
+
+=== thassa-oracle-wins-with-empty-library
+title: Thassa's Oracle wins the game when the controller's library is empty (X >= cards in library)
+ref: Thassa's Oracle Oracle
+state:
+  humanhand=Thassa's Oracle
+  humanbattlefield=Island;Island
+  humanlibrary=
+script:
+  p1: cast Thassa's Oracle
+  p1: pass
+  p2: pass
+expect:
+  lost p2
+  gameover
+
+=== thassa-oracle-no-win-with-large-library
+title: Thassa's Oracle does not win while the library has more cards than the devotion to blue (2)
+ref: Thassa's Oracle Oracle
+state:
+  humanhand=Thassa's Oracle
+  humanbattlefield=Island;Island
+  humanlibrary=Brainstorm;Ponder;Island;Island;Island
+script:
+  p1: cast Thassa's Oracle
+  p1: pass
+  p2: pass
+  p1: pick none
+expect:
+  alive p2
+
+=== thassa-oracle-wins-at-exact-devotion
+title: Thassa's Oracle wins with exactly two cards in library (devotion 2 from its own UU)
+ref: Thassa's Oracle Oracle
+state:
+  humanhand=Thassa's Oracle
+  humanbattlefield=Island;Island
+  humanlibrary=Brainstorm;Ponder
+script:
+  p1: cast Thassa's Oracle
+  p1: pass
+  p2: pass
+expect:
+  lost p2
+
+=== thassa-oracle-pile-bottoms-extra
+title: Thassa's Oracle keeps one chosen card on top and sends the rest to the bottom
+ref: Thassa's Oracle Oracle
+state:
+  humanhand=Thassa's Oracle
+  humanbattlefield=Island;Island
+  humanlibrary=Brainstorm;Ponder;Island;Island;Island
+script:
+  p1: cast Thassa's Oracle
+  p1: pass
+  p2: pass
+  p1: pick Ponder
+expect:
+  top p1 1 "Ponder"
+  alive p2
+
+=== cavern-of-souls-makes-creature-uncounterable
+title: Cavern of Souls (naming Merfolk) mana makes Thassa's Oracle uncounterable: Force of Will cannot counter it
+ref: Cavern of Souls Oracle
+state:
+  humanhand=Thassa's Oracle
+  humanbattlefield=Cavern of Souls|ChosenType:Merfolk;Island
+  humanlibrary=
+  aihand=Force of Will;Brainstorm
+script:
+  p1: cast Thassa's Oracle
+  p1: pass
+  p2: when-stack Thassa's Oracle
+  p2: cast Force of Will ~alt -> Thassa's Oracle
+  p2: pick Brainstorm
+expect:
+  controls p1 "Thassa's Oracle"
+
+=== jace-draws-from-empty-library-win
+title: Jace, Wielder of Mysteries wins the game if you would draw with an empty library
+ref: Jace, Wielder of Mysteries Oracle
+state:
+  humanbattlefield=Jace, Wielder of Mysteries|Counters:LOYALTY=4
+  humanlibrary=Island;Island
+script:
+  p1: activate Jace, Wielder of Mysteries ~Target player mills -> p1
+  p1: pass
+  p2: pass
+expect:
+  lost p2
+
+=== lion-eye-diamond-mana
+title: Lion's Eye Diamond discards the hand and gives three mana of one color
+ref: Lion's Eye Diamond Oracle
+state:
+  humanhand=Brainstorm;Ponder;Doomsday
+  humanbattlefield=Lion's Eye Diamond
+script:
+  p1: activate Lion's Eye Diamond ~Add three
+  p1: pick black
+  p1: check zone p1 hand size == 0
+expect:
+  zone p1 graveyard size == 4
+  mana p1 == 3
+
+=== dark-ritual-adds-bbb
+title: Dark Ritual adds BBB
+ref: Dark Ritual Oracle
+state:
+  humanhand=Dark Ritual
+  humanbattlefield=Swamp
+script:
+  p1: cast Dark Ritual
+  p1: pass
+  p2: pass
+expect:
+  mana p1 == 3
+
+=== street-wraith-cycling-life
+title: Street Wraith cycles for 2 life instead of mana
+ref: Street Wraith Oracle
+state:
+  humanhand=Street Wraith
+script:
+  p1: activate Street Wraith ~Cycling
+  p1: pass
+  p2: pass
+expect:
+  life p1 == 18
+  zone p1 graveyard has "Street Wraith"
+  zone p1 hand size == 1
+
+=== edge-of-autumn-fetches-basic
+title: Edge of Autumn cast with four or fewer lands fetches a basic land tapped
+ref: Edge of Autumn Oracle
+state:
+  humanhand=Edge of Autumn
+  humanbattlefield=Forest;Forest
+  humanlibrary=Swamp;Island;Island
+script:
+  p1: cast Edge of Autumn
+  p1: pass
+  p2: pass
+  p1: pick Swamp
+expect:
+  zone p1 battlefield count "Swamp" == 1
+  tapped p1 "Swamp"
+
+=== edge-of-autumn-five-lands-no-fetch
+title: Edge of Autumn does nothing when you control five lands
+ref: Edge of Autumn Oracle (intervening if is not used, it checks on resolution)
+state:
+  humanhand=Edge of Autumn
+  humanbattlefield=Forest;Forest;Forest;Forest;Forest
+  humanlibrary=Swamp;Island;Island
+script:
+  p1: cast Edge of Autumn
+  p1: pass
+  p2: pass
+expect:
+  zone p1 battlefield count "Swamp" == 0
+
+=== edge-of-autumn-cycling-sacrifices-land
+title: Edge of Autumn cycling costs sacrificing a land
+ref: Edge of Autumn Oracle
+state:
+  humanhand=Edge of Autumn
+  humanbattlefield=Forest;Island
+script:
+  p1: activate Edge of Autumn ~Cycling
+  p1: pick Forest
+  p1: pass
+  p2: pass
+expect:
+  zone p1 graveyard has "Forest"
+  zone p1 hand size == 1
+
+=== personal-tutor-puts-sorcery-on-top
+title: Personal Tutor finds a sorcery and puts it on top of the library
+ref: Personal Tutor Oracle
+state:
+  humanhand=Personal Tutor
+  humanbattlefield=Island
+  humanlibrary=Island;Island;Doomsday;Island
+script:
+  p1: cast Personal Tutor
+  p1: pass
+  p2: pass
+  p1: pick Doomsday
+expect:
+  top p1 1 "Doomsday"
+
+=== consider-surveils-then-draws
+title: Consider surveils 1 (here binning the top card) then draws the next card
+ref: Consider Oracle
+state:
+  humanhand=Consider
+  humanbattlefield=Island
+  humanlibrary=Dark Ritual;Brainstorm;Island
+script:
+  p1: cast Consider
+  p1: pass
+  p2: pass
+  p1: pick Dark Ritual
+expect:
+  zone p1 graveyard has "Dark Ritual"
+  zone p1 hand has "Brainstorm"
+
+=== reanimate-loses-life-equal-to-mana-value
+title: Reanimate returns a creature from a graveyard and its controller loses life equal to its mana value (Griselbrand, 8)
+ref: Reanimate Oracle
+state:
+  humanhand=Reanimate
+  humanbattlefield=Swamp
+  humangraveyard=Griselbrand
+script:
+  p1: cast Reanimate -> Griselbrand
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Griselbrand"
+  life p1 == 12
+
+=== reanimate-opponents-graveyard
+title: Reanimate can take a creature from the opponent's graveyard and puts it under your control
+ref: Reanimate Oracle
+state:
+  humanhand=Reanimate
+  humanbattlefield=Swamp
+  aigraveyard=Atraxa, Grand Unifier
+script:
+  p1: cast Reanimate -> Atraxa, Grand Unifier
+  p1: pass
+  p2: pass
+  p1: pick none
+expect:
+  controls p1 "Atraxa, Grand Unifier"
+  life p1 == 13
+
+=== reanimate-fizzles-to-surgical-extraction
+title: Surgical Extraction (paid with 2 life) exiling the target in response makes Reanimate fizzle: no life lost to Reanimate
+ref: Reanimate Oracle; Surgical Extraction Oracle; CR 608.2b
+state:
+  humanhand=Reanimate
+  humanbattlefield=Swamp
+  humangraveyard=Griselbrand
+  aihand=Surgical Extraction
+script:
+  p1: cast Reanimate -> Griselbrand
+  p1: pass
+  p2: when-stack Reanimate
+  p2: cast Surgical Extraction -> Griselbrand
+expect:
+  life p1 == 20
+  zone p1 exile has "Griselbrand"
+  not controls p1 "Griselbrand"
+  life p2 == 18
+
+=== animate-dead-minus-one-power
+title: Animate Dead returns the creature with -1/-0 (Griselbrand becomes 6/7)
+ref: Animate Dead Oracle
+state:
+  humanhand=Animate Dead
+  humanbattlefield=Swamp;Swamp
+  humangraveyard=Griselbrand
+script:
+  p1: cast Animate Dead -> Griselbrand
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Griselbrand"
+  pt p1 "Griselbrand" 6/7
+  life p1 == 20
+
+=== animate-dead-leaves-sacrifices-creature
+title: When Animate Dead leaves the battlefield (destroyed by Witch Enchanter), the reanimated creature is sacrificed
+ref: Animate Dead Oracle
+state:
+  humanhand=Animate Dead
+  humanbattlefield=Swamp;Swamp
+  humangraveyard=Griselbrand
+  aihand=Witch Enchanter
+  aibattlefield=Plains;Plains;Plains;Plains
+script:
+  p1: cast Animate Dead -> Griselbrand
+  p1: pass
+  p2: pass
+  p2: at p2:MAIN1
+  p2: cast Witch Enchanter
+  p2: pass
+  p1: pass
+  p2: pick Animate Dead
+expect:
+  zone p1 graveyard has "Griselbrand"
+  zone p1 graveyard has "Animate Dead"
+  not controls p1 "Griselbrand"
+
+=== shallow-grave-returns-top-creature-with-haste
+title: Shallow Grave returns the topmost creature card of the graveyard with haste, exiled at the next end step
+ref: Shallow Grave Oracle
+state:
+  humanhand=Shallow Grave
+  humanbattlefield=Swamp;Swamp
+  humangraveyard=Atraxa, Grand Unifier;Griselbrand
+script:
+  p1: cast Shallow Grave
+  p1: pass
+  p2: pass
+  p1: at END_OF_TURN
+  p1: pass
+  p2: pass
+expect:
+  zone p1 exile has "Griselbrand"
+  zone p1 graveyard has "Atraxa, Grand Unifier"
+
+=== unmask-alt-cost-exiles-black-card
+title: Unmask can be cast by exiling a black card from hand, and the caster picks a nonland card to discard
+ref: Unmask Oracle
+state:
+  humanhand=Unmask;Dark Ritual
+  aihand=Swords to Plowshares;Island
+script:
+  p1: cast Unmask ~alt -> p2
+  p1: pick Dark Ritual
+  p1: pass
+  p2: pass
+  p1: pick Swords to Plowshares
+expect:
+  zone p1 exile has "Dark Ritual"
+  zone p2 graveyard has "Swords to Plowshares"
+
+=== unmask-cannot-pitch-nonblack
+title: Unmask's alternative cost needs a black card: a red card cannot be exiled
+ref: Unmask Oracle
+state:
+  humanhand=Unmask;Lightning Bolt
+  aihand=Swords to Plowshares
+script:
+  p1: try cast Unmask ~alt -> p2
+  p1: pass
+expect:
+  zone p1 hand has "Unmask"
+  zone p1 hand has "Lightning Bolt"
+
+=== faithless-looting-draw-discard-and-flashback
+title: Faithless Looting draws two and discards two, then can be flashed back from the graveyard for {2}{R}
+ref: Faithless Looting Oracle
+state:
+  humanhand=Faithless Looting;Island;Island
+  humanbattlefield=Mountain;Mountain;Mountain;Mountain;Mountain
+  humanlibrary=Brainstorm;Ponder;Island;Island
+script:
+  p1: cast Faithless Looting
+  p1: pass
+  p2: pass
+  p1: pick Island;Island
+  p1: cast Faithless Looting ~alt
+  p1: pass
+  p2: pass
+  p1: pick Brainstorm;Ponder
+expect:
+  zone p1 exile has "Faithless Looting"
+  zone p1 graveyard has "Ponder"
+
+=== cabal-therapy-names-card
+title: Cabal Therapy discards every copy of the named card from the opponent's hand
+ref: Cabal Therapy Oracle
+state:
+  humanhand=Cabal Therapy
+  humanbattlefield=Swamp
+  aihand=Swords to Plowshares;Swords to Plowshares;Phelia, Exuberant Shepherd
+script:
+  p1: cast Cabal Therapy -> p2
+  p1: pick Swords to Plowshares
+  p1: pass
+  p2: pass
+expect:
+  zone p2 graveyard count "Swords to Plowshares" == 2
+  zone p2 hand has "Phelia, Exuberant Shepherd"
+
+=== cabal-therapy-flashback-sacrifice
+title: Cabal Therapy can be flashed back by sacrificing a creature
+ref: Cabal Therapy Oracle
+state:
+  humangraveyard=Cabal Therapy
+  humanbattlefield=Ocelot Pride
+  aihand=Phelia, Exuberant Shepherd
+script:
+  p1: cast Cabal Therapy -> p2
+  p1: pick Ocelot Pride
+  p1: pick Phelia, Exuberant Shepherd
+  p1: pass
+  p2: pass
+expect:
+  zone p2 graveyard has "Phelia, Exuberant Shepherd"
+  zone p1 exile has "Cabal Therapy"
+  zone p1 graveyard has "Ocelot Pride"
+
+=== griselbrand-draw-seven
+title: Griselbrand pays 7 life to draw seven cards
+ref: Griselbrand Oracle
+state:
+  humanbattlefield=Griselbrand
+  humanlibrary=Island;Island;Island;Island;Island;Island;Island;Island
+script:
+  p1: activate Griselbrand
+  p1: pass
+  p2: pass
+expect:
+  life p1 == 13
+  zone p1 hand size == 7
+
+=== griselbrand-cannot-pay-with-too-little-life
+title: Griselbrand's ability cannot be activated at 6 life
+ref: Griselbrand Oracle; CR 119.4
+state:
+  humanlife=6
+  humanbattlefield=Griselbrand
+script:
+  p1: try activate Griselbrand
+  p1: pass
+expect:
+  life p1 == 6
+  zone p1 hand size == 0
+
+=== archon-of-cruelty-etb
+title: Archon of Cruelty's trigger makes the opponent sacrifice, discard and lose 3, while the controller draws and gains 3
+ref: Archon of Cruelty Oracle
+state:
+  humanbattlefield=Archon of Cruelty
+  humanlibrary=Island;Island
+  aihand=Swords to Plowshares
+  aibattlefield=Phelia, Exuberant Shepherd
+script:
+  p1: at COMBAT_BEGIN
+  p1: attack Archon of Cruelty -> p2
+  p1: pick p2
+expect:
+  life p2 == 17
+  life p1 == 23
+  zone p2 graveyard has "Swords to Plowshares"
+  zone p2 graveyard has "Phelia, Exuberant Shepherd"
+  zone p1 hand size == 1
+
+=== raph-and-mikey-attack-trigger
+title: Raph and Mikey puts the first creature revealed from the library onto the battlefield tapped and attacking
+ref: Raph & Mikey, Troublemakers Oracle
+state:
+  humanbattlefield=Raph & Mikey, Troublemakers
+  humanlibrary=Island;Lotus Petal;Griselbrand;Island
+script:
+  p1: at COMBAT_BEGIN
+  p1: attack Raph & Mikey, Troublemakers -> p2
+  p1: at COMBAT_DAMAGE
+  p1: check controls p1 "Griselbrand"
+  p1: pass
+expect:
+  controls p1 "Griselbrand"
+  zone p1 library size == 3
+
+=== stronghold-gambit-lowest-creature-enters
+title: Stronghold Gambit puts the creature with the lowest mana value revealed onto the battlefield; both players reveal
+ref: Stronghold Gambit Oracle
+state:
+  humanhand=Stronghold Gambit;Griselbrand;Island
+  humanbattlefield=Mountain;Island
+  aihand=Phelia, Exuberant Shepherd
+script:
+  p1: cast Stronghold Gambit
+  p1: pass
+  p2: pass
+  p1: pick Griselbrand
+  p2: pick Phelia, Exuberant Shepherd
+expect:
+  controls p2 "Phelia, Exuberant Shepherd"
+  not controls p1 "Griselbrand"
+
+=== stronghold-gambit-noncreature-reveals-nothing
+title: Stronghold Gambit: a player who reveals a noncreature card puts nothing onto the battlefield
+ref: Stronghold Gambit Oracle
+state:
+  humanhand=Stronghold Gambit;Island
+  humanbattlefield=Mountain;Island
+  aihand=Phelia, Exuberant Shepherd;Swords to Plowshares
+script:
+  p1: cast Stronghold Gambit
+  p1: pass
+  p2: pass
+  p1: pick Island
+  p2: pick Phelia, Exuberant Shepherd
+expect:
+  controls p2 "Phelia, Exuberant Shepherd"
+
+=== collective-brutality-escalate-two-modes
+title: Collective Brutality with one discard (escalate) chooses two modes: opponent loses 2, I gain 2, and -2/-2 on a creature
+ref: Collective Brutality Oracle
+state:
+  humanhand=Collective Brutality;Island
+  humanbattlefield=Swamp;Swamp
+  aibattlefield=Phelia, Exuberant Shepherd
+script:
+  p1: cast Collective Brutality -> Phelia, Exuberant Shepherd | p2
+  p1: pick Target creature gets;Target opponent loses
+  p1: pick Island
+  p1: pass
+  p2: pass
+expect:
+  life p2 == 18
+  life p1 == 22
+  zone p2 graveyard has "Phelia, Exuberant Shepherd"
+  zone p1 graveyard has "Island"

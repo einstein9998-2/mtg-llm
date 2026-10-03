@@ -1,0 +1,118 @@
+id: fatal-push-destroys-mana-value-two-creature
+title: Fatal Push destroys a creature with mana value 2 (Orcish Bowmasters)
+area: card
+cards: [Fatal Push, Swamp, Orcish Bowmasters]
+tags: [fatal-push, removal, mana-value, destroy]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Fatal Push, text: "Destroy target creature if it has mana value 2 or less.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Fatal Push @push"]
+    battlefield: ["Swamp @s1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Orcish Bowmasters @ob"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@push", targets: ["@ob"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Fatal Push], battlefield: [{card: Swamp, tapped: true}]}
+    p1: {battlefield: [], graveyard: [Orcish Bowmasters]}
+notes: >
+  Bowmasters' mana cost {1}{B} gives mana value 2, so it is destroyed. Its abilities do not trigger on leaving.
+---
+id: fatal-push-revolt-after-fetchland-destroys-mana-value-three
+title: After sacrificing Bloodstained Mire this turn, Fatal Push destroys a mana value 3 creature
+area: card
+cards: [Fatal Push, Bloodstained Mire, Swamp, Loran of the Third Path]
+tags: [fatal-push, revolt, turn-history, fetchland]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Fatal Push, text: "Revolt — Destroy that creature if it has mana value 4 or less instead if a permanent left the battlefield under your control this turn.", verified: true}
+  - {kind: oracle, card: Bloodstained Mire, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "207.2c", text: "Ability words are similar to keywords in that they tie together cards that have similar functionality, but they have no special rules meaning and no individual entries in the Comprehensive Rules.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Fatal Push @push"]
+    battlefield: ["Bloodstained Mire @mire"]
+    library: ["Swamp @sw"]
+    library_pad: 10
+  p1:
+    battlefield: ["Loran of the Third Path @lo"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: activate, source: "@mire", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@sw"}
+  - p0: {t: cast, card: "@push", targets: ["@lo"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Bloodstained Mire, Fatal Push]
+      battlefield: [{card: Swamp, tapped: true}]
+    p1: {battlefield: [], graveyard: [Loran of the Third Path]}
+notes: >
+  Sacrificing the Mire is a permanent leaving the battlefield under p0's control this turn, so revolt is on when Push
+  resolves and the threshold is mana value 4: Loran (3) is destroyed. The fetched Swamp pays {B}. "Revolt" is an ability
+  word with no rules meaning (207.2c); the condition is the text after it. A wrong engine forgets turn history or only
+  counts creatures leaving.
+---
+id: fatal-push-revolt-still-misses-mana-value-five
+title: Even with revolt, Fatal Push does not destroy a mana value 5 creature
+area: card
+cards: [Fatal Push, Bloodstained Mire, Swamp, Quantum Riddler]
+tags: [fatal-push, revolt, mana-value, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Fatal Push, text: "Destroy that creature if it has mana value 4 or less instead if a permanent left the battlefield under your control this turn.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Fatal Push @push"]
+    battlefield: ["Bloodstained Mire @mire"]
+    library: ["Swamp @sw"]
+    library_pad: 10
+  p1:
+    battlefield: ["Quantum Riddler @qr"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: activate, source: "@mire", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@sw"}
+  - p0: {t: cast, card: "@push", targets: ["@qr"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 19, graveyard: [Bloodstained Mire, Fatal Push]}
+    p1: {battlefield: [{card: Quantum Riddler}], graveyard: []}
+notes: >
+  Quantum Riddler costs {3}{U}{U}: mana value 5. Revolt raises the limit to 4 only.
+  Paired with the revolt scenario above.

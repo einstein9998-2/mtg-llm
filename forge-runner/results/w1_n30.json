@@ -1,0 +1,41 @@
+{
+  "tag": "w1_n30",
+  "deck1": "delver.dck",
+  "deck2": "jund.dck",
+  "workers": 1,
+  "games_per_worker": 30,
+  "games_completed": 30,
+  "wins": {
+    "Ai(1)-UR Delver": 13,
+    "Ai(2)-Jund": 17
+  },
+  "return_codes": [
+    0
+  ],
+  "wall_sec_total": 66.5,
+  "games_per_sec_wall_incl_jvm_startup": 0.451,
+  "games_per_sec_per_worker_in_game_time": 0.498,
+  "aggregate_games_per_sec_steady_state": 0.536,
+  "ms_per_game": {
+    "mean": 2007,
+    "p50": 1700,
+    "p90": 3368,
+    "max": 4849
+  },
+  "mean_turns": 8.87,
+  "worker_wall_sec": [
+    66.5
+  ],
+  "warnings_sample": [
+    "Bloodbraid Elf Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Bloodstained Mire Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Daze Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Deathrite Shaman Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Error handling registered!",
+    "Fire Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Force of Will Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Grim Lavamancer Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Lightning Bolt Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Mountain Did not have activator set in SpellAbilityRestriction.canPlay()"
+  ]
+}

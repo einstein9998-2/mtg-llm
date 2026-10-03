@@ -1,0 +1,104 @@
+id: griselbrand-pay-seven-draw-seven-while-summoning-sick
+title: A summoning-sick Griselbrand can activate "Pay 7 life, Draw seven cards"; the life is paid on activation and the draws happen on resolution
+area: card
+cards: [Griselbrand, Island]
+tags: [griselbrand, activated-ability, pay-life, summoning-sickness, draw]
+derived_from: cr
+source:
+  - {kind: oracle, card: Griselbrand, text: "Pay 7 life: Draw seven cards.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    battlefield: [{card: Griselbrand, as: gris, sick: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@gris", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@gris", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {life: 13, hand_count: 0, library_count: 10}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 13
+      hand_count: 7
+      library_count: 3
+      battlefield: [{card: Griselbrand, sick: true}]
+notes: >
+  The ability has no {T} in its cost, so summoning sickness does not stop it (302.6 restricts only tap/untap-symbol
+  abilities). The 7 life is a cost, paid when the ability is activated (13 while it is on the stack); the seven draws
+  happen only when it resolves. Ability index 0: flying and lifelink are keywords, the life-payment ability is the only
+  activated ability. Wrong engines: block the activation for summoning sickness, or pay the life on resolution.
+---
+id: griselbrand-cannot-pay-seven-life-at-six
+title: At 6 life, Griselbrand's "Pay 7 life" ability is not offered
+area: card
+cards: [Griselbrand, Island]
+tags: [griselbrand, pay-life, negative, mask-validity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment.", verified: true}
+  - {kind: oracle, card: Griselbrand, text: "Pay 7 life: Draw seven cards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 6
+    battlefield: [{card: Griselbrand, as: gris}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@gris", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 6, hand_count: 0}
+    legal: {p0: {exclude: [{t: activate, source: "@gris"}]}}
+notes: >
+  6 < 7, so the cost cannot be paid (119.4, 118.3) and the action must not be in the legal set. Paired with the 7-life
+  scenario below (legal, and fatal) and the 20-life positive above.
+---
+id: griselbrand-pay-seven-at-exactly-seven-life-loses-before-drawing
+title: At exactly 7 life, Griselbrand's ability can be activated, and its controller loses at 0 life before the ability resolves
+area: card
+cards: [Griselbrand, Island]
+tags: [griselbrand, pay-life, state-based-actions, game-loss]
+derived_from: cr
+source:
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, \"Timing and Priority\"), the game checks for any of the listed conditions for state-based actions", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 7
+    battlefield: [{card: Griselbrand, as: gris}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@gris", ability: 0}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0: {life: 0}
+notes: >
+  7 >= 7, so the payment is legal. p0 would receive priority right after activating (117.3c); state-based actions are
+  checked first and p0, at 0 life, loses before the draw-seven ability can resolve. Wrong engines: forbid paying one's
+  entire life total, or resolve the draw before checking state-based actions.

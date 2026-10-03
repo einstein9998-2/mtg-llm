@@ -1,0 +1,190 @@
+id: daze-alt-cost-rejects-non-island-lands
+title: "Daze cannot be cast for its alternative cost when the only lands are not Islands, and cannot be hard cast without blue mana"
+area: core
+cards: [Brainstorm, Island, Daze, Mountain, Wasteland, Flooded Strand, Polluted Delta]
+tags: [daze, alternative-cost, land-types, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "205.3i", text: "Lands have their own unique set of subtypes; these subtypes are called land types. The land types are Cave, Desert, Forest, Gate, Island, Lair, Locus, Mine, Mountain, Plains, Planet, Power-Plant, Sphere, Swamp, Tower, Town, and Urza’s.", verified: true}
+  - {kind: cr, ref: "601.2e", text: "The game checks to see if the proposed spell can legally be cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Mountain @mtn", "Wasteland @waste", "Flooded Strand @strand", "Polluted Delta @delta"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@mtn"}, targets: ["@bs"]}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@waste"}, targets: ["@bs"]}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@strand"}, targets: ["@bs"]}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@delta"}, targets: ["@bs"]}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", targets: ["@bs"], pay: auto}}
+  - check:
+      legal: {p1: {exclude: [{t: cast, card: "@daze"}]}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@bs", controller: p0}
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: [Daze]
+      battlefield:
+        - {card: Mountain}
+        - {card: Wasteland}
+        - {card: Flooded Strand}
+        - {card: Polluted Delta}
+notes: >
+  p1 controls no Island at all (Mountain, Wasteland, and two fetchlands whose text mentions Island do not have the
+  Island subtype), so the alternative cost cannot be paid. The lands cannot produce {U} either, so the hard cast {1}{U}
+  fails too, and Daze is not offered in any form. Wrong engines match fetchlands by "mentions Island" or let the
+  caster return a non-Island.
+---
+id: daze-controller-may-decline-to-pay
+title: "When able to pay for Daze, the countered spell's controller may decline, and the spell is countered with the Island still untapped"
+area: core
+cards: [Brainstorm, Island, Daze]
+tags: [daze, counter-unless-pay, decision-owner, yes-no]
+derived_from: cr
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player doesn’t], [do something].”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bs"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false, expect_options: {include: [true, false]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Brainstorm]
+      hand: []
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: false}]
+    p1: {hand: [Island], graveyard: [Daze], battlefield: []}
+notes: >
+  The choice belongs to the controller of the targeted spell (p0), not to the Daze player. p0 has an untapped Island, so
+  both answers are offered, and answering no counters Brainstorm without tapping the second Island. A wrong engine could
+  ask p1, auto-pay, or tap the Island anyway.
+---
+id: daze-with-disruptor-flute-needs-three-mana-via-alt-cost
+title: "Disruptor Flute naming Daze adds {3} to Daze's alternative cost; tapping the Islands for mana and then returning one pays it"
+area: core
+cards: [Brainstorm, Island, Daze, Disruptor Flute]
+tags: [daze, alternative-cost, cost-increase, disruptor-flute, mana-payment, cr-118-9d, cr-601-2g]
+derived_from: cr
+source:
+  - {kind: oracle, card: Disruptor Flute, text: "Spells with the chosen name cost {3} more to cast.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2g", text: "If the total cost includes a mana payment, the player then has a chance to activate mana abilities (see rule 605, “Mana Abilities”). Mana abilities must be activated before costs are paid.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost. First, they pay all costs that don’t involve random elements or moving objects from the library to a public zone, in any order.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1", {card: Disruptor Flute, as: flute, flags: {chosen_name: Daze}}]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bs"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bs", controller: p0}
+        - {kind: spell, card: "@daze", controller: p1, targets: ["@bs"]}
+      p1:
+        hand: [Island]
+        battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Brainstorm]
+      battlefield: [{card: Island, tapped: true}, {card: Disruptor Flute}]
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  The Disruptor Flute (chosen name Daze; setup flag `chosen_name`) taxes every spell named Daze by {3}, including one cast
+  for its alternative cost (118.9d), so p1 must also produce {3} of mana. Mana abilities are activated before costs are
+  paid (601.2g, 601.2h), so p1 taps all three Islands for mana and then returns one of them (now tapped) to hand as the
+  alternative cost; the other two stay tapped. p0's Brainstorm is a different name and is untaxed. p0 has no untapped
+  Island left to pay Daze's {1}, so Brainstorm is countered. A wrong engine that ignores the tax on alternative costs
+  casts Daze for free; one that insists on returning an untapped Island rejects this legal cast.
+---
+id: daze-with-disruptor-flute-two-lands-cannot-pay
+title: "With Disruptor Flute naming Daze and only two Islands, Daze cannot be cast at all"
+area: core
+cards: [Brainstorm, Island, Daze, Disruptor Flute]
+tags: [daze, alternative-cost, cost-increase, disruptor-flute, mask-validity, cr-118-9d]
+derived_from: cr
+source:
+  - {kind: oracle, card: Disruptor Flute, text: "Spells with the chosen name cost {3} more to cast.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2", {card: Disruptor Flute, as: flute, flags: {chosen_name: Daze}}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bs"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j2"}, targets: ["@bs"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", targets: ["@bs"], pay: auto}}
+  - check:
+      legal: {p1: {exclude: [{t: cast, card: "@daze"}]}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@bs", controller: p0}
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: [Daze]
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: false}, {card: Disruptor Flute}]
+notes: >
+  Daze's alternative cost still carries the {3} increase, and two Islands can produce only {2} even if both are tapped
+  for mana before one is returned. The hard cast would cost {1}{U} + {3} = 5. No form of Daze is offered. Contrast with
+  the three-Island scenario in this file.

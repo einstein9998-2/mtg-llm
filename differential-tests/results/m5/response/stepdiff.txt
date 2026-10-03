@@ -1,0 +1,2 @@
+same 1739  mismatch 0  forge-errors 3  forge-play-failed 0  payment-noise-suppressed 39  no-forge-result 0
+mismatches by action:

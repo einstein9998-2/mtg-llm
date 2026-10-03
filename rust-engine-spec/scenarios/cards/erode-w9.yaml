@@ -1,0 +1,76 @@
+id: erode-destroys-planeswalker-controller-searches-basic
+title: Erode destroys a planeswalker, and that planeswalker's controller may fetch a basic land tapped
+area: card
+cards: [Erode, "Jace, Wielder of Mysteries", Island, Plains]
+tags: [erode, planeswalker, destroy, search, enters-tapped, opponent-decision]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Erode, text: "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Erode @erode"]
+    battlefield: ["Plains @w1"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: "Jace, Wielder of Mysteries", as: jace, counters: {loyalty: 3}}]
+    library: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@erode", targets: ["@jace"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: true}
+  - p1: {decision: search, found: "@isl"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Erode]
+    p1:
+      graveyard: ["Jace, Wielder of Mysteries"]
+      library_count: 10
+      battlefield: [{card: Island, controller: p1, tapped: true}]
+notes: >
+  Erode can target a planeswalker. The loyalty count (3) is a setup value only, not a printed number, and nothing
+  depends on it. The destroyed permanent's controller p1 decides the search; the Island enters tapped.
+---
+id: erode-cannot-target-artifact-and-search-may-be-declined
+title: Erode cannot target an artifact; destroying a creature whose controller declines leaves no new land
+area: card
+cards: [Erode, Aether Vial, "Phelia, Exuberant Shepherd", Plains]
+tags: [erode, targeting, mask-validity, may-choice, opponent-decision]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Erode, text: "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Erode @erode"]
+    battlefield: ["Plains @w1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aether Vial @pv", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@erode", targets: ["@pv"]}}
+  - p0: {t: cast, card: "@erode", targets: ["@ph"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      graveyard: ["Phelia, Exuberant Shepherd"]
+      library_count: 10
+      battlefield: [{card: Aether Vial}]
+notes: >
+  Aether Vial is an artifact, not a creature or planeswalker. Phelia is destroyed (graveyard, not exile); p1 declines
+  the search, so no land enters.

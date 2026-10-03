@@ -1,0 +1,130 @@
+id: phlage-sacrificed-first-damage-trigger-still-resolves
+title: If Phlage's sacrifice trigger resolves first, its damage trigger still deals 3 and gains 3 using last known information
+area: card
+cards: ["Phlage, Titan of Fire's Fury", Mountain, Plains, Plateau]
+tags: [phlage, last-known-information, trigger-ordering, etb-trigger, ability-independent-of-source]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Phlage, Titan of Fire's Fury", text: "Whenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won't affect the ability.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "In both instances, if the source is no longer in the zone it's expected to be in at that time, its last known information is used. The source can still perform the action even though it no longer exists.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Phlage, Titan of Fire's Fury @ph"]
+    battlefield: ["Mountain @mtn", "Plains @pl", "Plateau @plat"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ph", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: order_triggers
+      answer:
+        - {source: "@ph", text_contains: "deals 3 damage"}
+        - {source: "@ph", text_contains: "sacrifice it unless it escaped"}
+      note: "the damage trigger goes on the stack first (resolves last)"
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {graveyard: ["Phlage, Titan of Fire's Fury"], life: 20}
+      p1: {life: 20}
+      stack: [{kind: triggered, source: "@ph", text_contains: "3 damage"}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      graveyard: ["Phlage, Titan of Fire's Fury"]
+    p1:
+      life: 17
+notes: >
+  Phlage is already in the graveyard when the damage trigger resolves; the ability does not depend on its source and
+  Phlage, as it last existed, deals the damage (113.7a, 608.2h). The target was chosen as the trigger went on the stack
+  (after ordering). A wrong engine fizzles the trigger because its source left, or skips the life gain.
+---
+id: phlage-escape-not-offered-with-four-other-cards
+title: Phlage cannot be cast with escape when only four other cards are in its owner's graveyard
+area: card
+cards: ["Phlage, Titan of Fire's Fury", Mountain, Plains, Lightning Bolt, Brainstorm, Ponder, Island]
+tags: [phlage, escape, mask-validity, cast-from-graveyard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Phlage, Titan of Fire's Fury", text: "Escape—{R}{R}{W}{W}, Exile five other cards from your graveyard.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can't pay a cost without having the necessary resources to pay it fully.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    graveyard: ["Phlage, Titan of Fire's Fury @ph", "Lightning Bolt @g1", "Brainstorm @g2", "Ponder @g3", "Island @g4"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Plains @w1", "Plains @w2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ph", alt_cost: {escape: {exile: ["@g1", "@g2", "@g3", "@g4"]}}}}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+    legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@ph"}]}}
+    p0:
+      graveyard: ["Phlage, Titan of Fire's Fury", Lightning Bolt, Brainstorm, Ponder, Island]
+notes: >
+  Four other cards cannot pay "exile five other cards", and nothing else lets Phlage be cast from the graveyard, so no
+  cast of Phlage is offered. Positive control: the escape scenario above with five other cards. A wrong engine counts
+  Phlage itself toward the five.
+---
+id: phlage-attack-trigger-deals-3-gains-3
+title: Phlage attacking triggers its damage ability (3 to any target, gain 3), then deals 6 combat damage unblocked
+area: card
+cards: ["Phlage, Titan of Fire's Fury"]
+tags: [phlage, attack-trigger, combat, any-target, life-gain]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Phlage, Titan of Fire's Fury", text: "Whenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.", verified: true}
+  - {kind: cr, ref: "508.3a", text: "An ability that reads \"Whenever [a creature] attacks, . . .\" triggers if that creature is declared as an attacker.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Phlage, Titan of Fire's Fury @ph"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@ph", target: {player: p1}}]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack: [{kind: triggered, source: "@ph", controller: p0, targets: [{player: p1}]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {life: 23}
+      p1: {life: 17}
+  - advance: {to: combat_damage, of: p0}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      battlefield: [{card: "Phlage, Titan of Fire's Fury", tapped: true}]
+    p1:
+      life: 11
+notes: >
+  Setup state: Phlage is on the battlefield (for example after an earlier escape); whether it escaped does not matter
+  for the attack trigger. The trigger's target is chosen when it goes on the stack, right after the declaration. p1 has
+  no creatures, so no blocker declaration is raised and `advance` reaches the combat damage step: 17 - 6 = 11.

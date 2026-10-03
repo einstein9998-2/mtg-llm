@@ -1,0 +1,153 @@
+id: mu-pyroblast-destroys-kaito-on-uwx-turn
+title: On UWx's turn Kaito has no hexproof and is a blue planeswalker; Pyroblast's destroy mode kills him
+area: matchup
+cards: ["Kaito, Bane of Nightmares", Pyroblast, Underground Sea, Volcanic Island]
+tags: [matchup, dimir-vs-uwx, kaito, pyroblast, planeswalker, color, modal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kaito, Bane of Nightmares", text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has hexproof.", verified: true}
+  - {kind: oracle, card: Pyroblast, text: "Destroy target permanent if it's blue.", verified: true}
+  - {kind: cr, ref: "105.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: [{card: "Kaito, Bane of Nightmares", as: kaito, counters: {loyalty: 3}}, "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Volcanic Island @v1"]
+    library_pad: 10
+script:
+  - check: {p0: {battlefield: [{card: "Kaito, Bane of Nightmares", keywords_exclude: [hexproof], colors: [U, B]}, {card: Underground Sea}]}}
+  - p1: {t: cast, card: "@pyro", modes: [2], targets: ["@kaito"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: [{card: Underground Sea}]
+      graveyard: ["Kaito, Bane of Nightmares"]
+    p1:
+      graveyard: [Pyroblast]
+notes: >
+  "During your turn" is p0's turn only; on p1's turn Kaito has no hexproof. His mana cost {2}{U}{B} makes him blue (and
+  black), so Pyroblast's "if it's blue" check passes on resolution and he is destroyed. Pair of the next scenario and of
+  the hexproof scenario above. Bugs caught: hexproof applied on every turn, a multicolored permanent not counted as blue.
+---
+id: mu-hydroblast-counters-pyroblast-aimed-at-kaito
+title: Dimir answers UWx's Pyroblast on Kaito with Hydroblast (the Pyroblast is red); Kaito survives
+area: matchup
+cards: ["Kaito, Bane of Nightmares", Pyroblast, Hydroblast, Underground Sea, Volcanic Island]
+tags: [matchup, dimir-vs-uwx, kaito, pyroblast, hydroblast, counter-war, modal, color]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hydroblast, text: "Counter target spell if it's red.", verified: true}
+  - {kind: oracle, card: Pyroblast, text: "Destroy target permanent if it's blue.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Hydroblast @hydro"]
+    battlefield: [{card: "Kaito, Bane of Nightmares", as: kaito, counters: {loyalty: 3}}, "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Volcanic Island @v1"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pyro", modes: [2], targets: ["@kaito"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@hydro", modes: [1], targets: ["@pyro"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@pyro", controller: p1, modes: [2], targets: ["@kaito"]}
+        - {kind: spell, card: "@hydro", controller: p0, modes: [1], targets: ["@pyro"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield_contains: [{card: "Kaito, Bane of Nightmares", counters: {loyalty: 3}}]
+      graveyard: [Hydroblast]
+    p1:
+      graveyard: [Pyroblast]
+notes: >
+  Hydroblast resolves first; Pyroblast is red, so it is countered and never checks Kaito. Kaito keeps his loyalty.
+  Bugs caught: the color check on the wrong object, Pyroblast resolving anyway.
+---
+id: mu-uwx-stifles-kaito-ninjutsu-attacker-already-returned
+title: UWx Stifles Kaito's ninjutsu ability; the unblocked Bowmasters was already returned to hand as a cost, Kaito stays in hand and no combat damage is dealt
+area: matchup
+cards: ["Kaito, Bane of Nightmares", Orcish Bowmasters, Stifle, Underground Sea, Swamp, Tundra]
+tags: [matchup, dimir-vs-uwx, kaito, ninjutsu, stifle, activated-ability-from-hand, costs-are-not-refunded, combat]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Kaito, Bane of Nightmares", text: "Ninjutsu {1}{U}{B} ({1}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "702.49a", text: "Ninjutsu is an activated ability that functions only while the card with ninjutsu is in a player’s hand.", verified: true}
+  - {kind: cr, ref: "702.49c", text: "A ninjutsu ability may be activated only while a creature on the battlefield is unblocked (see rule 509.1h).", verified: true}
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn’t get a “refund” of any costs that were paid.", verified: true}
+  - {kind: cr, ref: "506.4", text: "A permanent is removed from combat if it leaves the battlefield", verified: true}
+  - {kind: cr, ref: "509.1h", text: "An attacking creature with one or more creatures declared as blockers for it becomes a blocked creature; one with no creatures declared as blockers for it becomes an unblocked creature.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Kaito, Bane of Nightmares @kaito"]
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1", "Underground Sea @us2", "Swamp @sw1"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @st"]
+    battlefield: ["Tundra @t1"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@bow", target: {player: p1}}]}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@kaito", ability: 0}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {phase: declare_blockers, pending: {actor: p0, kind: priority}}
+  - p0: {t: activate_from_hand, source: "@kaito", ability: 0, pay: auto}
+  - p0: {decision: choose_cards, purpose: return_unblocked_attacker, answer: ["@bow"]}
+  - check:
+      stack: [{kind: activated, source: "@kaito", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand: ["Kaito, Bane of Nightmares", Orcish Bowmasters]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@st", targets: [{ability_of: "@kaito"}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [], phase: declare_blockers, pending: {actor: p0, kind: priority}}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    phase: main2
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Kaito, Bane of Nightmares", Orcish Bowmasters]
+      battlefield:
+        - {card: Underground Sea, tapped: true}
+        - {card: Underground Sea, tapped: true}
+        - {card: Swamp, tapped: true}
+    p1:
+      life: 20
+      graveyard: [Stifle]
+notes: >
+  Ninjutsu needs an unblocked attacker, which exists only once blockers are declared (509.1h): in the declare attackers
+  step the activation is not legal. p1 has no creatures, so no block decision; in the declare blockers step Bowmasters
+  is unblocked. Returning it is part of the cost (with the mana), so it is in hand before p1 can respond; Stifle
+  counters the ability, Kaito never leaves p0's hand, and no cost is refunded. No creature is attacking any more, so no
+  combat damage (p1 stays at 20). No loyalty is involved because Kaito never enters. Bugs caught: ninjutsu offered
+  before blockers, the attacker returned on resolution instead of as a cost, Kaito put onto the battlefield despite
+  the counter, damage from a creature removed from combat.

@@ -1,0 +1,83 @@
+id: murktide-enters-with-counters-from-delve
+title: Murktide Regent enters with one +1/+1 counter per instant and sorcery exiled by delve, and the exile does not trigger its leave-the-graveyard ability
+area: core
+cards: [Murktide Regent, Lightning Bolt, Ponder, Island, Containment Priest]
+tags: [replacement-effect, enters-with-counters, delve, layers, counters]
+derived_from: cr
+source:
+  - {kind: oracle, card: Murktide Regent, text: "This creature enters with a +1/+1 counter on it for each instant and sorcery card exiled with it.", verified: true}
+  - {kind: oracle, card: Murktide Regent, text: "Whenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on this creature.", verified: true}
+  - {kind: cr, ref: "614.1c", text: "Effects that read \"[This permanent] enters with . . . ,\" \"As [this permanent] enters . . . ,\" or \"[This permanent] enters as . . . \" are replacement effects.", verified: true}
+  - {kind: cr, ref: "113.6", text: "Abilities of all other objects usually function only while that object is on the battlefield.", verified: true}
+  - {kind: cr, ref: "702.66a", text: "\"Delve\" means \"For each generic mana in this spell's total cost, you may exile a card from your graveyard rather than pay that mana.\"", verified: true}
+  - {kind: cr, ref: "613.4c", text: "Layer 7c: Effects and counters that modify power and/or toughness (but don't set power and/or toughness to a specific number or value) are applied.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mk"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    graveyard: ["Lightning Bolt @g1", "Ponder @g2", "Island @g3", "Containment Priest @g4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mk", delve: ["@g1", "@g2", "@g3", "@g4"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@mk", controller: p0}]
+      p0: {graveyard: [], exile: [Lightning Bolt, Ponder, Island, Containment Priest]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Murktide Regent, counters: {"+1/+1": 2}, pt: [5, 5], keywords: [flying], sick: true}]
+      graveyard: []
+notes: >
+  Murktide costs {5}{U}{U}; delving four cards pays four generic, the Islands pay {1}{U}{U}. Two of the exiled cards are
+  an instant and a sorcery, so it enters with exactly 2 counters, already on it as it enters (a replacement effect, not
+  a trigger: nothing goes on the stack). The "leaves your graveyard" trigger is an ability of the permanent and does
+  not function while Murktide is a spell on the stack (113.6), so delve does not add counters. A wrong engine counts
+  all exiled cards (4 counters), adds 2 more from the trigger (4), or puts an ETB trigger on the stack.
+---
+id: force-of-negation-exiles-countered-spell
+title: Force of Negation cast for its alternative cost counters Ponder and exiles it instead of putting it into the graveyard
+area: core
+cards: [Force of Negation, Brainstorm, Ponder, Island]
+tags: [replacement-effect, self-replacement, counterspell, alternative-cost, exile-instead]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "614.15", text: "Some replacement effects are not continuous effects. Rather, they are an effect of a resolving spell or ability that replace part or all of that spell or ability's own effect(s). Such effects are called self-replacement effects.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner's graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ponder @pd"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pd", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@pd"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [], exile: [Ponder], hand: []}
+    p1: {graveyard: [Force of Negation], exile: [Brainstorm], hand: []}
+notes: >
+  The default destination of a countered spell (graveyard, 701.6a) is replaced by exile. A wrong engine puts Ponder in
+  the graveyard (feeding delve and delirium later), or exiles Force of Negation itself. It is p0's turn, so p1 may use
+  the alternative cost.

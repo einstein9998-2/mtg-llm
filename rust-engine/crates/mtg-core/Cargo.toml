@@ -1,0 +1,18 @@
+[package]
+name = "mtg-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+smallvec.workspace = true
+bitflags.workspace = true
+serde.workspace = true
+
+[features]
+# Exposes full-state accessors for mtg-debug / mtg-diff. MUST NOT be enabled in agent-facing builds.
+diff-harness = []
+# Runs expensive consistency checks (derived-cache coherence, etc.) after every apply.
+audit = []
+# Test-only deliberate hidden-information leaks, toggled at runtime, used to prove the
+# non-interference test can fail (doc 04 section 7.2 item 7). MUST NOT be enabled in real builds.
+canary = []

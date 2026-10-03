@@ -1,0 +1,79 @@
+id: karakas-bounces-attacking-legendary-creature
+title: Karakas returns an attacking legendary creature to its owner's hand during the opponent's declare attackers step
+area: card
+cards: [Karakas, "Atraxa, Grand Unifier"]
+tags: [karakas, bounce, legendary, instant-speed-ability, combat]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Karakas, text: "{T}: Return target legendary creature to its owner's hand.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: begin_combat
+  p0:
+    life: 20
+    battlefield: ["Karakas @k"]
+    library_pad: 10
+  p1:
+    battlefield: ["Atraxa, Grand Unifier @atraxa"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@atraxa", target: {player: p0}}]}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@k", ability: 1, targets: ["@atraxa"]}
+  - check:
+      stack: [{kind: activated, source: "@k", controller: p0, targets: ["@atraxa"]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      battlefield: [{card: Karakas, tapped: true}]
+    p1:
+      hand: ["Atraxa, Grand Unifier"]
+      battlefield: []
+notes: >
+  Ability index 1 is the bounce ({T}: Add {W} is index 0). Activated abilities can be used whenever the player has
+  priority. Atraxa leaves combat by leaving the battlefield and deals no damage. Its enters ability does not matter
+  here (it does not enter).
+---
+id: karakas-targets-only-legendary-creatures
+title: Karakas cannot target a nonlegendary creature or a legendary land, only a legendary creature
+area: card
+cards: [Karakas, Murktide Regent, "Spider-Woman, Stunning Savior", "Boseiju, Who Endures"]
+tags: [karakas, targeting, legendary, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Karakas, text: "{T}: Return target legendary creature to its owner's hand.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Karakas @k"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk", "Spider-Woman, Stunning Savior @sw", "Boseiju, Who Endures @bos"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@k", ability: 1, targets: ["@murk"]}}
+  - expect_illegal: {p0: {t: activate, source: "@k", ability: 1, targets: ["@bos"]}}
+  - p0: {t: activate, source: "@k", ability: 1, targets: ["@sw"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      hand: ["Spider-Woman, Stunning Savior"]
+      battlefield: [{card: Murktide Regent}, {card: "Boseiju, Who Endures"}]
+notes: >
+  Murktide is not legendary; Boseiju is legendary but a land, not a creature. Spider-Woman is a legendary creature and is
+  returned (positive control).

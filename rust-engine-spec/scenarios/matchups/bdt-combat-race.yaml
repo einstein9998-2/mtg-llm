@@ -1,0 +1,153 @@
+id: mu-bdt-cloak-and-dagger-blocks-ocelot-lifelink-in-two-steps
+title: Cloak and Dagger blocks Ocelot Pride; Ocelot's first-strike lifelink gains Boros 1, then Cloak's deathtouch lifelink damage kills Ocelot and gains D&T 2
+area: matchup
+cards: [Ocelot Pride, "Cloak and Dagger, Entwined"]
+tags: [matchup, boros-vs-dt, combat, first-strike, lifelink, deathtouch, combat-damage-steps]
+derived_from: cr
+source:
+  - {kind: oracle, card: Ocelot Pride, text: "First strike, lifelink", verified: true}
+  - {kind: oracle, card: "Cloak and Dagger, Entwined", text: "Deathtouch, lifelink", verified: true}
+  - {kind: cr, ref: "702.7b", text: "The only creatures that assign combat damage in that step are the remaining attackers and blockers that had neither first strike nor double strike as the first combat damage step began", verified: true}
+  - {kind: cr, ref: "702.15b", text: "Damage dealt by a source with lifelink causes that source’s controller, or its owner if it has no controller, to gain that much life", verified: true}
+  - {kind: cr, ref: "702.2b", text: "A creature with toughness greater than 0 that’s been dealt damage by a source with deathtouch since the last time state-based actions were checked is destroyed as a state-based action.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    battlefield: ["Cloak and Dagger, Entwined @cd"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@oc", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@cd", attacker: "@oc"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: first-strike-step
+    check:
+      phase: first_strike_damage
+      pending: {actor: p0, kind: priority}
+      p0: {life: 21, battlefield: [{card: Ocelot Pride, damage: 0}]}
+      p1: {life: 20, battlefield: [{card: "Cloak and Dagger, Entwined", damage: 1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 21
+      graveyard: [Ocelot Pride]
+      battlefield: []
+    p1:
+      life: 22
+      battlefield: [{card: "Cloak and Dagger, Entwined", damage: 1}]
+notes: >
+  Ocelot deals its 1 first-strike damage in the first step (p0 21); the 2/2 Cloak survives with 1 damage and deals its
+  2 in the second step (only creatures without first strike deal damage there, 702.7b): p1 gains 2 (22) and Ocelot is
+  destroyed (lethal and deathtouch). A wrong engine resolves all combat damage in one step, or applies Cloak's
+  lifelink in the first-strike step.
+---
+id: mu-bdt-raptor-first-strike-kills-cloak-before-deathtouch-lifelink
+title: Amped Raptor's first strike kills a blocking Cloak and Dagger before it deals damage; deathtouch and lifelink never apply
+area: matchup
+cards: [Amped Raptor, "Cloak and Dagger, Entwined"]
+tags: [matchup, boros-vs-dt, combat, first-strike, deathtouch, lifelink, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Amped Raptor, text: "First strike", verified: true}
+  - {kind: oracle, card: "Cloak and Dagger, Entwined", text: "Deathtouch, lifelink", verified: true}
+  - {kind: cr, ref: "510.4", text: "The only creatures that assign combat damage in that step are the remaining attackers and blockers that had neither first strike nor double strike as the first combat damage step began", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Amped Raptor @raptor"]
+    library_pad: 10
+  p1:
+    battlefield: ["Cloak and Dagger, Entwined @cd"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@raptor", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@cd", attacker: "@raptor"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      p1: {graveyard: ["Cloak and Dagger, Entwined"], battlefield: [], life: 20}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      battlefield: [{card: Amped Raptor, tapped: true, damage: 0}]
+    p1:
+      life: 20
+      graveyard: ["Cloak and Dagger, Entwined"]
+notes: >
+  The 2/1 first striker deals 2 to the 2/2 Cloak in the first damage step; Cloak is destroyed before the regular step,
+  so it deals no damage: no deathtouch kill, no lifelink gain (p1 stays 20) and the Raptor has no damage. The Raptor is
+  blocked, so it deals no damage to p1. A wrong engine lets deathtouch or lifelink apply from a creature that never
+  dealt damage.
+---
+id: mu-bdt-first-strike-lethal-ends-game-before-lifelink-blocker
+title: At 1 life D&T blocks Sand Scout with lifelink Cloak and Dagger, but unblocked Ocelot Pride's first-strike damage ends the game before the regular damage step
+area: matchup
+cards: [Ocelot Pride, Sand Scout, "Cloak and Dagger, Entwined"]
+tags: [matchup, boros-vs-dt, combat, first-strike, lifelink, game-end, state-based-actions, race]
+derived_from: cr
+source:
+  - {kind: oracle, card: Ocelot Pride, text: "First strike, lifelink", verified: true}
+  - {kind: cr, ref: "510.4", text: "If at least one attacking or blocking creature has first strike (see rule 702.7) or double strike (see rule 702.4) as the combat damage step begins, the only creatures that assign combat damage in that step are those with first strike or double strike.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: begin_combat
+  p0:
+    life: 5
+    battlefield: ["Ocelot Pride @oc", "Sand Scout @scout"]
+    library_pad: 10
+  p1:
+    life: 1
+    battlefield: ["Cloak and Dagger, Entwined @cd"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks:
+        - {creature: "@oc", target: {player: p1}}
+        - {creature: "@scout", target: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@cd", attacker: "@scout"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p1: {life: 0}
+notes: >
+  Ocelot is unblocked and has first strike: it deals 1 to p1 in the first combat damage step (510.4), p1 goes to 0 and
+  loses as a state-based action (704.5a) before anyone gets priority in that step. Cloak's lifelink damage would only
+  come in the second step, which never happens. A wrong engine deals all combat damage at once (p1 would gain 2 from
+  Cloak at the same time and survive at 2).

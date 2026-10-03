@@ -1,0 +1,3 @@
+same 13272  mismatch 1  forge-errors 1  forge-play-failed 2  payment-noise-suppressed 14  no-forge-result 0
+mismatches by action:
+     1 /  122  play|Karakas

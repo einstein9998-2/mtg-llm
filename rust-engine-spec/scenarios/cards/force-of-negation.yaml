@@ -1,0 +1,138 @@
+id: force-of-negation-free-on-opponents-turn-exiles-spell
+title: Force of Negation cast free on the opponent's turn by exiling a blue card exiles the countered spell instead of graveyard
+area: card
+cards: [Force of Negation, Brainstorm, Stock Up, Island]
+tags: [force-of-negation, alternative-cost, counterspell, exile-instead, not-your-turn]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text ... that its controller may pay rather than paying the spell's mana cost.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Negation @fon", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@su", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@su"]}
+  - check:
+      stack: [{kind: spell, card: "@su", controller: p1}, {kind: spell, card: "@fon", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {life: 20, hand: [], exile: [Brainstorm]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      hand: []
+      exile: [Brainstorm]
+      graveyard: [Force of Negation]
+    p1:
+      hand: []
+      graveyard: []
+      exile: [Stock Up]
+      library_count: 10
+notes: >
+  It is p1's turn, so p0 may exile a blue card (Brainstorm) from hand instead of paying {1}{U}{U}. Unlike Force of Will
+  there is no life payment: p0's life stays 20. Stock Up is a noncreature spell, so it is a legal target. When Force
+  resolves, Stock Up is countered and goes to exile instead of the graveyard, so p1's graveyard stays empty and p1 never
+  looks at the library (library 10). Force of Negation itself goes to p0's graveyard. A wrong engine would put Stock Up
+  in the graveyard, charge 1 life, or require mana.
+---
+id: force-of-negation-cannot-target-creature-spell-w5
+title: Force of Negation cannot target a creature spell (Containment Priest) with either cost
+area: card
+cards: [Force of Negation, Brainstorm, Containment Priest, Island, Plains]
+tags: [force-of-negation, targeting, creature-spell, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell.", verified: true}
+  - {kind: oracle, card: Containment Priest, text: "Flash", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Negation @fon", "Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Containment Priest @cp"]
+    battlefield: ["Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@cp", pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@cp"]}}
+  - expect_illegal: {p0: {t: cast, card: "@fon", targets: ["@cp"], pay: auto}}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Force of Negation, Brainstorm]
+      battlefield:
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+    p1:
+      battlefield:
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Containment Priest, types: [Creature]}
+notes: >
+  Containment Priest on the stack is a creature spell, so it is not a legal target for "noncreature spell" under either
+  the alternative or the hard cost. Both probes must leave p0's hand, Islands and life untouched. After p0 passes, the
+  Priest resolves and p1 (active player) receives priority.
+---
+id: force-of-negation-pitch-must-be-a-blue-card-other-than-itself
+title: Force of Negation cannot exile Veil of Summer or itself as its blue card; Brainstorm works and costs no life
+area: card
+cards: [Force of Negation, Veil of Summer, Brainstorm, Island]
+tags: [force-of-negation, alternative-cost, card-color, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true, note: "the spell is on the stack, not in hand, when the cost is paid"}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Negation @fon", "Veil of Summer @vs", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @pbs"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pbs", pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@vs"}, targets: ["@pbs"]}}
+  - expect_illegal: {p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@fon"}, targets: ["@pbs"]}}
+  - p0: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@pbs"]}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@pbs", controller: p1}, {kind: spell, card: "@fon", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Veil of Summer]
+      exile: [Brainstorm]
+notes: >
+  Veil of Summer ({G}) is green, not blue. Force of Negation is on the stack while being cast (601.2a), not in hand, so
+  it cannot exile itself. Only Brainstorm is a legal pitch. No life is paid.

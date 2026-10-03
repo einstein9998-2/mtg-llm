@@ -1,0 +1,175 @@
+id: bauble-used-on-the-opponents-turn-draws-at-its-controllers-next-upkeep
+title: Mishra's Bauble activated during the opponent's turn draws at the controller's own next upkeep
+area: card
+cards: [Mishra's Bauble, Ponder, Island]
+tags: [mishras-bauble, delayed-trigger, upkeep, instant-speed-ability, draw]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "603.7b", text: "A delayed triggered ability will trigger only once—the next time its trigger event occurs—unless it has a stated duration, such as “this turn.”", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  priority: p1
+  p0:
+    battlefield: ["Mishra's Bauble @bb"]
+    library: ["Ponder @top", "Island @second"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@bb", ability: 0, targets: [{player: p0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      p0: {hand: [], graveyard: [Mishra's Bauble]}
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 5
+      active: p0
+      stack: [{kind: triggered, controller: p0, text_contains: "Draw a card"}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    turn: 5
+    phase: upkeep
+    active: p0
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Ponder], library_top: [Island], library_count: 11}
+notes: >
+  The ability has no timing restriction, so p0 can activate it with priority in p1's main phase (after p1 passes with an empty stack). The next turn's upkeep is
+  p0's own upkeep (turn 5), where the draw happens before p0's draw step (not reached, so the hand is just Ponder). The trigger fires once. A wrong engine
+  draws at once, or at the end of the turn, or waits for the upkeep after that.
+---
+id: bauble-draw-from-an-empty-library-loses-the-game
+title: A Mishra's Bauble delayed draw from an empty library makes its controller lose, while merely looking at an empty library does not
+area: card
+cards: [Mishra's Bauble]
+tags: [mishras-bauble, delayed-trigger, empty-library, state-based-actions, game-over, boundary]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "121.4", text: "A player who attempts to draw a card from a library with no cards in it loses the game the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @bb"]
+    library: []
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bb", ability: 0, targets: [{player: p0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      game: {over: false}
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - advance: {to: upkeep, of: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0: {library_count: 0, graveyard: [Mishra's Bauble]}
+notes: >
+  Targeting and looking at an empty library is legal and does nothing, so the game continues after the ability resolves. At p1's upkeep the delayed trigger makes p0
+  attempt a draw from the empty library, and p0 loses at the next state-based-action check (121.4, 704.5b), before the upkeep priority finishes. A wrong engine
+  skips the draw when the library is empty, or loses early on the look.
+---
+id: bauble-ability-countered-by-stifle-creates-no-delayed-draw
+title: Stifle countering Mishra's Bauble's activated ability means no look and no draw at the next upkeep, while the Bauble stays sacrificed
+area: card
+cards: [Mishra's Bauble, Stifle, Ponder, Island]
+tags: [mishras-bauble, stifle, delayed-trigger, countered-ability, stack-object-identity, upkeep]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Mishra's Bauble, text: "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "603.7a", text: "Delayed triggered abilities are created during the resolution of spells or abilities, as the result of a replacement effect being applied, or as a result of a static ability that allows a player to take an action. A delayed triggered ability won’t trigger until it has actually been created, even if its trigger event occurred just beforehand.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @bb"]
+    library: ["Ponder @top", "Island @second"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bb", ability: 0, targets: [{player: p0}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@bb", nth: 0}], pay: auto}
+  - check:
+      stack: [{kind: activated, source: "@bb"}, {kind: spell, card: "@stifle"}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Mishra's Bauble], hand: []}
+      p1: {graveyard: [Stifle]}
+  - advance: {to: upkeep, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: upkeep
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {hand: [], library_top: [Ponder, Island], library_count: 12}
+notes: >
+  The Bauble is sacrificed as a cost, so countering the ability does not bring it back. The ability never resolves, so the delayed triggered ability is never created
+  (603.7a) and nothing is on the stack at p1's upkeep; p0 draws nothing and keeps Ponder on top. A wrong engine creates the delayed trigger when the ability is put on the
+  stack (not when it resolves), or returns the Bauble.
+---
+id: bauble-look-reveals-the-top-card-only-to-its-controller
+title: Looking at the opponent's top card with Mishra's Bauble gives only the controller that knowledge
+area: hidden-info
+cards: [Mishra's Bauble, Ponder]
+tags: [mishras-bauble, hidden-information, look-at-top, library-known-top, observation]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "Look at the top card of target player's library.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @bb"]
+    library_pad: 10
+  p1:
+    library: ["Ponder @theirs"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bb", ability: 0, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {library_known_top: [Ponder], library_count: 11}
+  - at: after_script
+    observer: p1
+    obs:
+      me: {library_known_top: []}
+      events_text_exclude: [Ponder]
+notes: >
+  After the ability resolves p0 knows that the top card of p1's library is Ponder; p1's own observation must not contain that identity (neither as known
+  top card nor in event text), since the look is not a reveal. p1 does see that p0 sacrificed a Bauble (public). The shape `opp: {library_known_top: ...}` for
+  knowledge about the opponent's library is a schema request (section 6 only shows `me:`).

@@ -1,0 +1,152 @@
+id: nethergoyf-pt-counts-card-types-in-own-graveyard-only
+title: Nethergoyf counts the card types in its controller's graveyard and ignores the opponent's graveyard
+area: card
+cards: [Nethergoyf, Island, Brainstorm, Ponder, "Mishra's Bauble", Overlord of the Balemurk, Lightning Bolt]
+tags: [nethergoyf, characteristic-defining-ability, layer-7a, card-types, graveyard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "205.2a", text: "The card types are artifact, battle, conspiracy, creature, dungeon, enchantment, instant, kindred, land, phenomenon, plane, planeswalker, scheme, sorcery, and vanguard.", verified: true}
+  - {kind: cr, ref: "613.4a", text: "Layer 7a: Effects from characteristic-defining abilities that define power and/or toughness are applied.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Nethergoyf @goyf"]
+    graveyard: [Island, Brainstorm, Ponder, "Mishra's Bauble"]
+    library_pad: 10
+  p1:
+    graveyard: [Overlord of the Balemurk, Lightning Bolt]
+    library_pad: 10
+script: []
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Nethergoyf, pt: [4, 5]}]
+notes: >
+  p0's graveyard has a land, an instant, a sorcery and an artifact: four card types, so Nethergoyf is 4/5. p1's graveyard
+  (an enchantment creature and an instant) is not "your graveyard" for p0's Nethergoyf. An engine that reuses a
+  Tarmogoyf/Barrowgoyf all-graveyards count gets 6/7.
+---
+id: nethergoyf-multitype-card-counts-each-type-and-duplicates-count-once
+title: An enchantment creature card counts as two types and three lands count as one type
+area: card
+cards: [Nethergoyf, Overlord of the Balemurk, Island, Swamp, Underground Sea]
+tags: [nethergoyf, characteristic-defining-ability, card-types, multi-type-card]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "205.2a", text: "The card types are artifact, battle, conspiracy, creature, dungeon, enchantment, instant, kindred, land, phenomenon, plane, planeswalker, scheme, sorcery, and vanguard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Nethergoyf @goyf"]
+    graveyard: [Overlord of the Balemurk, Island, Swamp, Underground Sea]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script: []
+expect:
+  - at: after_script
+    p0:
+      battlefield: [{card: Nethergoyf, pt: [3, 4]}]
+notes: >
+  Overlord of the Balemurk's type line is Enchantment Creature, so it contributes two card types; the three lands
+  contribute one (land; basic land types and supertypes are not card types). Total 3: Nethergoyf is 3/4. Counting cards
+  gives 4/5; counting only one type per card gives 2/3.
+---
+id: nethergoyf-grows-when-resolving-instant-reaches-graveyard
+title: Nethergoyf is 0/1 with an empty graveyard and becomes 1/2 once Brainstorm finishes resolving
+area: card
+cards: [Nethergoyf, Brainstorm, Island, Ponder, Swamp]
+tags: [nethergoyf, characteristic-defining-ability, continuous-recalculation, brainstorm]
+derived_from: cr
+source:
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell's resolution, the spell is put into its owner's graveyard.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Nethergoyf @goyf", "Island @i1"]
+    library: ["Island @a", "Ponder @b", "Swamp @c"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check: {p0: {battlefield: [{card: Nethergoyf, pt: [0, 1]}, {card: Island, tapped: false}]}}
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - check: {p0: {battlefield_contains: [{card: Nethergoyf, pt: [0, 1]}]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@a", "@c"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@a", "@c"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Brainstorm]
+      library_top: [Island, Swamp]
+      battlefield:
+        - {card: Nethergoyf, pt: [1, 2]}
+        - {card: Island, tapped: true}
+notes: >
+  With an empty graveyard Nethergoyf is 0/1 and survives (toughness 1). While Brainstorm is on the stack it is not in the
+  graveyard, so Nethergoyf is still 0/1; after it resolves it is in the graveyard (608.2n) and Nethergoyf is 1/2. The two
+  lands are put back, so no land reaches the graveyard. A wrong engine caches P/T or counts the spell while on the stack.
+---
+id: nethergoyf-escape-exiling-four-card-types
+title: Nethergoyf escapes for {2}{B} by exiling other graveyard cards with four card types among them
+area: card
+cards: [Nethergoyf, Island, Brainstorm, Ponder, "Mishra's Bauble", Lightning Bolt, Swamp]
+tags: [nethergoyf, escape, alternative-cost, cast-from-graveyard, exile-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Nethergoyf, text: "Escape—{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them.", verified: true}
+  - {kind: cr, ref: "702.138a", text: "\"Escape [cost]\" means \"You may cast this card from your graveyard by paying [cost] rather than paying its mana cost.\"", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Swamp @s1", "Swamp @s2", "Island @i1"]
+    graveyard: ["Nethergoyf @goyf", "Island @gi", "Brainstorm @gb", "Ponder @gp", "Mishra's Bauble @gm", "Lightning Bolt @gl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@goyf", alt_cost: {escape: {exile: ["@gi", "@gb", "@gp", "@gm"]}}, pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@goyf", controller: p0}]
+      p0:
+        graveyard: [Lightning Bolt]
+        exile: [Island, Brainstorm, Ponder, "Mishra's Bauble"]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      exile: [Island, Brainstorm, Ponder, "Mishra's Bauble"]
+      battlefield:
+        - {card: Nethergoyf, pt: [1, 2]}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  The four exiled cards are a land, an instant, a sorcery and an artifact, so the escape cost's exile part is met; {2}{B}
+  is paid with all three lands. Lightning Bolt was not chosen and stays. On the battlefield Nethergoyf counts only the
+  instant left behind, so it is 1/2. The cast step names the exiled cards in alt_cost.escape (SCHEMA addenda spelling
+  alt_cost.escape.exile). A wrong engine refuses graveyard casting, exiles the whole graveyard, or charges {B}.

@@ -1,0 +1,107 @@
+id: priority-returns-to-active-player-after-nonactive-spell-resolves
+title: A spell cast by the nonactive player resolves and then the active player, not the caster, gets priority
+area: core
+cards: [Lightning Bolt, Mountain]
+tags: [priority, stack, nonactive-player, resolution]
+derived_from: cr
+source:
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - check: {phase: main1, priority: p1, stack: [], pending: {actor: p1, kind: priority}}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - check:
+      priority: p1
+      stack: [{kind: spell, card: "@bolt", controller: p1, targets: [{player: p0}]}]
+  - p1: {t: pass}
+  - check:
+      priority: p0
+      stack: [{kind: spell, card: "@bolt"}]
+      p0: {life: 20}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: main1
+    active: p0
+    priority: p0
+    pending: {actor: p0, kind: priority}
+    stack: []
+    p0: {life: 17}
+    p1: {graveyard: [Lightning Bolt]}
+notes: >
+  p0 (active) passes with an empty stack, so p1 receives priority in p0's main phase and may cast an instant. p1 gets
+  priority back after casting (117.3c), passes, p0 gets a chance to respond and passes, Bolt resolves, and then the
+  ACTIVE player p0 (not the caster p1) receives priority (117.3b). A wrong engine would give priority to the last
+  caster, or end the main phase because "both players already passed".
+---
+id: stack-resolves-last-in-first-out-after-both-pass
+title: With two spells on the stack the top one resolves first, and the active player gets priority after each resolution
+area: core
+cards: [Lightning Bolt, Mountain]
+tags: [priority, stack, lifo, resolution]
+derived_from: cr
+source:
+  - {kind: cr, ref: "117.4", text: "If all players pass in succession (that is, if all players pass without taking any actions in between passing), the spell or ability on top of the stack resolves or, if the stack is empty, the phase or step ends.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b0"]
+    battlefield: ["Mountain @m0"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @b1"]
+    battlefield: ["Mountain @m1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b0", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@b1", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - label: both-on-stack
+    check:
+      stack:
+        - {kind: spell, card: "@b0", controller: p0}
+        - {kind: spell, card: "@b1", controller: p1}
+      priority: p0
+      p0: {life: 20}
+      p1: {life: 20}
+  - p0: {t: pass}
+  - label: after-first-resolution
+    check:
+      stack: [{kind: spell, card: "@b0", controller: p0}]
+      priority: p0
+      pending: {actor: p0, kind: priority}
+      p0: {life: 17, graveyard: []}
+      p1: {life: 20, graveyard: [Lightning Bolt]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    priority: p0
+    p0: {life: 17, graveyard: [Lightning Bolt]}
+    p1: {life: 17, graveyard: [Lightning Bolt]}
+notes: >
+  Order of play: p0 casts, passes; p1 responds with its own Bolt (stack bottom to top: b0, b1) and passes; p0 gets
+  priority and passes; both passed in succession, so the TOP object (p1's Bolt, aimed at p0) resolves first. The check
+  after it shows p0 at 17 and p0's own Bolt still on the stack, and the active player p0 holds priority (117.3b).
+  Then p0 and p1 pass again and p0's Bolt resolves. A wrong engine would resolve first-cast-first (p1 would drop first)
+  or give priority to p1 after the first resolution.

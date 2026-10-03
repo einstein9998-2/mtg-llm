@@ -1,0 +1,47 @@
+{
+  "tag": "dnt_vs_jund_w4_n30",
+  "deck1": "dnt.dck",
+  "deck2": "jund75.dck",
+  "workers": 4,
+  "games_per_worker": 30,
+  "games_completed": 120,
+  "wins": {
+    "Ai(1)-Death and Taxes": 49,
+    "Ai(2)-Jund75": 71
+  },
+  "return_codes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "wall_sec_total": 124.9,
+  "games_per_sec_wall_incl_jvm_startup": 0.961,
+  "games_per_sec_per_worker_in_game_time": 1.174,
+  "aggregate_games_per_sec_steady_state": 1.38,
+  "ms_per_game": {
+    "mean": 3409,
+    "p50": 2774,
+    "p90": 5492,
+    "max": 13544
+  },
+  "mean_turns": 10.07,
+  "worker_wall_sec": [
+    113.2,
+    124.9,
+    112.1,
+    113.2
+  ],
+  "warnings_sample": [
+    "Badlands Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Bayou Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Bloodbraid Elf Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Bloodstained Mire Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Dark Confidant Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Error handling registered!",
+    "Fatal Push Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Forest Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Grim Lavamancer Did not have activator set in SpellAbilityRestriction.canPlay()",
+    "Kolaghan's Command Did not have activator set in SpellAbilityRestriction.canPlay()"
+  ]
+}

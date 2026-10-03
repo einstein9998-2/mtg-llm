@@ -1,0 +1,19 @@
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see interaction-tests/README.md.
+
+=== flow-state-takes-two-with-instant-and-sorcery
+title: Flow State takes two cards when an instant and a sorcery are in your graveyard
+ref: Flow State Oracle
+state:
+  humanhand=Flow State
+  humanbattlefield=Island;Island
+  humangraveyard=Brainstorm;Lightning Bolt
+  humanlibrary=Brainstorm;Ponder;Island;Island;Island;Island
+script:
+  p1: cast Flow State
+  p1: pass
+  p2: pass
+  p1: pick Brainstorm;Ponder
+expect:
+  zone p1 hand size == 2
+  zone p1 hand has "Ponder"
+

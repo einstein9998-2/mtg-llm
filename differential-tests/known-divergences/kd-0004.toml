@@ -1,0 +1,12 @@
+id = "kd-0004"
+title = "Forge: Flow State counts the resolving spell as an instant or sorcery card in the graveyard"
+status = "accepted"
+who_is_right = "engine"
+cr_citation = "CR 608.2n: as the final part of resolution the spell is put into its owner's graveyard, so it is on the stack, not in the graveyard, while its effects are applied"
+rulings = []
+affected_oracles = ["forge"]
+match = { kinds = ["STATE_MISMATCH"], cards = ["Flow State"], feature_tags = [] }
+suppress = false               # only one scenario is affected; it is carried as xfail rather than pattern-suppressed
+regression_scenario = "differential-tests/repros/f1-flow-state-count.scn"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Scenario flow-state-takes-two-with-instant-and-sorcery gives the controller one Brainstorm and one Lightning Bolt (two instants, no sorcery) in the graveyard and casts Flow State, a sorcery. Forge takes two cards (it counts Flow State itself); the engine takes one. The scenario's expectation was written against Forge's behavior; the rules text says one. Mark the scenario as an engine-correct xfail for Forge."

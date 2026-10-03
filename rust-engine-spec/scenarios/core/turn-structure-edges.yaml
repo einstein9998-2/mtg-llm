@@ -1,0 +1,119 @@
+id: cleanup-removes-damage-and-ends-pump-at-the-same-time
+title: A Monk pumped by prowess and dealt 1 damage survives cleanup, because damage removal and the end of "until end of turn" effects happen simultaneously
+area: core
+cards: [Monk Token, Prismari Charm, Volcanic Island, Mountain]
+tags: [cleanup, until-end-of-turn, damage, prowess, turn-structure, state-based-actions]
+derived_from: cr
+source:
+  - {kind: cr, ref: "514.2", text: "Second, the following actions happen simultaneously: all damage marked on permanents (including phased-out permanents) is removed and all “until end of turn” and “this turn” effects end.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "Prismari Charm deals 1 damage to each of one or two targets.", verified: true}
+  - {kind: cr, ref: "702.108a", text: "Prowess is a triggered ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: [{token: Monk Token, as: monk}, "Volcanic Island @volc", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [2], targets: ["@monk"], pay: {tap: ["@volc", "@m1"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@charm", controller: p0}
+        - {kind: triggered, source: "@monk", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@charm", controller: p0}]
+      p0: {battlefield_contains: [{token: Monk Token, pt: [2, 2], damage: 0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{token: Monk Token, pt: [2, 2], damage: 1}], graveyard: [Prismari Charm]}
+  - advance: {to: upkeep, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: upkeep
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield_contains: [{token: Monk Token, pt: [1, 1], damage: 0}]
+notes: >
+  Prowess triggers on the cast and resolves first: the Monk is 2/2 until end of turn. Charm (mode 2, one target) then
+  deals 1 damage: 2/2 with 1 damage, alive. In cleanup the damage is removed and the pump ends in one simultaneous
+  action (514.2), so the Monk is never a 1/1 with 1 damage and survives into p1's turn as an undamaged 1/1. Prowess
+  text is checked against 702.108a in refs. Wrong engine: ending "until end of turn" effects before removing damage
+  (SBA kills the Monk), or removing damage only at the next untap.
+---
+id: edge-of-autumn-land-is-not-a-land-play-and-the-land-drop-is-still-available
+title: Edge of Autumn puts a basic land onto the battlefield without using the land drop or triggering City of Traitors; p0 then plays one land (City is sacrificed) and no second land
+area: core
+cards: [Edge of Autumn, City of Traitors, Forest, Mountain]
+tags: [land-drop, lands-played, edge-of-autumn, city-of-traitors, put-onto-battlefield, special-action, search]
+derived_from: cr
+source:
+  - {kind: oracle, card: Edge of Autumn, text: "If you control four or fewer lands, search your library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+  - {kind: cr, ref: "305.2a", text: "To determine whether a player can play a land, compare the number of lands the player can play this turn with the number of lands they have already played this turn", verified: true}
+  - {kind: cr, ref: "305.2b", text: "A player can’t play a land, for any reason, if the number of lands the player can play this turn is equal to or less than the number of lands they have already played this turn.", verified: true}
+  - {kind: cr, ref: "116.2a", text: "Playing a land is a special action.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Edge of Autumn @edge", "Mountain @hm1", "Mountain @hm2"]
+    battlefield: ["City of Traitors @city", "Forest @f1", "Forest @f2"]
+    library: ["Mountain @lm"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@edge", pay: {tap: ["@f1", "@f2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@lm"}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        lands_played: 0
+        library_count: 10
+        battlefield:
+          - {card: City of Traitors, tapped: false}
+          - {card: Forest, tapped: true}
+          - {card: Forest, tapped: true}
+          - {card: Mountain, tapped: true}
+  - p0: {t: play_land, card: "@hm1"}
+  - check:
+      stack: [{kind: triggered, source: "@city", controller: p0}]
+      p0: {lands_played: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: play_land, card: "@hm2"}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      hand: [Mountain]
+      graveyard: [Edge of Autumn, City of Traitors]
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Forest, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: false}
+notes: >
+  p0 controls three lands, so Edge searches: the Mountain enters tapped and the library is shuffled (order not
+  asserted; 11 -> 10 cards). Putting a land onto the battlefield with an effect is not playing a land: lands_played
+  stays 0 and City of Traitors ("when you play another land") does not trigger. The land drop is still available, so
+  p0 plays a Mountain from hand (lands_played 1); that triggers City, which is sacrificed. A second land play is not
+  offered (305.2b). Wrong engines: Edge using up the land drop, City triggering on the fetched Mountain, or a second
+  land play allowed.

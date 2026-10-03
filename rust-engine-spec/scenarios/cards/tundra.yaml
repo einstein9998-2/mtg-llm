@@ -1,0 +1,73 @@
+id: tundra-colors-chosen-count-for-converge-two-colors
+title: Two Tundras tapped for {W} and {U} pay Prismatic Ending X=1 with two colors, exiling a mana value 2 permanent
+area: card
+cards: [Tundra, Prismatic Ending, "Phelia, Exuberant Shepherd"]
+tags: [tundra, dual-land, choose-color, converge, prismatic-ending, mana-pool]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tundra, text: "({T}: Add {W} or {U}.)", verified: true}
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Tundra @t1", "Tundra @t2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @phelia"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@t1", ability: 0, choose_color: W}
+  - p0: {t: activate, source: "@t2", ability: 0, choose_color: U}
+  - check: {p0: {mana_pool: {W: 1, U: 1}}}
+  - p0: {t: cast, card: "@pe", x: 1, targets: ["@phelia"], pay: auto}
+  - check: {p0: {mana_pool: {}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismatic Ending]}
+    p1: {exile: ["Phelia, Exuberant Shepherd"], battlefield: []}
+notes: >
+  The mana's color is the one chosen when the dual land is tapped, so the spell was paid with one white and one blue:
+  two colors, Phelia (mana value 2) is exiled. Pair: the next scenario taps both for white.
+---
+id: tundra-both-tapped-for-white-one-color
+title: Two Tundras both tapped for {W} pay Prismatic Ending X=1 with one color; a mana value 2 permanent stays
+area: card
+cards: [Tundra, Prismatic Ending, "Phelia, Exuberant Shepherd"]
+tags: [tundra, dual-land, choose-color, converge, prismatic-ending, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tundra, text: "({T}: Add {W} or {U}.)", verified: true}
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Tundra @t1", "Tundra @t2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @phelia"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@t1", ability: 0, choose_color: W}
+  - p0: {t: activate, source: "@t2", ability: 0, choose_color: W}
+  - p0: {t: cast, card: "@pe", x: 1, targets: ["@phelia"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismatic Ending]}
+    p1: {exile: [], battlefield: [{card: "Phelia, Exuberant Shepherd"}]}
+notes: >
+  Same lands, but both produced white: one color spent, Phelia survives. Bug caught: counting the colors a land could
+  produce instead of the colors actually spent.

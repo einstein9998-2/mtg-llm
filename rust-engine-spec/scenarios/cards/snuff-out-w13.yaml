@@ -1,0 +1,82 @@
+id: snuff-out-pay-4-life-with-tapped-swamp
+title: Snuff Out cast for 4 life while its controller controls only a tapped Swamp destroys a nonblack creature
+area: card
+cards: [Snuff Out, Swamp, "Phelia, Exuberant Shepherd", Nethergoyf]
+tags: [snuff-out, alternative-cost, pay-life, targeting, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Snuff Out, text: "If you control a Swamp, you may pay 4 life rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Snuff Out, text: "Destroy target nonblack creature. It can't be regenerated.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text, or applied to it from another effect, that its controller may pay rather than paying the spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Snuff Out @so"]
+    battlefield: [{card: Swamp, as: sw, tapped: true}]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph", "Nethergoyf @ng"]
+    library_pad: 10
+script:
+  - check:
+      legal:
+        p0:
+          include: [{t: cast, card: "@so", alt_cost: {pay_life: 4}, targets: ["@ph"]}]
+          exclude: [{t: cast, card: "@so", alt_cost: null}, {t: cast, card: "@so", targets: ["@ng"]}]
+  - expect_illegal: {p0: {t: cast, card: "@so", alt_cost: {pay_life: 4}, targets: ["@ng"]}}
+  - expect_illegal: {p0: {t: cast, card: "@so", alt_cost: null, targets: ["@ph"], pay: auto}}
+  - p0: {t: cast, card: "@so", alt_cost: {pay_life: 4}, targets: ["@ph"]}
+  - check:
+      p0: {life: 16}
+      stack: [{kind: spell, card: "@so", controller: p0, targets: ["@ph"]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 16
+      graveyard: [Snuff Out]
+      battlefield: [{card: Swamp, tapped: true}]
+    p1:
+      graveyard: ["Phelia, Exuberant Shepherd"]
+      battlefield: [{card: Nethergoyf}]
+notes: >
+  The alternative cost needs only control of a Swamp, not an untapped one, and 4 life (20 - 4 = 16). The hard cast
+  ({3}{B}) is not payable and is not offered. Nethergoyf is black, so it is not a legal target. Phelia is white.
+---
+id: snuff-out-without-swamp-not-castable
+title: Without a Swamp and without mana Snuff Out is not offered at all
+area: card
+cards: [Snuff Out, Island, Volcanic Island, "Phelia, Exuberant Shepherd"]
+tags: [snuff-out, alternative-cost, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Snuff Out, text: "If you control a Swamp, you may pay 4 life rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Snuff Out @so"]
+    battlefield: ["Island @i1", "Island @i2", "Volcanic Island @vi"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@so", alt_cost: {pay_life: 4}, targets: ["@ph"]}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@so"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, hand: [Snuff Out]}
+    p1: {battlefield: [{card: "Phelia, Exuberant Shepherd"}]}
+notes: >
+  No Swamp, so the life payment is unavailable; three lands without black mana cannot pay {3}{B}. Negative pair of
+  snuff-out-pay-4-life-with-tapped-swamp.

@@ -1,0 +1,4 @@
+#!/bin/sh
+# usage: sample_opp_hands [options]   (see README.md)
+D="$(cd "$(dirname "$0")/.." && pwd)"
+PYTHONPATH="$D" exec python3 -m mtgtools sample_opp_hands "$@"

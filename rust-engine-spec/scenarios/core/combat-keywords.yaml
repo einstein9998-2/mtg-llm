@@ -1,0 +1,400 @@
+id: lifelink-gain-simultaneous-with-combat-damage-prevents-loss
+title: Lifelink life gain happens at the same time as combat damage, so a player at 2 life taking 2 and gaining 7 does not lose
+area: core
+cards: ["Atraxa, Grand Unifier", "Goblin Token", "Zombie Token"]
+tags: [combat, lifelink, simultaneous, state-based-actions, atraxa, life-loss]
+derived_from: cr
+source:
+  - {kind: cr, ref: "510.2", text: "Second, all combat damage that’s been assigned is dealt simultaneously. This turn-based action doesn’t use the stack.", verified: true}
+  - {kind: cr, ref: "702.15b", text: "Damage dealt by a source with lifelink causes that source’s controller, or its owner if it has no controller, to gain that much life (in addition to any other results that damage causes).", verified: true}
+  - {kind: cr, ref: "120.3f", text: "Damage dealt by a source with lifelink causes that source’s controller to gain that much life, in addition to the damage’s other results.", verified: true}
+  - {kind: cr, ref: "120.3a", text: "Damage dealt to a player by a source without infect causes that player to lose that much life.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, “Timing and Priority”), the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: begin_combat
+  p0:
+    life: 2
+    battlefield: ["Atraxa, Grand Unifier @atraxa"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}, {token: Zombie Token, as: zomb}]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1:
+      decision: declare_attackers
+      attacks:
+        - {creature: "@gob", target: {player: p0}}
+        - {creature: "@zomb", target: {player: p0}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: declare_blockers, blocks: [{blocker: "@atraxa", attacker: "@gob"}], expect_options: {include: ["@atraxa"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    game: {over: false}
+    phase: combat_damage
+    active: p1
+    priority: p1
+    p0:
+      life: 7
+      battlefield: [{card: "Atraxa, Grand Unifier", damage: 1, tapped: false}]
+    p1:
+      life: 20
+      battlefield: [{token: Zombie Token, tapped: true}]
+notes: >
+  p1 (active, turn 4) attacks with a 1/1 Goblin and a 2/2 Zombie; p0, at 2 life, blocks only the Goblin with Atraxa. All
+  combat damage is dealt simultaneously (510.2): the unblocked Zombie deals 2 to p0 (2 - 2) while Atraxa deals 7 to the Goblin
+  and lifelink gains 7 as part of the same damage event (120.3f). The state-based action check afterwards (704.3) sees
+  2 - 2 + 7 = 7 life, so p0 does not lose (704.5a). A wrong engine applies the life loss, runs the SBA check (p0 loses at 0),
+  and only then applies the lifelink gain. Atraxa takes 1 and survives; the Goblin token is gone.
+---
+id: deathtouch-assigns-one-damage-to-each-blocker-all-die
+title: A deathtouch attacker divides 4 damage as 1 and 3 among two big blockers and both are destroyed
+area: core
+cards: [The Atropal, Murktide Regent, "Atraxa, Grand Unifier"]
+tags: [combat, deathtouch, multiple-blockers, combat-damage-assignment, state-based-actions, kd-0001, assign-combat-damage-decision, lifelink]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.2b", text: "A creature with toughness greater than 0 that’s been dealt damage by a source with deathtouch since the last time state-based actions were checked is destroyed as a state-based action.", verified: true}
+  - {kind: cr, ref: "704.5h", text: "If a creature has toughness greater than 0, and it’s been dealt damage by a source with deathtouch since the last time state-based actions were checked, that creature is destroyed.", verified: true}
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: cr, ref: "510.1a", text: "Each attacking creature and each blocking creature assigns combat damage equal to its power.", verified: true}
+  - {kind: cr, ref: "702.15b", text: "Damage dealt by a source with lifelink causes that source’s controller, or its owner if it has no controller, to gain that much life (in addition to any other results that damage causes).", verified: true}
+  - {kind: oracle, card: Tomb of Annihilation, text: "Create The Atropal, a legendary 4/4 black God Horror creature token with deathtouch.", verified: false, note: "text is in oracle.json dungeons (Cradle of the Death God); the validator cannot match dungeon text, so not marked verified"}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: The Atropal, as: atropal}]
+    library_pad: 10
+  p1:
+    battlefield:
+      - {card: Murktide Regent, as: murk, counters: {"+1/+1": 3}}
+      - "Atraxa, Grand Unifier @atraxa"
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield: [{token: The Atropal, pt: [4, 4], keywords: [deathtouch]}]}
+      p1: {battlefield_contains: [{card: Murktide Regent, pt: [6, 6]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@atropal", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@murk", attacker: "@atropal"}, {blocker: "@atraxa", attacker: "@atropal"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: assign_combat_damage
+      assignment: {"@murk": 1, "@atraxa": 3}
+      expect_options: {include: ["@murk", "@atraxa"], exclude: [{player: p1}]}
+expect:
+  - at: after_script
+    p0: {life: 20, battlefield: [], graveyard: []}
+    p1:
+      life: 27
+      battlefield: []
+      graveyard: [Murktide Regent, "Atraxa, Grand Unifier"]
+notes: >
+  The Atropal (4/4 deathtouch) is blocked by a 6/6 Murktide Regent (3 counters) and Atraxa 7/7 (flying creatures can block
+  a ground attacker). p0 assigns 1 to the Regent and 3 to Atraxa. Any damage from a deathtouch source destroys a creature
+  with toughness > 0 as a state-based action (702.2b, 704.5h), so both die although neither received lethal damage by
+  toughness. The blockers deal 6 + 7 to the Atropal (dies; token). Atraxa's lifelink gains p1 7 life (20 to 27).
+  Wrong engines require lethal-by-toughness damage or forget the SBA for 1 damage.
+---
+id: deathtouch-zero-damage-assigned-blocker-survives
+title: A deathtouch attacker that assigns all its damage to one blocker leaves the other blocker undamaged and alive
+area: core
+cards: [The Atropal, Murktide Regent, "Atraxa, Grand Unifier"]
+tags: [combat, deathtouch, multiple-blockers, combat-damage-assignment, negative-case, kd-0001, assign-combat-damage-decision, lifelink]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.2b", text: "A creature with toughness greater than 0 that’s been dealt damage by a source with deathtouch since the last time state-based actions were checked is destroyed as a state-based action.", verified: true}
+  - {kind: cr, ref: "704.5h", text: "If a creature has toughness greater than 0, and it’s been dealt damage by a source with deathtouch since the last time state-based actions were checked, that creature is destroyed.", verified: true}
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: cr, ref: "702.15b", text: "Damage dealt by a source with lifelink causes that source’s controller, or its owner if it has no controller, to gain that much life (in addition to any other results that damage causes).", verified: true}
+  - {kind: oracle, card: Tomb of Annihilation, text: "Create The Atropal, a legendary 4/4 black God Horror creature token with deathtouch.", verified: false, note: "text is in oracle.json dungeons (Cradle of the Death God); the validator cannot match dungeon text, so not marked verified"}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: The Atropal, as: atropal}]
+    library_pad: 10
+  p1:
+    battlefield:
+      - {card: Murktide Regent, as: murk, counters: {"+1/+1": 3}}
+      - "Atraxa, Grand Unifier @atraxa"
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@atropal", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@murk", attacker: "@atropal"}, {blocker: "@atraxa", attacker: "@atropal"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: assign_combat_damage, assignment: {"@murk": 4, "@atraxa": 0}}
+expect:
+  - at: after_script
+    p0: {battlefield: [], graveyard: []}
+    p1:
+      life: 27
+      battlefield: [{card: "Atraxa, Grand Unifier", damage: 0, tapped: false}]
+      graveyard: [Murktide Regent]
+notes: >
+  Negative counterpart: p0 puts all 4 damage on the Regent (4 < its toughness 6, but deathtouch destroys it) and 0 on
+  Atraxa. Atraxa was dealt no damage by the Atropal, so the deathtouch SBA (704.5h: "has been dealt damage by a source with
+  deathtouch") does not apply to her, and she survives undamaged. Atraxa's own 7 deathtouch and lifelink damage kills the
+  Atropal and gains p1 7 life (20 to 27); the Regent deals 6.
+---
+id: deathtouch-lifelink-attacker-kills-larger-blocker
+title: Atraxa deals 7 damage to a 10/10 blocker and destroys it through deathtouch while the blocker destroys Atraxa
+area: core
+cards: ["Atraxa, Grand Unifier", Murktide Regent]
+tags: [combat, deathtouch, lifelink, atraxa, combat-damage, state-based-actions]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.2b", text: "A creature with toughness greater than 0 that’s been dealt damage by a source with deathtouch since the last time state-based actions were checked is destroyed as a state-based action.", verified: true}
+  - {kind: cr, ref: "704.5h", text: "If a creature has toughness greater than 0, and it’s been dealt damage by a source with deathtouch since the last time state-based actions were checked, that creature is destroyed.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: cr, ref: "702.15b", text: "Damage dealt by a source with lifelink causes that source’s controller, or its owner if it has no controller, to gain that much life (in addition to any other results that damage causes).", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "Flying, vigilance, deathtouch, lifelink", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Atraxa, Grand Unifier @atraxa"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Murktide Regent, as: murk, counters: {"+1/+1": 7}}]
+    library_pad: 10
+script:
+  - check: {p1: {battlefield: [{card: Murktide Regent, pt: [10, 10]}]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@atraxa", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@murk", attacker: "@atraxa"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p0: {life: 27, battlefield: [], graveyard: ["Atraxa, Grand Unifier"]}
+    p1: {life: 20, battlefield: [], graveyard: [Murktide Regent]}
+notes: >
+  The Regent with 7 counters is 10/10. Atraxa assigns all 7 of her damage to it (single blocker); 7 < 10, so only deathtouch
+  (702.2b, 704.5h) destroys it. The Regent deals 10 to Atraxa (toughness 7), which destroys her (704.5g). Lifelink gains p0 7
+  life (20 to 27). Both creatures go to their owners' graveyards.
+---
+id: trample-two-blockers-lethal-to-each-before-player
+title: A trampler blocked by two 1/1s must assign lethal damage to both blockers before any goes to the player
+area: core
+cards: ["Zombie Token", Cori-Steel Cutter, "Skeleton Token", "Goblin Token"]
+tags: [combat, trample, multiple-blockers, combat-damage-assignment, assign-combat-damage-decision, mask-validity, kd-0001]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.19b", text: "The controller of an attacking creature with trample first assigns damage to the creature(s) blocking it. Once all those blocking creatures are assigned lethal damage, any excess damage is assigned as its controller chooses among those blocking creatures and the player, planeswalker, or battle the creature is attacking. When checking for assigned lethal damage, take into account damage already marked on the creature and damage from other creatures that’s being assigned during the same combat damage step", verified: true}
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: oracle, card: "Cori-Steel Cutter", text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield:
+      - {token: Zombie Token, as: zomb}
+      - {card: Cori-Steel Cutter, as: cutter, attached_to: "@zomb"}
+    library_pad: 10
+  p1:
+    battlefield: [{token: Skeleton Token, as: skel}, {token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@zomb", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@skel", attacker: "@zomb"}, {blocker: "@gob", attacker: "@zomb"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {decision: assign_combat_damage, assignment: {"@skel": 1, "@gob": 0, player: 2}}}
+  - p0:
+      decision: assign_combat_damage
+      assignment: {"@skel": 1, "@gob": 1, player: 1}
+      expect_options: {include: ["@skel", "@gob", {player: p1}]}
+expect:
+  - at: after_script
+    p0: {battlefield_contains: [{token: Zombie Token, damage: 2, tapped: true}]}
+    p1: {life: 19, battlefield: []}
+notes: >
+  3/3 trampler versus two 1/1 blockers: the excess over the player is only allowed after lethal damage is assigned to ALL
+  blockers (702.19b), so 1 + 1 to the blockers and 1 to the player (p1: 20 to 19). Giving 1 to one blocker, 0 to the
+  other and 2 to the player is illegal. There is no assignment order between the blockers (510.1c). Both blockers die;
+  they deal 1 + 1 to the Zombie (3/3, survives with 2 damage).
+---
+id: trample-blocker-removed-all-damage-to-player
+title: A trampler whose only blocker was removed assigns all its combat damage to the player without a choice
+area: core
+cards: ["Zombie Token", Cori-Steel Cutter, "Goblin Token", Lightning Bolt, Mountain]
+tags: [combat, trample, blocker-removed, combat-damage, burn, instant]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.19d", text: "If an attacking creature with trample or trample over planeswalkers is blocked, but there are no creatures blocking it when damage is assigned, its damage is assigned to the defending player and/or planeswalker as though all blocking creatures have been assigned lethal damage.", verified: true}
+  - {kind: cr, ref: "509.1h", text: "A creature remains blocked even if all the creatures blocking it are removed from combat.", verified: true}
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: oracle, card: "Lightning Bolt", text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: oracle, card: "Cori-Steel Cutter", text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield:
+      - {token: Zombie Token, as: zomb}
+      - {card: Cori-Steel Cutter, as: cutter, attached_to: "@zomb"}
+      - "Mountain @mtn"
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@zomb", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@gob", attacker: "@zomb"}]}
+  - p0: {t: cast, card: "@bolt", targets: ["@gob"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {phase: declare_blockers, priority: p0, stack: [], p1: {battlefield: [], life: 20}, p0: {graveyard: [Lightning Bolt]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p1: {life: 17, battlefield: []}
+    p0: {battlefield_contains: [{token: Zombie Token, damage: 0, tapped: true}]}
+notes: >
+  After blockers are declared p0 Bolts the lone blocker. The Zombie (3/3 trample) is still a blocked creature (509.1h), but no
+  creature is blocking it when damage is assigned, so all of its damage is assigned to the player as though lethal had been
+  assigned to all blockers (702.19d): p1 20 to 17. No assign_combat_damage decision is raised because there is only one
+  possible recipient. Compare the next scenario, without trample.
+---
+id: blocked-attacker-stays-blocked-when-blocker-removed-no-damage
+title: A blocked creature without trample whose blocker is removed deals no combat damage to the player
+area: core
+cards: ["Zombie Token", "Goblin Token", Lightning Bolt, Mountain]
+tags: [combat, blocked, blocker-removed, combat-damage, burn, instant, negative-case]
+derived_from: cr
+source:
+  - {kind: cr, ref: "509.1h", text: "A creature remains blocked even if all the creatures blocking it are removed from combat.", verified: true}
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: cr, ref: "506.4", text: "A permanent is removed from combat if it leaves the battlefield, ... A creature that’s removed from combat stops being an attacking, blocking, blocked, and/or unblocked creature.", verified: true}
+  - {kind: oracle, card: "Lightning Bolt", text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: [{token: Zombie Token, as: zomb}, "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@zomb", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@gob", attacker: "@zomb"}]}
+  - p0: {t: cast, card: "@bolt", targets: ["@gob"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {phase: declare_blockers, priority: p0, stack: [], p1: {battlefield: [], life: 20}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p1: {life: 20, battlefield: []}
+    p0: {battlefield: [{token: Zombie Token, damage: 0, tapped: true}, {card: Mountain, tapped: true}], graveyard: [Lightning Bolt]}
+notes: >
+  Once declared blocked, a creature remains blocked even if every creature blocking it leaves combat (509.1h), and a blocked
+  creature with no blockers left assigns no combat damage (510.1c). Without trample the 2/2 Zombie deals nothing to
+  p1, who stays at 20. A wrong engine treats the creature as unblocked once its blocker is gone and deals 2 to the player.
+---
+id: attacker-exiled-after-block-blocker-assigns-no-damage-controller-gains-life
+title: Swords to Plowshares on a blocked attacker removes it from combat; the blocker deals no damage and the Zombie's controller gains life equal to its power
+area: core
+cards: ["Zombie Token", "Goblin Token", Swords to Plowshares, Plains]
+tags: [combat, removal, removed-from-combat, blocked, instant, priority, life-gain]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Swords to Plowshares", text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "506.4", text: "A permanent is removed from combat if it leaves the battlefield, ... A creature that’s removed from combat stops being an attacking, blocking, blocked, and/or unblocked creature.", verified: true}
+  - {kind: cr, ref: "510.1d", text: "A blocking creature assigns combat damage to the creatures it’s blocking. If it isn’t currently blocking any creatures (if, for example, they were destroyed or removed from combat), it assigns no combat damage.", verified: true}
+  - {kind: cr, ref: "704.5d", text: "If a token is in a zone other than the battlefield, it ceases to exist.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: Zombie Token, as: zomb}]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @swords"]
+    battlefield: [{token: Goblin Token, as: gob}, "Plains @pl"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@zomb", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@gob", attacker: "@zomb"}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@swords", targets: ["@zomb"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      phase: declare_blockers
+      priority: p0
+      stack: []
+      p0: {life: 22, battlefield: [], exile: [], graveyard: []}
+      p1: {life: 20}
+  - advance: {to: end_combat, of: p0}
+expect:
+  - at: after_script
+    phase: end_combat
+    priority: p0
+    p0: {life: 22, battlefield: [], graveyard: []}
+    p1:
+      life: 20
+      graveyard: [Swords to Plowshares]
+      battlefield: [{token: Goblin Token, damage: 0, tapped: false}, {card: Plains, tapped: true}]
+notes: >
+  p1 blocks the Zombie with the Goblin, then casts Swords to Plowshares on the attacking Zombie. The Zombie leaves the
+  battlefield and is removed from combat (506.4), so the Goblin is blocking nothing and assigns no damage (510.1d); it
+  survives undamaged. Swords gives the Zombie's controller (p0) life equal to its power (2): 20 to 22. The exiled token ceases
+  to exist (704.5d), so p0's exile and graveyard are empty. Nothing deals combat damage; the advance to end_combat
+  is used instead of asserting a combat damage priority round.

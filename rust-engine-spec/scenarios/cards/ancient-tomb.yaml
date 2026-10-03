@@ -1,0 +1,130 @@
+id: ancient-tomb-two-colorless-two-damage
+title: Ancient Tomb taps for {C}{C} and deals 2 damage to its controller immediately
+area: card
+cards: [Ancient Tomb]
+tags: [ancient-tomb, mana-ability, damage, mana-pool]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: cr, ref: "405.6c", text: "Mana abilities resolve immediately. If a mana ability both produces mana and has another effect, the mana is produced and the other effect happens immediately.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn't go on the stack, so it can't be targeted, countered, or otherwise responded to.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Ancient Tomb @tomb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tomb", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      mana_pool: {C: 2}
+      battlefield: [{card: Ancient Tomb, tapped: true}]
+notes: >
+  Ability index 0 is the only activated ability. The activation is a mana ability, so nothing goes on the stack; the
+  2 damage is part of the same immediate resolution (405.6c), so life is already 18 and p0 still holds priority.
+  A wrong engine would put the damage on the stack as a separate trigger, or give {C} only once, or give colored mana.
+---
+id: ancient-tomb-pays-generic-part-of-stock-up
+title: Ancient Tomb pays the generic {2} of Stock Up while an Island pays {U}; the damage is taken during payment
+area: card
+cards: [Ancient Tomb, Island, Stock Up]
+tags: [ancient-tomb, mana-payment, mana-ability, damage]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: oracle, card: Stock Up, text: "Look at the top five cards of your library.", verified: true}
+  - {kind: cr, ref: "605.3a", text: "A player may activate an activated mana ability ... whenever they are casting a spell or activating an ability that requires a mana payment", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stock Up @su"]
+    battlefield: ["Ancient Tomb @tomb", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@su", pay: {tap: ["@tomb", "@isl"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@su", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      mana_pool: {}
+      hand: []
+      battlefield: [{card: Ancient Tomb, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Stock Up costs {2}{U}. {C}{C} from the Tomb covers the generic {2} exactly and the Island supplies {U}, so no mana is
+  left floating. The Tomb's 2 damage happens during the payment (mana ability), so life is 18 when the spell is on the
+  stack. Catches an engine that forgets the damage when the land is tapped as part of a payment.
+---
+id: ancient-tomb-colorless-cannot-pay-colored-cost
+title: Ancient Tomb alone cannot pay {U}; the cast is not offered
+area: card
+cards: [Ancient Tomb, Brainstorm]
+tags: [ancient-tomb, mana-payment, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Ancient Tomb @tomb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bs", pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Brainstorm]
+      battlefield: [{card: Ancient Tomb, tapped: false}]
+notes: >
+  {C} is not blue. Brainstorm costs {U}, so with only an Ancient Tomb the cast must be impossible and, crucially, the
+  engine must not tap the Tomb or deal 2 damage while probing: life stays 20 and the Tomb stays untapped.
+---
+id: ancient-tomb-survive-at-three-life
+title: Tapping Ancient Tomb at 3 life leaves 1 life and the game continues
+area: card
+cards: [Ancient Tomb]
+tags: [ancient-tomb, life-loss, mana-pool]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 3
+    battlefield: ["Ancient Tomb @tomb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tomb", ability: 0}
+expect:
+  - at: after_script
+    game: {over: false}
+    pending: {actor: p0, kind: priority}
+    p0: {life: 1, mana_pool: {C: 2}}
+notes: >
+  Boundary partner of the lethal case, 3 - 2 = 1 is not 0 or less, so the game continues and the mana is available.

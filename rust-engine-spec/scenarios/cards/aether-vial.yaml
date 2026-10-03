@@ -1,0 +1,166 @@
+id: aether-vial-upkeep-counter-declined
+title: Declining Aether Vial's upkeep "may" leaves its charge counters unchanged
+area: card
+cards: [Aether Vial]
+tags: [aether-vial, upkeep-trigger, may-choice, counters]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aether Vial, text: "At the beginning of your upkeep, you may put a charge counter on this artifact.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 1}}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: add_charge_counter, answer: false}
+expect:
+  - at: after_script
+    turn: 3
+    phase: upkeep
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Aether Vial, counters: {charge: 1}}]
+notes: >
+  Pair of a sibling scenario: the "may" is a real choice, and "no" changes nothing.
+  The third step is p0's priority pass in its own upkeep with the trigger on the stack.
+---
+id: aether-vial-puts-creature-at-instant-speed-without-casting
+title: Aether Vial with two counters puts a mana value 2 creature onto the battlefield on the opponent's turn; it is not cast
+area: card
+cards: [Aether Vial, "Spider-Woman, Stunning Savior", Recruiter of the Guard, Solitude]
+tags: [aether-vial, put-onto-battlefield, not-cast, mana-value, instant-speed, activated-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aether Vial, text: "{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    hand: ["Spider-Woman, Stunning Savior @sw", "Recruiter of the Guard @rec", "Solitude @sol"]
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 2}}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@vial", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@vial", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_onto_battlefield, answer: ["@sw"], expect_options: {include: ["@sw"], exclude: ["@rec", "@sol"]}}
+expect:
+  - at: after_script
+    turn: 4
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Recruiter of the Guard, Solitude]
+      spells_cast_this_turn: 0
+      battlefield:
+        - {card: Aether Vial, tapped: true, counters: {charge: 2}}
+        - {card: "Spider-Woman, Stunning Savior", sick: true}
+notes: >
+  Spider-Woman's mana cost {1}{W/U} has mana value 2 (hybrid counts its largest component, 202.3f), equal to the two
+  charge counters; Recruiter (3) and Solitude (5) are not offered. Spider-Woman has no flash, but the Vial ability can be
+  activated whenever p0 has priority, and the creature is put onto the battlefield, not cast, so p0's spell count stays
+  0. After the ability resolves the active player p1 receives priority. The "may put" is modelled as one choose_cards that
+  may be empty (same shape as Show and Tell); the runner adapter owns the shape. Ability index 0: the upkeep ability is
+  triggered, so the {T} ability is the first activated ability.
+---
+id: aether-vial-creature-exiled-by-containment-priest
+title: A creature put in with Aether Vial is exiled by the opponent's Containment Priest and its ETB never triggers
+area: card
+cards: [Aether Vial, Recruiter of the Guard, Containment Priest]
+tags: [aether-vial, containment-priest, replacement-effect, not-cast, etb-trigger]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: Aether Vial, text: "{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Recruiter of the Guard @rec"]
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 3}}]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @priest"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@vial", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_onto_battlefield, answer: ["@rec"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      exile: [Recruiter of the Guard]
+      battlefield: [{card: Aether Vial, tapped: true, counters: {charge: 3}}]
+    p1:
+      battlefield: [{card: Containment Priest}]
+notes: >
+  The Vial puts the card onto the battlefield without casting it, so the Priest's replacement applies to p0's creature
+  too (it is not limited to its controller's creatures) and the Recruiter goes to exile instead. It never entered, so
+  no ETB trigger: the stack is empty. Positive pair: a sibling scenario.
+---
+id: aether-vial-ignores-disruptor-flute-tax
+title: Disruptor Flute's tax on a creature's name does not apply when Aether Vial puts that creature onto the battlefield
+area: card
+cards: [Aether Vial, "Spider-Woman, Stunning Savior", Disruptor Flute, Plains]
+tags: [aether-vial, disruptor-flute, cost-increase, not-cast, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Disruptor Flute, text: "Spells with the chosen name cost {3} more to cast.", verified: true}
+  - {kind: oracle, card: Aether Vial, text: "{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Spider-Woman, Stunning Savior @sw"]
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 2}}, "Plains @w1", "Plains @w2"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Disruptor Flute, as: flute, flags: {chosen_name: "Spider-Woman, Stunning Savior"}}]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@sw"}}
+  - p0: {t: activate, source: "@vial", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_onto_battlefield, answer: ["@sw"], expect_options: {include: ["@sw"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield:
+        - {card: Aether Vial, tapped: true, counters: {charge: 2}}
+        - {card: "Spider-Woman, Stunning Savior"}
+        - {card: Plains, tapped: false}
+        - {card: Plains, tapped: false}
+notes: >
+  Casting Spider-Woman would cost {1}{W/U} plus {3}: five mana, and p0 has two Plains, so the cast is not offered. The
+  Flute taxes spells only; the Vial's ability puts the card onto the battlefield without casting it, so no cost applies
+  and both Plains stay untapped. The Flute names the creature, not the Vial, so the Vial's ability is not stopped.

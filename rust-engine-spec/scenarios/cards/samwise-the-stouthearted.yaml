@@ -1,0 +1,111 @@
+id: samwise-returns-permanent-card-that-died-this-turn-then-ring-tempts
+title: Samwise returns a permanent card put into its controller's graveyard from the battlefield this turn, then the Ring tempts that player
+area: card
+cards: [Samwise the Stouthearted, Wasteland, Swords to Plowshares, Scrubland, Plains]
+tags: [samwise, etb-trigger, graveyard-recursion, targeting, the-ring-tempts-you, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Samwise the Stouthearted, text: "When Samwise enters, choose up to one target permanent card in your graveyard that was put there from the battlefield this turn. Return it to your hand. Then the Ring tempts you.", verified: true}
+  - {kind: cr, ref: "701.54a", text: "Each time the Ring tempts you, choose a creature you control. That creature becomes your Ring-bearer until another creature becomes your Ring-bearer or another player gains control of it.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Samwise the Stouthearted @sam"]
+    battlefield: ["Wasteland @waste", "Plains @w1", "Plains @w2"]
+    graveyard: ["Swords to Plowshares @stpgy"]
+    library_pad: 10
+  p1:
+    battlefield: ["Scrubland @scrub"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@waste", ability: 1, targets: ["@scrub"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {graveyard: [Swords to Plowshares, Wasteland]}
+      p1: {graveyard: [Scrubland], battlefield: []}
+  - p0: {t: cast, card: "@sam", pay: {tap: ["@w1", "@w2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@waste", expect_options: {include: ["@waste"], exclude: ["@stpgy", "@scrub"]}}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: ring_bearer, answer: ["@sam"], expect_options: {include: ["@sam"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Wasteland]
+      graveyard: [Swords to Plowshares]
+      battlefield:
+        - {card: Samwise the Stouthearted}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  Wasteland was sacrificed (a cost) this turn, so it is a permanent card put into p0's graveyard from the battlefield
+  this turn. Swords to Plowshares is not a permanent card, and p1's Scrubland is in p1's graveyard, not "your"
+  graveyard: neither is offered. After the return, the Ring tempts p0, who chooses a creature they control as
+  Ring-bearer (701.54a); Samwise is the only one, but the choice is the player's (one-candidate choices the rules give
+  are presented). The ring-bearer step shape (choose_cards, purpose ring_bearer) is a runner adapter question; the
+  Ring emblem and designation are not asserted because SCHEMA has no key for them (see REPORT schema-requests).
+---
+id: samwise-cannot-return-card-discarded-this-turn
+title: A creature card discarded from hand this turn is not a legal Samwise target; the Ring still tempts its controller
+area: card
+cards: [Samwise the Stouthearted, Recruiter of the Guard, Thoughtseize, Swamp, Plains]
+tags: [samwise, flash, etb-trigger, no-legal-target, the-ring-tempts-you, thoughtseize]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Samwise the Stouthearted, text: "When Samwise enters, choose up to one target permanent card in your graveyard that was put there from the battlefield this turn. Return it to your hand. Then the Ring tempts you.", verified: true}
+  - {kind: oracle, card: Samwise the Stouthearted, text: "Flash", verified: true}
+  - {kind: oracle, card: Thoughtseize, text: "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Recruiter of the Guard @rec", "Samwise the Stouthearted @sam"]
+    battlefield: ["Plains @w1", "Plains @w2"]
+    library_pad: 10
+  p1:
+    hand: ["Thoughtseize @pts"]
+    battlefield: ["Swamp @pb"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pts", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: discard, answer: ["@rec"], expect_options: {include: ["@rec", "@sam"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@sam", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@sam", controller: p0, targets: []}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: choose_cards, purpose: ring_bearer, answer: ["@sam"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Recruiter of the Guard]
+      battlefield:
+        - {card: Samwise the Stouthearted}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+    p1:
+      life: 18
+      graveyard: [Thoughtseize]
+notes: >
+  Recruiter went to the graveyard from p0's hand, not from the battlefield, so the trigger has no legal target and,
+  being "up to one", goes on the stack with no target (no target decision). Flash lets p0 cast Samwise on p1's turn.
+  On resolution nothing returns but "Then the Ring tempts you" still happens. After each resolution the active player
+  p1 gets priority. A wrong engine accepts any card that went to the graveyard this turn, or skips the tempt when
+  nothing was returned.

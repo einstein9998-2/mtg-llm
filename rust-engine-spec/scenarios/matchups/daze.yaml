@@ -1,0 +1,123 @@
+id: mu-daze-aluren-paid-with-lotus-petal
+title: The Alurentell player pays for Daze on Aluren by sacrificing Lotus Petal, and Aluren resolves
+area: matchup
+cards: [Daze, Volcanic Island, Aluren, Lotus Petal, Island, Tropical Island, Hedge Maze]
+tags: [matchup, daze, counter-unless-pay, lotus-petal, mana-ability, aluren]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "605.3a", text: "A player may activate an activated mana ability whenever they have priority, whenever they are casting a spell or activating an ability that requires a mana payment, or whenever a rule or effect asks for a mana payment, even if it's in the middle of casting or resolving a spell or activating or resolving an ability.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Daze @daze"]
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    hand: ["Aluren @alu"]
+    battlefield: ["Island @i", "Tropical Island @t1", "Tropical Island @t2", "Hedge Maze @hm", "Lotus Petal @lp"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@alu", pay: {tap: ["@i", "@t1", "@t2", "@hm"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@volc"}, targets: ["@alu"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_for_daze, answer: true, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@alu", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p1: {graveyard: [Lotus Petal]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {graveyard: [Lotus Petal], battlefield_contains: [{card: Aluren, controller: p1}], hand: []}
+    p0: {hand: [Volcanic Island], graveyard: [Daze]}
+notes: >
+  Aluren's {2}{G}{G} is paid with the four lands. The only remaining source is Lotus Petal, whose mana ability can be
+  activated while Daze asks for a payment (605.3a), so the pay prompt is offered; paying sacrifices the Petal (pay: auto
+  has only one way). Daze resolves without countering, then Aluren resolves. A wrong engine ignores artifact mana sources
+  when deciding whether payment is possible.
+---
+id: mu-daze-aluren-tapped-out-countered
+title: Daze counters Aluren when all four lands paid for it
+area: matchup
+cards: [Daze, Volcanic Island, Aluren, "Dragon's Rage Channeler", Island, Tropical Island, Hedge Maze]
+tags: [matchup, daze, counter-unless-pay, aluren, legal-actions]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Daze @daze", "Dragon's Rage Channeler @drc"]
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    hand: ["Aluren @alu"]
+    battlefield: ["Island", "Tropical Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@alu", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@volc"}, targets: ["@alu"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {graveyard: [Aluren], hand: []}
+    p0: {hand: ["Dragon's Rage Channeler", Volcanic Island], graveyard: [Daze], battlefield: []}
+notes: >
+  Four lands pay {2}{G}{G}; nothing is left for Daze's {1}, so no prompt and Aluren is countered.
+---
+id: mu-daze-stock-up-declined-with-spare-land
+title: Declining to pay for Daze while able to pay lets Daze counter Stock Up and leaves the land untapped
+area: matchup
+cards: [Daze, Volcanic Island, Stock Up, Island, Tropical Island, Hedge Maze]
+tags: [matchup, daze, counter-unless-pay, yes-no]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner's graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Daze @daze"]
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su"]
+    battlefield: ["Island @i", "Tropical Island @t", "Hedge Maze @hm", "Island @spare"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@su", pay: {tap: ["@i", "@t", "@hm"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@volc"}, targets: ["@su"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_for_daze, answer: false, expect_options: {include: [true, false]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      graveyard: [Stock Up]
+      battlefield_contains: [{card: Island, tapped: false}]
+      library_count: 10
+    p0: {hand: [Volcanic Island], graveyard: [Daze]}
+notes: >
+  p1 could pay with the spare Island but declines; Stock Up is countered and the spare Island stays untapped. The prompt
+  belongs to p1 (the controller of the targeted spell), not to Daze's caster.

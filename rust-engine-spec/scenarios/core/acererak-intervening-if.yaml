@@ -1,0 +1,92 @@
+id: acererak-etb-triggers-when-tomb-not-completed
+title: "Acererak's enters trigger goes on the stack when Tomb of Annihilation has not been completed, then returns Acererak to hand and ventures"
+area: core
+cards: [Acererak the Archlich, Swamp, Island]
+tags: [acererak, intervening-if, triggers, etb, venture, return-to-hand]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing. If the ability triggers, it checks the stated condition again as it resolves.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "701.49a", text: "If a player is instructed to venture into the dungeon while they don't own a dungeon card in the command zone, they choose a dungeon card they own from outside the game and put it into the command zone. They put their venture marker on the topmost room.", verified: true}
+  - {kind: cr, ref: "309.4c", text: "Each room has a triggered ability called a room ability whose effect is printed on the card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @ace"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ace", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: triggered, source: "@ace", controller: p0}
+      p0: {battlefield_contains: [{card: Acererak the Archlich, controller: p0}], hand: [], command: []}
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - p0:
+      decision: choose_dungeon
+      answer: Lost Mine of Phandelver
+      expect_options: {include: [Lost Mine of Phandelver, Dungeon of the Mad Mage, Tomb of Annihilation]}
+expect:
+  - at: after_script
+    p0:
+      hand: [Acererak the Archlich]
+      battlefield: [{card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}]
+      command: [{dungeon: Lost Mine of Phandelver, room: Cave Entrance}]
+    stack:
+      - {kind: triggered}
+    pending: {actor: p0, kind: priority}
+notes: >
+  Condition true when Acererak enters, so the trigger goes on the stack; when it resolves the condition is still true,
+  Acererak returns to hand and p0 ventures (no dungeon yet: choose one, marker on the topmost room, Cave Entrance). Moving
+  into the room triggers its room ability (309.4c), which is the lone stack object left (its text is the dungeon batch's
+  business). Which dungeon p0 picks is free; Tomb is offered as an option too. Catches an engine that bounces without
+  venturing, ventures without bouncing, or leaves Acererak on the battlefield.
+---
+id: acererak-etb-does-not-trigger-when-tomb-completed
+title: "Acererak's enters ability does not trigger at all once its controller has completed Tomb of Annihilation"
+area: core
+cards: [Acererak the Archlich, Swamp]
+tags: [acererak, intervening-if, triggers, negative-case, etb, completed-dungeon]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @ace"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    completed_dungeons: ["Tomb of Annihilation"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ace", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@ace", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield_contains: [{card: Acererak the Archlich, controller: p0}]
+      command: []
+      completed_dungeons: [Tomb of Annihilation]
+notes: >
+  The intervening-if clause is checked when the trigger event (entering) occurs; it is false, so nothing is put on the
+  stack (stack is empty as soon as the spell has resolved and p0 has priority again, and no choose_dungeon decision ever
+  appears). Acererak stays on the battlefield. A wrong engine would trigger and only check the condition on resolution,
+  which would leave a stack object (or ask for a dungeon) here.

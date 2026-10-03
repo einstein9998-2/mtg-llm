@@ -1,0 +1,121 @@
+id: null-rod-stops-bauble-petal-and-treasure-activations-but-not-casting
+title: Null Rod stops activating Mishra's Bauble, Lotus Petal and a Treasure token, though the Bauble can still be cast and enters the battlefield
+area: card
+cards: [Null Rod, Mishra's Bauble, Lotus Petal, Treasure Token]
+tags: [null-rod, mana-ability, activated-ability, artifact, treasure, lotus-petal, mishras-bauble, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Null Rod, text: "Activated abilities of artifacts can't be activated.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "111.10a", text: "A Treasure token is a colorless Treasure artifact token with “{T}, Sacrifice this token: Add one mana of any color.”", verified: true, note: "the Treasure Token text in oracle.json is recalled; this CR rule is the verified source that it is an artifact with that ability"}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mishra's Bauble @bb"]
+    battlefield: ["Lotus Petal @petal", {token: Treasure Token, as: tr}]
+    library_pad: 10
+  p1:
+    battlefield: ["Null Rod @rod"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", pay: auto}
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {battlefield_contains: [{card: Mishra's Bauble}]}
+  - expect_illegal: {p0: {t: activate, source: "@bb", ability: 0, targets: [{player: p0}]}}
+  - expect_illegal: {p0: {t: activate, source: "@petal", ability: 0, choose_color: R}}
+  - expect_illegal: {p0: {t: activate, source: "@tr", ability: 0, choose_color: R}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      graveyard: []
+      battlefield: [{card: Mishra's Bauble, tapped: false}, {card: Lotus Petal, tapped: false}, {token: Treasure Token, tapped: false}]
+    p1: {battlefield: [{card: Null Rod}]}
+notes: >
+  Null Rod forbids activating any ability of any artifact (it affects both players), and mana abilities are activated abilities, so the Petal and the Treasure
+  token cannot be sacrificed for mana. Casting is not activating: the Bauble can still be cast from hand and enters the battlefield, but it cannot then be
+  used. Each probe changes no state (nothing tapped or sacrificed, the mana pool stays empty). A wrong engine exempts mana abilities.
+---
+id: null-rod-stops-cori-steel-cutter-equip
+title: Null Rod stops Cori-Steel Cutter's equip ability even with enough mana and a legal target
+area: card
+cards: [Null Rod, Cori-Steel Cutter, Dragon's Rage Channeler, Mountain]
+tags: [null-rod, equip, activated-ability, artifact, cori-steel-cutter, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Null Rod, text: "Activated abilities of artifacts can't be activated.", verified: true}
+  - {kind: cr, ref: "702.6a", text: "Equip is an activated ability of Equipment cards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Cori-Steel Cutter @cut", "Dragon's Rage Channeler @drc", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Null Rod @rod"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@cut", ability: 0, targets: ["@drc"], pay: auto}}
+  - check:
+      legal:
+        p0:
+          exclude: [{t: activate, source: "@cut", ability: 0}]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Cori-Steel Cutter, attached_to: null}, {card: Dragon's Rage Channeler, pt: [1, 1]}]
+      battlefield: [{card: Cori-Steel Cutter}, {card: Dragon's Rage Channeler}, {card: Mountain, tapped: false}, {card: Mountain, tapped: false}]
+notes: >
+  Equip is an activated ability of an artifact card, so Null Rod (on the opponent's side) prevents it. The Mountains stay untapped and nothing is attached. The
+  Mountains' own mana abilities are unaffected (they are lands, see the next scenario). A wrong engine forgets that equip is an ability of the Equipment.
+---
+id: null-rod-does-not-affect-lands-or-nonartifact-abilities
+title: Null Rod leaves a Mountain's mana ability and Scalding Tarn's fetch ability working
+area: card
+cards: [Null Rod, Scalding Tarn, Mountain, Island]
+tags: [null-rod, land, mana-ability, fetchland, non-artifact, search]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Null Rod, text: "Activated abilities of artifacts can't be activated.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mountain @m", "Scalding Tarn @tarn"]
+    library: ["Island @isl", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Null Rod @rod"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@m", ability: 0}
+  - check:
+      p0: {mana_pool: {R: 1}, battlefield_contains: [{card: Mountain, tapped: true}]}
+  - p0: {t: activate, source: "@tarn", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, purpose: fetch, found: "@isl"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      mana_pool: {R: 1}
+      graveyard: [Scalding Tarn]
+      battlefield: [{card: Mountain, tapped: true}, {card: Island}]
+    p1: {battlefield: [{card: Null Rod}]}
+notes: >
+  Null Rod only restricts artifacts. A Mountain still taps for mana, and the (nonartifact) Scalding Tarn can still be paid for with 1 life and sacrificed,
+  fetching the Island (the shuffle is not asserted; the library order is not asserted either). Life 20 to 19. A wrong engine applies the restriction to all permanents.

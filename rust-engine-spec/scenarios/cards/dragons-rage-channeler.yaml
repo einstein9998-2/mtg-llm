@@ -1,0 +1,156 @@
+id: drc-surveil-on-own-noncreature-cast-resolves-before-the-spell
+title: Dragon's Rage Channeler surveils 1 when its controller casts a noncreature spell; the trigger goes above the spell and resolves first
+area: card
+cards: [Dragon's Rage Channeler, Mountain, Lightning Bolt, Island, Ponder]
+tags: [drc, surveil, cast-trigger, stack-order, noncreature-spell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Once the steps described in 601.2a–h are completed, effects that modify the characteristics of the spell as it's cast are applied, then the spell becomes cast. Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Mountain @mtn"]
+    library: ["Island @top", "Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}, {kind: triggered, source: "@drc", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@top"], on_top_order: []}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}]
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Island], library_top: [Ponder]}
+      p1: {life: 20}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Island, Lightning Bolt]
+      library_count: 11
+      battlefield_contains: [{card: Dragon's Rage Channeler, pt: [1, 1], keywords_exclude: [flying]}]
+    p1: {life: 17}
+notes: >
+  Casting Bolt triggers DRC, so the trigger is put on the stack above Bolt and resolves first; p0 may put the Island into the graveyard. Bolt then
+  resolves. Graveyard types at the end are land and instant only (two), so DRC stays a 1/1 without flying. A wrong engine surveils after Bolt
+  resolves or does not give the controller the surveil choice.
+---
+id: drc-ignores-opponents-noncreature-spells
+title: Dragon's Rage Channeler does not trigger when the opponent casts a noncreature spell
+area: card
+cards: [Dragon's Rage Channeler, Lightning Bolt, Mountain]
+tags: [drc, cast-trigger, you-vs-opponent, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  priority: p1
+  p0:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {life: 17, library_count: 10, battlefield: [{card: Dragon's Rage Channeler}]}
+notes: >
+  "Whenever you cast" refers to the DRC's controller only. p1's Bolt creates no trigger and p0 gets no surveil decision. After Bolt resolves the active
+  player (p1) receives priority.
+---
+id: drc-no-delirium-with-three-card-types-and-may-stay-home
+title: Four cards but only three card types in the graveyard is not delirium, so Dragon's Rage Channeler stays a 1/1 without flying and may skip combat
+area: card
+cards: [Dragon's Rage Channeler, Lightning Bolt, Brainstorm, Ponder, Mishra's Bauble]
+tags: [drc, delirium, card-types, graveyard-count, attack-requirement]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    graveyard: ["Lightning Bolt", "Brainstorm", "Ponder", "Mishra's Bauble"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield: [{card: Dragon's Rage Channeler, pt: [1, 1], keywords_exclude: [flying]}]}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: []}
+expect:
+  - at: after_script
+    p0: {battlefield: [{card: Dragon's Rage Channeler, tapped: false, pt: [1, 1]}]}
+notes: >
+  The graveyard holds Lightning Bolt and Brainstorm (both instants), Ponder (sorcery) and Mishra's Bauble (artifact): four cards but only three distinct
+  card types, so delirium is off. The attack requirement belongs to the delirium clause, so declaring no attackers is legal. A wrong engine that counts
+  cards instead of types turns delirium on here. Whether the engine skips the declare-attackers decision when no attack is possible is not at issue:
+  a legal attacker exists, so the decision is raised.
+---
+id: drc-delirium-pt-flying-and-must-attack
+title: With four card types in the graveyard Dragon's Rage Channeler is a 3/3 flyer that must attack each combat if able
+area: card
+cards: [Dragon's Rage Channeler, Lightning Bolt, Ponder, Mishra's Bauble, Island]
+tags: [drc, delirium, card-types, attack-requirement, flying]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: cr, ref: "508.1d", text: "The active player checks each creature they control to see whether it's affected by any requirements (effects that say a creature attacks if able, or that it attacks if some condition is met). If the number of requirements that are being obeyed is fewer than the maximum possible number of requirements that could be obeyed without disobeying any restrictions, the declaration of attackers is illegal.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    graveyard: ["Lightning Bolt", "Ponder", "Mishra's Bauble", "Island"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield: [{card: Dragon's Rage Channeler, pt: [3, 3], keywords: [flying]}]}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: declare_attackers, attacks: []}}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@drc", target: {player: p1}}]}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    active: p0
+    pending: {actor: p0, kind: priority}
+    p0: {battlefield: [{card: Dragon's Rage Channeler, tapped: true, pt: [3, 3], keywords: [flying]}]}
+notes: >
+  Instant (Bolt), sorcery (Ponder), artifact (Bauble) and land (Island) are four distinct types, so delirium is on: 1/1 becomes 3/3 with flying,
+  and "attacks each combat if able" forbids the empty declaration (the creature is untapped, not summoning sick, no restriction applies). The legal
+  declaration attacks p1. The scenario stops at the declare-attackers priority so no blocker decision is needed.

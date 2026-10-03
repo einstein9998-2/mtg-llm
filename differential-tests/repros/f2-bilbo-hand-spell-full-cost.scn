@@ -1,0 +1,12 @@
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see interaction-tests/README.md.
+
+=== bilbo-does-not-discount-spells-cast-from-hand
+title: Bilbo's reduction applies only to spells cast from outside the hand; Kaito ({2}{U}{B}) cannot be cast from hand with three mana sources
+ref: Bilbo, Thief in the Night Oracle
+state:
+  humanbattlefield=Bilbo, Thief in the Night;Underground Sea;Underground Sea;Undercity Sewers
+  humanhand=Kaito, Bane of Nightmares
+script:
+  p1: try cast Kaito, Bane of Nightmares
+expect:
+  not controls p1 "Kaito, Bane of Nightmares"

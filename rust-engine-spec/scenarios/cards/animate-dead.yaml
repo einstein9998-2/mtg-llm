@@ -1,0 +1,98 @@
+id: animate-dead-returns-griselbrand-with-minus-one-power
+title: Animate Dead resolves onto Griselbrand in the graveyard; its enters trigger returns Griselbrand attached and Griselbrand is 6/7
+area: card
+cards: [Animate Dead, Griselbrand, Swamp, Island]
+tags: [animate-dead, aura, reanimation, etb-trigger, intervening-if, pt-modification]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Animate Dead, text: "Enchant creature card in a graveyard", verified: true}
+  - {kind: oracle, card: Animate Dead, text: "When this Aura enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the battlefield with this Aura.\" Return enchanted creature card to the battlefield under your control and attach this Aura to it.", verified: true}
+  - {kind: oracle, card: Animate Dead, text: "Enchanted creature gets -1/-0.", verified: true}
+  - {kind: cr, ref: "303.4a", text: "An Aura spell requires a target, which is defined by its enchant ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Animate Dead @ad"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    graveyard: ["Griselbrand @g"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ad", targets: ["@g"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@ad", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: []
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Animate Dead, attached_to: "@g"}
+        - {card: Griselbrand, controller: p0, sick: true, pt: [6, 7]}
+notes: >
+  The Aura spell targets a creature card in a graveyard (303.4a), resolves, and its enters trigger (with an intervening
+  "if it's on the battlefield") goes on the stack before p0 gets priority. On resolution Griselbrand returns under p0's
+  control with Animate Dead attached, and the static -1/-0 makes it 6/7. Unlike Reanimate, no life is lost. Wrong
+  engines: return the creature when the Aura spell resolves (no trigger on the stack), leave the Aura in the graveyard
+  by state-based actions, forget the -1/-0, or charge life.
+---
+id: animate-dead-targets-only-creature-cards-in-graveyards
+title: Animate Dead cannot target a creature on the battlefield or a noncreature card, and returns an opponent's creature card under its caster's control
+area: card
+cards: [Animate Dead, Street Wraith, "Thassa's Oracle", Doomsday, Swamp, Island]
+tags: [animate-dead, targeting, control, pt-modification]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Animate Dead, text: "Enchant creature card in a graveyard", verified: true}
+  - {kind: oracle, card: Animate Dead, text: "Return enchanted creature card to the battlefield under your control and attach this Aura to it.", verified: true}
+  - {kind: oracle, card: Animate Dead, text: "Enchanted creature gets -1/-0.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Animate Dead @ad"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Thassa's Oracle @o"]
+    graveyard: ["Street Wraith @w", "Doomsday @dd"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ad", targets: ["@o"]}}
+  - expect_illegal: {p0: {t: cast, card: "@ad", targets: ["@dd"]}}
+  - p0: {t: cast, card: "@ad", targets: ["@w"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Animate Dead, attached_to: "@w"}
+        - {card: Street Wraith, controller: p0, sick: true, pt: [2, 4]}
+    p1:
+      graveyard: [Doomsday]
+      battlefield: [{card: "Thassa's Oracle"}]
+notes: >
+  The Aura spell's target must match "creature card in a graveyard": Thassa's Oracle is a creature on the battlefield
+  and Doomsday is a sorcery card, so both probes are illegal. Any graveyard is allowed: Street Wraith (3/4) comes from
+  p1's graveyard under p0's control as a 2/4. Two pass pairs: the Aura spell resolves, then its enters trigger.

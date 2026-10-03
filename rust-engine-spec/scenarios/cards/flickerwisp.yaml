@@ -1,0 +1,174 @@
+id: flickerwisp-own-recruiter-returns-and-retriggers-etb
+title: A permanent of its own controller exiled by Flickerwisp returns at the end step and its enters trigger happens again
+area: card
+cards: [Flickerwisp, Recruiter of the Guard, "Phelia, Exuberant Shepherd", Plains]
+tags: [flickerwisp, flicker, delayed-trigger, etb-trigger, recruiter-of-the-guard, search]
+derived_from: cr
+source:
+  - {kind: oracle, card: Flickerwisp, text: "When this creature enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.", verified: true}
+  - {kind: oracle, card: Recruiter of the Guard, text: "When this creature enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Flickerwisp @wisp"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3", "Recruiter of the Guard @rec"]
+    library: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wisp", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@rec"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {exile: [Recruiter of the Guard]}
+  - advance: {to: end, of: p0}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@rec", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [], battlefield_contains: [{card: Recruiter of the Guard, controller: p0}]}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: may_search, answer: true}
+  - p0: {decision: search, found: "@ph"}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Phelia, Exuberant Shepherd"]
+      library_count: 10
+      exile: []
+notes: >
+  Recruiter returns under its owner p0's control at the beginning of the end step; entering again triggers its ETB
+  (603.6a), which goes on the stack before p0 next gets priority. The advance crosses combat with no decision (Recruiter
+  is in exile, Flickerwisp is summoning sick). A wrong engine does not fire ETB triggers for delayed-trigger returns.
+---
+id: flickerwisp-exiled-token-does-not-return
+title: A token exiled by Flickerwisp ceases to exist; the end-step return finds nothing to return
+area: card
+cards: [Flickerwisp, Plains]
+tags: [flickerwisp, token, delayed-trigger, state-based-actions, zone-change]
+derived_from: cr
+source:
+  - {kind: oracle, card: Flickerwisp, text: "When this creature enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.", verified: true}
+  - {kind: cr, ref: "111.7", text: "A token that’s in a zone other than the battlefield ceases to exist. This is a state-based action; see rule 704.", verified: true}
+  - {kind: cr, ref: "111.8", text: "A token that has left the battlefield can’t move to another zone or come back onto the battlefield.", verified: true}
+  - {kind: cr, ref: "603.7c", text: "However, if that object is no longer in the zone it’s expected to be in at the time the delayed triggered ability resolves, the ability won’t affect it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Flickerwisp @wisp"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wisp", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@gob"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p1: {battlefield: [], exile: []}
+  - advance: {to: end, of: p0}
+  - check:
+      stack: [{kind: triggered, source: "@wisp", controller: p0}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      battlefield: []
+      exile: []
+notes: >
+  The Goblin token goes to exile and ceases to exist at the next state-based action check (111.7), before p0 gets
+  priority. The delayed trigger was still created and still triggers at the end step, but has nothing to return
+  (111.8, 603.7c). A wrong engine returns a token, keeps it in exile, or never creates the delayed trigger.
+---
+id: flickerwisp-vialed-in-end-step-returns-at-next-turns-end-step
+title: Flickerwisp put onto the battlefield during an end step returns its exiled card at the following turn's end step, not this one
+area: card
+cards: [Flickerwisp, Aether Vial, Plains]
+tags: [flickerwisp, aether-vial, delayed-trigger, end-step, next-end-step, turn-structure]
+derived_from: cr
+source:
+  - {kind: oracle, card: Flickerwisp, text: "Return that card to the battlefield under its owner's control at the beginning of the next end step.", verified: true}
+  - {kind: cr, ref: "603.7a", text: "A delayed triggered ability won’t trigger until it has actually been created, even if its trigger event occurred just beforehand.", verified: true}
+  - {kind: cr, ref: "603.7b", text: "A delayed triggered ability will trigger only once—the next time its trigger event occurs—unless it has a stated duration, such as “this turn.”", verified: true}
+  - {kind: oracle, card: Aether Vial, text: "{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    hand: ["Flickerwisp @wisp"]
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 3}}]
+    library_pad: 10
+  p1:
+    battlefield: ["Plains @pw"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@vial", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_onto_battlefield, answer: ["@wisp"]}
+  - p0: {decision: choose_target, slot: 0, answer: "@pw", expect_options: {include: ["@pw", "@vial"], exclude: ["@wisp"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      turn: 4
+      phase: end
+      stack: []
+      pending: {actor: p1, kind: priority}
+      p1: {battlefield: [], exile: [Plains]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: next-upkeep
+    check:
+      turn: 5
+      phase: upkeep
+      stack: [{kind: triggered, source: "@vial", controller: p0}]
+      p1: {battlefield: [], exile: [Plains]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: add_charge_counter, answer: false}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: []}
+  - advance: {to: end, of: p0}
+  - check:
+      turn: 5
+      phase: end
+      stack: [{kind: triggered, source: "@wisp", controller: p0}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 5
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      exile: []
+      battlefield: [{card: Plains, controller: p1, tapped: false}]
+notes: >
+  The Vial puts Flickerwisp in during p1's end step (after its beginning), so the delayed trigger created by the ETB
+  first triggers at the beginning of the next end step, p0's turn 5 end step (603.7a/b). p1's Plains therefore stays in
+  exile through p1's cleanup and p0's upkeep (checked at label next-upkeep). On turn 5 the Vial trigger is declined, and
+  Flickerwisp could attack (no longer summoning sick), so the declare_attackers decision is scripted with no attackers;
+  508.8 then skips blockers and damage. A wrong engine returns the Plains in the same end step or in cleanup.

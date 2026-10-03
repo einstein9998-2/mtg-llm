@@ -1,0 +1,125 @@
+id: mu-cutter-flurry-bauble-then-bolt-makes-equipped-monk
+title: Mishra's Bauble then Lightning Bolt triggers Flurry; the new Monk is equipped, does not prowess off Bolt, and pumps on the third spell
+area: matchup
+cards: [Cori-Steel Cutter, "Mishra's Bauble", Lightning Bolt, Ponder, Volcanic Island, Aluren, Tropical Island]
+tags: [matchup, cori-steel-cutter, flurry, token, prowess, equipment, cast-trigger, spell-count]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Flurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: cr, ref: "702.108a", text: "Prowess is a triggered ability. \"Prowess\" means \"Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.\"", verified: true}
+  - {kind: cr, ref: "603.2", text: "Whenever a game event or game state matches a triggered ability's trigger event, that ability automatically triggers.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mishra's Bauble @bb", "Lightning Bolt @bolt", "Ponder @pd"]
+    battlefield: ["Cori-Steel Cutter @cut", "Volcanic Island", "Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bb", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: triggered, source: "@cut", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: attach_equipment, answer: true}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      p0: {battlefield_contains: [{token: Monk Token, pt: [2, 2], keywords: [prowess, trample, haste]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@pd", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@pd", controller: p0}
+        - {kind: triggered, controller: p0, text_contains: "+1/+1"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@pd", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p1: {life: 17}
+    p0:
+      spells_cast_this_turn: 3
+      battlefield_contains:
+        - {token: Monk Token, pt: [3, 3], sick: true}
+        - {card: Cori-Steel Cutter}
+        - {card: "Mishra's Bauble"}
+notes: >
+  The Bauble (cost 0) is spell one; Bolt is spell two, so Flurry triggers on top of Bolt and resolves first: a 1/1 Monk
+  token, and p0 attaches the Cutter (2/2 trample haste). Prowess did not exist when Bolt was cast, so Bolt gives no pump.
+  Bolt resolves (20 -> 17). Ponder is spell three: no Flurry (only the second spell), but the Monk's prowess triggers:
+  3/3 until end of turn. The Cutter's attachment is asserted through the Monk's derived 2/2 trample haste, because a token
+  created mid-script has no alias for attached_to (see the report's schema requests).
+---
+id: mu-cutter-flurry-on-opponents-turn-bolt-and-daze
+title: Bolt and Daze cast on the opponent's turn are the UR player's second spell that turn and trigger Flurry
+area: matchup
+cards: [Cori-Steel Cutter, Lightning Bolt, Daze, Volcanic Island, Stock Up, Island, Tropical Island, Hedge Maze]
+tags: [matchup, cori-steel-cutter, flurry, opponents-turn, daze, token, spell-count]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Flurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Daze @daze"]
+    battlefield: ["Cori-Steel Cutter @cut", "Volcanic Island @v"]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@su", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@v"}, targets: ["@su"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@su", controller: p1}
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@daze", controller: p0, targets: ["@su"]}
+        - {kind: triggered, source: "@cut", controller: p0}
+      p0: {hand: [Volcanic Island], spells_cast_this_turn: 2}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: attach_equipment, answer: true}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      p1: {graveyard: [Stock Up]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {life: 17, graveyard: [Stock Up], hand: []}
+    p0:
+      hand: [Volcanic Island]
+      graveyard: [Lightning Bolt, Daze]
+      battlefield: [{card: Cori-Steel Cutter}, {token: Monk Token, pt: [2, 2], keywords: [prowess, trample, haste], sick: true}]
+notes: >
+  "Each turn" counts p0's spells in p1's turn too. Bolt (tapping Volcanic Island) is p0's first spell; p0 keeps priority
+  and casts Daze by returning the tapped Volcanic Island: second spell, Flurry triggers on top. The Monk is created and
+  equipped; then Daze resolves and p1, tapped out, cannot pay (no prompt), so Stock Up is countered; then Bolt hits p1.
+  After each resolution the active player p1 gets priority first.

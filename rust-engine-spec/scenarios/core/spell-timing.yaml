@@ -1,0 +1,179 @@
+id: sorcery-not-castable-on-opponents-turn-but-instant-is
+title: Stock Up (sorcery) is not offered during the opponent's main phase even when payable, while Lightning Bolt is
+area: core
+cards: [Stock Up, Lightning Bolt, Island, Mountain]
+tags: [timing, sorcery-speed, instant-speed, nonactive-player, mask-validity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority. A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+  - {kind: oracle, card: Stock Up, text: "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Stock Up @su", "Lightning Bolt @bolt"]
+    battlefield: ["Island", "Island", "Island", "Mountain"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - check:
+      phase: main1
+      active: p1
+      priority: p0
+      stack: []
+      legal: {p0: {include: [{t: cast, card: "@bolt"}, {t: pass}], exclude: [{t: cast, card: "@su"}]}}
+  - expect_illegal: {p0: {t: cast, card: "@su", pay: auto}}
+expect:
+  - at: after_script
+    priority: p0
+    stack: []
+    p0: {hand: [Stock Up, Lightning Bolt]}
+notes: >
+  p0 receives priority in p1's first main phase with an empty stack and four untapped lands, so Stock Up ({2}{U}) is
+  affordable, but a sorcery can only be cast by its controller during that controller's own main phase (117.1a, 307.1).
+  Bolt is offered at the same decision. A wrong engine would offer any castable card whenever the player has priority.
+---
+id: sorcery-timing-follows-phases-of-own-turn
+title: A sorcery is castable in your own main phases with an empty stack and not in upkeep, draw step, or end step
+area: core
+cards: [Stock Up, Lightning Bolt, Island, Mountain]
+tags: [timing, sorcery-speed, instant-speed, turn-structure, mask-validity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "505.6a", text: "The main phase is the only phase in which a player can normally cast artifact, creature, enchantment, planeswalker, and sorcery spells. The active player may cast these spells.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  p0:
+    hand: ["Stock Up @su", "Lightning Bolt @bolt"]
+    battlefield: ["Island", "Island", "Island", "Mountain"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - label: upkeep
+    check: {phase: upkeep, legal: {p0: {include: [{t: cast, card: "@bolt"}], exclude: [{t: cast, card: "@su"}]}}}
+  - expect_illegal: {p0: {t: cast, card: "@su", pay: auto}}
+  - advance: {to: draw, of: p0}
+  - label: draw
+    check: {phase: draw, legal: {p0: {include: [{t: cast, card: "@bolt"}], exclude: [{t: cast, card: "@su"}]}}}
+  - expect_illegal: {p0: {t: cast, card: "@su", pay: auto}}
+  - advance: {to: main1, of: p0}
+  - label: main1
+    check: {phase: main1, legal: {p0: {include: [{t: cast, card: "@bolt"}, {t: cast, card: "@su"}]}}}
+  - advance: {to: main2, of: p0}
+  - label: main2
+    check: {phase: main2, legal: {p0: {include: [{t: cast, card: "@bolt"}, {t: cast, card: "@su"}]}}}
+  - advance: {to: end, of: p0}
+  - label: end
+    check: {phase: end, legal: {p0: {include: [{t: cast, card: "@bolt"}], exclude: [{t: cast, card: "@su"}]}}}
+  - expect_illegal: {p0: {t: cast, card: "@su", pay: auto}}
+expect:
+  - at: after_script
+    phase: end
+    priority: p0
+    stack: []
+    p0: {hand_count: 3}
+notes: >
+  The same hand is probed in five steps of p0's own turn: Stock Up is offered only in the two main phases (empty stack,
+  active player) and Bolt in all of them. Nothing is cast, so the hand ends with Stock Up, Bolt and the card drawn in the
+  draw step. A wrong engine would treat "my turn" as sufficient, or allow sorceries in the end step or upkeep.
+---
+id: sorcery-not-castable-while-the-stack-is-non-empty
+title: With Lightning Bolt on the stack the active player may cast another instant but not a sorcery; once it resolves the sorcery is offered again
+area: core
+cards: [Stock Up, Lightning Bolt, Island, Mountain]
+tags: [timing, sorcery-speed, instant-speed, stack, mask-validity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stock Up @su", "Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Island", "Island", "Island", {card: Mountain, as: m1}, {card: Mountain, as: m2}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check: {legal: {p0: {include: [{t: cast, card: "@su"}, {t: cast, card: "@b1"}]}}}
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - check:
+      stack: [{kind: spell, card: "@b1"}]
+      priority: p0
+      legal: {p0: {include: [{t: cast, card: "@b2"}], exclude: [{t: cast, card: "@su"}]}}
+  - expect_illegal: {p0: {t: cast, card: "@su", pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {stack: [], priority: p0, p1: {life: 17}, legal: {p0: {include: [{t: cast, card: "@su"}]}}}
+expect:
+  - at: after_script
+    stack: []
+    priority: p0
+    p0: {hand: [Stock Up, Lightning Bolt], graveyard: [Lightning Bolt]}
+notes: >
+  p0 is the active player in its main phase with plenty of mana, so Stock Up is offered at first. After Bolt is cast
+  p0 has priority again (117.3c) but the stack is not empty, so only instants are offered (Bolt 2, yes; Stock Up, no).
+  After Bolt resolves and p0 has priority with an empty stack, Stock Up is offered again. A wrong engine would test only
+  "own main phase" and ignore the stack.
+---
+id: flash-creature-castable-at-instant-speed-other-permanents-are-not
+title: Containment Priest (flash) can be cast in the opponent's end step; a creature without flash, an artifact and an enchantment cannot
+area: core
+cards: [Containment Priest, Faerie Macabre, Cori-Steel Cutter, Aluren, Plains, Island, Swamp, Mountain, Forest]
+tags: [timing, flash, sorcery-speed, nonactive-player, end-step, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Containment Priest, text: "Flash", verified: true}
+  - {kind: cr, ref: "505.6a", text: "The main phase is the only phase in which a player can normally cast artifact, creature, enchantment, planeswalker, and sorcery spells. The active player may cast these spells.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    hand: ["Containment Priest @priest", "Faerie Macabre @faerie", "Cori-Steel Cutter @cutter", "Aluren @aluren"]
+    battlefield: ["Plains", "Island", "Swamp", "Swamp", "Swamp", "Mountain", "Forest", "Forest"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - check:
+      phase: end
+      active: p1
+      priority: p0
+      stack: []
+      legal: {p0: {include: [{t: cast, card: "@priest"}], exclude: [{t: cast, card: "@faerie"}, {t: cast, card: "@cutter"}, {t: cast, card: "@aluren"}]}}
+  - expect_illegal: {p0: {t: cast, card: "@faerie", pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@cutter", pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@aluren", pay: auto}}
+  - p0: {t: cast, card: "@priest", pay: auto}
+  - check: {stack: [{kind: spell, card: "@priest", controller: p0}], priority: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    active: p1
+    priority: p1
+    stack: []
+    p0:
+      hand: [Faerie Macabre, Cori-Steel Cutter, Aluren]
+      battlefield_contains: [{card: Containment Priest, controller: p0}]
+notes: >
+  p0 holds a flash creature (Containment Priest), a creature without flash (Faerie Macabre), an artifact (Cori-Steel
+  Cutter) and an enchantment (Aluren) in p1's end step; all four are payable with the eight lands. Only the flash
+  creature is offered. Casting it works, it resolves on both passes, and it enters the battlefield (it was cast, so its
+  own replacement effect does not exile it); afterwards the ACTIVE player p1 has priority (117.3b).

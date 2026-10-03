@@ -1,0 +1,111 @@
+id: street-wraith-cannot-cycle-at-one-life
+title: At 1 life, Street Wraith's cycling (pay 2 life) is not offered
+area: card
+cards: [Street Wraith, Island]
+tags: [street-wraith, cycling, pay-life, negative, mask-validity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "118.3", text: "For example, a player with only 1 life can’t pay a cost of 2 life", verified: true}
+  - {kind: oracle, card: Street Wraith, text: "Cycling—Pay 2 life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    hand: ["Street Wraith @sw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@sw", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 1, hand: [Street Wraith]}
+    legal: {p0: {exclude: [{t: activate_from_hand, source: "@sw"}]}}
+notes: >
+  118.3's own example: 1 life cannot pay 2 life. Paired with the positive cycling scenario above.
+---
+id: street-wraith-swampwalk-unblockable-against-underground-sea
+title: Street Wraith cannot be blocked when the defending player controls Underground Sea (a Swamp), so no block decision is raised
+area: card
+cards: [Street Wraith, Underground Sea, "Thassa's Oracle", Island]
+tags: [street-wraith, landwalk, swampwalk, evasion, combat, land-subtypes]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.14c", text: "A creature with landwalk can’t be blocked as long as the defending player controls at least one land with the specified land type", verified: true}
+  - {kind: oracle, card: Street Wraith, text: "Swampwalk (This creature can't be blocked as long as defending player controls a Swamp.)", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{card: Street Wraith, as: sw}]
+    library_pad: 10
+  p1:
+    life: 20
+    battlefield: ["Underground Sea @us", "Thassa's Oracle @o"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@sw", target: {player: p1}}]}
+  - advance: {to: combat_damage, of: p0}
+expect:
+  - at: after_script
+    phase: combat_damage
+    pending: {actor: p0, kind: priority}
+    p1:
+      life: 17
+      battlefield:
+        - {card: Underground Sea}
+        - {card: "Thassa's Oracle", damage: 0}
+notes: >
+  Underground Sea's type line is "Land — Island Swamp", so it has the Swamp land type. Street Wraith (3/4) therefore
+  can't be blocked; the only potential blocker has no legal block, so no declare_blockers decision is raised (SCHEMA
+  addenda) and the advance passes through. p1 takes 3. Wrong engines: look for the name "Swamp" or basic Swamps only,
+  or offer the Oracle as a blocker. Paired with the next scenario, where p1 controls no Swamp.
+---
+id: street-wraith-blockable-without-a-swamp
+title: Street Wraith can be blocked when the defending player controls no Swamp
+area: card
+cards: [Street Wraith, Island, "Thassa's Oracle"]
+tags: [street-wraith, landwalk, combat, blocking]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.14c", text: "A creature with landwalk can’t be blocked as long as the defending player controls at least one land with the specified land type", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{card: Street Wraith, as: sw}]
+    library_pad: 10
+  p1:
+    life: 20
+    battlefield: ["Island @pi", "Thassa's Oracle @o"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@sw", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@o", attacker: "@sw"}], expect_options: {include: ["@o"]}}
+  - advance: {to: combat_damage, of: p0}
+expect:
+  - at: after_script
+    phase: combat_damage
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Street Wraith, tapped: true, damage: 1}]
+    p1:
+      life: 20
+      graveyard: ["Thassa's Oracle"]
+      battlefield: [{card: Island}]
+notes: >
+  With only an Island, swampwalk does nothing and the 1/3 Oracle may block. Street Wraith deals 3 (lethal to the 1/3,
+  destroyed by state-based actions) and takes 1. A single blocker without trample raises no damage assignment decision.
+  p1 takes no damage. Wrong engine: treat swampwalk as unconditional unblockability.

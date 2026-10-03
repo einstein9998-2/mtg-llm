@@ -1,0 +1,12 @@
+[package]
+name = "mtg-diff"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mtg-core = { path = "../../../../rust-engine/crates/mtg-core", features = ["diff-harness"] }
+mtg-view = { path = "../../../../rust-engine/crates/mtg-view", features = ["diff-harness"] }
+mtg-cards = { path = "../../../../rust-engine/crates/mtg-cards" }
+mtg-debug = { path = "../../../../rust-engine/crates/mtg-debug" }
+mtg-fuzz = { path = "../../../../rust-engine/crates/mtg-fuzz" }
+serde_json = "1"

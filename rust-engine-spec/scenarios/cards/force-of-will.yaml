@@ -1,0 +1,184 @@
+id: fow-hard-cast-for-five-mana-pays-no-life-and-exiles-nothing
+title: Force of Will hard cast for {3}{U}{U} costs no life and exiles no card
+area: card
+cards: [Force of Will, Island, Lightning Bolt, Mountain]
+tags: [force-of-will, hard-cast, mana-payment, counterspell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3", "Island @j4", "Island @j5"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", targets: ["@bolt"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1:
+      life: 20
+      exile: []
+      graveyard: [Force of Will]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Without choosing the alternative cost the mana cost {3}{U}{U} is paid: five Islands tap, life stays 20 and nothing is exiled. A wrong engine may charge life or
+  a pitch card in addition to mana.
+---
+id: fow-alt-cost-needs-another-blue-card-not-itself-not-a-red-card
+title: Force of Will's alternative cost cannot exile Force of Will itself or a non-blue card, so with only those in hand it is not castable
+area: card
+cards: [Force of Will, Lightning Bolt, Mountain]
+tags: [force-of-will, alternative-cost, pitch-spell, mask-validity, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Lightning Bolt @bolt2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bolt2", pay_life: 1}, targets: ["@bolt"]}}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@fow", pay_life: 1}, targets: ["@bolt"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bolt"}]
+    pending: {actor: p1, kind: priority}
+    legal:
+      p1:
+        include: [{t: pass}]
+        exclude: [{t: cast, card: "@fow"}]
+    p1: {life: 20, hand: [Force of Will, Lightning Bolt]}
+notes: >
+  Lightning Bolt ({R}) is a red card, not blue. Force of Will is already on the stack as the spell being cast, so it is no longer "in your hand" and cannot
+  be exiled as its own cost. With no mana, no blue card to pitch, the cast is not offered at all. Life stays 20 after both rejected probes.
+---
+id: fow-counters-daze-and-the-island-stays-in-hand
+title: Force of Will in response counters Daze, so Brainstorm resolves normally and the Daze caster keeps the returned Island in hand
+area: card
+cards: [Force of Will, Daze, Brainstorm, Preordain, Ponder, Lightning Bolt, Island]
+tags: [force-of-will, daze, alternative-cost, stack, counterspell, put-back]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Force of Will @fow", "Preordain @pre"]
+    battlefield: ["Island @i1"]
+    library: ["Ponder @pond", "Lightning Bolt @bolt", "Island @top"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bs"]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pre", pay_life: 1}, targets: ["@daze"]}
+  - check:
+      stack: [{kind: spell, card: "@bs"}, {kind: spell, card: "@daze"}, {kind: spell, card: "@fow"}]
+      p0: {life: 19, hand: [], exile: [Preordain]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bs"}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Daze], hand: [Island]}
+      p0: {graveyard: [Force of Will]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@top", "@pond"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@pond", "@top"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Lightning Bolt]
+      graveyard: [Force of Will, Brainstorm]
+      exile: [Preordain]
+      library_top: [Ponder, Island]
+      library_count: 12
+    p1: {hand: [Island], graveyard: [Daze], life: 20}
+notes: >
+  Stack bottom to top: Brainstorm, Daze, Force of Will. p0 receives priority again after p1 passes (Daze cast; 117.3c lets p0 act before Daze resolves). Force
+  of Will counters Daze, which does not require p0 to pay anything; the Island p1 returned as a cost stays in p1's hand. Brainstorm then resolves: p0
+  draws Ponder, Lightning Bolt, Island (hand was empty), puts Island and Ponder back (Ponder on top) and keeps Bolt. The pitched Preordain is exiled
+  and p0 paid 1 life. Library 13 - 3 + 2 = 12.
+---
+id: fow-countered-by-fow-pitch-costs-stay-paid
+title: Force of Will countering Force of Will leaves both pitch costs paid, the countered one gone, and the original spell resolving
+area: card
+cards: [Force of Will, Brainstorm, Preordain, Lightning Bolt, Mountain]
+tags: [force-of-will, alternative-cost, stack, counterspell, costs-are-not-refunded, life-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Force of Will @fow2", "Preordain @pre"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow1", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow1", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow2", alt_cost: {exile_blue_card: "@pre", pay_life: 1}, targets: ["@fow1"]}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}, {kind: spell, card: "@fow1"}, {kind: spell, card: "@fow2"}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Force of Will]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 19, hand: [], exile: [Preordain], graveyard: [Lightning Bolt, Force of Will]}
+    p1: {life: 16, hand: [], exile: [Brainstorm], graveyard: [Force of Will]}
+notes: >
+  p1's Force of Will is countered by p0's, so Lightning Bolt resolves after all: p1 is at 20 - 1 (pitch) - 3 (Bolt) = 16 and p0 at 20 - 1 = 19. Both pitched
+  blue cards stay exiled; countering a spell never refunds its costs.

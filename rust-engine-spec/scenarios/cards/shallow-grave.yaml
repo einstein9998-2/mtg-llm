@@ -1,0 +1,91 @@
+id: shallow-grave-returns-top-creature-card-with-haste
+title: Shallow Grave returns the topmost creature card of the graveyard (skipping a noncreature card above it) and the creature can attack this turn
+area: card
+cards: [Shallow Grave, Griselbrand, Archon of Cruelty, Brainstorm, Swamp, Island]
+tags: [shallow-grave, graveyard-order, reanimation, haste, combat]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Shallow Grave, text: "Return the top creature card of your graveyard to the battlefield. That creature gains haste until end of turn.", verified: true}
+  - {kind: cr, ref: "702.10b", text: "If a creature has haste, it can attack even if it hasn’t been controlled by its controller continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Shallow Grave @sg"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    graveyard: ["Archon of Cruelty @a", "Griselbrand @g", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sg", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: [Archon of Cruelty, Brainstorm, Shallow Grave]
+        battlefield_contains: [{card: Griselbrand, controller: p0, sick: true, keywords: [haste]}]
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@g", target: {player: p1}}], expect_options: {include: ["@g"]}}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Griselbrand, tapped: true}]
+notes: >
+  Setup graveyards are listed bottom to top, so the order is Archon, Griselbrand, Brainstorm (top). The top card is not a
+  creature; the top creature card is Griselbrand, not Archon. No targets are chosen (the card is determined on
+  resolution). Griselbrand is newly controlled but has haste, so it is offered as an attacker. No life is lost. Wrong
+  engines: return the bottom creature, return Brainstorm, let the player choose, or forbid the attack.
+---
+id: shallow-grave-exiles-the-creature-at-the-next-end-step
+title: The creature returned by Shallow Grave is exiled by a delayed trigger at the beginning of the next end step
+area: card
+cards: [Shallow Grave, Griselbrand, Swamp, Island]
+tags: [shallow-grave, delayed-trigger, end-step, exile]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Shallow Grave, text: "Exile it at the beginning of the next end step.", verified: true}
+  - {kind: cr, ref: "603.7c", text: "A delayed triggered ability that refers to a particular object still affects it even if the object changes characteristics.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main2
+  p0:
+    hand: ["Shallow Grave @sg"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    graveyard: ["Griselbrand @g"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sg", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: end, of: p0}
+  - check:
+      stack: [{kind: triggered, controller: p0}]
+      p0: {battlefield_contains: [{card: Griselbrand}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: [Griselbrand]
+      graveyard: [Shallow Grave]
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+notes: >
+  Cast in main2 so no combat decision intervenes. At the beginning of p0's end step the delayed trigger goes on the
+  stack before p0 receives priority (the advance stops there with the trigger on the stack). After it resolves,
+  Griselbrand is in exile, not the graveyard. Wrong engines: exile immediately, at cleanup, or not at all; or move it
+  to the graveyard.

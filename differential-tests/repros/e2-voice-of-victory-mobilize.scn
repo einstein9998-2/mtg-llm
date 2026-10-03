@@ -1,0 +1,19 @@
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see interaction-tests/README.md.
+
+=== voice-of-victory-mobilize
+title: Voice of Victory attacks with two tapped and attacking 1/1 Warrior tokens that are sacrificed at end step
+ref: Voice of Victory Oracle; CR 702.181
+state:
+  humanbattlefield=Voice of Victory
+script:
+  p1: at COMBAT_BEGIN
+  p1: attack Voice of Victory -> p2
+  p1: at COMBAT_DAMAGE
+  p1: check controls p1 "Warrior Token"
+  p1: at END_OF_TURN
+  p1: pass
+  p2: pass
+expect:
+  life p2 == 17
+  not controls p1 "Warrior Token"
+

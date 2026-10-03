@@ -1,0 +1,118 @@
+id: swords-exiles-opponent-creature-controller-gains-power
+title: Swords to Plowshares exiles the opponent's Quantum Riddler and the opponent gains 4 life; noncreature permanents are not legal targets
+area: card
+cards: [Swords to Plowshares, Plains, Quantum Riddler, Lotus Petal, Island]
+tags: [swords-to-plowshares, exile, life-gain, targeting, instant]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Quantum Riddler @qr", "Lotus Petal @petal", "Island @isl"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@stp", targets: ["@petal"]}}
+  - expect_illegal: {p0: {t: cast, card: "@stp", targets: ["@isl"]}}
+  - p0: {t: cast, card: "@stp", targets: ["@qr"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, graveyard: [Swords to Plowshares]}
+    p1:
+      life: 24
+      exile: [Quantum Riddler]
+      graveyard: []
+      battlefield: [{card: Lotus Petal}, {card: Island}]
+notes: >
+  Riddler is 4/6; its controller (p1, not the caster) gains 4. It is exiled, not put into the graveyard. Bugs caught: the
+  caster gaining the life, gaining toughness instead of power, sending the creature to the graveyard, targeting an
+  artifact or land.
+---
+id: swords-life-uses-current-power-with-counters
+title: Swords to Plowshares on Phelia with a +1/+1 counter gives its controller 3 life (power including counters)
+area: card
+cards: [Swords to Plowshares, Plains, "Phelia, Exuberant Shepherd"]
+tags: [swords-to-plowshares, life-gain, counters, power, last-known-information]
+derived_from: cr
+source:
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "122.1a", text: "A +X/+Y counter on a creature or on a creature card in a zone other than the battlefield, where X and Y are numbers, adds X to that object’s power and Y to that object’s toughness.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "if it's no longer in that zone, or if the effect has moved it from a public zone to a hidden zone, the effect uses the object's last known information.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    life: 10
+    battlefield: [{card: "Phelia, Exuberant Shepherd", as: phelia, counters: {"+1/+1": 1}}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@stp", targets: ["@phelia"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {life: 13, exile: ["Phelia, Exuberant Shepherd"], battlefield: []}
+notes: >
+  Phelia is printed 2/2; with one +1/+1 counter her power is 3. The creature is exiled first, then the life is computed
+  from the exiled object's last known information (power 3, counters included), not from the card in exile (2).
+  Bug caught: reading printed power or the power of the card after it left the battlefield.
+---
+id: swords-negative-power-gains-zero-life
+title: Swords to Plowshares on a creature with negative power gives zero life, not a life loss
+area: card
+cards: [Swords to Plowshares, Dismember, Plains, Quantum Riddler]
+tags: [swords-to-plowshares, dismember, negative-power, life-gain, phyrexian-mana]
+derived_from: cr
+source:
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: oracle, card: Dismember, text: "Target creature gets -5/-5 until end of turn.", verified: true}
+  - {kind: cr, ref: "107.1b", text: "If a calculation that would determine the result of an effect yields a negative number, zero is used instead", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dismember @dis", "Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Quantum Riddler @qr"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dis", phyrexian: [life, life], targets: ["@qr"], pay: {tap: ["@pl1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {life: 16}
+      p1: {battlefield: [{card: Quantum Riddler, pt: [-1, 1]}]}
+  - p0: {t: cast, card: "@stp", targets: ["@qr"], pay: {tap: ["@pl2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 16, graveyard: [Dismember, Swords to Plowshares]}
+    p1: {life: 20, exile: [Quantum Riddler], battlefield: []}
+notes: >
+  Dismember paid with {1} (a Plains) and 4 life (p0 20 -> 16) makes Riddler -1/1, which survives (toughness 1). Swords
+  then exiles it; its power is -1, and a player can't gain negative life: 107.1b says zero is used, so p1 stays at 20.
+  Bug caught: p1 losing 1 life (life change by a signed amount).

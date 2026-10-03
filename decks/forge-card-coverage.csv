@@ -1,0 +1,145 @@
+card,forge_script,ai_remove_deck_flag,named_in_forge_unit_tests,decks
+Abrade,a/abrade.txt,,,boros-aggro
+Acererak the Archlich,a/acererak_the_archlich.txt,,,alurentell
+Aether Vial,a/aether_vial.txt,,yes,bw-death-and-taxes
+"Ajani, Nacatl Pariah",a/ajani_nacatl_pariah_ajani_nacatl_avenger.txt,,,boros-aggro
+Aluren,a/aluren.txt,Random,,alurentell
+Amped Raptor,a/amped_raptor.txt,,,boros-aggro
+Ancient Tomb,a/ancient_tomb.txt,Random,,alurentell
+Animate Dead,a/animate_dead.txt,,yes,reanimator
+Archon of Cruelty,a/archon_of_cruelty.txt,,,reanimator
+Arid Mesa,a/arid_mesa.txt,,,boros-aggro;uwx-control
+"Atraxa, Grand Unifier",a/atraxa_grand_unifier.txt,,,alurentell;reanimator
+Badlands,b/badlands.txt,,,reanimator
+Barrowgoyf,b/barrowgoyf.txt,,,dimir-tempo;doomsday
+"Bilbo, Thief in the Night",b/bilbo_thief_in_the_night.txt,,,dimir-tempo
+Bitter Triumph,b/bitter_triumph.txt,,,doomsday
+Bloodstained Mire,b/bloodstained_mire.txt,,yes,dimir-tempo;reanimator
+Boggart Trawler,b/boggart_trawler_boggart_bog.txt,,,bw-death-and-taxes
+"Boseiju, Who Endures",b/boseiju_who_endures.txt,,,alurentell
+Brainstorm,b/brainstorm.txt,,,alurentell;dimir-tempo;doomsday;ur-cutter;uwx-control
+Brazen Borrower,b/brazen_borrower_petty_theft.txt,,,dimir-tempo
+Cabal Therapy,c/cabal_therapy.txt,All,,reanimator
+Carpet of Flowers,c/carpet_of_flowers.txt,All,,alurentell
+Cavern of Souls,c/cavern_of_souls.txt,,,doomsday
+City of Traitors,c/city_of_traitors.txt,All,,alurentell
+"Cloak and Dagger, Entwined",c/cloak_and_dagger_entwined.txt,,,bw-death-and-taxes
+Collective Brutality,c/collective_brutality.txt,,,reanimator
+Consider,c/consider.txt,,,doomsday
+Consign to Memory,c/consign_to_memory.txt,,,alurentell;dimir-tempo;uwx-control
+Containment Priest,c/containment_priest.txt,,,boros-aggro;bw-death-and-taxes;uwx-control
+Cori-Steel Cutter,c/cori_steel_cutter.txt,,,ur-cutter
+Dark Ritual,d/dark_ritual.txt,,yes,doomsday;reanimator
+Daze,d/daze.txt,,,dimir-tempo;doomsday;ur-cutter
+Deafening Silence,d/deafening_silence.txt,Random,,boros-aggro;bw-death-and-taxes
+Defense Grid,d/defense_grid.txt,Random,,alurentell
+Dismember,d/dismember.txt,,,alurentell
+Disruptor Flute,d/disruptor_flute.txt,Random,,alurentell;bw-death-and-taxes
+Doomsday,d/doomsday.txt,All,,doomsday
+Dragon's Rage Channeler,d/dragons_rage_channeler.txt,,,ur-cutter
+Duress,d/duress.txt,,,doomsday
+Edge of Autumn,e/edge_of_autumn.txt,All,,doomsday
+Elegant Parlor,e/elegant_parlor.txt,,,boros-aggro
+Erode,e/erode.txt,,,boros-aggro;bw-death-and-taxes;uwx-control
+Faerie Macabre,f/faerie_macabre.txt,,,alurentell;boros-aggro;bw-death-and-taxes
+Faithless Looting,f/faithless_looting.txt,All,,reanimator
+Fatal Push,f/fatal_push.txt,,yes,dimir-tempo;doomsday
+Flickerwisp,f/flickerwisp.txt,,,bw-death-and-taxes
+Flooded Strand,f/flooded_strand.txt,,yes,alurentell;boros-aggro;bw-death-and-taxes;dimir-tempo;doomsday;ur-cutter;uwx-control
+Flow State,f/flow_state.txt,,,dimir-tempo;doomsday
+Flusterstorm,f/flusterstorm.txt,,,doomsday
+Force of Negation,f/force_of_negation.txt,,,alurentell;dimir-tempo;doomsday;uwx-control
+Force of Will,f/force_of_will.txt,,yes,alurentell;dimir-tempo;doomsday;ur-cutter;uwx-control
+Gaddock Teeg,g/gaddock_teeg.txt,,,boros-aggro
+Goblin Bombardment,g/goblin_bombardment.txt,All,yes,boros-aggro
+Grafdigger's Cage,g/grafdiggers_cage.txt,Random,,bw-death-and-taxes
+Griselbrand,g/griselbrand.txt,,yes,reanimator
+Guide of Souls,g/guide_of_souls.txt,,,boros-aggro
+Hedge Maze,h/hedge_maze.txt,,,alurentell
+Hide on the Ceiling,h/hide_on_the_ceiling.txt,,,doomsday
+Hydroblast,h/hydroblast.txt,Random,,dimir-tempo;ur-cutter;uwx-control
+"Jace, Wielder of Mysteries",j/jace_wielder_of_mysteries.txt,Random,,doomsday
+"Kaito, Bane of Nightmares",k/kaito_bane_of_nightmares.txt,,,dimir-tempo
+Karakas,k/karakas.txt,,,boros-aggro;bw-death-and-taxes
+"Koma, World-Eater",k/koma_world_eater.txt,,,reanimator
+"Lavinia, Azorius Renegade",l/lavinia_azorius_renegade.txt,Random,,uwx-control
+Lazotep Quarry,l/lazotep_quarry.txt,,,boros-aggro
+Lightning Bolt,l/lightning_bolt.txt,,yes,ur-cutter
+Lion's Eye Diamond,l/lions_eye_diamond.txt,All,,doomsday
+Loran of the Third Path,l/loran_of_the_third_path.txt,Random,,bw-death-and-taxes
+Lotus Petal,l/lotus_petal.txt,Random,,alurentell;doomsday;reanimator
+Magus of the Moon,m/magus_of_the_moon.txt,Random,,reanimator
+Marsh Flats,m/marsh_flats.txt,,,boros-aggro;bw-death-and-taxes;reanimator
+Massacre,m/massacre.txt,,,dimir-tempo;reanimator
+Meltdown,m/meltdown.txt,All,,ur-cutter
+Meticulous Archive,m/meticulous_archive.txt,,,uwx-control
+Mishra's Bauble,m/mishras_bauble.txt,All,,dimir-tempo;ur-cutter
+Misty Rainforest,m/misty_rainforest.txt,,,alurentell;doomsday;ur-cutter
+Moonshadow,m/moonshadow.txt,,,dimir-tempo
+Murktide Regent,m/murktide_regent.txt,,,doomsday;ur-cutter;uwx-control
+Nethergoyf,n/nethergoyf.txt,All,,dimir-tempo
+Nihil Spellbomb,n/nihil_spellbomb.txt,Random,,dimir-tempo
+Null Rod,n/null_rod.txt,Random,,dimir-tempo;ur-cutter
+Ocelot Pride,o/ocelot_pride.txt,,,boros-aggro
+Omniscience,o/omniscience.txt,Random,,alurentell
+Orcish Bowmasters,o/orcish_bowmasters.txt,,,bw-death-and-taxes;dimir-tempo
+Overlord of the Balemurk,o/overlord_of_the_balemurk.txt,,,bw-death-and-taxes
+Path to Exile,p/path_to_exile.txt,,yes,bw-death-and-taxes
+Personal Tutor,p/personal_tutor.txt,Random,,doomsday
+"Phelia, Exuberant Shepherd",p/phelia_exuberant_shepherd.txt,,,bw-death-and-taxes;uwx-control
+"Phlage, Titan of Fire's Fury",p/phlage_titan_of_fires_fury.txt,,,boros-aggro
+Plateau,p/plateau.txt,,yes,boros-aggro
+Polluted Delta,p/polluted_delta.txt,,,alurentell;dimir-tempo;doomsday;reanimator;ur-cutter;uwx-control
+Ponder,p/ponder.txt,,,alurentell;dimir-tempo;doomsday;ur-cutter;uwx-control
+Preordain,p/preordain.txt,,,ur-cutter
+Prismari Charm,p/prismari_charm.txt,,,ur-cutter
+Prismatic Ending,p/prismatic_ending.txt,All,,uwx-control
+Prismatic Vista,p/prismatic_vista.txt,,,alurentell;bw-death-and-taxes
+Pyroblast,p/pyroblast.txt,Random,,boros-aggro;ur-cutter;uwx-control
+Pyroclasm,p/pyroclasm.txt,,yes,ur-cutter
+Quantum Riddler,q/quantum_riddler.txt,,,uwx-control
+"Raph & Mikey, Troublemakers",r/raph_mikey_troublemakers.txt,,,reanimator
+Raucous Theater,r/raucous_theater.txt,,,reanimator
+Reanimate,r/reanimate.txt,,,reanimator
+Recruiter of the Guard,r/recruiter_of_the_guard.txt,,,bw-death-and-taxes
+Samwise the Stouthearted,s/samwise_the_stouthearted.txt,,,bw-death-and-taxes
+Sand Scout,s/sand_scout.txt,,,boros-aggro
+Savannah,s/savannah.txt,,,boros-aggro
+Scalding Tarn,s/scalding_tarn.txt,,,doomsday;ur-cutter
+Scrubland,s/scrubland.txt,,,bw-death-and-taxes
+Shadowy Backstreet,s/shadowy_backstreet.txt,,,bw-death-and-taxes
+Shallow Grave,s/shallow_grave.txt,,,reanimator
+Show and Tell,s/show_and_tell.txt,,,alurentell;reanimator
+Skyclave Apparition,s/skyclave_apparition.txt,,,bw-death-and-taxes
+Snow-Covered Island,s/snow_covered_island.txt,,yes,doomsday;uwx-control
+Snow-Covered Plains,s/snow_covered_plains.txt,,,uwx-control
+Snow-Covered Swamp,s/snow_covered_swamp.txt,,,doomsday
+Snuff Out,s/snuff_out.txt,,,dimir-tempo
+Solitude,s/solitude.txt,,,bw-death-and-taxes
+"Spider-Woman, Stunning Savior",s/spider_woman_stunning_savior.txt,,,boros-aggro
+Stifle,s/stifle.txt,All,,uwx-control
+Stock Up,s/stock_up.txt,,,alurentell
+Street Wraith,s/street_wraith.txt,,,doomsday
+Stronghold Gambit,s/stronghold_gambit.txt,All,,reanimator
+Surgical Extraction,s/surgical_extraction.txt,,,bw-death-and-taxes;reanimator;ur-cutter
+Swords to Plowshares,s/swords_to_plowshares.txt,,yes,boros-aggro;bw-death-and-taxes;uwx-control
+"Tamiyo, Inquisitive Student",t/tamiyo_inquisitive_student_tamiyo_seasoned_scholar.txt,,,uwx-control
+Thassa's Oracle,t/thassas_oracle.txt,,,doomsday
+Thoughtseize,t/thoughtseize.txt,,,bw-death-and-taxes;dimir-tempo;doomsday;reanimator
+Thundering Falls,t/thundering_falls.txt,,,ur-cutter
+Triumph of Saint Katherine,t/triumph_of_saint_katherine.txt,,,uwx-control
+Tropical Island,t/tropical_island.txt,,,alurentell
+Tundra,t/tundra.txt,,,uwx-control
+Undercity Sewers,u/undercity_sewers.txt,,,dimir-tempo;doomsday;reanimator
+Underground Sea,u/underground_sea.txt,,,dimir-tempo;doomsday;reanimator
+Unholy Heat,u/unholy_heat.txt,,,ur-cutter
+Unmask,u/unmask.txt,All,,reanimator
+Veil of Summer,v/veil_of_summer.txt,Random,,alurentell
+Verdant Catacombs,v/verdant_catacombs.txt,,,doomsday;reanimator
+Voice of Victory,v/voice_of_victory.txt,,,boros-aggro
+Volcanic Island,v/volcanic_island.txt,,,ur-cutter;uwx-control
+Wasteland,w/wasteland.txt,,,boros-aggro;bw-death-and-taxes;dimir-tempo;ur-cutter;uwx-control
+White Orchid Phantom,w/white_orchid_phantom.txt,,,bw-death-and-taxes
+Windswept Heath,w/windswept_heath.txt,,,boros-aggro
+Witch Enchanter,w/witch_enchanter_witch_blessed_meadow.txt,,,bw-death-and-taxes
+Wrath of the Skies,w/wrath_of_the_skies.txt,All,,bw-death-and-taxes;uwx-control

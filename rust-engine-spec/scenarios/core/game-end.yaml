@@ -1,0 +1,184 @@
+id: one-life-left-after-damage-does-not-lose
+title: A player left at 1 life by Lightning Bolt is still in the game and receives priority
+area: core
+cards: [Lightning Bolt, Mountain]
+tags: [game-end, state-based-actions, life, damage]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 4
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    game: {over: false}
+    priority: p0
+    pending: {actor: p0, kind: priority}
+    stack: []
+    p0: {life: 1}
+notes: >
+  Negative companion of the previous scenario: 4 - 3 = 1, which is above 0, so nothing happens and p0 (active) gets
+  priority. A wrong engine using "life <= 1" or "life < 3" would end the game.
+---
+id: fetchland-at-one-life-is-legal-and-loses-before-the-search
+title: Paying 1 life for a fetchland at 1 life is allowed, and the player loses before the ability resolves
+area: core
+cards: [Polluted Delta, Island]
+tags: [game-end, state-based-actions, life-payment, fetchland, sacrifice-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment. If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    battlefield: ["Polluted Delta @delta"]
+    library: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check: {legal: {p0: {include: [{t: activate, source: "@delta", ability: 0}]}}}
+  - p0: {t: activate, source: "@delta", ability: 0, targets: []}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0: {life: 0}
+notes: >
+  At 1 life the player may pay 1 life (119.4: life total greater than or equal to the payment), so the activation is
+  offered. After the costs are paid p0 has 0 life, and before p0 would get priority again the state-based action
+  704.5a makes p0 lose, so the ability never resolves and the game ends with p1 as the winner. A wrong engine would hide
+  the activation at 1 life ("can't pay life you need") or let the search resolve first.
+---
+id: draw-from-empty-library-loses-in-the-draw-step
+title: A player whose library is empty loses when the draw step makes them draw
+area: core
+cards: [Island]
+tags: [game-end, state-based-actions, empty-library, draw-step]
+derived_from: cr
+source:
+  - {kind: cr, ref: "121.4", text: "A player who attempts to draw a card from a library with no cards in it loses the game the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+  - {kind: cr, ref: "504.1", text: "First, the active player draws a card. This turn-based action doesn't use the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  p0:
+    library: []
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+notes: >
+  p0 has no cards in its library (the setup gives it none and no padding). Passing through the upkeep leads to the draw
+  step, where the turn-based draw is attempted on an empty library; p0 loses at the next state-based-action check, which
+  happens before anyone would receive priority in the draw step. The cards list contains Island only because p1's
+  padding is basic Islands.
+---
+id: draw-three-from-a-two-card-library-loses-even-after-putting-cards-back
+title: Brainstorm with only two cards in the library still loses to the failed third draw, although the put-back refills the library
+area: core
+cards: [Brainstorm, Ponder, Island]
+tags: [game-end, state-based-actions, empty-library, brainstorm, draw, resolution]
+derived_from: cr
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+  - {kind: cr, ref: "121.4", text: "A player who attempts to draw a card from a library with no cards in it loses the game the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, \"Timing and Priority\"), the game checks for any of the listed conditions for state-based actions", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @isl"]
+    library: ["Ponder @pd", "Island @li"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@pd", "@li"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@pd", "@li"]}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+notes: >
+  Brainstorm resolves completely before any state-based check (SBAs are only performed when a player would receive
+  priority, 704.3): p0 draws Ponder and Island, the third draw is attempted on an empty library (704.5b flag), then the
+  two cards in hand (the only two) are put back, so the library has two cards again. At the next check p0 still loses,
+  because the rule is "attempted to draw ... since the last time state-based actions were checked", not "has an empty
+  library". The put-back decisions are still presented (the resolution runs to the end); with exactly two cards in hand
+  the choice of which two is forced but still appears in scenario mode, and the order has two permutations. A wrong
+  engine would stop the resolution at the failed draw, or check the library size at the SBA time and keep the player alive.
+---
+id: simultaneous-loss-of-both-players-is-a-draw
+title: Prismari Charm dealing 1 damage to both players at 1 life each ends the game as a draw
+area: core
+cards: [Prismari Charm, Volcanic Island, Mountain]
+tags: [game-end, draw, simultaneous-loss, state-based-actions, prismari-charm]
+derived_from: cr
+source:
+  - {kind: cr, ref: "104.4a", text: "If all the players remaining in a game lose simultaneously, the game is a draw.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, \"Timing and Priority\"), the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event.", verified: true}
+  - {kind: oracle, card: Prismari Charm, text: "Prismari Charm deals 1 damage to each of one or two targets.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Volcanic Island @vi", "Mountain @m"]
+    library_pad: 10
+  p1:
+    life: 1
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [2], targets: [{player: p0}, {player: p1}], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@charm", controller: p0, modes: [2]}]
+      priority: p0
+      game: {over: false}
+      p0: {life: 1}
+      p1: {life: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, result: draw}
+    p0: {life: 0}
+    p1: {life: 0}
+notes: >
+  Both players are at 1 life. Mode 2 of Prismari Charm ("1 damage to each of one or two targets") targets both players
+  (a player may target themselves). When it resolves both players drop to 0 and the next state-based check makes them lose
+  simultaneously, so the game is a draw (104.4a) and has no winner. {U}{R} is paid with Volcanic Island (U) and Mountain
+  (R). A wrong engine would declare the active player or the caster the loser, or the opponent the winner. The `game`
+  key `result: draw` is assumed, see the report.

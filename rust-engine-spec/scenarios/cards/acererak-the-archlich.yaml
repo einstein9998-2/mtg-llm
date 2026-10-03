@@ -1,0 +1,327 @@
+id: acererak-hardcast-etb-returns-and-ventures
+title: Acererak cast for its mana cost enters, its ETB trigger returns it to hand and ventures; the first venture offers all three dungeons
+area: card
+cards: [Acererak the Archlich, Swamp, Island, Ponder, Brainstorm]
+tags: [acererak, etb-trigger, intervening-if, venture, choose-dungeon, room-ability, scry]
+derived_from: cr
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "701.49a", text: "If a player is instructed to venture into the dungeon while they don't own a dungeon card in the command zone, they choose a dungeon card they own from outside the game and put it into the command zone. They put their venture marker on the topmost room.", verified: true}
+  - {kind: cr, ref: "309.4c", text: "The full text of each room ability is \"When you move your venture marker into this room, [effect.]\" ... Each room ability is controlled by the player who owns the dungeon card that is that ability's source.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is ... If the ability triggers, it checks the stated condition again as it resolves.", verified: true}
+  - {kind: cr, ref: "701.22a", text: "To \"scry N\" means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Lost Mine of Phandelver, Cave Entrance: Scry 1. (dungeon room text, reference/oracle.json dungeons section)", verified: false, note: "dungeon room text is pinned in oracle.json but the validator accepts verified oracle sources only for cards; see REPORT schema-requests"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library: ["Ponder @pd", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@acer", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: etb-on-stack
+    check:
+      stack: [{kind: triggered, source: "@acer", controller: p0, text_contains: "return Acererak"}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: Acererak the Archlich, sick: true}], hand_count: 0, command: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_dungeon, answer: Lost Mine of Phandelver, expect_options: {count: 3, include: [Lost Mine of Phandelver, Dungeon of the Mad Mage, Tomb of Annihilation]}}
+  - label: room-on-stack
+    check:
+      stack: [{kind: triggered, controller: p0, text_contains: "Scry 1"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        hand: [Acererak the Archlich]
+        command: [{dungeon: Lost Mine of Phandelver, room: Cave Entrance}]
+        battlefield: [{card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: scry, to_bottom: ["@pd"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich]
+      library_top: [Brainstorm]
+      library_bottom: [Ponder]
+      command: [{dungeon: Lost Mine of Phandelver, room: Cave Entrance}]
+      completed_dungeons: []
+      graveyard: []
+notes: >
+  Acererak ({2}{B}) is paid with three Swamps. On resolution it enters, the ETB trigger's intervening-if is true (no Tomb
+  completed), so it triggers and waits on the stack with Acererak on the battlefield (anyone may respond there). On
+  resolution it returns Acererak to hand first, then ventures (608.2c, order written): no dungeon is in the command zone,
+  so p0 chooses one of the three dungeons (all three offered, the engine never pre-selects) and the marker goes on the
+  topmost room; putting the marker into Cave Entrance triggers its room ability (309.4c), controlled by p0, which goes on
+  the stack before p0 gets priority. Scry 1 then sends Ponder under the 10 padding Islands. Bugs caught: venturing before
+  the return, auto-choosing a dungeon, offering fewer than three, no room trigger for the topmost room, Acererak staying.
+---
+id: acererak-no-etb-trigger-after-tomb-completed
+title: With Tomb of Annihilation completed, Acererak's ETB does not trigger at all and Acererak stays on the battlefield
+area: card
+cards: [Acererak the Archlich, Swamp]
+tags: [acererak, intervening-if, completed-dungeon, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: cr, ref: "309.7", text: "A player completes a dungeon as that dungeon card is removed from the game.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    completed_dungeons: [Tomb of Annihilation]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield_contains: [{card: Acererak the Archlich, pt: [5, 5], sick: true}]
+      command: []
+      completed_dungeons: [Tomb of Annihilation]
+notes: >
+  The intervening-if is checked when Acererak enters; it is false, so the ability never triggers (603.4): the stack is
+  empty right after the spell resolves, p0 is not asked to choose a dungeon, and Acererak stays as a 5/5. A wrong engine
+  puts the trigger on the stack anyway (and only fizzles it on resolution), or bounces Acererak.
+---
+id: acererak-etb-still-bounces-if-only-lost-mine-completed
+title: Completing Lost Mine of Phandelver does not stop Acererak's bounce; only Tomb of Annihilation counts
+area: card
+cards: [Acererak the Archlich, Aluren, Swamp]
+tags: [acererak, intervening-if, completed-dungeon, aluren, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Aluren @alu", "Swamp @s1"]
+    completed_dungeons: [Lost Mine of Phandelver]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@acer", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_dungeon, answer: Dungeon of the Mad Mage, expect_options: {include: [Dungeon of the Mad Mage, Tomb of Annihilation]}}
+expect:
+  - at: after_script
+    stack: [{kind: triggered, controller: p0, text_contains: "gain 1 life"}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich]
+      command: [{dungeon: Dungeon of the Mad Mage, room: Yawning Portal}]
+      completed_dungeons: [Lost Mine of Phandelver]
+notes: >
+  The condition names Tomb of Annihilation only; another completed dungeon is irrelevant. An engine that tracks a single
+  "completed a dungeon" flag instead of the named per-player record would leave Acererak on the battlefield. The
+  choose_dungeon mask is checked only for the two dungeons not yet completed: whether an already completed dungeon can be
+  chosen again is an open question (REPORT ambiguities), so the scenario asserts nothing about Lost Mine in the mask.
+  Free cast via Aluren (no mana spent).
+---
+id: acererak-intervening-if-rechecked-on-resolution
+title: Acererak's ETB trigger does nothing on resolution if Tomb of Annihilation was completed while it waited (second Acererak, legend rule)
+area: card
+cards: [Acererak the Archlich, Aluren, The Atropal]
+tags: [acererak, intervening-if, legend-rule, venture, dungeon-completion, state-based-actions, aluren, flash]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.4", text: "If the ability triggers, it checks the stated condition again as it resolves. If the condition isn't true at that time, the ability is removed from the stack and does nothing.", verified: true}
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners' graveyards.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority ... the game checks for any of the listed conditions for state-based actions ... otherwise all triggered abilities that are waiting to be put on the stack are put on the stack", verified: true}
+  - {kind: cr, ref: "309.6", text: "If a player's venture marker is on the bottommost room of a dungeon card, and that dungeon card isn't the source of a room ability that has triggered but not yet left the stack, the dungeon card's owner removes it from the game.", verified: true}
+  - {kind: cr, ref: "309.7", text: "A player completes a dungeon as that dungeon card is removed from the game.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Tomb of Annihilation: Oubliette leads to Cradle of the Death God; Cradle of the Death God: Create The Atropal, a legendary 4/4 black God Horror creature token with deathtouch.", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 6
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @a1", "Acererak the Archlich @a2"]
+    battlefield: ["Aluren @alu"]
+    command: [{dungeon: Tomb of Annihilation, room: Oubliette}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@a1", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@a1", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: cast, card: "@a2", alt_cost: {free: aluren}}
+    note: "Aluren lets the second copy be cast with the first trigger on the stack"
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: legend_rule, keep: "@a2"}
+  - label: two-etb-triggers
+    check:
+      stack:
+        - {kind: triggered, source: "@a1", controller: p0}
+        - {kind: triggered, source: "@a2", controller: p0}
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Acererak the Archlich], battlefield_contains: [{card: Acererak the Archlich}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: cradle-on-stack
+    check:
+      stack:
+        - {kind: triggered, source: "@a1", controller: p0}
+        - {kind: triggered, controller: p0, text_contains: "The Atropal"}
+      p0:
+        hand: [Acererak the Archlich]
+        command: [{dungeon: Tomb of Annihilation, room: Cradle of the Death God}]
+        completed_dungeons: []
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: tomb-completed
+    check:
+      stack: [{kind: triggered, source: "@a1", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        command: []
+        completed_dungeons: [Tomb of Annihilation]
+        battlefield_contains: [{token: The Atropal, pt: [4, 4], keywords: [deathtouch]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Acererak the Archlich]
+      graveyard: [Acererak the Archlich]
+      command: []
+      completed_dungeons: [Tomb of Annihilation]
+      battlefield:
+        - {card: Aluren}
+        - {token: The Atropal, pt: [4, 4]}
+notes: >
+  a1 enters and its ETB trigger (T1) waits. a2 is cast through Aluren with T1 on the stack; when a2 enters its own ETB (T2)
+  triggers (Tomb still not completed), then the legend rule (a state-based action, before triggers go on the stack) makes p0
+  keep one: p0 keeps a2 so a1 goes to the graveyard. T2 resolves first (top): a2 returns to hand and the venture moves the
+  marker from Oubliette to Cradle (single arrow). While the Cradle trigger waits or is on the stack, 309.6 does not remove
+  the dungeon. After it resolves (The Atropal is created) the state-based action removes Tomb and p0 completes it. T1 then
+  resolves: its intervening-if is checked again and is false, so it is removed and does nothing: no venture (no
+  choose_dungeon decision, command zone stays empty) and nothing returns. Keeping a2 is deliberate: keeping a1 would make
+  T2 resolve with its source gone, which is an open question (REPORT ambiguities). Bugs caught: no re-check on resolution,
+  completing Tomb while its room trigger is on the stack, a1's trigger venturing into a new dungeon.
+---
+id: acererak-attack-opponent-without-creature-gets-no-prompt
+title: An opponent with no creature cannot sacrifice, so p0 gets the Zombie without any prompt
+area: card
+cards: [Acererak the Archlich, Swamp, Island, Zombie Token]
+tags: [acererak, attack-trigger, opponent-choice, mask-validity, token]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "Whenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "A player can't sacrifice something that isn't a permanent, or something that's a permanent they don't control.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Acererak the Archlich @acer", "Swamp @s1"]
+    completed_dungeons: [Tomb of Annihilation]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@acer", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    phase: declare_attackers
+    p0:
+      battlefield:
+        - {card: Acererak the Archlich, tapped: true}
+        - {card: Swamp}
+        - {token: Zombie Token, pt: [2, 2]}
+    p1: {battlefield: [{card: Island}], graveyard: []}
+notes: >
+  p1 controls no creature, so sacrificing is impossible and the "unless" option must not be offered (no yes_no for p1; the
+  next decision is p0's priority). The Island is not a creature and is not a candidate. Bugs caught: an empty
+  sacrifice prompt, a prompt that lets p1 decline without a creature, no Zombie.
+---
+id: acererak-legend-rule-when-it-stays
+title: With Tomb completed, a second Acererak cast through Aluren stays too and the legend rule makes p0 keep one
+area: card
+cards: [Acererak the Archlich, Aluren]
+tags: [acererak, legend-rule, completed-dungeon, aluren, state-based-actions]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners' graveyards.", verified: true}
+  - {kind: cr, ref: "603.4", text: "The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+setup:
+  turn: 8
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @a2"]
+    battlefield: ["Aluren @alu", "Acererak the Archlich @a1"]
+    completed_dungeons: [Tomb of Annihilation]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@a2", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: legend_rule, keep: "@a1", expect_options: {include: ["@a1", "@a2"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Aluren}, {card: Acererak the Archlich, sick: false}]
+      graveyard: [Acererak the Archlich]
+      hand: []
+      command: []
+notes: >
+  No ETB trigger (Tomb completed), so the only event is the legend rule: p0 chooses which copy stays. Keeping the old one
+  (not summoning sick) shows the choice is p0's and is honoured. Bugs caught: auto-keeping the newest copy, no choice, a
+  phantom ETB trigger.

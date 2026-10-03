@@ -1,0 +1,41 @@
+id: ponder-reorder-shuffle-then-draw-scripted
+title: Ponder lets p0 order the top three, optionally shuffle, then draw; a scripted shuffle decides the card drawn
+area: card
+cards: [Ponder, "Atraxa, Grand Unifier", Island, Aluren, Brainstorm]
+tags: [ponder, shuffle, random, library-order, optional, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ponder, text: "Look at the top three cards of your library, then put them back in any order. You may shuffle.", verified: true}
+  - {kind: oracle, card: Ponder, text: "Draw a card.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ponder @pd"]
+    battlefield: ["Island @isl"]
+    library: ["Atraxa, Grand Unifier @atx", "Island @is1", "Aluren @al", "Brainstorm @bs"]
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Brainstorm, "Atraxa, Grand Unifier", Island, Aluren]}
+script:
+  - p0: {t: cast, card: "@pd", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: order_cards, purpose: ponder_top, answer: ["@al", "@atx", "@is1"], expect_options: {count: 3}}
+  - p0: {decision: yes_no, purpose: ponder_shuffle, answer: true}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      graveyard: [Ponder]
+      library_count: 3
+      library_top: ["Atraxa, Grand Unifier", Island, Aluren]
+notes: >
+  The ordering is irrelevant after a shuffle; choosing to shuffle consumes exactly one scripted shuffle event, whose
+  result puts Brainstorm on top, which the draw then takes (hand: Brainstorm). Answering "no" instead would have drawn
+  Aluren, the first card of the chosen order (see the ordering answer). The shuffle happens before the draw.

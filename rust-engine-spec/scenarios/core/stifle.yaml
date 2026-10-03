@@ -1,0 +1,238 @@
+id: stifle-wasteland-land-already-sacrificed-target-survives
+title: "Stifle on Wasteland's ability: Wasteland is already sacrificed, its target land is not destroyed"
+area: core
+cards: [Wasteland, Stifle, Volcanic Island, Island]
+tags: [stifle, wasteland, counter-ability, costs, no-refund, sacrifice-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn't get a \"refund\" of any costs that were paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Volcanic Island @volc", "Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@w", ability: 1, targets: ["@volc"]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@w", nth: 0}], pay: {tap: ["@j1"]}}
+  - check:
+      stack:
+        - {kind: activated, source: "@w", controller: p0}
+        - {kind: spell, card: "@stifle", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Wasteland], battlefield: []}
+    p1:
+      graveyard: [Stifle]
+      battlefield: [{card: Volcanic Island, tapped: false}, {card: Island, tapped: true}]
+notes: >
+  The sacrifice was a cost, so Wasteland is in the graveyard before Stifle is even cast, and the countering does not give
+  it back. The ability never resolves, so Volcanic Island survives untapped. Catches an engine that returns the cost
+  payment, or that resolves the destroy anyway.
+---
+id: stifle-mishras-bauble-no-draw-because-delayed-trigger-never-created
+title: "Stifle on Mishra's Bauble's ability: the Bauble is already sacrificed and no card is ever drawn, because the delayed trigger is created on resolution"
+area: core
+cards: [Mishra's Bauble, Stifle, Island, Ponder]
+tags: [stifle, mishras-bauble, delayed-triggers, counter-ability, costs, no-refund, upkeep]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "603.7a", text: "Delayed triggered abilities are created during the resolution of spells or abilities, as the result of a replacement effect being applied, or as a result of a static ability that allows a player to take an action. A delayed triggered ability won't trigger until it has actually been created, even if its trigger event occurred just beforehand.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn't get a \"refund\" of any costs that were paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @bauble"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bauble", ability: 0, targets: [{player: p0}]}
+  - check:
+      stack:
+        - {kind: activated, source: "@bauble", controller: p0}
+      p0: {graveyard: [Mishra's Bauble], battlefield: []}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@bauble", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {hand_count: 0, graveyard: [Mishra's Bauble], library_count: 11}
+  - advance: {to: upkeep, of: p1}
+  - check:
+      turn: 4
+      stack: []
+      p0: {hand_count: 0, library_count: 11}
+  - advance: {to: upkeep, of: p0}
+expect:
+  - at: after_script
+    turn: 5
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand_count: 0, library_top: [Ponder], graveyard: [Mishra's Bauble]}
+notes: >
+  The whole ability is countered (701.6a: none of its effects occur). "Draw a card at the beginning of the next turn's
+  upkeep" is the second sentence of the same ability: it creates a delayed triggered ability when the ability resolves
+  (603.7a), so a countered ability never creates it. The Bauble is already gone as a cost (701.6b). Therefore no draw trigger
+  appears at turn 4's upkeep (the "next turn") nor at turn 5's upkeep, and p0's hand stays empty at both upkeeps (the
+  draw-step draw has not happened yet). The "look at the top card" part is also countered; it is not observable as state.
+  Catches an engine that registers the delayed trigger at activation time instead of at resolution.
+---
+id: stifle-drc-trigger-spell-stays-on-stack
+title: "Stifle on Dragon's Rage Channeler's surveil trigger: no surveil, the spell that caused it is untouched"
+area: core
+cards: [Dragon's Rage Channeler, Brainstorm, Stifle, Island, Lightning Bolt]
+tags: [stifle, drc, triggers, counter-ability, surveil, stack]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Island @i1"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@drc", nth: 0}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bs", controller: p0}
+        - {kind: triggered, source: "@drc", controller: p0}
+        - {kind: spell, card: "@stifle", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@bs", controller: p0}
+    pending: {actor: p0, kind: priority}
+    p0: {library_top: [Lightning Bolt], graveyard: []}
+    p1: {graveyard: [Stifle]}
+notes: >
+  Stifle counters only the trigger; Brainstorm stays on the stack and p0 gets priority again with it (117.3b). No surveil
+  decision. Catches an engine whose Stifle also counters the spell below, or that skips the surveil only visually.
+---
+id: stifle-flurry-trigger-no-monk
+title: "Stifle on Cori-Steel Cutter's flurry trigger: no Monk token is created"
+area: core
+cards: [Cori-Steel Cutter, Lightning Bolt, Stifle, Mountain, Island]
+tags: [stifle, cori-steel-cutter, flurry, triggers, counter-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Flurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@cutter", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@b1", controller: p0}
+      - {kind: spell, card: "@b2", controller: p0}
+    pending: {actor: p0, kind: priority}
+    p0:
+      spells_cast_this_turn: 2
+      battlefield: [{card: Cori-Steel Cutter}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+    p1: {graveyard: [Stifle]}
+notes: >
+  The flurry trigger is countered, so no Monk token and no attach prompt. The two Bolts remain on the stack, and the spell
+  count is still 2 (countering the trigger does not undo the casts). The battlefield stays exactly Cutter and two tapped
+  Mountains. Catches an engine that creates the token as part of triggering rather than on resolution.
+---
+id: stifle-acererak-etb-trigger-acererak-stays
+title: "Stifle on Acererak's enters trigger: Acererak stays on the battlefield and p0 does not venture"
+area: core
+cards: [Acererak the Archlich, Stifle, Swamp, Island]
+tags: [stifle, acererak, triggers, counter-ability, etb, venture]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @ace"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ace", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: triggered, source: "@ace", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@ace", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield_contains: [{card: Acererak the Archlich, controller: p0}]
+      command: []
+    p1: {graveyard: [Stifle]}
+notes: >
+  Acererak resolves and its enters trigger goes on the stack; the active player p0 receives priority after the spell
+  resolves and passes, so p1 can cast Stifle on the trigger. With the trigger countered Acererak neither returns to hand
+  nor ventures: no dungeon enters the command zone and no choose_dungeon decision appears. Catches an engine that
+  implements the return and venture as part of the permanent entering instead of as a stack trigger.

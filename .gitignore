@@ -1,0 +1,22 @@
+# Build output
+target/
+**/target/
+__pycache__/
+*.pyc
+*.swp
+
+# Result dumps, game logs and trained artifacts (regenerate; see docs)
+*.jsonl.gz
+*.tsv
+**/runs/
+llm-player/runs/
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+
+# Secrets (the sealed holdout key must never be committed)
+*.key
+*.pem
+.env
+holdout-key*

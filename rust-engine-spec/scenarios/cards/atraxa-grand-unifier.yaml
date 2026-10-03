@@ -1,0 +1,246 @@
+id: atraxa-hardcast-keywords-and-reveal-ten-one-per-type
+title: Hard-cast Atraxa enters as a 7/7 flying vigilance deathtouch lifelink legend and its ETB lets p0 take one card per card type from the top ten
+area: card
+cards: ["Atraxa, Grand Unifier", Forest, Plains, Island, Swamp, Mountain, Ancient Tomb, Lotus Petal, Faerie Macabre, Brainstorm, Aluren, Ponder, Stock Up, Veil of Summer, Force of Will, Show and Tell]
+tags: [atraxa, etb-trigger, reveal, library-bottom, random-order, one-per-card-type, hard-cast]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "Flying, vigilance, deathtouch, lifelink", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "When Atraxa enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order.", verified: true}
+  - {kind: cr, ref: "205.2a", text: "The card types are artifact, battle, conspiracy, creature, dungeon, enchantment, instant, kindred, land, phenomenon, plane, planeswalker, scheme, sorcery, and vanguard.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+  - {kind: cr, ref: "401.4", text: "If an effect puts two or more cards in a specific position in a library at the same time, the owner of those cards may arrange them in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Atraxa, Grand Unifier @atx"]
+    battlefield: ["Forest @f", "Plains @p", "Island @i", "Swamp @s", "Ancient Tomb @tomb", "Mountain @m"]
+    library: ["Lotus Petal @lp", "Faerie Macabre @fm", "Brainstorm @bs", "Aluren @al", "Island @is1", "Ponder @pd", "Stock Up @su", "Veil of Summer @vs", "Force of Will @fow", "Show and Tell @st"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@atx", pay: {tap: ["@f", "@p", "@i", "@s", "@tomb", "@m"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@atx", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        life: 18
+        battlefield_contains:
+          - {card: "Atraxa, Grand Unifier", types: [Creature], supertypes: [Legendary], pt: [7, 7], keywords: [flying, vigilance, deathtouch, lifelink], sick: true}
+  - resolve_top: true
+  - p0:
+      decision: choose_cards
+      purpose: atraxa_hand
+      answer: ["@lp", "@fm", "@fow", "@al", "@is1", "@pd"]
+      expect_options: {include: ["@lp", "@fm", "@bs", "@al", "@is1", "@pd", "@su", "@vs", "@fow", "@st"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      spells_cast_this_turn: 1
+      hand: [Lotus Petal, Faerie Macabre, Force of Will, Aluren, Island, Ponder]
+      library_count: 14
+      library_bottom_multiset: [Brainstorm, Stock Up, Veil of Summer, Show and Tell]
+notes: >
+  Cost {3}{G}{W}{U}{B} = 7 mana: Forest G, Plains W, Island U, Swamp B, Ancient Tomb {C}{C} and Mountain {R} cover the
+  three generic; the Tomb costs 2 life (18). The ten revealed cards: artifact (Lotus Petal), creatures (Faerie Macabre),
+  instants (Brainstorm, Veil of Summer, Force of Will), enchantment (Aluren), land (Island), sorceries (Ponder, Stock
+  Up, Show and Tell). One card per type is taken: Petal, Macabre, Force of Will, Aluren, Island, Ponder. The other
+  four go to the bottom in random order (so only the multiset is asserted); the 10 padding Islands stay on top, so
+  library_count is 10 + 4 = 14. No planeswalker or battle among the revealed cards, so no choice for those types.
+---
+id: atraxa-etb-fewer-than-ten-cards-in-library
+title: Atraxa's ETB with only four cards in the library reveals all four
+area: card
+cards: ["Atraxa, Grand Unifier", Show and Tell, Island, Brainstorm, Lightning Bolt, Lotus Petal]
+tags: [atraxa, show-and-tell, etb-trigger, reveal, short-library]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "When Atraxa enters, reveal the top ten cards of your library.", verified: true}
+  - {kind: cr, ref: "609.3", text: "If an effect attempts to do something impossible, it does only as much as possible.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Brainstorm @bs", "Lightning Bolt @bolt", "Island @is1", "Lotus Petal @lp"]
+  p1:
+    hand: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@atx"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: atraxa_hand, answer: ["@bs", "@is1", "@lp"], expect_options: {include: ["@bs", "@bolt", "@is1", "@lp"], count: 4}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm, Island, Lotus Petal]
+      library_count: 1
+      library_top: [Lightning Bolt]
+      library_bottom: [Lightning Bolt]
+notes: >
+  Only four cards exist, so "the top ten" is those four (609.3: do as much as possible). One card per type: Brainstorm
+  (instant; the Bolt is a second instant and cannot also be taken), Island, Lotus Petal. The leftover Bolt goes to the
+  bottom, which is also the top of the one-card library. Whether a random event is consumed for a single leftover card is
+  not asserted (random: any).
+---
+id: atraxa-etb-stifled-nothing-revealed
+title: Stifle on Atraxa's enters trigger leaves Atraxa on the battlefield and reveals nothing
+area: card
+cards: ["Atraxa, Grand Unifier", Show and Tell, Island, Stifle]
+tags: [atraxa, show-and-tell, etb-trigger, stifle, counter-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "When Atraxa enters, reveal the top ten cards of your library.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle", "Island @ph"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@atx"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - check:
+      stack: [{kind: triggered, source: "@atx", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@atx", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand_count: 0
+      library_count: 10
+      battlefield_contains: [{card: "Atraxa, Grand Unifier"}]
+    p1:
+      graveyard: [Stifle]
+      hand: [Island]
+notes: >
+  The ETB is a triggered ability on the stack, so Stifle can counter it: no cards are revealed, nothing moves, p0's
+  library keeps its 10 cards. Atraxa herself stays on the battlefield. p1 holds a land card so that Show and Tell's
+  simultaneous choice exists for p1 (p1 answers "nothing").
+---
+id: atraxa-legend-rule-etb-still-resolves
+title: A second Atraxa put in by Show and Tell dies to the legend rule but its enters trigger still resolves
+area: card
+cards: ["Atraxa, Grand Unifier", Show and Tell, Island]
+tags: [atraxa, show-and-tell, legend-rule, etb-trigger, state-based-actions]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners' graveyards. This is called the \"legend rule.\"", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack ... the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority ... the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event.", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "When Atraxa enters, reveal the top ten cards of your library.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @a2"]
+    battlefield: ["Atraxa, Grand Unifier @a1", "Island @i1", "Island @i2", "Island @i3"]
+    library: ["Island @is1"]
+    library_pad: 10
+  p1:
+    hand: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@a2"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - p0: {decision: legend_rule, keep: "@a1", expect_options: {include: ["@a1", "@a2"]}}
+  - check:
+      stack: [{kind: triggered, source: "@a2", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: [Show and Tell, "Atraxa, Grand Unifier"]
+        battlefield_contains: [{card: "Atraxa, Grand Unifier", alias: a1}]
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: atraxa_hand, answer: ["@is1"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: [Show and Tell, "Atraxa, Grand Unifier"]
+      battlefield_contains: [{card: "Atraxa, Grand Unifier", alias: a1}]
+      library_count: 10
+notes: >
+  The legend rule is a state-based action performed before triggers are put on the stack (704.3), so p0 chooses which
+  Atraxa to keep (keeping the original @a1) and the new one goes to the graveyard; its already-triggered enters ability
+  still goes on the stack and resolves (it does not depend on its source). All ten revealed cards are Islands, so only
+  one (land) may be taken; library: 11 - 10 revealed + 9 returned to the bottom = 10.
+---
+id: atraxa-etb-bottom-order-unknown-to-everyone
+title: After Atraxa's reveal the owner knows no positions in their library, since the bottom order was random
+area: hidden-info
+cards: ["Atraxa, Grand Unifier", Show and Tell, Island, Acererak the Archlich, Faerie Macabre, Containment Priest, Lightning Bolt, Brainstorm, Tropical Island, Lotus Petal, Aluren, Ponder]
+tags: [atraxa, show-and-tell, reveal, random-order, library-knowledge, hidden-info]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "Put the rest on the bottom of your library in a random order.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true, note: "analogy only: random order means no player knows it"}
+observer: p0
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Acererak the Archlich @ac", "Faerie Macabre @fm", "Containment Priest @cp", "Lightning Bolt @bolt", "Brainstorm @bs", "Island @is1", "Tropical Island @ti", "Lotus Petal @lp", "Aluren @al", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    hand: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@atx"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: atraxa_hand, answer: []}
+expect:
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_count: 20, library_known_top: [], library_known_bottom: []}
+      opp: {hand_count: 1}
+notes: >
+  The ten revealed cards' identities are public, but their order on the bottom is random, so the owner (observer p0)
+  must not be told any positions (design doc 02 section 6: random-order bottoming gives no position knowledge).
+  Asserts library_known_bottom is empty (SCHEMA addenda): an engine that records the revealed order as known bottom
+  positions fails.

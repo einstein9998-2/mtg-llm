@@ -1,0 +1,248 @@
+id: omniscience-casts-atraxa-free
+title: Omniscience lets its controller cast Atraxa (mana value 7) from hand without paying its mana cost
+area: card
+cards: [Omniscience, "Atraxa, Grand Unifier"]
+tags: [omniscience, alternative-cost, free-cast]
+derived_from: cr
+source:
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: cr, ref: "118.9", text: "Alternative costs are usually phrased, \"You may [action] rather than pay [this object's] mana cost,\" or \"You may cast [this object] without paying its mana cost.\"", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Atraxa, Grand Unifier @atx"]
+    battlefield: ["Omniscience @omni"]
+    library_pad: 15
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@atx", alt_cost: {free: omniscience}}
+  - check:
+      stack: [{kind: spell, card: "@atx", controller: p0}]
+      p0: {mana_pool: {}, spells_cast_this_turn: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: triggered, source: "@atx", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield: [{card: Omniscience}, {card: "Atraxa, Grand Unifier", pt: [7, 7], sick: true}]
+notes: >
+  No mana source exists, so only the Omniscience permission makes the cast legal. Atraxa's ETB trigger is left on the
+  stack (its resolution is another batch's subject).
+---
+id: omniscience-does-not-cover-cards-in-exile
+title: Omniscience does not make a card exiled by Runestone Caverns free; it can still be cast by paying its cost
+area: card
+cards: [Omniscience, Acererak the Archlich, Lightning Bolt, Island, Ponder, Volcanic Island]
+tags: [omniscience, zone-restriction, play-from-exile, venture, mad-mage, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Dungeon of the Mad Mage, Runestone Caverns: Exile the top two cards of your library. You may play them.", verified: false, note: "dungeon room text from reference/oracle.json dungeons section"}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Omniscience @omni", "Volcanic Island @volc"]
+    command: [{dungeon: Dungeon of the Mad Mage, room: Lost Level}]
+    library: ["Lightning Bolt @bolt", "Island @isl", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", alt_cost: {free: omniscience}}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_room, answer: Runestone Caverns, expect_options: {exact: [Runestone Caverns, Muiral's Graveyard]}}
+  - resolve_top: true
+  - check:
+      p0: {exile: [Lightning Bolt, Island], hand: [Acererak the Archlich]}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", alt_cost: {free: omniscience}, targets: [{player: p1}]}}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      exile: [Island]
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Omniscience}, {card: Volcanic Island, tapped: true}]
+    p1: {life: 17}
+notes: >
+  Omniscience covers spells cast from hand only. Acererak from hand is free (the loop works with Omniscience at sorcery
+  speed); the Bolt in exile is castable through Runestone Caverns' permission, but only by paying {R}.
+---
+id: omniscience-no-flash-but-paying-normally-allowed
+title: Omniscience gives no flash (a creature cannot be cast with a spell on the stack) and does not force free casting (Bolt paid normally)
+area: card
+cards: [Omniscience, Lightning Bolt, "Spider-Woman, Stunning Savior", Volcanic Island]
+tags: [omniscience, timing, flash, optional-permission, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+  - {kind: cr, ref: "118.9b", text: "Alternative costs are generally optional.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Spider-Woman, Stunning Savior @sw"]
+    battlefield: ["Omniscience @omni", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - expect_illegal: {p0: {t: cast, card: "@sw", alt_cost: {free: omniscience}}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bolt", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Spider-Woman, Stunning Savior"]
+      battlefield: [{card: Omniscience}, {card: Volcanic Island, tapped: true}]
+notes: >
+  The Bolt was paid with {R} although Omniscience was available ("may"). With Bolt on the stack, Spider-Woman cannot be
+  cast: Omniscience changes the cost, not the timing. Contrast with Aluren, which grants flash.
+---
+id: omniscience-force-of-will-free-not-combined-with-pitch
+title: Force of Will cast through Omniscience costs nothing (no life, no exiled card); Omniscience and the pitch cost cannot be combined
+area: card
+cards: [Omniscience, Force of Will, Brainstorm, Lightning Bolt, Volcanic Island]
+tags: [omniscience, alternative-cost, one-alternative-cost, force-of-will, counterspell]
+derived_from: cr
+source:
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it's being cast.", verified: true}
+  - {kind: cr, ref: "601.2b", text: "A player can't apply two alternative methods of casting or two alternative costs to a single spell.", verified: true}
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Omniscience @omni"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@fow", alt_cost: {free: omniscience, exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}}
+  - p0: {t: cast, card: "@fow", alt_cost: {free: omniscience}, targets: ["@bolt"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {life: 20, hand: [Brainstorm], graveyard: [Force of Will], exile: []}
+    p1: {graveyard: [Lightning Bolt]}
+notes: >
+  Omniscience works at instant speed for an instant (it changes only the cost). Bugs caught: still charging 1 life or a
+  blue card, or allowing both permissions on one spell. p1 is active, so p1 receives priority after Force resolves.
+---
+id: omniscience-free-cast-still-pays-defense-grid
+title: On the opponent's turn, Force of Will cast through Omniscience still costs {3} under Defense Grid
+area: card
+cards: [Omniscience, Defense Grid, Force of Will, Lightning Bolt, Island, Volcanic Island]
+tags: [omniscience, defense-grid, cost-increase, alternative-cost]
+derived_from: cr
+source:
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow"]
+    battlefield: ["Omniscience @omni", "Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island @volc", "Defense Grid @dg"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - check:
+      p1: {battlefield: [{card: Volcanic Island, tapped: true}, {card: Defense Grid}]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow", alt_cost: {free: omniscience}, targets: ["@bolt"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 20
+      graveyard: [Force of Will]
+      battlefield: [{card: Omniscience}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1: {graveyard: [Lightning Bolt]}
+notes: >
+  p1's Bolt on p1's own turn pays only {R} (no tax for p1). p0's free Force on p1's turn costs exactly {3}: all three
+  Islands tap. Bug caught: "without paying its mana cost" skipping cost increases.
+---
+id: show-and-tell-puts-omniscience-in-without-casting-it
+title: Show and Tell puts Omniscience onto the battlefield without casting it; Atraxa is then cast free
+area: card
+cards: [Show and Tell, Omniscience, "Atraxa, Grand Unifier", Island]
+tags: [omniscience, show-and-tell, put-onto-battlefield, not-cast, free-cast, simultaneous-secret-choice]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Omniscience @omni", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 15
+  p1:
+    hand: ["Island @pisl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@omni"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - label: omniscience-in
+    check:
+      stack: []
+      p0:
+        spells_cast_this_turn: 1
+        battlefield_contains: [{card: Omniscience}]
+        graveyard: [Show and Tell]
+      p1: {hand: [Island], battlefield: []}
+  - p0: {t: cast, card: "@atx", alt_cost: {free: omniscience}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: triggered, source: "@atx", controller: p0}]
+    p0:
+      spells_cast_this_turn: 2
+      hand: []
+      battlefield_contains: [{card: Omniscience}, {card: "Atraxa, Grand Unifier"}]
+notes: >
+  Omniscience ({7}{U}{U}{U}) was never cast: only Show and Tell and Atraxa count as spells cast (a wrong engine counts 3 or
+  treats Omniscience as a spell that could have been countered). p1 chose to put nothing in.

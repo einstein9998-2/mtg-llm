@@ -1,0 +1,270 @@
+PASS      00-smoke.scn/smoke-bolt-face  Lightning Bolt to the face
+PASS      00-smoke.scn/smoke-fow-bolt  Force of Will pitching Brainstorm counters Lightning Bolt
+PASS      10-cutter-vs-alurentell-a.scn/fow-alt-pitch-counters-stock-up  Force of Will pitching a blue card counters Stock Up (alt cost: 1 life + exile a blue card)
+PASS      10-cutter-vs-alurentell-a.scn/fow-alt-needs-other-blue-card  Force of Will alt cost is unavailable if the only blue card in hand is itself
+PASS      10-cutter-vs-alurentell-a.scn/fow-alt-cannot-pitch-nonblue  Force of Will cannot exile a non-blue card as its alternative cost
+PASS      10-cutter-vs-alurentell-a.scn/fow-alt-at-one-life  Force of Will alt cost can be paid at exactly 1 life (the player then loses)
+PASS      10-cutter-vs-alurentell-a.scn/fow-hard-cast  Force of Will cast for its mana cost does not cost life or a card
+PARTIAL   10-cutter-vs-alurentell-a.scn/daze-return-island-counters  Daze returning an Island counters a spell whose controller cannot pay {1}
+         ~ picks never asked by the engine: ["pick no"]
+PASS      10-cutter-vs-alurentell-a.scn/daze-paid-resolves  Daze does nothing if the spell's controller pays {1}
+PARTIAL   10-cutter-vs-alurentell-a.scn/daze-returns-tapped-island  Daze can return a tapped Island
+         ~ picks never asked by the engine: ["pick no"]
+PARTIAL   10-cutter-vs-alurentell-a.scn/daze-returns-dual-with-island-type  Daze can return Volcanic Island (it has the Island subtype)
+         ~ picks never asked by the engine: ["pick no"]
+PASS      10-cutter-vs-alurentell-a.scn/daze-needs-an-island  Daze alt cost unavailable when the only lands are not Islands
+PARTIAL   10-cutter-vs-alurentell-a.scn/daze-vs-aluren-free-creature  Daze can counter a creature cast for free with Aluren; unpayable, so the creature is countered
+         ~ picks never asked by the engine: ["pick no"]
+PASS      10-cutter-vs-alurentell-a.scn/veil-of-summer-uncounterable  Veil of Summer in response to Force of Will: Stock Up resolves and Veil draws a card (opponent cast a blue spell)
+PASS      10-cutter-vs-alurentell-a.scn/veil-of-summer-no-draw-without-blue-or-black-spell  Veil of Summer draws no card if the opponent cast no blue or black spell this turn
+PASS      10-cutter-vs-alurentell-a.scn/veil-of-summer-hexproof-from-blue-not-red  Veil of Summer gives hexproof from blue: a blue spell cannot target Atraxa but a red spell can
+PASS      10-cutter-vs-alurentell-a.scn/show-and-tell-both-put-in  Show and Tell: both players put a permanent from hand onto the battlefield (Atraxa vs Murktide Regent)
+PARTIAL   10-cutter-vs-alurentell-a.scn/show-and-tell-only-legal-types  Show and Tell: instants and sorceries cannot be put onto the battlefield (only artifact, creature, enchantment, land)
+         ~ expectation trace not supported on the Rust side
+         ~ expectation trace not supported on the Rust side
+PASS      10-cutter-vs-alurentell-a.scn/show-and-tell-land  Show and Tell may put a land card (Ancient Tomb) onto the battlefield
+PASS      10-cutter-vs-alurentell-a.scn/show-and-tell-veil-protects-vs-fow  Veil of Summer makes Show and Tell uncounterable; both players still put a permanent in
+PASS      10-cutter-vs-alurentell-a.scn/show-and-tell-omniscience-then-free-spells  Show and Tell puts Omniscience in; afterwards a spell from hand is cast for free
+PASS      11-cutter-vs-alurentell-b.scn/aluren-free-cast-any-time-p1  Aluren: its controller casts Acererak (MV 3) for free at instant speed during the opponent's turn
+PASS(xf)  11-cutter-vs-alurentell-b.scn/aluren-opponent-may-cast-free  Aluren: the OPPONENT (no lands) casts Dragon's Rage Channeler for free at instant speed
+PASS(xf)  11-cutter-vs-alurentell-b.scn/aluren-seat-order-second-seat-controller  Aluren with the seats swapped (p1 is second in Forge's player list): its controller p1 casts Dragon's Rage Channeler for free
+PASS      11-cutter-vs-alurentell-b.scn/aluren-seat-order-first-seat-opponent  Aluren with the seats swapped: the OPPONENT p2 (first in Forge's player list) can cast for free
+PASS      11-cutter-vs-alurentell-b.scn/aluren-mv-limit-four  Aluren does not let a player cast a creature with mana value above 3 for free (Murktide Regent MV 7, Atraxa MV 7)
+PASS      11-cutter-vs-alurentell-b.scn/aluren-noncreature-not-free  Aluren does not make noncreature spells free (Brainstorm cast with no mana fails)
+PASS      11-cutter-vs-alurentell-b.scn/aluren-creature-card-in-graveyard  Aluren gives no permission to cast creature cards from the graveyard (Dragon's Rage Channeler in graveyard)
+PASS      11-cutter-vs-alurentell-b.scn/aluren-creature-card-in-exile  Aluren gives no permission to cast creature cards from exile
+PASS      11-cutter-vs-alurentell-b.scn/aluren-creature-card-top-of-library  Aluren gives no permission to cast the creature card on top of the library
+PASS      11-cutter-vs-alurentell-b.scn/aluren-opponent-hand-not-castable  Aluren: a player cannot cast creature cards from the OPPONENT's hand
+PASS      11-cutter-vs-alurentell-b.scn/acererak-loop-lost-mine  Acererak with Aluren: each free cast returns it to hand and ventures; Lost Mine rooms Cave Entrance -> Goblin Lair -> Dark Pool
+PASS      12-cutter-vs-alurentell-c.scn/acererak-tomb-completed-stays  Acererak with Aluren through Tomb of Annihilation: Trapped Entry -> Veils of Fear -> Sandfall Cell -> Cradle of the Death God; after completion Acererak stays on the battlefield
+PASS      12-cutter-vs-alurentell-c.scn/acererak-attack-zombie-unless-sacrifice  Acererak attacks: the opponent makes a 2/2 Zombie for you unless they sacrifice a creature
+PASS      12-cutter-vs-alurentell-c.scn/atraxa-reveal-ten-one-of-each-type  Atraxa: reveal ten, put one card of each type into hand (creature, land, artifact, enchantment, instant, sorcery), rest on the bottom
+PASS      12-cutter-vs-alurentell-c.scn/atraxa-reveal-ten-library-shorter  Atraxa with fewer than ten cards in library reveals all of them
+PASS      12-cutter-vs-alurentell-c.scn/atraxa-keywords  Atraxa: flying, vigilance, deathtouch, lifelink combat (blocks and gains life from damage dealt)
+PASS      12-cutter-vs-alurentell-c.scn/omniscience-free-cast-from-hand  Omniscience: Atraxa cast from hand without paying its mana cost; no mana spent
+PASS      12-cutter-vs-alurentell-c.scn/omniscience-free-force-of-will-no-pitch  Omniscience: Force of Will cast for free from hand counters a spell with no life paid and no card exiled
+PASS      12-cutter-vs-alurentell-c.scn/omniscience-not-instant-speed-for-creatures  Omniscience does not grant flash: Atraxa cannot be cast for free on the opponent's turn
+PASS      12-cutter-vs-alurentell-c.scn/omniscience-and-aluren-both  With Omniscience and Aluren, a creature spell (MV 3) can be cast free at instant speed (Aluren) while Atraxa (MV 7) only at sorcery speed (Omniscience)
+PASS      13-cutter-vs-alurentell-d.scn/cutter-flurry-second-spell-makes-monk  Cori-Steel Cutter: the second spell each turn creates a 1/1 Monk with prowess (first and third spells do not)
+PASS      13-cutter-vs-alurentell-d.scn/cutter-flurry-attach-optional  Cori-Steel Cutter flurry: the Cutter may be attached to the new Monk, making it 2/2 with trample and haste
+PASS      13-cutter-vs-alurentell-d.scn/cutter-flurry-counts-countered-spells  Flurry triggers on cast, so a countered second spell still makes a Monk
+PASS      13-cutter-vs-alurentell-d.scn/cutter-flurry-opponent-turn-spells-count  Flurry counts spells cast in the opponent's turn: two instants during p2's turn create a Monk
+PASS      13-cutter-vs-alurentell-d.scn/murktide-delve-counters  Murktide Regent: delving away five cards with three instants/sorceries gives three +1/+1 counters (6/6)
+PASS      13-cutter-vs-alurentell-d.scn/murktide-delve-only-nonspells-no-counters  Murktide Regent: delving a land and a creature gives no counters (3/3)
+PASS      13-cutter-vs-alurentell-d.scn/murktide-grows-when-instant-leaves-graveyard  Murktide Regent on the battlefield gets a counter whenever an instant or sorcery card leaves your graveyard (second Murktide delving a Bolt)
+PARTIAL   13-cutter-vs-alurentell-d.scn/murktide-needs-colored-mana  Delve cannot pay for {U}{U}: Murktide Regent cannot be cast with one blue source and a full graveyard
+         ~ picks never asked by the engine: ["pick all"]
+PASS      13-cutter-vs-alurentell-d.scn/drc-delirium-needs-four-types  Dragon's Rage Channeler: 4 card types in the graveyard make it 3/3 flying; only 3 types do not
+PASS      13-cutter-vs-alurentell-d.scn/drc-three-types-no-delirium  Dragon's Rage Channeler with only three card types in the graveyard stays 1/1
+PASS      13-cutter-vs-alurentell-d.scn/drc-surveil-on-noncreature-spell  Dragon's Rage Channeler surveils 1 when you cast a noncreature spell, not a creature spell
+PASS      13-cutter-vs-alurentell-d.scn/unholy-heat-delirium  Unholy Heat deals 6 with delirium (kills Acererak 5/5) and only 2 without
+PASS      13-cutter-vs-alurentell-d.scn/unholy-heat-no-delirium  Unholy Heat without delirium deals only 2 damage (Acererak survives)
+PASS      13-cutter-vs-alurentell-d.scn/prismari-charm-two-targets-damage  Prismari Charm mode 2: 1 damage to each of two targets (a Dragon's Rage Channeler and a Recruiter of the Guard, both 1/1, die)
+PASS      13-cutter-vs-alurentell-d.scn/prismari-charm-bounce  Prismari Charm mode 3: bounce target nonland permanent
+PASS      13-cutter-vs-alurentell-d.scn/prismari-charm-surveil-draw  Prismari Charm mode 1: surveil 2 then draw a card
+PASS      13-cutter-vs-alurentell-d.scn/wasteland-kills-ancient-tomb  Wasteland destroys a nonbasic land (Ancient Tomb)
+PASS      13-cutter-vs-alurentell-d.scn/wasteland-cannot-target-basic  Wasteland cannot target a basic land (Island, and Snow-Covered Island)
+PASS      13-cutter-vs-alurentell-d.scn/wasteland-hits-dual-with-basic-types  Wasteland can destroy Tropical Island (nonbasic, though it has basic land types)
+PASS      13-cutter-vs-alurentell-d.scn/wasteland-in-response-tomb-still-taps  In response to Wasteland, the target land can still be tapped for mana; the mana is usable
+PASS      13-cutter-vs-alurentell-d.scn/ancient-tomb-damage  Ancient Tomb deals 2 damage to its controller when tapped for mana (Stock Up paid with Tomb + Island)
+PASS(xf)  13-cutter-vs-alurentell-d.scn/ancient-tomb-lethal-tap  Tapping Ancient Tomb at 2 life is legal (the controller dies); Forge's AI payment code refuses to do it
+PASS      13-cutter-vs-alurentell-d.scn/city-of-traitors-played-land  City of Traitors is sacrificed when you play another land
+PASS      13-cutter-vs-alurentell-d.scn/city-of-traitors-fetch-is-not-play  A fetchland putting a land onto the battlefield is not "playing" a land: City of Traitors stays
+PASS      13-cutter-vs-alurentell-d.scn/lotus-petal-mana  Lotus Petal sacrificed for blue mana pays for Brainstorm
+PASS      13-cutter-vs-alurentell-d.scn/mishra-bauble-delayed-draw  Mishra's Bauble: look at the top card now, draw at the beginning of the next turn's upkeep (opponent's upkeep)
+PASS      13-cutter-vs-alurentell-d.scn/brainstorm-put-back-two  Brainstorm: draw three, put two on top of library
+PASS      13-cutter-vs-alurentell-d.scn/stock-up-chooses-two-of-five  Stock Up: look at the top five, put two into hand, the rest on the bottom
+PASS      20-dimir-vs-uwx.scn/stifle-fetchland-activation  Stifle counters a fetchland's activated ability (land is sacrificed as a cost, nothing is fetched)
+PASS      20-dimir-vs-uwx.scn/stifle-bowmasters-trigger  Stifle on the Bowmasters ETB trigger stops the damage and the Orc Army
+PASS      20-dimir-vs-uwx.scn/bowmasters-etb-damage-and-amass  Bowmasters ETB deals 1 damage to any target and amasses Orcs 1 (an Orc Army token with one +1/+1 counter)
+PARTIAL   20-dimir-vs-uwx.scn/bowmasters-triggers-on-extra-draw-not-draw-step  Bowmasters does not trigger on the opponent's draw-step draw, but does on a second draw (Brainstorm gives three)
+         ~ expectation draws not supported on the Rust side
+PASS      20-dimir-vs-uwx.scn/consign-counters-trigger  Consign to Memory counters a triggered ability (Bowmasters ETB)
+PASS      20-dimir-vs-uwx.scn/consign-counters-colorless-spell  Consign to Memory counters a colorless spell (Mishra's Bauble)
+PARTIAL   20-dimir-vs-uwx.scn/consign-cannot-target-colored-spell  Consign to Memory cannot target a colored spell (Fatal Push)
+         ~ expectation trace not supported on the Rust side
+PASS      20-dimir-vs-uwx.scn/consign-replicate-copies  Consign to Memory replicate creates a copy that is not cast (the spell count stays 1) and the trigger is still countered
+PASS      20-dimir-vs-uwx.scn/force-of-negation-free-on-opponents-turn  Force of Negation exiles a blue card to counter a noncreature spell for free on the opponent's turn, and exiles the spell
+PASS      20-dimir-vs-uwx.scn/force-of-negation-no-free-on-own-turn  Force of Negation's alternative cost is unavailable on its controller's own turn
+PASS      20-dimir-vs-uwx.scn/force-of-negation-cannot-hit-creature  Force of Negation cannot target a creature spell
+PARTIAL   20-dimir-vs-uwx.scn/daze-counter-unless-pays-one  Daze counters a spell unless its controller pays {1}; paying with an untapped land saves it
+         ~ expectation log not supported on the Rust side
+PASS      20-dimir-vs-uwx.scn/daze-return-island-cost  Daze's alternative cost returns an Island you control to hand (the Island is a cost, not an effect)
+PASS      20-dimir-vs-uwx.scn/nethergoyf-power-counts-card-types  Nethergoyf's power equals the number of card types in your graveyard (creature, instant, land = 3, so 3/4)
+PASS      20-dimir-vs-uwx.scn/nethergoyf-power-ignores-opponent-graveyard  Nethergoyf counts only its controller's graveyard
+PASS      20-dimir-vs-uwx.scn/barrowgoyf-counts-all-graveyards  Barrowgoyf counts card types in all graveyards (instant, creature, land across both = 3)
+PASS      20-dimir-vs-uwx.scn/nethergoyf-escape  Nethergoyf can escape from the graveyard exiling cards with four or more card types among them
+PASS      20-dimir-vs-uwx.scn/moonshadow-enters-with-six-counters  Moonshadow enters as a 1/1 (seven-seven with six -1/-1 counters)
+PASS      20-dimir-vs-uwx.scn/moonshadow-loses-counter-on-permanent-to-graveyard  Moonshadow removes a -1/-1 counter when a permanent card is put into your graveyard
+PASS      20-dimir-vs-uwx.scn/moonshadow-not-for-instants  Moonshadow ignores instant and sorcery cards going to the graveyard
+PASS      20-dimir-vs-uwx.scn/fatal-push-no-revolt-kills-cmc-two  Fatal Push without revolt kills a creature with mana value 2 or less but not a mana value 3 one
+PASS      20-dimir-vs-uwx.scn/fatal-push-revolt-kills-cmc-four  Fatal Push with revolt (a permanent left the battlefield this turn) kills a mana value 3 creature
+PASS      20-dimir-vs-uwx.scn/snuff-out-alt-cost-needs-swamp  Snuff Out's free alternative cost (4 life) requires a Swamp
+PASS      20-dimir-vs-uwx.scn/snuff-out-pays-four-life  Snuff Out with a Swamp pays 4 life and destroys a nonblack creature
+PASS      20-dimir-vs-uwx.scn/snuff-out-cannot-target-black  Snuff Out cannot target a black creature (Nethergoyf)
+PASS      20-dimir-vs-uwx.scn/thoughtseize-takes-nonland  Thoughtseize makes the opponent discard a nonland card of the caster's choice and costs 2 life
+PASS      20-dimir-vs-uwx.scn/thoughtseize-cannot-take-land  Thoughtseize cannot take a land even if the hand is all lands (still costs life)
+PASS      21-uwx-and-dimir-cards.scn/swords-exiles-and-gains-life  Swords to Plowshares exiles the creature and its controller gains life equal to its power
+PASS      21-uwx-and-dimir-cards.scn/prismatic-ending-converge-two-colors  Prismatic Ending with X=2 paid with W and U (two colors) exiles a mana value 2 permanent
+PASS      21-uwx-and-dimir-cards.scn/prismatic-ending-single-color-cannot-hit-two  Prismatic Ending paid with one color (all Plains) cannot exile a mana value 2 permanent
+PASS      21-uwx-and-dimir-cards.scn/murktide-delve-exiles-and-counts-instants  Murktide Regent delving away two instants and a land enters with two +1/+1 counters (only instants and sorceries count)
+PASS      21-uwx-and-dimir-cards.scn/quantum-riddler-warp-from-hand  Quantum Riddler warp {1}{U}: cast from hand for the warp cost, it is exiled at the next end step and can be cast later from exile
+PARTIAL   21-uwx-and-dimir-cards.scn/quantum-riddler-draws-extra-with-low-hand  Quantum Riddler draws an extra card when you would draw and have one or fewer cards in hand (Brainstorm draws four)
+         ~ expectation draws not supported on the Rust side
+PASS      21-uwx-and-dimir-cards.scn/tamiyo-flips-on-third-draw  Tamiyo, Inquisitive Student flips on the controller's third draw of the turn (Brainstorm after a draw step)
+PASS      21-uwx-and-dimir-cards.scn/phelia-attack-flickers-opponents-permanent  Phelia exiles an opponent's permanent when attacking and it returns under its owner's control at end step with no counter for Phelia
+PASS      21-uwx-and-dimir-cards.scn/phelia-resets-counters-on-flickered-card  A permanent exiled and returned by Phelia comes back as a new object (Moonshadow gets its six -1/-1 counters again)
+PASS      21-uwx-and-dimir-cards.scn/brazen-borrower-petty-theft  Petty Theft returns target nonland permanent an opponent controls to its owner's hand
+PASS      21-uwx-and-dimir-cards.scn/brazen-borrower-cast-from-exile-after-adventure  After Petty Theft resolves the Borrower is exiled on an adventure and can be cast as a creature
+PASS      21-uwx-and-dimir-cards.scn/flow-state-takes-one  Flow State with no instant and sorcery pair in the graveyard puts one of the top three into hand
+FAIL      21-uwx-and-dimir-cards.scn/flow-state-takes-two-with-instant-and-sorcery  Flow State takes two cards when an instant and a sorcery are in your graveyard
+         - zone p1 hand size == 2   <-- size is 1: ["Brainstorm"]
+         - zone p1 hand has "Ponder"   <-- not found; zone has ["Brainstorm"]
+           | p1 cast Flow State  => option 1
+           | p1 pass
+           | p2 pass
+           |    [p1 decision ChooseCards { purpose: LookTake, remaining: 1 } options ["Island", "Brainstorm", "Ponder"]]
+           | p1 pick Brainstorm;Ponder for ChooseCards { purpose: LookTake, remaining: 1 } among ["Island", "Brainstorm", "Ponder"]
+           |    [p1 decision ChooseCards { purpose: OrderBottom, remaining: 2 } options ["Island", "Ponder"]]
+           |    [final p1 life 20] hand=["Brainstorm"] battlefield=["Island", "Island"] graveyard=["Brainstorm", "Lightning Bolt", "Flow State"] exile=[] library=["Island", "Island", "Island", "Ponder", "Island"]
+           |    [final p2 life 20] hand=[] battlefield=[] graveyard=[] exile=[] library=["Island", "Island", "Island", "Island", "Island", "Island"]
+           |    [final turn 3 step Main1 stack 0]
+PASS      21-uwx-and-dimir-cards.scn/kaito-ninjutsu-returns-attacker  Kaito's ninjutsu returns an unblocked attacker to hand and puts Kaito onto the battlefield attacking
+PASS      21-uwx-and-dimir-cards.scn/kaito-is-creature-on-own-turn-only  Kaito is a 3/4 hexproof Ninja creature only during his controller's turn
+PASS      21-uwx-and-dimir-cards.scn/kaito-not-creature-on-opponents-turn  Kaito is not a creature on the opponent's turn
+PASS      21-uwx-and-dimir-cards.scn/wasteland-destroys-nonbasic  Wasteland destroys a nonbasic land but cannot target a basic
+PASS      21-uwx-and-dimir-cards.scn/wasteland-cannot-target-basic  Wasteland cannot target a basic land
+PASS      21-uwx-and-dimir-cards.scn/snow-covered-basic-is-basic  Wasteland cannot target a Snow-Covered Island (it is a basic land)
+PARTIAL   21-uwx-and-dimir-cards.scn/force-of-will-vs-stifle-on-own-spell-no-interaction  Stifle cannot target a spell (only abilities)
+         ~ expectation trace not supported on the Rust side
+PASS      21-uwx-and-dimir-cards.scn/phelia-own-permanent-gets-counter  Phelia flickering the controller's own permanent puts a +1/+1 counter on Phelia (it returns under her controller's control)
+PASS      22-boros-vs-bw-dnt.scn/spider-woman-opponent-creature-enters-tapped  With Spider-Woman out, an opponent's creature (Phelia, flashed in) enters tapped
+PASS      22-boros-vs-bw-dnt.scn/spider-woman-opponent-artifact-enters-tapped  With Spider-Woman out, an opponent's artifact (Aether Vial) enters tapped
+PASS      22-boros-vs-bw-dnt.scn/spider-woman-own-creature-untapped  Spider-Woman only taps opponents' creatures: the controller's own creature enters untapped
+PASS      22-boros-vs-bw-dnt.scn/spider-woman-aether-vial-creature-enters-tapped  A creature put onto the battlefield with Aether Vial still enters tapped under Spider-Woman
+PASS      22-boros-vs-bw-dnt.scn/aether-vial-cannot-be-countered  A creature put onto the battlefield with Aether Vial uses no stack and cannot be countered
+PASS      22-boros-vs-bw-dnt.scn/aether-vial-wrong-mana-value  Aether Vial with two charge counters offers a mana value 2 creature but not a mana value 3 one
+PASS      22-boros-vs-bw-dnt.scn/phlage-etb-sacrificed-unless-escaped  Phlage cast from hand deals 3 damage, gains 3 life, then is sacrificed
+PASS      22-boros-vs-bw-dnt.scn/phlage-escape-stays  Phlage cast with escape (exile five other cards) stays on the battlefield
+PASS      22-boros-vs-bw-dnt.scn/phlage-escape-needs-five-other-cards  Phlage cannot escape with only four other cards in the graveyard
+PASS      22-boros-vs-bw-dnt.scn/goblin-bombardment-sacrifice-damage  Goblin Bombardment sacrifices a creature as a cost and deals 1 damage to any target
+PASS      22-boros-vs-bw-dnt.scn/goblin-bombardment-in-response-to-removal  Sacrificing a creature to Bombardment in response to Swords means no lifegain from Swords
+PASS      22-boros-vs-bw-dnt.scn/voice-of-victory-blocks-opponent-spells-on-my-turn  Voice of Victory stops the opponent casting spells during its controller's turn (Solitude evoke is refused)
+PASS      22-boros-vs-bw-dnt.scn/voice-of-victory-allows-spells-on-opponents-turn  Voice of Victory does not stop the opponent casting spells during the opponent's own turn
+PASS      22-boros-vs-bw-dnt.scn/voice-of-victory-mobilize  Voice of Victory attacks with two tapped and attacking 1/1 Warrior tokens that are sacrificed at end step
+PASS      22-boros-vs-bw-dnt.scn/ocelot-pride-end-step-cat  Ocelot Pride makes a 1/1 Cat at your end step if you gained life this turn
+PASS      22-boros-vs-bw-dnt.scn/ocelot-pride-with-lifegain  Ocelot Pride creates a Cat at end step after lifegain (Phlage's 3 life)
+PASS      22-boros-vs-bw-dnt.scn/ocelot-pride-city-blessing-copies-tokens  With the city's blessing Ocelot Pride copies each token that entered this turn (Guide of Souls gives the lifegain, Ajani makes a token)
+PASS      22-boros-vs-bw-dnt.scn/ajani-etb-token  Ajani, Nacatl Pariah makes a 2/1 Cat Warrior token when it enters
+PASS      22-boros-vs-bw-dnt.scn/ajani-flips-when-cat-dies  Ajani transforms into a planeswalker when another Cat you control dies
+PASS      22-boros-vs-bw-dnt.scn/sand-scout-fetches-desert  Sand Scout fetches a Desert (Lazotep Quarry) tapped when an opponent controls more lands
+PASS      22-boros-vs-bw-dnt.scn/sand-scout-no-fetch-when-not-behind  Sand Scout does not fetch when the opponent does not control more lands
+PASS      22-boros-vs-bw-dnt.scn/sand-scout-wasteland-makes-token  Sand Scout makes a Sand Warrior when a land card goes to your graveyard (sacrificed Wasteland)
+PASS      22-boros-vs-bw-dnt.scn/sand-scout-triggers-once-per-turn  Sand Scout's token trigger happens only once each turn even if two lands hit the graveyard
+PARTIAL   22-boros-vs-bw-dnt.scn/guide-of-souls-lifegain-and-energy  Guide of Souls gains 1 life and an energy counter when another creature enters
+         ~ expectation log not supported on the Rust side
+PASS      22-boros-vs-bw-dnt.scn/amped-raptor-free-spell-from-top  Amped Raptor cast from hand exiles from the top until a nonland and may cast it paying energy equal to its mana value
+PASS      22-boros-vs-bw-dnt.scn/karakas-bounces-legendary  Karakas returns a legendary creature (Samwise) to its owner's hand
+PASS      22-boros-vs-bw-dnt.scn/karakas-cannot-bounce-nonlegendary  Karakas cannot target a nonlegendary creature (Ocelot Pride)
+PASS      22-boros-vs-bw-dnt.scn/elegant-parlor-enters-tapped  Elegant Parlor enters tapped and surveils 1
+PASS      22-boros-vs-bw-dnt.scn/solitude-etb-exile-and-lifegain  Solitude cast normally exiles a creature, whose controller gains life equal to its power, and stays on the battlefield with lifelink
+PASS      22-boros-vs-bw-dnt.scn/solitude-evoke-exiles-and-sacrifices  Evoked Solitude exiles a white card from hand, its ETB exiles a creature, and it is sacrificed
+PASS      22-boros-vs-bw-dnt.scn/solitude-evoke-needs-other-white-card  Solitude's evoke cost cannot exile Solitude itself and needs another white card
+PASS      22-boros-vs-bw-dnt.scn/skyclave-apparition-exiles-and-leaves-illusion  Skyclave Apparition exiles a mana value 3 permanent; when it leaves, the owner gets a 3/3 Illusion token
+PARTIAL   22-boros-vs-bw-dnt.scn/skyclave-apparition-mana-value-cap  Skyclave Apparition cannot exile a permanent with mana value 5 or more
+         ~ picks never asked by the engine: ["pick !Omniscience"]
+PASS      22-boros-vs-bw-dnt.scn/skyclave-apparition-leaves-gives-token  When Skyclave Apparition dies, the exiled card's owner creates an X/X Illusion where X is its mana value
+PASS      22-boros-vs-bw-dnt.scn/flickerwisp-returns-at-end-step  Flickerwisp exiles another target permanent, which returns at the beginning of the next end step
+PASS      22-boros-vs-bw-dnt.scn/flickerwisp-exiled-token-gone  A token (Orc Army) exiled by Flickerwisp ceases to exist and does not return
+PASS      22-boros-vs-bw-dnt.scn/flickerwisp-on-skyclave-returns-card  Flickering Skyclave Apparition's exiled card: the old exile does not return; the Apparition's leave trigger gives an Illusion
+PARTIAL   22-boros-vs-bw-dnt.scn/cloak-and-dagger-exiles-nonland-until-leaves  Cloak and Dagger exiles a nonland card from the opponent's hand until it leaves the battlefield
+         ~ picks never asked by the engine: ["pick p2", "pick Lightning Bolt"]
+PARTIAL   22-boros-vs-bw-dnt.scn/cloak-and-dagger-returns-card-when-removed  When Cloak and Dagger leaves the battlefield the exiled card returns to its owner's hand
+         ~ pick never matched a decision: pick p2
+         ~ pick never matched a decision: pick Lightning Bolt
+PASS      22-boros-vs-bw-dnt.scn/overlord-impending-is-not-a-creature  Overlord of the Balemurk cast for its impending cost enters as a non-creature with five time counters
+PASS      22-boros-vs-bw-dnt.scn/overlord-etb-mills-four-and-returns-creature  Overlord of the Balemurk mills four and may return a creature card (not an Avatar) to hand
+PASS      22-boros-vs-bw-dnt.scn/overlord-time-counter-removed-end-step  Impending Overlord loses a time counter at the beginning of its controller's end step
+PARTIAL   22-boros-vs-bw-dnt.scn/samwise-returns-permanent-that-died-this-turn  Samwise returns a permanent card put into your graveyard from the battlefield this turn, then the Ring tempts you
+         ~ expectation log not supported on the Rust side
+PARTIAL   22-boros-vs-bw-dnt.scn/samwise-ignores-cards-not-from-battlefield  Samwise cannot return a card that went to the graveyard from hand (discarded) this turn
+         ~ picks never asked by the engine: ["pick !Phelia, Exuberant Shepherd"]
+PASS      22-boros-vs-bw-dnt.scn/white-orchid-phantom-destroys-nonbasic  White Orchid Phantom destroys a nonbasic land; the land's controller may fetch a basic tapped
+PARTIAL   22-boros-vs-bw-dnt.scn/white-orchid-phantom-cannot-target-basic  White Orchid Phantom cannot target a basic land
+         ~ picks never asked by the engine: ["pick !Plains"]
+PASS      22-boros-vs-bw-dnt.scn/recruiter-of-the-guard-finds-toughness-two  Recruiter of the Guard searches for a creature with toughness 2 or less and puts it into hand
+PASS      22-boros-vs-bw-dnt.scn/witch-enchanter-destroys-artifact  Witch Enchanter destroys target artifact an opponent controls
+PASS      22-boros-vs-bw-dnt.scn/boggart-trawler-exiles-graveyard  Boggart Trawler's ETB exiles target player's graveyard
+PASS      23-doomsday-and-reanimator.scn/doomsday-keeps-five-exiles-rest  Doomsday lets you choose five cards from library and graveyard, exiles the rest, and you lose half your life rounded up
+PASS      23-doomsday-and-reanimator.scn/doomsday-pile-order  Doomsday puts the chosen five on top in the order chosen
+PASS      23-doomsday-and-reanimator.scn/doomsday-life-rounds-up  Doomsday at 7 life costs 4 (half rounded up), leaving 3
+PARTIAL   23-doomsday-and-reanimator.scn/doomsday-fewer-than-five-cards  Doomsday with a four-card library and graveyard total keeps all of them
+         ~ picks never asked by the engine: ["pick all"]
+PASS      23-doomsday-and-reanimator.scn/doomsday-countered-by-fow-no-life-loss  A countered Doomsday costs no life and exiles nothing
+PASS      23-doomsday-and-reanimator.scn/thassa-oracle-wins-with-empty-library  Thassa's Oracle wins the game when the controller's library is empty (X >= cards in library)
+PASS      23-doomsday-and-reanimator.scn/thassa-oracle-no-win-with-large-library  Thassa's Oracle does not win while the library has more cards than the devotion to blue (2)
+PASS      23-doomsday-and-reanimator.scn/thassa-oracle-wins-at-exact-devotion  Thassa's Oracle wins with exactly two cards in library (devotion 2 from its own UU)
+PASS      23-doomsday-and-reanimator.scn/thassa-oracle-pile-bottoms-extra  Thassa's Oracle keeps one chosen card on top and sends the rest to the bottom
+PASS      23-doomsday-and-reanimator.scn/cavern-of-souls-makes-creature-uncounterable  Cavern of Souls (naming Merfolk) mana makes Thassa's Oracle uncounterable: Force of Will cannot counter it
+PASS      23-doomsday-and-reanimator.scn/jace-draws-from-empty-library-win  Jace, Wielder of Mysteries wins the game if you would draw with an empty library
+PARTIAL   23-doomsday-and-reanimator.scn/lion-eye-diamond-mana  Lion's Eye Diamond discards the hand and gives three mana of one color
+         ~ pick never matched a decision: pick black
+PASS      23-doomsday-and-reanimator.scn/dark-ritual-adds-bbb  Dark Ritual adds BBB
+PASS      23-doomsday-and-reanimator.scn/street-wraith-cycling-life  Street Wraith cycles for 2 life instead of mana
+PASS      23-doomsday-and-reanimator.scn/edge-of-autumn-fetches-basic  Edge of Autumn cast with four or fewer lands fetches a basic land tapped
+PASS      23-doomsday-and-reanimator.scn/edge-of-autumn-five-lands-no-fetch  Edge of Autumn does nothing when you control five lands
+PASS      23-doomsday-and-reanimator.scn/edge-of-autumn-cycling-sacrifices-land  Edge of Autumn cycling costs sacrificing a land
+PASS      23-doomsday-and-reanimator.scn/personal-tutor-puts-sorcery-on-top  Personal Tutor finds a sorcery and puts it on top of the library
+PASS      23-doomsday-and-reanimator.scn/consider-surveils-then-draws  Consider surveils 1 (here binning the top card) then draws the next card
+PASS      23-doomsday-and-reanimator.scn/reanimate-loses-life-equal-to-mana-value  Reanimate returns a creature from a graveyard and its controller loses life equal to its mana value (Griselbrand, 8)
+PASS      23-doomsday-and-reanimator.scn/reanimate-opponents-graveyard  Reanimate can take a creature from the opponent's graveyard and puts it under your control
+PASS      23-doomsday-and-reanimator.scn/reanimate-fizzles-to-surgical-extraction  Surgical Extraction (paid with 2 life) exiling the target in response makes Reanimate fizzle: no life lost to Reanimate
+PASS      23-doomsday-and-reanimator.scn/animate-dead-minus-one-power  Animate Dead returns the creature with -1/-0 (Griselbrand becomes 6/7)
+PASS      23-doomsday-and-reanimator.scn/animate-dead-leaves-sacrifices-creature  When Animate Dead leaves the battlefield (destroyed by Witch Enchanter), the reanimated creature is sacrificed
+PASS      23-doomsday-and-reanimator.scn/shallow-grave-returns-top-creature-with-haste  Shallow Grave returns the topmost creature card of the graveyard with haste, exiled at the next end step
+PASS      23-doomsday-and-reanimator.scn/unmask-alt-cost-exiles-black-card  Unmask can be cast by exiling a black card from hand, and the caster picks a nonland card to discard
+PASS      23-doomsday-and-reanimator.scn/unmask-cannot-pitch-nonblack  Unmask's alternative cost needs a black card: a red card cannot be exiled
+PASS      23-doomsday-and-reanimator.scn/faithless-looting-draw-discard-and-flashback  Faithless Looting draws two and discards two, then can be flashed back from the graveyard for {2}{R}
+PASS      23-doomsday-and-reanimator.scn/cabal-therapy-names-card  Cabal Therapy discards every copy of the named card from the opponent's hand
+PASS      23-doomsday-and-reanimator.scn/cabal-therapy-flashback-sacrifice  Cabal Therapy can be flashed back by sacrificing a creature
+PASS      23-doomsday-and-reanimator.scn/griselbrand-draw-seven  Griselbrand pays 7 life to draw seven cards
+PASS      23-doomsday-and-reanimator.scn/griselbrand-cannot-pay-with-too-little-life  Griselbrand's ability cannot be activated at 6 life
+PASS      23-doomsday-and-reanimator.scn/archon-of-cruelty-etb  Archon of Cruelty's trigger makes the opponent sacrifice, discard and lose 3, while the controller draws and gains 3
+PASS      23-doomsday-and-reanimator.scn/raph-and-mikey-attack-trigger  Raph and Mikey puts the first creature revealed from the library onto the battlefield tapped and attacking
+PASS      23-doomsday-and-reanimator.scn/stronghold-gambit-lowest-creature-enters  Stronghold Gambit puts the creature with the lowest mana value revealed onto the battlefield; both players reveal
+PASS      23-doomsday-and-reanimator.scn/stronghold-gambit-noncreature-reveals-nothing  Stronghold Gambit: a player who reveals a noncreature card puts nothing onto the battlefield
+PASS      23-doomsday-and-reanimator.scn/collective-brutality-escalate-two-modes  Collective Brutality with one discard (escalate) chooses two modes: opponent loses 2, I gain 2, and -2/-2 on a creature
+PASS      30-manabase-and-sideboard.scn/fetch-delta-finds-underground-sea  Polluted Delta pays 1 life, is sacrificed, and fetches an untapped Underground Sea (dual land with basic land types)
+PASS      30-manabase-and-sideboard.scn/fetch-delta-cannot-find-plateau  Polluted Delta cannot fetch Plateau (Mountain Plains has neither Island nor Swamp type)
+PASS      30-manabase-and-sideboard.scn/fetch-arid-mesa-finds-plateau  Arid Mesa (Mountain or Plains) fetches Plateau
+PASS      30-manabase-and-sideboard.scn/fetch-marsh-flats-finds-scrubland  Marsh Flats (Plains or Swamp) fetches Scrubland
+PASS      30-manabase-and-sideboard.scn/fetch-windswept-heath-finds-savannah  Windswept Heath (Forest or Plains) fetches Savannah
+PASS      30-manabase-and-sideboard.scn/fetch-bloodstained-mire-finds-badlands  Bloodstained Mire (Swamp or Mountain) fetches Badlands
+PASS      30-manabase-and-sideboard.scn/fetch-scalding-tarn-finds-volcanic  Scalding Tarn (Island or Mountain) fetches Volcanic Island
+PASS      30-manabase-and-sideboard.scn/fetch-verdant-catacombs-finds-sea  Verdant Catacombs (Swamp or Forest) fetches Underground Sea
+PASS      30-manabase-and-sideboard.scn/fetch-misty-rainforest-finds-surveil-land  Misty Rainforest (Forest or Island) fetches Hedge Maze, which enters tapped and surveils
+PASS      30-manabase-and-sideboard.scn/prismatic-vista-fetches-basic  Prismatic Vista fetches a basic land (battlefield, untapped) for 1 life
+PASS      30-manabase-and-sideboard.scn/surveil-land-undercity-sewers  Undercity Sewers enters tapped and surveils 1
+PASS      30-manabase-and-sideboard.scn/surveil-land-thundering-falls  Thundering Falls (Island Mountain) enters tapped, surveils 1, and keeps the card on top when declined
+PASS      30-manabase-and-sideboard.scn/surveil-land-meticulous-archive  Meticulous Archive (Plains Island) enters tapped and surveils 1
+PASS      30-manabase-and-sideboard.scn/surveil-land-shadowy-backstreet  Shadowy Backstreet (Plains Swamp) enters tapped and surveils 1
+PASS      30-manabase-and-sideboard.scn/surveil-land-raucous-theater  Raucous Theater enters tapped and surveils 1
+PASS      30-manabase-and-sideboard.scn/preordain-scry-two-draw-one  Preordain scries 2 (one to the bottom) then draws a card
+PASS      30-manabase-and-sideboard.scn/erode-destroys-and-gives-basic  Erode destroys a creature and its controller may search for a basic land, put onto the battlefield tapped
+PASS      30-manabase-and-sideboard.scn/bilbo-escape-costs-one-less  Bilbo makes spells cast from outside your hand cost {1} less: Nethergoyf escape costs {1}{B}
+PASS      30-manabase-and-sideboard.scn/bilbo-attack-casts-instant-from-graveyard  Bilbo attacking lets you cast an instant from the graveyard (reduced by 1) and exile it afterwards
+PASS      30-manabase-and-sideboard.scn/koma-cannot-be-countered  Koma, World-Eater cannot be countered (Force of Will does nothing)
+PASS      30-manabase-and-sideboard.scn/koma-ward-four  Koma's ward {4}: an opponent who cannot pay {4} has Swords to Plowshares countered
+PARTIAL   30-manabase-and-sideboard.scn/pyroblast-counters-blue-spell  Pyroblast counters a blue spell
+         ~ picks never asked by the engine: ["pick Counter target spell"]
+PARTIAL   30-manabase-and-sideboard.scn/pyroblast-cannot-counter-nonblue  Pyroblast's counter mode can target any spell but does nothing to a nonblue one (Lightning Bolt still resolves)
+         ~ picks never asked by the engine: ["pick Counter target spell"]
+PASS      30-manabase-and-sideboard.scn/grafdigger-cage-stops-reanimate  With Grafdigger's Cage out, Reanimate cannot put the creature onto the battlefield (the life loss still happens)
+PASS      30-manabase-and-sideboard.scn/grafdigger-cage-stops-flashback  With Grafdigger's Cage out, Faithless Looting cannot be flashed back from the graveyard
+PASS      30-manabase-and-sideboard.scn/containment-priest-exiles-reanimated-creature  Containment Priest exiles a creature put onto the battlefield without being cast (Reanimate), but not one that was cast
+PASS      30-manabase-and-sideboard.scn/containment-priest-allows-cast-creature  Containment Priest does not exile a creature that was cast from hand
+PASS      30-manabase-and-sideboard.scn/faerie-macabre-fizzles-reanimate  Discarding Faerie Macabre (free) to exile Griselbrand in response makes Reanimate fizzle with no life loss
+PASS      30-manabase-and-sideboard.scn/surgical-extraction-hits-hand-and-library  Surgical Extraction exiles every copy from graveyard, hand and library
+PASS      30-manabase-and-sideboard.scn/deafening-silence-one-noncreature-spell  Deafening Silence: a player cannot cast a second noncreature spell in a turn
+
+TOTAL pass=210 partial=22 fail=1 error=0 unsupported=0

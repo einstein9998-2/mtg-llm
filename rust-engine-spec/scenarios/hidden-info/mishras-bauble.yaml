@@ -1,0 +1,105 @@
+id: hi-bauble-own-library-looker-knows-top
+title: Mishra's Bauble on its controller's own library teaches the controller the top card and the opponent nothing
+area: hidden-info
+cards: [Mishra's Bauble, Lightning Bolt, Murktide Regent, Aluren, Tropical Island]
+tags: [hidden-info, look-at-top, library-knowledge, sacrifice-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "701.20e", text: "Some effects instruct a player to look at one or more cards. Looking at a card follows the same rules as revealing a card, except that the card is shown only to the specified player.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mishra's Bauble @bb"]
+    library: ["Murktide Regent @x"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bb", ability: 0, targets: [{player: p0}]}
+  - check:
+      stack: [{kind: activated, source: "@bb", controller: p0}]
+      p0: {graveyard: [Mishra's Bauble], battlefield: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Lightning Bolt], library_count: 11, library_top: [Murktide Regent]}
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: [Murktide Regent]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 1, library_count: 11}
+      option_labels_exclude_names: [Murktide Regent, Lightning Bolt]
+      events_text_exclude: [Murktide Regent, Lightning Bolt]
+notes: >
+  Tapping and sacrificing the Bauble is the cost, so it is in the graveyard while the ability is on the stack. On resolution
+  only the controller looks (701.20e). p1 learns that p0 looked at the top card of p0's library, not which card it is.
+---
+id: hi-bauble-delayed-draw-takes-known-card
+title: Mishra's Bauble's delayed draw at the next upkeep draws the looked-at card and ends the position knowledge
+area: hidden-info
+cards: [Mishra's Bauble, Lightning Bolt, Murktide Regent, Aluren, Tropical Island]
+tags: [hidden-info, delayed-trigger, draw, library-knowledge, upkeep]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mishra's Bauble, text: "Draw a card at the beginning of the next turn's upkeep.", verified: true}
+  - {kind: cr, ref: "603.7e", text: "If an activated or triggered ability creates a delayed triggered ability, the source of that delayed triggered ability is the same as the source of that other ability. The controller of that delayed triggered ability is the player who controlled that other ability as it resolved.", verified: true}
+  - {kind: cr, ref: "121.1", text: "A player draws a card by putting the top card of their library into their hand.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: end
+  priority: p0
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mishra's Bauble @bb"]
+    library: ["Murktide Regent @x"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bb", ability: 0, targets: [{player: p0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: upkeep, of: p1}
+  - check:
+      turn: 4
+      active: p1
+      stack: [{kind: triggered, source: "@bb", controller: p0}]
+      pending: {actor: p1, kind: priority}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    turn: 4
+    phase: upkeep
+    pending: {actor: p1, kind: priority}
+    p0: {hand: [Lightning Bolt, Murktide Regent], library_count: 10}
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: []}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 2, library_count: 10}
+      option_labels_exclude_names: [Murktide Regent, Lightning Bolt]
+      events_text_exclude: [Murktide Regent, Lightning Bolt]
+notes: >
+  The Bauble is used in p0's end step; the next turn is p1's, so the delayed trigger fires in p1's upkeep. Its controller is
+  p0 (603.7e), so p0 draws, even though it is p1's turn. p1 holds priority first as the active player; resolve_top passes
+  for p1 then p0. The drawn card is the one p0 looked at; after the draw p0 knows no library position. A wrong engine makes
+  the active player draw, draws at p0's own next upkeep, or keeps stale top knowledge.

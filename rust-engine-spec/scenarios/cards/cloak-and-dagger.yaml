@@ -1,0 +1,169 @@
+id: cloak-and-dagger-etb-exiles-nonland-card-from-hand
+title: Cloak and Dagger's ETB lets its controller exile a revealed nonland card from the opponent's hand or the chosen creature
+area: card
+cards: ["Cloak and Dagger, Entwined", Brainstorm, Island, Flickerwisp, Scrubland, Plains, Swamp]
+tags: [cloak-and-dagger, etb-trigger, reveal, exile-until, targeting, hand-disruption]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Cloak and Dagger, Entwined", text: "When Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "If the spell has a variable number of targets, the player announces how many targets they will choose before they announce those targets.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Cloak and Dagger, Entwined @cd"]
+    battlefield: ["Scrubland @s1", "Plains @w1", "Swamp @b1"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Island @isl"]
+    battlefield: ["Flickerwisp @wisp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@cd", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}, expect_options: {exclude: [{player: p0}]}}
+  - p0: {decision: choose_target, slot: 1, answer: "@wisp", expect_options: {include: ["@wisp"], exclude: ["@cd"]}}
+  - check:
+      stack: [{kind: triggered, source: "@cd", controller: p0, targets: [{player: p1}, "@wisp"]}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: exile, answer: ["@bs"], expect_options: {include: ["@bs", "@wisp"], exclude: ["@isl"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: "Cloak and Dagger, Entwined", keywords: [deathtouch, lifelink]}
+        - {card: Scrubland, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Swamp, tapped: true}
+    p1:
+      hand: [Island]
+      exile: [Brainstorm]
+      battlefield: [{card: Flickerwisp}]
+notes: >
+  {1}{W}{B} is paid by the three lands. The trigger's first target must be an opponent (p0 is not offered); the creature
+  target must be controlled by that opponent and cannot be Cloak and Dagger. On resolution p1 reveals and p0 picks one
+  object among p1's nonland cards in hand and the chosen creature: the Island (a land) is not offered. A wrong engine
+  lets the opponent pick, offers the land, or exiles both.
+---
+id: cloak-and-dagger-exiled-hand-card-returns-when-it-leaves
+title: When Cloak and Dagger leaves the battlefield, the card it exiled from hand returns to its owner's hand
+area: card
+cards: ["Cloak and Dagger, Entwined", Brainstorm, Swords to Plowshares, Scrubland, Plains, Swamp]
+tags: [cloak-and-dagger, exile-until, leaves-battlefield, swords-to-plowshares, zone-return]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Cloak and Dagger, Entwined", text: "You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.", verified: true}
+  - {kind: cr, ref: "610.3", text: "Some one-shot effects cause an object to change zones “until” a specified event occurs. A second one-shot effect is created immediately after the specified event. This second one-shot effect returns the object to its previous zone.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Cloak and Dagger, Entwined @cd"]
+    battlefield: ["Scrubland @s1", "Plains @w1", "Swamp @b1"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Swords to Plowshares @stp"]
+    battlefield: ["Plains @pw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@cd", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: exile, answer: ["@bs"], expect_options: {include: ["@bs", "@stp"]}}
+  - check:
+      p1: {hand: [Swords to Plowshares], exile: [Brainstorm]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@cd"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      exile: ["Cloak and Dagger, Entwined"]
+      battlefield: [{card: Scrubland, tapped: true}, {card: Plains, tapped: true}, {card: Swamp, tapped: true}]
+    p1:
+      life: 20
+      hand: [Brainstorm]
+      exile: []
+      graveyard: [Swords to Plowshares]
+      battlefield: [{card: Plains, tapped: true}]
+notes: >
+  p1 controls no creature, so the "up to one target creature" slot has no candidate and no decision for it is raised;
+  the trigger has only the opponent target. Brainstorm is exiled until Cloak and Dagger leave. Swords exiles Cloak and
+  Dagger (power 2, so its controller p0 gains 2); immediately after that event the return effect puts Brainstorm back
+  into p1's hand (610.3: its previous zone, not the battlefield, and not using the stack). A wrong engine leaves the
+  card in exile, puts it onto the battlefield, or waits for a trigger to resolve.
+---
+id: cloak-and-dagger-bounced-before-etb-resolves-exiles-nothing
+title: If Cloak and Dagger leave before their ETB trigger resolves, the chosen card is not exiled
+area: card
+cards: ["Cloak and Dagger, Entwined", Griselbrand, Karakas, Scrubland, Plains, Swamp]
+tags: [cloak-and-dagger, karakas, exile-until, trigger-resolution, source-left-battlefield]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Cloak and Dagger, Entwined", text: "You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.", verified: true}
+  - {kind: cr, ref: "610.3b", text: "If a resolving triggered ability creates the initial one-shot effect that causes the object to change zones, and the specified event has already occurred before that one-shot effect would occur but after that ability triggered, the object doesn’t move.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Cloak and Dagger, Entwined @cd"]
+    battlefield: ["Scrubland @s1", "Plains @w1", "Swamp @b1", "Karakas @kar"]
+    library_pad: 10
+  p1:
+    battlefield: ["Griselbrand @gris"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@cd", pay: {tap: ["@s1", "@w1", "@b1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 1, answer: "@gris"}
+  - p0: {t: activate, source: "@kar", ability: 1, targets: ["@cd"]}
+  - check:
+      stack:
+        - {kind: triggered, source: "@cd", controller: p0}
+        - {kind: activated, source: "@kar", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@cd", controller: p0}]
+      p0: {hand: ["Cloak and Dagger, Entwined"]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: exile, answer: ["@gris"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Cloak and Dagger, Entwined"]
+    p1:
+      exile: []
+      battlefield: [{card: Griselbrand}]
+notes: >
+  p0 bounces its own Cloak and Dagger in response to the ETB trigger. When the trigger resolves the "until" event has
+  already happened after the ability triggered, so the chosen creature does not move (610.3b) and stays on the
+  battlefield. A wrong engine exiles Griselbrand forever (no leave event left to return it). The choose_cards step is
+  scripted because the instruction "You may exile ..." is still followed in order (608.2c): the player still makes the
+  "may" choice, and 610.3b cancels only the move ("the object doesn't move"); no rule removes the choice. The rules
+  outcome (Griselbrand stays, nothing in exile) is what this scenario fixes; the choice's exact shape is the runner
+  adapter's (SCHEMA addenda). p1's hand is empty, so only the creature is an option.

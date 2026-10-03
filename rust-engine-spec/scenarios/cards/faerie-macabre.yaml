@@ -1,0 +1,111 @@
+id: faerie-macabre-cannot-be-activated-from-battlefield
+title: Faerie Macabre on the battlefield cannot use its discard ability
+area: card
+cards: [Faerie Macabre, Lightning Bolt]
+tags: [faerie-macabre, activated-ability, zone-restriction, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+  - {kind: cr, ref: "113.6j", text: "An object's activated ability that has a cost that can't be paid while the object is on the battlefield functions from any zone in which its cost can be paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Faerie Macabre @fm"]
+    library_pad: 10
+  p1:
+    graveyard: ["Lightning Bolt @bolt"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@fm", ability: 0, targets: ["@bolt"]}}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@bolt"]}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield: [{card: Faerie Macabre}]
+      graveyard: []
+    p1:
+      graveyard: [Lightning Bolt]
+notes: >
+  "Discard this card" can only be paid from a hand, so a Faerie Macabre that is a permanent cannot activate it (and a
+  "from hand" activation is impossible because the card is not in a hand). Nothing may change.
+---
+id: faerie-macabre-cannot-target-itself-targets-chosen-before-discard
+title: Faerie Macabre cannot target itself because targets are chosen before the discard cost is paid
+area: card
+cards: [Faerie Macabre, Lightning Bolt]
+tags: [faerie-macabre, targeting, cost-payment-order, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+  - {kind: cr, ref: "602.2b", text: "The remainder of the process for activating an ability is identical to the process for casting a spell listed in rules 601.2b–i.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "The player announces their choice of an appropriate object or player for each target the spell requires.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Faerie Macabre @fm"]
+    library_pad: 10
+  p1:
+    graveyard: ["Lightning Bolt @bolt"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@fm"]}}
+  - p0: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@bolt"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Faerie Macabre]
+      exile: []
+    p1:
+      graveyard: []
+      exile: [Lightning Bolt]
+notes: >
+  Targets are announced (601.2c) before costs are paid (602.2b refers to the casting sequence), and while it is being
+  activated Faerie Macabre is in the hand, not a graveyard card, so it is not a legal target for "target cards from
+  graveyards". Only after the discard is it in the graveyard. The legal activation targeting the Bolt resolves and exiles it.
+---
+id: faerie-macabre-hard-cast-flying-creature
+title: Faerie Macabre cast for {1}{B}{B} enters as a 2/2 flyer
+area: card
+cards: [Faerie Macabre, Swamp, Island]
+tags: [faerie-macabre, creature, flying, mana-payment, cast]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Faerie Macabre, text: "Flying", verified: true}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Faerie Macabre @fm"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Island @i1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@fm", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Faerie Macabre, types: [Creature], pt: [2, 2], keywords: [flying], sick: true}
+notes: >
+  {1}{B}{B}: both Swamps pay BB and the Island pays the generic. The card's graveyard-hate ability is irrelevant on the
+  battlefield; the creature has flying and is summoning sick (just entered).

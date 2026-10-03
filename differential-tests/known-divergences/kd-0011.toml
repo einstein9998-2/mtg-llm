@@ -1,0 +1,12 @@
+id = "kd-0011"
+title = "Forge: lists a hand cast (Force of Will alt cost, Stifle) during the Voice of Victory player's turn, then refuses to play it"
+status = "accepted"
+who_is_right = "engine"
+cr_citation = "Voice of Victory: 'Your opponents can't cast spells during your turn' (CR 101.2)"
+rulings = []
+affected_oracles = ["forge"]
+match = { sides = ["FORGE_ONLY"], kinds = ["cast"], zones = ["Hand"], cards = ["Force of Will", "Stifle"], feature_tags = ["voice-of-victory-on-bf"] }
+suppress = true
+regression_scenario = "none yet: Forge-side behaviour, the engine correctly does not offer the cast"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Found by lockstep lines on random games (boros-aggro vs dimir-tempo seed 700289 for Force of Will, boros-aggro vs uwx-control seed 702393 for Stifle): during the Voice of Victory player's turn Forge's priority menu lists the opponent's Force of Will (alternative cost) or Stifle while the probe's play fails with 'checkRestrictions refused'. Same class as kd-0003, kd-0008 and kd-0009. Needs Brady's approval (Forge-bug verdict, doc 04 6.4)."

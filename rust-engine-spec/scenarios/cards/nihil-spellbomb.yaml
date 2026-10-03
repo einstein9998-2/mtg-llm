@@ -1,0 +1,92 @@
+id: nihil-spellbomb-exiles-graveyard-and-pays-b-to-draw
+title: Nihil Spellbomb exiles the opponent's graveyard; its graveyard trigger resolves first and paying {B} draws a card
+area: card
+cards: [Nihil Spellbomb, Swamp, Ponder, Lightning Bolt, Island, Brainstorm]
+tags: [nihil-spellbomb, sacrifice-cost, leaves-battlefield-trigger, optional-payment, graveyard-hate, stack-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Nihil Spellbomb, text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", verified: true}
+  - {kind: oracle, card: Nihil Spellbomb, text: "When this artifact is put into a graveyard from the battlefield, you may pay {B}. If you do, draw a card.", verified: true}
+  - {kind: cr, ref: "603.6c", text: "Leaves-the-battlefield abilities trigger when a permanent moves from the battlefield to another zone", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Nihil Spellbomb @nb", "Swamp @s1"]
+    library: ["Ponder @l1"]
+    library_pad: 10
+  p1:
+    graveyard: [Lightning Bolt, Island, Brainstorm]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@nb", ability: 0, targets: [{player: p1}]}
+  - check:
+      stack: [{kind: activated, source: "@nb"}, {kind: triggered, source: "@nb"}]
+      p0: {graveyard: [Nihil Spellbomb]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_b_to_draw, answer: true}
+  - check: {stack: [{kind: activated, source: "@nb"}], p0: {hand: [Ponder]}, p1: {graveyard: [Lightning Bolt, Island, Brainstorm]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Nihil Spellbomb]
+      battlefield: [{card: Swamp, tapped: true}]
+    p1:
+      graveyard: []
+      exile: [Lightning Bolt, Island, Brainstorm]
+notes: >
+  Sacrifice is part of the cost, so the "put into a graveyard from the battlefield" trigger happens during activation and
+  goes on the stack above the activated ability; it resolves first. p0 pays {B} with the Swamp and draws Ponder; then
+  the activated ability exiles p1's graveyard. A wrong engine puts the trigger below the ability or makes the payment
+  mandatory.
+---
+id: nihil-spellbomb-shrinks-barrowgoyf-by-exiling-graveyard
+title: Exiling the opponent's graveyard shrinks their Barrowgoyf, which still counts the Spellbomb in its owner's graveyard
+area: card
+cards: [Nihil Spellbomb, Barrowgoyf, Island, Lightning Bolt, Ponder, Overlord of the Balemurk]
+tags: [nihil-spellbomb, barrowgoyf, characteristic-defining-ability, graveyard-hate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Nihil Spellbomb, text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", verified: true}
+  - {kind: oracle, card: Barrowgoyf, text: "Barrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Nihil Spellbomb @nb"]
+    graveyard: [Island]
+    library_pad: 10
+  p1:
+    battlefield: ["Barrowgoyf @bg"]
+    graveyard: [Lightning Bolt, Ponder, Overlord of the Balemurk]
+    library_pad: 10
+script:
+  - check: {p1: {battlefield: [{card: Barrowgoyf, pt: [5, 6]}]}}
+  - p0: {t: activate, source: "@nb", ability: 0, targets: [{player: p1}]}
+  - check: {p1: {battlefield: [{card: Barrowgoyf, pt: [6, 7]}]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Island, Nihil Spellbomb], hand: []}
+    p1:
+      graveyard: []
+      exile: [Lightning Bolt, Ponder, Overlord of the Balemurk]
+      battlefield: [{card: Barrowgoyf, pt: [2, 3]}]
+notes: >
+  Before: land, instant, sorcery, enchantment, creature = 5 (5/6). Sacrificing the Spellbomb adds artifact (6/7) while the
+  ability waits. p0 has no lands, so the draw trigger resolves with no decision (first pair of passes). The ability then
+  exiles p1's graveyard; p0's graveyard (land, artifact) remains, so Barrowgoyf is 2/3.

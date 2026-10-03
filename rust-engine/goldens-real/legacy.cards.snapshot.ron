@@ -1,0 +1,844 @@
+// The Legacy pool (eight decks). Oracle text per /mnt/project-files/rust-engine-spec/reference/oracle.json.
+// Cards are added in the order the spec scenarios need them.
+[
+  // ---- basic and dual lands -------------------------------------------------------------------
+  (name: "Plains", types: "LAND", supertypes: "BASIC", subtypes: ["Plains"]),
+  (name: "Island", types: "LAND", supertypes: "BASIC", subtypes: ["Island"]),
+  (name: "Swamp", types: "LAND", supertypes: "BASIC", subtypes: ["Swamp"]),
+  (name: "Mountain", types: "LAND", supertypes: "BASIC", subtypes: ["Mountain"]),
+  (name: "Forest", types: "LAND", supertypes: "BASIC", subtypes: ["Forest"]),
+  (name: "Volcanic Island", types: "LAND", subtypes: ["Island", "Mountain"]),
+  (name: "Tropical Island", types: "LAND", subtypes: ["Forest", "Island"]),
+  (name: "Underground Sea", types: "LAND", subtypes: ["Island", "Swamp"]),
+  (name: "Tundra", types: "LAND", subtypes: ["Plains", "Island"]),
+  (name: "Badlands", types: "LAND", subtypes: ["Swamp", "Mountain"]),
+  (name: "Scrubland", types: "LAND", subtypes: ["Plains", "Swamp"]),
+  (name: "Plateau", types: "LAND", subtypes: ["Mountain", "Plains"]),
+  (name: "Savannah", types: "LAND", subtypes: ["Forest", "Plains"]),
+
+  // Surveil lands: enter tapped, surveil 1.
+  (name: "Hedge Maze", types: "LAND", subtypes: ["Forest", "Island"], abilities: [
+    Enters(filter: (self_only: true), effect: Tapped),
+    Triggered(text: "When this land enters, surveil 1.", on: Enters(filter: (self_only: true)), effect: Surveil(Const(1))),
+  ]),
+  (name: "Thundering Falls", types: "LAND", subtypes: ["Island", "Mountain"], abilities: [
+    Enters(filter: (self_only: true), effect: Tapped),
+    Triggered(text: "When this land enters, surveil 1.", on: Enters(filter: (self_only: true)), effect: Surveil(Const(1))),
+  ]),
+  (name: "Elegant Parlor", types: "LAND", subtypes: ["Mountain", "Plains"], abilities: [
+    Enters(filter: (self_only: true), effect: Tapped),
+    Triggered(text: "When this land enters, surveil 1.", on: Enters(filter: (self_only: true)), effect: Surveil(Const(1))),
+  ]),
+  (name: "Meticulous Archive", types: "LAND", subtypes: ["Plains", "Island"], abilities: [
+    Enters(filter: (self_only: true), effect: Tapped),
+    Triggered(text: "When this land enters, surveil 1.", on: Enters(filter: (self_only: true)), effect: Surveil(Const(1))),
+  ]),
+  (name: "Shadowy Backstreet", types: "LAND", subtypes: ["Plains", "Swamp"], abilities: [
+    Enters(filter: (self_only: true), effect: Tapped),
+    Triggered(text: "When this land enters, surveil 1.", on: Enters(filter: (self_only: true)), effect: Surveil(Const(1))),
+  ]),
+  (name: "Undercity Sewers", types: "LAND", subtypes: ["Island", "Swamp"], abilities: [
+    Enters(filter: (self_only: true), effect: Tapped),
+    Triggered(text: "When this land enters, surveil 1.", on: Enters(filter: (self_only: true)), effect: Surveil(Const(1))),
+  ]),
+  (name: "Raucous Theater", types: "LAND", subtypes: ["Swamp", "Mountain"], abilities: [
+    Enters(filter: (self_only: true), effect: Tapped),
+    Triggered(text: "When this land enters, surveil 1.", on: Enters(filter: (self_only: true)), effect: Surveil(Const(1))),
+  ]),
+
+  // Fetch lands.
+  (name: "Flooded Strand", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Plains", "Island"]), dest: Battlefield)),
+  ]),
+  (name: "Polluted Delta", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Island", "Swamp"]), dest: Battlefield)),
+  ]),
+  (name: "Scalding Tarn", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Island", "Mountain"]), dest: Battlefield)),
+  ]),
+  (name: "Misty Rainforest", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Forest", "Island"]), dest: Battlefield)),
+  ]),
+  (name: "Verdant Catacombs", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Forest card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Swamp", "Forest"]), dest: Battlefield)),
+  ]),
+  (name: "Bloodstained Mire", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Swamp", "Mountain"]), dest: Battlefield)),
+  ]),
+  (name: "Arid Mesa", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Mountain", "Plains"]), dest: Battlefield)),
+  ]),
+  (name: "Marsh Flats", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Plains", "Swamp"]), dest: Battlefield)),
+  ]),
+  (name: "Windswept Heath", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Forest", "Plains"]), dest: Battlefield)),
+  ]),
+  (name: "Prismatic Vista", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield, then shuffle.", cost: [TapSelf, PayLife(1), SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND", supertypes_any: "BASIC"), dest: Battlefield)),
+  ]),
+
+  // Utility lands.
+  (name: "Wasteland", types: "LAND", abilities: [
+    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
+    Activated(text: "{T}, Sacrifice this land: Destroy target nonbasic land.", cost: [TapSelf, SacrificeSelf], targets: [(objects: (types_any: "LAND", supertypes_not: "BASIC"))],
+      effect: Destroy(One(Target(0)))),
+  ]),
+  (name: "Ancient Tomb", types: "LAND", abilities: [
+    Activated(text: "{T}: Add {C}{C}. This land deals 2 damage to you.", cost: [TapSelf], is_mana: true, effect: Seq([AddMana(color: C, n: 2), Damage(amount: Const(2), to: Player(You))])),
+  ]),
+  (name: "City of Traitors", types: "LAND", abilities: [
+    Triggered(text: "When you play another land, sacrifice this land.", on: LandPlayed(who: You, filter: (not_self: true)), effect: Sacrifice(One(This))),
+    Activated(text: "{T}: Add {C}{C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 2)),
+  ]),
+  (name: "Karakas", types: "LAND", supertypes: "LEGENDARY", abilities: [
+    Activated(text: "{T}: Add {W}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: W, n: 1)),
+    Activated(text: "{T}: Return target legendary creature to its owner's hand.", cost: [TapSelf], targets: [(objects: (types_any: "CREATURE", supertypes_any: "LEGENDARY"))], effect: Bounce(One(Target(0)))),
+  ]),
+
+  // ---- mana artifacts, tokens --------------------------------------------------------------------
+  (name: "Lotus Petal", cost: "{0}", types: "ARTIFACT", abilities: [
+    Activated(text: "{T}, Sacrifice this artifact: Add one mana of any color.", cost: [TapSelf, SacrificeSelf], is_mana: true, effect: AddManaAny(n: Const(1))),
+  ]),
+  (name: "Lion's Eye Diamond", cost: "{0}", types: "ARTIFACT", abilities: [
+    Activated(text: "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant.", cost: [DiscardHand, SacrificeSelf], is_mana: true, effect: AddManaAny(n: Const(3))),
+  ]),
+  (name: "Treasure Token", types: "ARTIFACT", subtypes: ["Treasure"], is_token: true, abilities: [
+    Activated(text: "{T}, Sacrifice this artifact: Add one mana of any color.", cost: [TapSelf, SacrificeSelf], is_mana: true, effect: AddManaAny(n: Const(1))),
+  ]),
+  (name: "Goblin Token", types: "CREATURE", colors: "R", subtypes: ["Goblin"], pt: (1, 1), is_token: true),
+  (name: "Zombie Token", types: "CREATURE", colors: "B", subtypes: ["Zombie"], pt: (2, 2), is_token: true),
+  (name: "Skeleton Token", types: "CREATURE", colors: "B", subtypes: ["Skeleton"], pt: (1, 1), is_token: true),
+  (name: "Cat Token", types: "CREATURE", colors: "W", subtypes: ["Cat"], pt: (1, 1), is_token: true),
+  (name: "Sand Warrior Token", types: "CREATURE", colors: "R | G | W", subtypes: ["Sand", "Warrior"], pt: (1, 1), is_token: true),
+  (name: "Orc Army Token", types: "CREATURE", colors: "B", subtypes: ["Orc", "Army"], pt: (0, 0), is_token: true),
+  (name: "The Atropal", types: "CREATURE", colors: "B", supertypes: "LEGENDARY", subtypes: ["God", "Horror"], pt: (4, 4), keywords: "DEATHTOUCH", is_token: true),
+  (name: "Monk Token", types: "CREATURE", colors: "W", subtypes: ["Monk"], pt: (1, 1), keywords: "PROWESS", is_token: true),
+
+  // ---- cantrips and library manipulation ----------------------------------------------------------
+  (name: "Brainstorm", cost: "{U}", types: "INSTANT", abilities: [
+    Spell(effect: Seq([Draw(who: You, n: Const(3)), PutBack(Const(2))])),
+  ]),
+  (name: "Ponder", cost: "{U}", types: "SORCERY", abilities: [
+    Spell(effect: Seq([Reorder(Const(3)), May(who: You, then: Shuffle(You)), Draw(who: You, n: Const(1))])),
+  ]),
+  (name: "Preordain", cost: "{U}", types: "SORCERY", abilities: [
+    Spell(effect: Seq([Scry(Const(2)), Draw(who: You, n: Const(1))])),
+  ]),
+  (name: "Consider", cost: "{U}", types: "INSTANT", abilities: [
+    Spell(effect: Seq([Surveil(Const(1)), Draw(who: You, n: Const(1))])),
+  ]),
+  (name: "Stock Up", cost: "{2}{U}", types: "SORCERY", abilities: [
+    Spell(effect: LookTake(look: Const(5), take: 2)),
+  ]),
+  (name: "Flow State", cost: "{1}{U}", types: "SORCERY", abilities: [
+    Spell(effect: If(
+      cond: And([
+        Controls(who: You, filter: (zone: Graveyard, types_any: "INSTANT"), at_least: 1),
+        Controls(who: You, filter: (zone: Graveyard, types_any: "SORCERY"), at_least: 1),
+      ]),
+      then: LookTake(look: Const(3), take: 2),
+      els: LookTake(look: Const(3), take: 1))),
+  ]),
+  (name: "Dark Ritual", cost: "{B}", types: "INSTANT", abilities: [
+    Spell(effect: AddMana(color: B, n: 3)),
+  ]),
+  (name: "Faithless Looting", cost: "{R}", types: "SORCERY", abilities: [
+    Spell(effect: Seq([Draw(who: You, n: Const(2)), Discard(who: You, n: Const(2))])),
+    Alt(label: "flashback", key: "flashback", cost: [Mana("{2}{R}")], zone: Graveyard, exile_after: true),
+  ]),
+
+  // ---- counterspells and stack interaction -----------------------------------------------------------
+  (name: "Daze", cost: "{1}{U}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (zone: Stack, stack: Spell))], effect: CounterUnless(target: 0, pays: "{1}")),
+    Alt(label: "return an Island you control to its owner's hand", key: "return_island", cost: [ReturnToHand(subtypes_any: ["Island"])]),
+  ]),
+  (name: "Force of Will", cost: "{3}{U}{U}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (zone: Stack, stack: Spell))], effect: CounterSpell(0)),
+    Alt(label: "pay 1 life and exile a blue card from your hand", key: "exile_blue_card", cost: [ExileFromHand(zone: Hand, colors_any: "U"), PayLife(1)]),
+  ]),
+  (name: "Force of Negation", cost: "{1}{U}{U}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (zone: Stack, stack: Spell, types_not: "CREATURE"))], effect: CounterSpellExile(0)),
+    Alt(label: "exile a blue card from your hand", key: "exile_blue_card", cost: [ExileFromHand(zone: Hand, colors_any: "U")], cond: Not(IsActive(You))),
+  ]),
+  (name: "Stifle", cost: "{U}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (zone: Stack, stack: Ability))], effect: CounterAbility(0)),
+  ]),
+  (name: "Hydroblast", cost: "{U}", types: "INSTANT", abilities: [
+    Spell(choose: (1, 1), modes: [
+      (label: "Counter target spell if it's red", targets: [(objects: (zone: Stack, stack: Spell))],
+        effect: If(cond: Matches(Target(0), (colors_any: "R")), then: CounterSpell(0))),
+      (label: "Destroy target permanent if it's red", targets: [(objects: ())],
+        effect: If(cond: Matches(Target(0), (colors_any: "R")), then: Destroy(One(Target(0))))),
+    ]),
+  ]),
+  (name: "Pyroblast", cost: "{R}", types: "INSTANT", abilities: [
+    Spell(choose: (1, 1), modes: [
+      (label: "Counter target spell if it's blue", targets: [(objects: (zone: Stack, stack: Spell))],
+        effect: If(cond: Matches(Target(0), (colors_any: "U")), then: CounterSpell(0))),
+      (label: "Destroy target permanent if it's blue", targets: [(objects: ())],
+        effect: If(cond: Matches(Target(0), (colors_any: "U")), then: Destroy(One(Target(0))))),
+    ]),
+  ]),
+
+  // ---- removal ---------------------------------------------------------------------------------------
+  (name: "Lightning Bolt", cost: "{R}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)],
+          effect: Damage(amount: Const(3), to: Target(0))),
+  ]),
+  (name: "Unholy Heat", cost: "{R}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE | PLANESWALKER"))],
+      effect: If(cond: Delirium(You), then: Damage(amount: Const(6), to: Target(0)), els: Damage(amount: Const(2), to: Target(0)))),
+  ]),
+  (name: "Abrade", cost: "{1}{R}", types: "INSTANT", abilities: [
+    Spell(choose: (1, 1), modes: [
+      (label: "Abrade deals 3 damage to target creature", targets: [(objects: (types_any: "CREATURE"))],
+        effect: Damage(amount: Const(3), to: Target(0))),
+      (label: "Destroy target artifact", targets: [(objects: (types_any: "ARTIFACT"))], effect: Destroy(One(Target(0)))),
+    ]),
+  ]),
+  (name: "Pyroclasm", cost: "{1}{R}", types: "SORCERY", abilities: [
+    Spell(effect: ForEach(filter: (types_any: "CREATURE"), body: Damage(amount: Const(2), to: Obj(Each(0))))),
+  ]),
+  (name: "Dismember", cost: "{1}{B/P}{B/P}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"))],
+      effect: Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(-5, -5), until: EndOfTurn)),
+  ]),
+  (name: "Bitter Triumph", cost: "{1}{B}", types: "INSTANT", abilities: [
+    AddCost(options: [[Discard(zone: Hand)], [PayLife(3)]], optional: false),
+    Spell(targets: [(objects: (types_any: "CREATURE | PLANESWALKER"))], effect: Destroy(One(Target(0)))),
+  ]),
+  (name: "Snuff Out", cost: "{3}{B}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE", colors_not: "B"))], effect: Destroy(One(Target(0)))),
+    Alt(label: "pay 4 life", key: "pay_life", cost: [PayLife(4)], cond: Controls(who: You, filter: (subtypes_any: ["Swamp"]), at_least: 1)),
+  ]),
+  (name: "Massacre", cost: "{2}{B}{B}", types: "SORCERY", abilities: [
+    Spell(effect: Continuous(objs: All(types_any: "CREATURE"), layer: L7c, effect: ModifyPT(-2, -2), until: EndOfTurn)),
+    Alt(label: "without paying its mana cost", key: "free", cost: [], cond: And([
+      Controls(who: Opp, filter: (subtypes_any: ["Plains"]), at_least: 1),
+      Controls(who: You, filter: (subtypes_any: ["Swamp"]), at_least: 1),
+    ])),
+  ]),
+  (name: "Swords to Plowshares", cost: "{W}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"))],
+      effect: Seq([GainLife(who: ControllerOf(Target(0)), n: PowerOf(Target(0))), Exile(One(Target(0)))])),
+  ]),
+  (name: "Path to Exile", cost: "{W}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"))],
+      effect: Seq([
+        Exile(One(Target(0))),
+        May(who: ControllerOf(Target(0)),
+          then: Search(who: ControllerOf(Target(0)), filter: (zone: Library, types_any: "LAND", supertypes_any: "BASIC"), dest: Battlefield, tapped: true)),
+      ])),
+  ]),
+  (name: "Erode", cost: "{W}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE | PLANESWALKER"))],
+      effect: Seq([
+        Destroy(One(Target(0))),
+        May(who: ControllerOf(Target(0)),
+          then: Search(who: ControllerOf(Target(0)), filter: (zone: Library, types_any: "LAND", supertypes_any: "BASIC"), dest: Battlefield, tapped: true)),
+      ])),
+  ]),
+  (name: "Meltdown", cost: "{X}{R}", types: "SORCERY", abilities: [
+    Spell(effect: ForEach(filter: (types_any: "ARTIFACT"),
+      body: If(cond: Cmp(CmcOf(Each(0)), Le, X), then: Destroy(One(Each(0)))))),
+  ]),
+  (name: "Prismari Charm", cost: "{U}{R}", types: "INSTANT", abilities: [
+    Spell(choose: (1, 1), modes: [
+      (label: "Surveil 2, then draw a card", effect: Seq([Surveil(Const(2)), Draw(who: You, n: Const(1))])),
+      (label: "Prismari Charm deals 1 damage to each of one or two targets",
+        targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any), (objects: (types_any: "CREATURE | PLANESWALKER"), players: Any, optional: true, distinct: true)],
+        effect: Seq([Damage(amount: Const(1), to: Target(0)), Damage(amount: Const(1), to: Target(1))])),
+      (label: "Return target nonland permanent to its owner's hand", targets: [(objects: (types_not: "LAND"))], effect: Bounce(One(Target(0)))),
+    ]),
+  ]),
+
+  // ---- discard and graveyard ---------------------------------------------------------------------------
+  (name: "Duress", cost: "{B}", types: "SORCERY", abilities: [
+    Spell(targets: [(players: Opp)],
+      effect: DiscardChoose(who: Target(0), filter: (zone: Hand, types_not: "CREATURE | LAND"))),
+  ]),
+  (name: "Thoughtseize", cost: "{B}", types: "SORCERY", abilities: [
+    Spell(targets: [(players: Any)],
+      effect: Seq([DiscardChoose(who: Target(0), filter: (zone: Hand, types_not: "LAND")), LoseLife(who: You, n: Const(2))])),
+  ]),
+  (name: "Unmask", cost: "{3}{B}", types: "SORCERY", abilities: [
+    Spell(targets: [(players: Any)], effect: DiscardChoose(who: Target(0), filter: (zone: Hand, types_not: "LAND"))),
+    Alt(label: "exile a black card from your hand", key: "exile_black_card", cost: [ExileFromHand(zone: Hand, colors_any: "B")]),
+  ]),
+  (name: "Reanimate", cost: "{B}", types: "SORCERY", abilities: [
+    Spell(targets: [(objects: (zone: Graveyard, types_any: "CREATURE"))],
+      effect: Seq([MoveTo(objs: One(Target(0)), to: Battlefield, ctrl: You), LoseLife(who: You, n: CmcOf(Target(0)))])),
+  ]),
+
+  // ---- wave 2a: delve, delirium, delayed triggers -----------------------------------------------------
+  (name: "Murktide Regent", cost: "{5}{U}{U}", types: "CREATURE", subtypes: ["Dragon"], pt: (3, 3), keywords: "FLYING", abilities: [
+    Delve,
+    Enters(filter: (self_only: true), effect: CountersDelved(PlusOne)),
+    Triggered(text: "Whenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on this creature.", on: ZoneChange(filter: (types_any: "INSTANT | SORCERY", owner: You), from: Some(Graveyard)),
+      effect: AddCounters(objs: One(This), kind: PlusOne, n: Const(1))),
+  ]),
+  (name: "Dragon's Rage Channeler", cost: "{R}", types: "CREATURE", subtypes: ["Human", "Shaman"], pt: (1, 1), abilities: [
+    Triggered(text: "Whenever you cast a noncreature spell, surveil 1.", on: SpellCast(caster: You, filter: (types_not: "CREATURE")), effect: Surveil(Const(1))),
+    Static(layer: L6, applies_to: (self_only: true), effect: GrantKeywords("FLYING | MUST_ATTACK"), cond: Delirium(You)),
+    Static(layer: L7c, applies_to: (self_only: true), effect: ModifyPT(2, 2), cond: Delirium(You)),
+  ]),
+  (name: "Mishra's Bauble", cost: "{0}", types: "ARTIFACT", abilities: [
+    Activated(text: "{T}, Sacrifice this artifact: Look at the top card of target player's library.", cost: [TapSelf, SacrificeSelf], targets: [(players: Any)],
+      effect: Seq([LookTop(who: Target(0)), Delay(when: NextUpkeep, ability: 1)])),
+    Triggered(text: "Draw a card at the beginning of the next turn's upkeep.", on: Delayed, effect: Draw(who: You, n: Const(1))),
+  ]),
+
+  // ---- wave 2b: equipment ------------------------------------------------------------------------------
+  (name: "Cori-Steel Cutter", cost: "{1}{R}", types: "ARTIFACT", subtypes: ["Equipment"], abilities: [
+    Static(layer: L6, applies_to: (equipped_by_source: true), effect: GrantKeywords("TRAMPLE | HASTE")),
+    Static(layer: L7c, applies_to: (equipped_by_source: true), effect: ModifyPT(1, 1)),
+    Triggered(text: "Flurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it.", on: SpellCast(caster: You, nth: Some(2)),
+      effect: Seq([CreateToken(token: "Monk Token", n: Const(1), who: You), May(who: You, then: Attach(what: This, to: Moved(0)))])),
+    Activated(text: "Equip {1}{R}", cost: [Mana("{1}{R}")], timing: Sorcery, targets: [(objects: (types_any: "CREATURE", controller: You))], effect: Attach(what: This, to: Target(0))),
+  ]),
+
+  // ---- wave 2c: flicker, evoke, enters replacements -----------------------------------------------------
+  (name: "Phelia, Exuberant Shepherd", cost: "{1}{W}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Dog"], pt: (2, 2), keywords: "FLASH", abilities: [
+    Triggered(text: "Whenever Phelia attacks, exile up to one other target nonland permanent.", on: Attacks(filter: (self_only: true)),
+      targets: [(objects: (types_not: "LAND", not_self: true), optional: true)],
+      effect: ExileUntil(objs: One(Target(0)), when: NextEndStep, ability: 1)),
+    // The delayed return; a +1/+1 counter if the card came back under its exiler's control.
+    Triggered(text: "At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.", on: Delayed, effect: Seq([
+      MoveTo(objs: Captured, to: Battlefield),
+      If(cond: ControlledBy(Moved(0), You), then: AddCounters(objs: One(This), kind: PlusOne, n: Const(1))),
+    ])),
+  ]),
+  (name: "Flickerwisp", cost: "{1}{W}{W}", types: "CREATURE", subtypes: ["Elemental"], pt: (3, 1), keywords: "FLYING", abilities: [
+    Triggered(text: "When this creature enters, exile another target permanent.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (not_self: true))],
+      effect: ExileUntil(objs: One(Target(0)), when: NextEndStep, ability: 1)),
+    Triggered(text: "Return that card to the battlefield under its owner's control at the beginning of the next end step.", on: Delayed, effect: MoveTo(objs: Captured, to: Battlefield)),
+  ]),
+  (name: "Solitude", cost: "{3}{W}{W}", types: "CREATURE", subtypes: ["Elemental", "Incarnation"], pt: (3, 2), keywords: "FLASH | LIFELINK", abilities: [
+    Triggered(text: "When this creature enters, exile up to one other target creature. That creature's controller gains life equal to its power.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_any: "CREATURE", not_self: true), optional: true)],
+      effect: Seq([GainLife(who: ControllerOf(Target(0)), n: PowerOf(Target(0))), Exile(One(Target(0)))])),
+    Triggered(text: "When this creature enters, if its evoke cost was paid, its controller sacrifices it.", on: Enters(filter: (self_only: true)), cond: WasCast(key: Some("evoke")), effect: Sacrifice(One(This))),
+    Alt(label: "evoke: exile a white card from your hand", key: "evoke", cost: [ExileFromHand(zone: Hand, colors_any: "W")]),
+  ]),
+  (name: "Containment Priest", cost: "{1}{W}", types: "CREATURE", subtypes: ["Human", "Cleric"], pt: (2, 2), keywords: "FLASH", abilities: [
+    Enters(filter: (types_any: "CREATURE", token: Some(false)), cast: Some(false), effect: Exile),
+  ]),
+  (name: "Spider-Woman, Stunning Savior", cost: "{1}{W/U}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Spider", "Human", "Hero"], pt: (2, 2), keywords: "FLYING", abilities: [
+    Enters(filter: (types_any: "ARTIFACT | CREATURE", controller: Opp), effect: Tapped),
+  ]),
+  (name: "Recruiter of the Guard", cost: "{2}{W}", types: "CREATURE", subtypes: ["Human", "Soldier"], pt: (1, 1), abilities: [
+    Triggered(text: "When this creature enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.", on: Enters(filter: (self_only: true)),
+      effect: May(who: You, then: Search(filter: (zone: Library, types_any: "CREATURE", toughness: (Le, 2)), dest: Hand))),
+  ]),
+
+  // ---- wave 2d: restrictions and permissions --------------------------------------------------------------
+  (name: "Null Rod", cost: "{2}", types: "ARTIFACT", abilities: [
+    Restrict(what: CantActivate(sources: (types_any: "ARTIFACT"))),
+  ]),
+  (name: "Gaddock Teeg", cost: "{G}{W}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Kithkin", "Advisor"], pt: (2, 2), abilities: [
+    Restrict(what: CantCast(applies: (types_not: "CREATURE", cmc: (Ge, 4)))),
+    Restrict(what: CantCast(applies: (types_not: "CREATURE", has_x: true))),
+  ]),
+  (name: "Deafening Silence", cost: "{W}", types: "ENCHANTMENT", abilities: [
+    Restrict(what: CantCast(applies: (types_not: "CREATURE"), second_noncreature: true)),
+  ]),
+  (name: "Voice of Victory", cost: "{1}{W}", types: "CREATURE", subtypes: ["Human", "Bard"], pt: (1, 3), abilities: [
+    Restrict(who: Opp, cond: IsActive(You), what: CantCast()),
+    Triggered(text: "Mobilize 2: Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.", on: Attacks(filter: (self_only: true)),
+      effect: Seq([CreateToken(token: "Warrior Token", n: Const(2), who: You), TapAttackMoved, DelayMoved(when: NextEndStep, ability: 2)])),
+    Triggered(text: "Sacrifice the Warrior tokens.", on: Delayed, effect: Sacrifice(Captured)),
+  ]),
+  (name: "Warrior Token", types: "CREATURE", colors: "R", subtypes: ["Warrior"], pt: (1, 1), is_token: true),
+  (name: "Lavinia, Azorius Renegade", cost: "{W}{U}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Human", "Soldier"], pt: (2, 2), abilities: [
+    Restrict(who: Opp, what: CantCast(applies: (types_not: "CREATURE"), cmc_over_lands: true)),
+    Triggered(text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", on: SpellCast(caster: Opp), cond: Cmp(ManaSpent(EventObj), Eq, Const(0)), effect: CounterSpellOf(EventObj)),
+  ]),
+  (name: "Grafdigger's Cage", cost: "{1}", types: "ARTIFACT", abilities: [
+    Restrict(what: CantCast(from: [Graveyard, Library])),
+    Enters(filter: (types_any: "CREATURE"), from: Some(Graveyard), effect: Prevent),
+    Enters(filter: (types_any: "CREATURE"), from: Some(Library), effect: Prevent),
+  ]),
+  (name: "Defense Grid", cost: "{2}", types: "ARTIFACT", abilities: [
+    CostMod(applies: (), generic: 3, not_casters_turn: true),
+  ]),
+  (name: "Aluren", cost: "{2}{G}{G}", types: "ENCHANTMENT", abilities: [
+    Permit(key: "aluren", applies: (types_any: "CREATURE", cmc: (Le, 3)), flash: true),
+  ]),
+  (name: "Omniscience", cost: "{7}{U}{U}{U}", types: "ENCHANTMENT", abilities: [
+    Permit(key: "omniscience", who: You, applies: (types_not: "LAND")),
+  ]),
+
+  // ---- wave 3: activated from hand ------------------------------------------------------------
+  (name: "Faerie Macabre", cost: "{1}{B}{B}", types: "CREATURE", colors: "B", subtypes: ["Faerie", "Rogue"], pt: (2, 2), keywords: "FLYING", abilities: [
+    Activated(text: "Discard this card: Exile up to two target cards from graveyards.", zone: Hand, cost: [DiscardSelf],
+      targets: [(objects: (zone: Graveyard), optional: true), (objects: (zone: Graveyard), optional: true, distinct: true)],
+      effect: Seq([Exile(One(Target(0))), Exile(One(Target(1)))])),
+  ]),
+  (name: "Boseiju, Who Endures", types: "LAND", supertypes: "LEGENDARY", abilities: [
+    Activated(text: "{T}: Add {G}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: G, n: 1)),
+    Activated(text: "Channel — {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.",
+      zone: Hand, cost: [Mana("{1}{G}"), DiscardSelf], cost_reduce: (types_any: "CREATURE", supertypes_any: "LEGENDARY", controller: You),
+      targets: [(objects: (types_any: "ARTIFACT | ENCHANTMENT | LAND", supertypes_not: "BASIC", controller: Opp))],
+      effect: Seq([Destroy(One(Target(0))), May(who: ControllerOf(Target(0)), then: Search(who: ControllerOf(Target(0)), filter: (zone: Library, types_any: "LAND", subtypes_any: ["Plains", "Island", "Swamp", "Mountain", "Forest"]), dest: Battlefield))])),
+  ]),
+  (name: "Street Wraith", cost: "{3}{B}{B}", types: "CREATURE", colors: "B", subtypes: ["Wraith"], pt: (3, 4), keywords: "SWAMPWALK", abilities: [
+    Activated(text: "Cycling—Pay 2 life. (Pay 2 life, Discard this card: Draw a card.)", zone: Hand, cost: [PayLife(2), DiscardSelf], effect: Draw(who: You, n: Const(1))),
+  ]),
+
+  // ---- wave 4: names, revolt ---------------------------------------------------------------------------
+  (name: "Cabal Therapy", cost: "{B}", types: "SORCERY", abilities: [
+    Spell(targets: [(players: Any)], effect: Seq([ChooseName(lands: false), DiscardNamed(who: Target(0))])),
+    Alt(label: "flashback", key: "flashback", cost: [Sacrifice(types_any: "CREATURE", controller: You)], zone: Graveyard, exile_after: true),
+  ]),
+  (name: "Disruptor Flute", cost: "{2}", types: "ARTIFACT", keywords: "FLASH", abilities: [
+    EntersChoice(CardName),
+    CostMod(applies: (chosen_name: true), generic: 3),
+    Restrict(what: CantActivate(sources: (chosen_name: true), except_mana: true)),
+  ]),
+  (name: "Fatal Push", cost: "{B}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "CREATURE"))],
+      effect: If(cond: Or([Matches(Target(0), (cmc: (Le, 2))), And([Revolt(You), Matches(Target(0), (cmc: (Le, 4)))])]), then: Destroy(One(Target(0))))),
+  ]),
+  (name: "Veil of Summer", cost: "{G}", types: "INSTANT", abilities: [
+    Spell(effect: Seq([
+      If(cond: CastColor(who: Opp, colors: "U | B"), then: Draw(who: You, n: Const(1))),
+      PlayerFx(who: You, fx: SpellsUncounterable, until: EndOfTurn),
+      PlayerFx(who: You, fx: HexproofFrom("U | B"), until: EndOfTurn),
+      Continuous(objs: All(controller: You), layer: L6, effect: HexproofFrom("U | B"), until: EndOfTurn),
+    ])),
+  ]),
+  (name: "Thassa's Oracle", cost: "{U}{U}", types: "CREATURE", subtypes: ["Merfolk", "Wizard"], pt: (1, 3), abilities: [
+    Triggered(text: "When this creature enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game.",
+      on: Enters(filter: (self_only: true)),
+      effect: Seq([LookPutTop(look: Devotion("U", You)), If(cond: Cmp(Devotion("U", You), Ge, CardsInLibrary(You)), then: Win(You))])),
+  ]),
+  (name: "Goblin Bombardment", cost: "{1}{R}", types: "ENCHANTMENT", abilities: [
+    Activated(text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", cost: [Sacrifice(types_any: "CREATURE", controller: You)],
+      targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)], effect: Damage(amount: Const(1), to: Target(0))),
+  ]),
+
+  // ---- wave 5: copies ------------------------------------------------------------------------------------
+  (name: "Consign to Memory", cost: "{U}", types: "INSTANT", abilities: [
+    Replicate("{1}"),
+    Triggered(text: "Replicate (When you cast this spell, copy it for each time you paid its replicate cost. You may choose new targets for the copies.)", zone: Stack,
+      on: SpellCast(caster: You, filter: (self_only: true)), cond: Cmp(Replicated(This), Gt, Const(0)),
+      effect: CopySpell(what: This, n: Replicated(This))),
+    Spell(targets: [(objects: (zone: Stack, stack: Triggered, alt: [(zone: Stack, stack: Spell, colorless: true)]))], effect: CounterAny(0)),
+  ]),
+  (name: "Flusterstorm", cost: "{U}", types: "INSTANT", abilities: [
+    Triggered(text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", zone: Stack,
+      on: SpellCast(caster: You, filter: (self_only: true)), effect: CopySpell(what: This, n: EventAmount)),
+    Spell(targets: [(objects: (zone: Stack, stack: Spell, types_any: "INSTANT | SORCERY"))], effect: CounterUnless(target: 0, pays: "{1}")),
+  ]),
+
+  // ---- wave 5: cheap batch -------------------------------------------------------------------------------
+  (name: "Griselbrand", cost: "{4}{B}{B}{B}{B}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Demon"], pt: (7, 7), keywords: "FLYING | LIFELINK", abilities: [
+    Activated(text: "Pay 7 life: Draw seven cards.", cost: [PayLife(7)], effect: Draw(who: You, n: Const(7))),
+  ]),
+  (name: "Loran of the Third Path", cost: "{2}{W}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Human", "Artificer"], pt: (2, 1), keywords: "VIGILANCE", abilities: [
+    Triggered(text: "When Loran enters, destroy up to one target artifact or enchantment.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_any: "ARTIFACT | ENCHANTMENT"), optional: true)], effect: Destroy(One(Target(0)))),
+    Activated(text: "{T}: You and target opponent each draw a card.", cost: [TapSelf], targets: [(players: Opp)],
+      effect: Seq([Draw(who: You, n: Const(1)), Draw(who: Target(0), n: Const(1))])),
+  ]),
+  (name: "Aether Vial", cost: "{1}", types: "ARTIFACT", abilities: [
+    Triggered(text: "At the beginning of your upkeep, you may put a charge counter on this artifact.", on: BeginStep(step: Upkeep, whose: You),
+      effect: May(who: You, then: AddCounters(objs: One(This), kind: Charge, n: Const(1)))),
+    Activated(text: "{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.", cost: [TapSelf],
+      effect: PutChosen(who: You, from: Hand, filter: (zone: Hand, types_any: "CREATURE"), cmc: Counters(This, Charge), to: Battlefield, optional: true)),
+  ]),
+  (name: "Edge of Autumn", cost: "{1}{G}", types: "SORCERY", abilities: [
+    Spell(effect: If(cond: Cmp(Count(types_any: "LAND", controller: You), Le, Const(4)),
+      then: Search(filter: (zone: Library, types_any: "LAND", supertypes_any: "BASIC"), dest: Battlefield, tapped: true))),
+    Activated(text: "Cycling—Sacrifice a land. (Sacrifice a land, Discard this card: Draw a card.)", zone: Hand, cost: [Sacrifice(types_any: "LAND", controller: You), DiscardSelf], effect: Draw(who: You, n: Const(1))),
+  ]),
+  (name: "Nihil Spellbomb", cost: "{1}", types: "ARTIFACT", abilities: [
+    Activated(text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", cost: [TapSelf, SacrificeSelf], targets: [(players: Any)], effect: ExileGraveyard(who: Target(0))),
+    Triggered(text: "When this artifact is put into a graveyard from the battlefield, you may pay {B}. If you do, draw a card.", on: ZoneChange(filter: (self_only: true), from: Some(Battlefield), to: Some(Graveyard)),
+      effect: MayPay(who: You, pays: "{B}", then: Draw(who: You, n: Const(1)))),
+  ]),
+  (name: "Shallow Grave", cost: "{1}{B}", types: "INSTANT", abilities: [
+    Spell(effect: Seq([
+      MoveTo(objs: TopOfGraveyard(who: You, filter: (zone: Graveyard, types_any: "CREATURE")), to: Battlefield),
+      Continuous(objs: One(Moved(0)), layer: L6, effect: GrantKeywords("HASTE"), until: EndOfTurn),
+      DelayMoved(when: NextEndStep, ability: 1),
+    ])),
+    Triggered(text: "Exile it at the beginning of the next end step.", on: Delayed, effect: Exile(Captured)),
+  ]),
+  (name: "Guide of Souls", cost: "{W}", types: "CREATURE", subtypes: ["Human", "Cleric"], pt: (1, 2), abilities: [
+    Triggered(text: "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter).", on: Enters(filter: (types_any: "CREATURE", controller: You, not_self: true)),
+      effect: Seq([GainLife(who: You, n: Const(1)), GainEnergy(who: You, n: Const(1))])),
+    Triggered(text: "Whenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.", on: YouAttack,
+      effect: If(cond: Cmp(Energy(You), Ge, Const(3)), then: May(who: You, then: Seq([LoseEnergy(who: You, n: Const(3)), Reflexive(ability: 2)])))),
+    Triggered(text: "When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.", on: Delayed,
+      targets: [(objects: (types_any: "CREATURE", attacking: Some(true)))],
+      effect: Seq([AddCounters(objs: One(Target(0)), kind: PlusOne, n: Const(2)), AddCounters(objs: One(Target(0)), kind: Flying, n: Const(1)),
+        Continuous(objs: One(Target(0)), layer: L4, effect: AddSubtypes(["Angel"]), until: Forever)])),
+  ]),
+  (name: "Prismatic Ending", cost: "{X}{W}", types: "SORCERY", abilities: [
+    Spell(targets: [(objects: (types_not: "LAND"))], effect: If(cond: Cmp(CmcOf(Target(0)), Le, ColorsSpent(This)), then: Exile(One(Target(0))))),
+  ]),
+  (name: "Skyclave Apparition", cost: "{1}{W}{W}", types: "CREATURE", subtypes: ["Kor", "Spirit"], pt: (2, 2), abilities: [
+    Triggered(text: "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_not: "LAND", token: Some(false), controller: Opp, cmc: (Le, 4)), optional: true)], effect: ExileLinked(One(Target(0)))),
+    Triggered(text: "When this creature leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.", on: ZoneChange(filter: (self_only: true), from: Some(Battlefield)),
+      effect: LinkedToken(token: "Illusion Token (Skyclave Apparition)")),
+  ]),
+  (name: "Illusion Token (Skyclave Apparition)", types: "CREATURE", colors: "U", subtypes: ["Illusion"], pt: (0, 0), is_token: true),
+
+  // ---- wave 6: graveyard creatures, escape, Bowmasters -------------------------------------------------------
+  (name: "Nethergoyf", cost: "{B}", types: "CREATURE", subtypes: ["Lhurgoyf"], pt: (0, 1), abilities: [
+    Static(layer: L7a, applies_to: (self_only: true), effect: SetPTExpr(x: GraveyardTypes(Some(You)), t_plus: 1)),
+    Alt(label: "escape", key: "escape", cost: [Mana("{2}{B}"), ExileTypes(4)], zone: Graveyard),
+  ]),
+  (name: "Barrowgoyf", cost: "{2}{B}", types: "CREATURE", subtypes: ["Lhurgoyf"], pt: (0, 1), keywords: "DEATHTOUCH | LIFELINK", abilities: [
+    Static(layer: L7a, applies_to: (self_only: true), effect: SetPTExpr(x: GraveyardTypes(None), t_plus: 1)),
+    Triggered(text: "Whenever this creature deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.", on: CombatDamageToPlayer(filter: (self_only: true)),
+      effect: May(who: You, then: Seq([Mill(who: You, n: EventAmount), TakeMoved(filter: (zone: Graveyard, types_any: "CREATURE"), to: Hand, optional: true)]))),
+  ]),
+  (name: "Phlage, Titan of Fire's Fury", cost: "{1}{R}{W}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Elder", "Giant"], pt: (6, 6), abilities: [
+    Triggered(text: "When Phlage enters, sacrifice it unless it escaped.", on: Enters(filter: (self_only: true)),
+      effect: If(cond: Not(WasCast(key: Some("escape"))), then: Sacrifice(One(This)))),
+    Triggered(text: "Whenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)], effect: Seq([Damage(amount: Const(3), to: Target(0)), GainLife(who: You, n: Const(3))])),
+    Triggered(text: "Whenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.", on: Attacks(filter: (self_only: true)),
+      targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)], effect: Seq([Damage(amount: Const(3), to: Target(0)), GainLife(who: You, n: Const(3))])),
+    Alt(label: "escape", key: "escape", zone: Graveyard, cost: [Mana("{R}{R}{W}{W}"),
+      ExileFromGraveyard(zone: Graveyard), ExileFromGraveyard(zone: Graveyard), ExileFromGraveyard(zone: Graveyard), ExileFromGraveyard(zone: Graveyard), ExileFromGraveyard(zone: Graveyard)]),
+  ]),
+  (name: "Orcish Bowmasters", cost: "{1}{B}", types: "CREATURE", subtypes: ["Orc", "Archer"], pt: (1, 1), keywords: "FLASH", abilities: [
+    Triggered(text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)], effect: Seq([Damage(amount: Const(1), to: Target(0)), Amass(token: "Orc Army Token", n: Const(1))])),
+    Triggered(text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", on: Draw(who: Opp, not_first_in_draw_step: true),
+      targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)], effect: Seq([Damage(amount: Const(1), to: Target(0)), Amass(token: "Orc Army Token", n: Const(1))])),
+  ]),
+
+  // ---- wave 7: Ocelot Pride -------------------------------------------------------------------------------
+  (name: "Ocelot Pride", cost: "{W}", types: "CREATURE", subtypes: ["Cat"], pt: (1, 1), keywords: "FIRST_STRIKE | LIFELINK", abilities: [
+    Ascend,
+    Triggered(text: "At the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token. Then if you have the city's blessing, for each token you control that entered this turn, create a token that's a copy of it.",
+      on: BeginStep(step: End, whose: You), cond: Cmp(LifeGainedThisTurn(You), Ge, Const(1)),
+      effect: Seq([
+        CreateToken(token: "Cat Token (Ocelot Pride)", n: Const(1), who: You),
+        If(cond: Blessing(You), then: ForEach(filter: (token: Some(true), controller: You, entered_this_turn: Some(true)), body: CopyToken(One(Each(0))))),
+      ])),
+  ]),
+  (name: "Cat Token (Ocelot Pride)", types: "CREATURE", colors: "W", subtypes: ["Cat"], pt: (1, 1), is_token: true),
+
+  // ---- wave 8: Show and Tell, Atraxa -----------------------------------------------------------------------
+  (name: "Show and Tell", cost: "{2}{U}", types: "SORCERY", abilities: [
+    Spell(effect: EachPutFromHand(filter: (zone: Hand, types_any: "ARTIFACT | CREATURE | ENCHANTMENT | LAND"))),
+  ]),
+  (name: "Atraxa, Grand Unifier", cost: "{3}{G}{W}{U}{B}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Phyrexian", "Angel"], pt: (7, 7), keywords: "FLYING | VIGILANCE | DEATHTOUCH | LIFELINK", abilities: [
+    Triggered(text: "When Atraxa enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order.", on: Enters(filter: (self_only: true)),
+      effect: RevealPickTypes(look: Const(10))),
+  ]),
+
+  // ---- wave 9: Acererak and the dungeons ---------------------------------------------------------------
+  (name: "Lost Mine of Phandelver", dungeon: (rooms: [
+    (name: "Cave Entrance", exits: [1, 2]), (name: "Goblin Lair", exits: [3, 4]), (name: "Mine Tunnels", exits: [4, 5]),
+    (name: "Storeroom", exits: [6]), (name: "Dark Pool", exits: [6]), (name: "Fungi Cavern", exits: [6]), (name: "Temple of Dumathoin"),
+  ]), abilities: [
+    Triggered(text: "Cave Entrance: Scry 1.", on: Delayed, zone: Command, effect: Scry(Const(1))),
+    Triggered(text: "Goblin Lair: Create a 1/1 red Goblin creature token.", on: Delayed, zone: Command, effect: CreateToken(token: "Goblin Token", n: Const(1), who: You)),
+    Triggered(text: "Mine Tunnels: Create a Treasure token.", on: Delayed, zone: Command, effect: CreateToken(token: "Treasure Token", n: Const(1), who: You)),
+    Triggered(text: "Storeroom: Put a +1/+1 counter on target creature.", on: Delayed, zone: Command, targets: [(objects: (types_any: "CREATURE"))],
+      effect: AddCounters(objs: One(Target(0)), kind: PlusOne, n: Const(1))),
+    Triggered(text: "Dark Pool: Each opponent loses 1 life and you gain 1 life.", on: Delayed, zone: Command, effect: Seq([LoseLife(who: Opp, n: Const(1)), GainLife(who: You, n: Const(1))])),
+    Triggered(text: "Fungi Cavern: Target creature gets -4/-0 until your next turn.", on: Delayed, zone: Command, targets: [(objects: (types_any: "CREATURE"))],
+      effect: Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(-4, 0), until: YourNextTurn)),
+    Triggered(text: "Temple of Dumathoin: Draw a card.", on: Delayed, zone: Command, effect: Draw(who: You, n: Const(1))),
+  ]),
+  (name: "Dungeon of the Mad Mage", dungeon: (rooms: [
+    (name: "Yawning Portal", exits: [1]), (name: "Dungeon Level", exits: [2, 3]), (name: "Goblin Bazaar", exits: [4]), (name: "Twisted Caverns", exits: [4]),
+    (name: "Lost Level", exits: [5, 6]), (name: "Runestone Caverns", exits: [7]), (name: "Muiral's Graveyard", exits: [7]), (name: "Deep Mines", exits: [8]), (name: "Mad Wizard's Lair"),
+  ]), abilities: [
+    Triggered(text: "Yawning Portal: You gain 1 life.", on: Delayed, zone: Command, effect: GainLife(who: You, n: Const(1))),
+    Triggered(text: "Dungeon Level: Scry 1.", on: Delayed, zone: Command, effect: Scry(Const(1))),
+    Triggered(text: "Goblin Bazaar: Create a Treasure token.", on: Delayed, zone: Command, effect: CreateToken(token: "Treasure Token", n: Const(1), who: You)),
+    Triggered(text: "Twisted Caverns: Target creature can't attack until your next turn.", on: Delayed, zone: Command, targets: [(objects: (types_any: "CREATURE"))],
+      effect: Continuous(objs: One(Target(0)), layer: L6, effect: CantAttack, until: YourNextTurn)),
+    Triggered(text: "Lost Level: Scry 2.", on: Delayed, zone: Command, effect: Scry(Const(2))),
+    Triggered(text: "Runestone Caverns: Exile the top two cards of your library. You may play them.", on: Delayed, zone: Command, effect: ExilePlay(n: Const(2))),
+    Triggered(text: "Muiral's Graveyard: Create two 1/1 black Skeleton creature tokens.", on: Delayed, zone: Command, effect: CreateToken(token: "Skeleton Token", n: Const(2), who: You)),
+    Triggered(text: "Deep Mines: Scry 3.", on: Delayed, zone: Command, effect: Scry(Const(3))),
+    Triggered(text: "Mad Wizard's Lair: Draw three cards and reveal them. You may cast one of them without paying its mana cost.", on: Delayed, zone: Command, effect: DrawRevealCast(n: Const(3))),
+  ]),
+  (name: "Tomb of Annihilation", dungeon: (rooms: [
+    (name: "Trapped Entry", exits: [1, 3]), (name: "Veils of Fear", exits: [2]), (name: "Sandfall Cell", exits: [4]), (name: "Oubliette", exits: [4]), (name: "Cradle of the Death God"),
+  ]), abilities: [
+    Triggered(text: "Trapped Entry: Each player loses 1 life.", on: Delayed, zone: Command, effect: ForEachPlayer(body: LoseLife(who: Each, n: Const(1)))),
+    Triggered(text: "Veils of Fear: Each player loses 2 life unless they discard a card.", on: Delayed, zone: Command,
+      effect: ForEachPlayer(body: MayElse(who: Each, can: Cmp(CardsInHand(Each), Ge, Const(1)), then: Discard(who: Each, n: Const(1)), els: LoseLife(who: Each, n: Const(2))))),
+    Triggered(text: "Sandfall Cell: Each player loses 2 life unless they sacrifice a creature, artifact, or land of their choice.", on: Delayed, zone: Command,
+      effect: ForEachPlayer(body: MayElse(who: Each, can: Controls(who: Each, filter: (types_any: "CREATURE | ARTIFACT | LAND"), at_least: 1),
+        then: SacrificeChosen(who: Each, filter: (types_any: "CREATURE | ARTIFACT | LAND")), els: LoseLife(who: Each, n: Const(2))))),
+    Triggered(text: "Oubliette: Discard a card and sacrifice a creature, an artifact, and a land.", on: Delayed, zone: Command,
+      effect: Seq([Discard(who: You, n: Const(1)), SacrificeOneEach(who: You, filters: [(types_any: "CREATURE"), (types_any: "ARTIFACT"), (types_any: "LAND")])])),
+    Triggered(text: "Cradle of the Death God: Create The Atropal, a legendary 4/4 black God Horror creature token with deathtouch.", on: Delayed, zone: Command,
+      effect: CreateToken(token: "The Atropal", n: Const(1), who: You)),
+  ]),
+  (name: "Acererak the Archlich", cost: "{2}{B}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Zombie", "Wizard"], pt: (5, 5), abilities: [
+    Triggered(text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", on: Enters(filter: (self_only: true)),
+      cond: Not(Completed(who: You, dungeon: "Tomb of Annihilation")), effect: Seq([MoveTo(objs: One(This), to: Hand), Venture])),
+    Triggered(text: "Whenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice.", on: Attacks(filter: (self_only: true)),
+      effect: If(cond: Controls(who: Opp, filter: (types_any: "CREATURE"), at_least: 1),
+        then: MayElse(who: Opp, then: SacrificeChosen(who: Opp, filter: (types_any: "CREATURE")), els: CreateToken(token: "Zombie Token", n: Const(1), who: You)),
+        els: CreateToken(token: "Zombie Token", n: Const(1), who: You))),
+  ]),
+
+  // ---- wave 10: Archon of Cruelty, Personal Tutor, Carpet of Flowers, Sand Scout ---------------------------
+  (name: "Archon of Cruelty", cost: "{6}{B}{B}", types: "CREATURE", subtypes: ["Archon"], pt: (6, 6), keywords: "FLYING", abilities: [
+    Triggered(text: "Whenever this creature enters or attacks, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.", on: Enters(filter: (self_only: true)),
+      targets: [(players: Opp)], effect: Seq([SacrificeChosen(who: Target(0), filter: (types_any: "CREATURE | PLANESWALKER")), Discard(who: Target(0), n: Const(1)), LoseLife(who: Target(0), n: Const(3)), Draw(who: You, n: Const(1)), GainLife(who: You, n: Const(3))])),
+    Triggered(text: "Whenever this creature enters or attacks, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.", on: Attacks(filter: (self_only: true)),
+      targets: [(players: Opp)], effect: Seq([SacrificeChosen(who: Target(0), filter: (types_any: "CREATURE | PLANESWALKER")), Discard(who: Target(0), n: Const(1)), LoseLife(who: Target(0), n: Const(3)), Draw(who: You, n: Const(1)), GainLife(who: You, n: Const(3))])),
+  ]),
+  (name: "Personal Tutor", cost: "{U}", types: "SORCERY", abilities: [
+    Spell(effect: Search(filter: (zone: Library, types_any: "SORCERY"), dest: Library)),
+  ]),
+  (name: "Carpet of Flowers", cost: "{G}", types: "ENCHANTMENT", abilities: [
+    Triggered(text: "At the beginning of each of your main phases, if you haven't added mana with this ability this turn, you may add X mana of any one color, where X is the number of Islands target opponent controls.", on: BeginStep(step: Main1, whose: You),
+      cond: Not(UsedThisTurn(1)), targets: [(players: Opp)],
+      effect: May(who: You, then: Seq([MarkUsed(1), AddManaAny(n: Count(subtypes_any: ["Island"], controller: Opp))]))),
+    Triggered(text: "At the beginning of each of your main phases, if you haven't added mana with this ability this turn, you may add X mana of any one color, where X is the number of Islands target opponent controls.", on: BeginStep(step: Main2, whose: You),
+      cond: Not(UsedThisTurn(1)), targets: [(players: Opp)],
+      effect: May(who: You, then: Seq([MarkUsed(1), AddManaAny(n: Count(subtypes_any: ["Island"], controller: Opp))]))),
+  ]),
+  (name: "Sand Scout", cost: "{1}{W}", types: "CREATURE", subtypes: ["Human", "Scout"], pt: (2, 2), abilities: [
+    Triggered(text: "When this creature enters, if an opponent controls more lands than you, search your library for a Desert card, put it onto the battlefield tapped, then shuffle.", on: Enters(filter: (self_only: true)),
+      cond: Cmp(Count(types_any: "LAND", controller: Opp), Gt, Count(types_any: "LAND", controller: You)),
+      effect: Search(filter: (zone: Library, types_any: "LAND", subtypes_any: ["Desert"]), dest: Battlefield, tapped: true)),
+    Triggered(text: "Whenever one or more land cards are put into your graveyard from anywhere, create a 1/1 red, green, and white Sand Warrior creature token. This ability triggers only once each turn.",
+      on: ZoneChange(filter: (types_any: "LAND", owner: You), from: None, to: Some(Graveyard)), once_per_turn: true, zone: Battlefield,
+      effect: CreateToken(token: "Sand Warrior Token", n: Const(1), who: You)),
+  ]),
+
+  // ---- wave 11: Quantum Riddler ------------------------------------------------------------------------
+  (name: "Quantum Riddler", cost: "{3}{U}{U}", types: "CREATURE", subtypes: ["Sphinx"], pt: (4, 6), keywords: "FLYING", abilities: [
+    Alt(label: "warp", key: "warp", cost: [Mana("{1}{U}")]),
+    Triggered(text: "When this creature enters, draw a card.", on: Enters(filter: (self_only: true)), effect: Draw(who: You, n: Const(1))),
+    Enters(filter: (self_only: true), cast: Some(true), effect: EndStepAbility(3, 1)),
+    Triggered(text: "Exile this creature (warp). You may cast it from exile on a later turn.", on: Delayed, effect: Seq([Exile(One(This)), AllowCastMoved])),
+    DrawPlusOne,
+  ]),
+  // ---- wave 12: Doomsday ------------------------------------------------------------------------------
+  (name: "Doomsday", cost: "{B}{B}{B}", types: "SORCERY", abilities: [
+    Spell(effect: Seq([Pile(n: 5), LoseLife(who: You, n: HalfUp(Life(You)))])),
+  ]),
+  (name: "Surgical Extraction", cost: "{B/P}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (zone: Graveyard, supertypes_not: "BASIC"))], effect: ExtractSame(target: 0)),
+  ]),
+  // ---- wave 13: Magus of the Moon ---------------------------------------------------------------------
+  (name: "Magus of the Moon", cost: "{2}{R}", types: "CREATURE", colors: "R", subtypes: ["Human", "Wizard"], pt: (2, 2), abilities: [
+    Static(layer: L4, applies_to: (types_any: "LAND", supertypes_not: "BASIC"), effect: BecomeBasicLand(3)),
+  ]),
+  (name: "Collective Brutality", cost: "{1}{B}", types: "SORCERY", abilities: [
+    Escalate([Discard(zone: Hand)]),
+    Spell(choose: (1, 3), modes: [
+      (label: "Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.",
+        targets: [(players: Opp)], effect: DiscardChoose(who: Target(0), filter: (zone: Hand, types_any: "INSTANT | SORCERY"))),
+      (label: "Target creature gets -2/-2 until end of turn.",
+        targets: [(objects: (types_any: "CREATURE"))], effect: Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(-2, -2), until: EndOfTurn)),
+      (label: "Target opponent loses 2 life and you gain 2 life.",
+        targets: [(players: Opp)], effect: Seq([LoseLife(who: Target(0), n: Const(2)), GainLife(who: You, n: Const(2))])),
+    ]),
+  ]),
+  (name: "Animate Dead", cost: "{1}{B}", types: "ENCHANTMENT", subtypes: ["Aura"], abilities: [
+    Spell(targets: [(objects: (zone: Graveyard, types_any: "CREATURE"))], effect: Seq([])),
+    Triggered(text: "When this Aura enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the battlefield with this Aura.\" Return enchanted creature card to the battlefield under your control and attach this Aura to it.",
+      on: Enters(filter: (self_only: true)), effect: ReanimateAttach),
+    Triggered(text: "When this Aura leaves the battlefield, that creature's controller sacrifices it.", on: ZoneChange(filter: (self_only: true), from: Some(Battlefield)), effect: Sacrifice(One(AttachedTo))),
+    Static(layer: L7c, applies_to: (equipped_by_source: true), effect: ModifyPT(-1, 0)),
+  ]),
+  (name: "Cavern of Souls", types: "LAND", abilities: [
+    EntersChoice(CreatureType),
+    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
+    Activated(text: "{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered.", cost: [TapSelf], is_mana: true, effect: AddManaRestricted),
+  ]),
+  // ---- wave 14: Moonshadow, Lazotep Quarry, Amped Raptor ------------------------------------------------
+  (name: "Moonshadow", cost: "{B}", types: "CREATURE", colors: "B", subtypes: ["Elemental"], pt: (7, 7), keywords: "MENACE", abilities: [
+    Enters(filter: (self_only: true), effect: Counters(MinusOne, 6)),
+    Triggered(text: "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.",
+      on: ZoneChange(filter: (types_any: "ARTIFACT | CREATURE | ENCHANTMENT | LAND | PLANESWALKER", token: Some(false), owner: You), from: None, to: Some(Graveyard)), batch: true, cond: HasCounter(This, MinusOne),
+      effect: AddCounters(objs: One(This), kind: MinusOne, n: Const(-1))),
+  ]),
+  (name: "Lazotep Quarry", types: "LAND", subtypes: ["Desert"], abilities: [
+    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
+    Activated(text: "{T}, Sacrifice a creature: Add one mana of any color.", cost: [TapSelf, Sacrifice(types_any: "CREATURE", controller: You)], is_mana: true, effect: AddManaAny(n: Const(1))),
+    Activated(text: "{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery.",
+      cost: [Mana("{X}{2}"), TapSelf, Sacrifice(subtypes_any: ["Desert"], controller: You)], timing: Sorcery,
+      targets: [(objects: (zone: Graveyard, types_any: "CREATURE", owner: You, cmc_x: true))],
+      effect: Seq([MoveTo(objs: One(Target(0)), to: Exile), CopyAs(objs: One(Moved(0)), pt: (4, 4), color: "B", subtype: 20)])),
+  ]),
+  (name: "Amped Raptor", cost: "{1}{R}", types: "CREATURE", colors: "R", subtypes: ["Dinosaur"], pt: (2, 1), keywords: "FIRST_STRIKE", abilities: [
+    Triggered(text: "When this creature enters, you get {E}{E} (two energy counters). Then if you cast it from your hand, exile cards from the top of your library until you exile a nonland card. You may cast that card by paying an amount of {E} equal to its mana value rather than paying its mana cost.",
+      on: Enters(filter: (self_only: true)),
+      effect: Seq([GainEnergy(who: You, n: Const(2)), If(cond: WasCast(from: Some(Hand), key: None), then: ExileCastEnergy)])),
+  ]),
+  (name: "Wrath of the Skies", cost: "{X}{W}{W}", types: "SORCERY", abilities: [
+    Spell(effect: EnergyWrath(filter: (types_any: "ARTIFACT | CREATURE | ENCHANTMENT"))),
+  ]),
+  (name: "Cloak and Dagger, Entwined", cost: "{1}{W}{B}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Human", "Hero"], pt: (2, 2), keywords: "DEATHTOUCH | LIFELINK", abilities: [
+    Triggered(text: "When Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.",
+      on: Enters(filter: (self_only: true)),
+      targets: [(players: Opp), (objects: (types_any: "CREATURE", controller: Opp, not_self: true), optional: true)],
+      effect: ExileUntilLeaves(creature: 1)),
+  ]),
+  (name: "Bilbo, Thief in the Night", cost: "{1}{U}", types: "CREATURE", colors: "U", supertypes: "LEGENDARY", subtypes: ["Halfling", "Rogue"], pt: (2, 2), abilities: [
+    CostMod(applies: (), who: You, generic: -1, not_from_hand: true),
+    Triggered(text: "Whenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If you do, exile it instead of putting it anywhere else.",
+      on: Attacks(filter: (self_only: true)),
+      effect: CastFromGraveyard(filter: (zone: Graveyard, types_any: "ARTIFACT | INSTANT | SORCERY", owner: You))),
+  ]),
+  (name: "White Orchid Phantom", cost: "{W}{W}", types: "CREATURE", colors: "W", subtypes: ["Spirit", "Knight"], pt: (2, 2), keywords: "FLYING | FIRST_STRIKE", abilities: [
+    Triggered(text: "When this creature enters, destroy up to one target nonbasic land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+      on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_any: "LAND", supertypes_not: "BASIC"), optional: true)],
+      effect: Seq([Destroy(One(Target(0))), May(who: ControllerOf(Target(0)), then: Search(who: ControllerOf(Target(0)), filter: (zone: Library, types_any: "LAND", supertypes_any: "BASIC"), dest: Battlefield, tapped: true))])),
+  ]),
+  (name: "Koma, World-Eater", cost: "{3}{G}{G}{U}{U}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Serpent"], pt: (8, 12), keywords: "TRAMPLE | UNCOUNTERABLE", abilities: [
+    Triggered(text: "Ward {4}", on: BecomesTarget(by: Opp), effect: CounterEventUnless(pays: "{4}")),
+    Triggered(text: "Whenever Koma deals combat damage to a player, create four 3/3 blue Serpent creature tokens named Koma's Coil.",
+      on: CombatDamageToPlayer(filter: (self_only: true)), effect: CreateToken(token: "Koma's Coil", n: Const(4), who: You)),
+  ]),
+  (name: "Koma's Coil", types: "CREATURE", colors: "U", subtypes: ["Serpent"], pt: (3, 3), is_token: true),
+  (name: "Emblem: Ninjas you control get +1/+1", types: "EMBLEM", is_token: true, abilities: [
+    Static(layer: L7c, applies_to: (subtypes_any: ["Ninja"], controller: You), effect: ModifyPT(1, 1)),
+  ]),
+  (name: "Kaito, Bane of Nightmares", cost: "{2}{U}{B}", types: "PLANESWALKER", supertypes: "LEGENDARY", subtypes: ["Kaito"], abilities: [
+    Enters(filter: (self_only: true), effect: Counters(Loyalty, 4)),
+    Activated(text: "Ninjutsu {1}{U}{B}", zone: Hand, cost: [Mana("{1}{U}{B}"), ReturnToHand(types_any: "CREATURE", controller: You, attacking: true, unblocked: true)], effect: NinjutsuEnter),
+    Static(layer: L4, applies_to: (self_only: true), cond: And([IsActive(You), HasCounter(This, Loyalty)]), effect: SetTypes("CREATURE", ["Ninja"])),
+    Static(layer: L6, applies_to: (self_only: true), cond: And([IsActive(You), HasCounter(This, Loyalty)]), effect: GrantKeywords("HEXPROOF")),
+    Static(layer: L7b, applies_to: (self_only: true), cond: And([IsActive(You), HasCounter(This, Loyalty)]), effect: SetPT(3, 4)),
+    Activated(text: "+1: You get an emblem with \"Ninjas you control get +1/+1.\"", cost: [Loyalty(1)], effect: CreateEmblem("Emblem: Ninjas you control get +1/+1")),
+    Activated(text: "0: Surveil 2. Then draw a card for each opponent who lost life this turn.", cost: [Loyalty(0)],
+      effect: Seq([Surveil(Const(2)), Draw(who: You, n: Min(LifeLostThisTurn(Opp), Const(1)))])),
+    Activated(text: "-2: Tap target creature. Put two stun counters on it.", cost: [Loyalty(-2)], targets: [(objects: (types_any: "CREATURE"))],
+      effect: Seq([Tap(One(Target(0))), AddCounters(objs: One(Target(0)), kind: Stun, n: Const(2))])),
+  ]),
+  (name: "Jace, Wielder of Mysteries", cost: "{1}{U}{U}{U}", types: "PLANESWALKER", supertypes: "LEGENDARY", subtypes: ["Jace"], abilities: [
+    Enters(filter: (self_only: true), effect: Counters(Loyalty, 4)),
+    EmptyDrawWins,
+    Activated(text: "+1: Target player mills two cards. Draw a card.", cost: [Loyalty(1)], targets: [(players: Any)],
+      effect: Seq([Mill(who: Target(0), n: Const(2)), Draw(who: You, n: Const(1))])),
+    Activated(text: "-8: Draw seven cards. Then if your library has no cards in it, you win the game.", cost: [Loyalty(-8)],
+      effect: Seq([Draw(who: You, n: Const(7)), If(cond: Cmp(CardsInLibrary(You), Eq, Const(0)), then: Win(You))])),
+  ]),
+  (name: "Hide on the Ceiling", cost: "{X}{U}", types: "INSTANT", abilities: [
+    Spell(targets: [(objects: (types_any: "ARTIFACT | CREATURE"), distinct: true, x_count: true)],
+      effect: ExileUntil(objs: TargetsFrom(0), when: NextEndStep, ability: 1)),
+    Triggered(text: "Return the exiled cards to the battlefield under their owners' control at the beginning of the next end step.", on: Delayed, effect: MoveTo(objs: Captured, to: Battlefield)),
+  ]),
+  (name: "The Ring", types: "EMBLEM", is_token: true, abilities: [
+    Triggered(text: "Whenever your Ring-bearer attacks, draw a card, then discard a card.", on: Attacks(filter: (ring_bearer: true)), zone: Command,
+      cond: Cmp(RingLevel(You), Ge, Const(2)), effect: Seq([Draw(who: You, n: Const(1)), Discard(who: You, n: Const(1))])),
+    Triggered(text: "Whenever your Ring-bearer becomes blocked by a creature, that creature's controller sacrifices it at end of combat.", on: BecomesBlocked(filter: (ring_bearer: true)), zone: Command,
+      cond: Cmp(RingLevel(You), Ge, Const(3)), effect: DelayEventObj(when: EndCombat, ability: 3)),
+    Triggered(text: "Whenever your Ring-bearer deals combat damage to a player, each opponent loses 3 life.", on: CombatDamageToPlayer(filter: (ring_bearer: true)), zone: Command,
+      cond: Cmp(RingLevel(You), Ge, Const(4)), effect: LoseLife(who: Opp, n: Const(3))),
+    Triggered(text: "Sacrifice the blocker at end of combat.", on: Delayed, effect: Sacrifice(Captured)),
+  ]),
+  (name: "Samwise the Stouthearted", cost: "{1}{W}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Halfling", "Peasant"], pt: (2, 1), keywords: "FLASH", abilities: [
+    Triggered(text: "When Samwise the Stouthearted enters, choose up to one target permanent card in your graveyard that was put there from the battlefield this turn. Return it to your hand. Then the Ring tempts you.",
+      on: Enters(filter: (self_only: true)),
+      targets: [(objects: (zone: Graveyard, types_any: "ARTIFACT | CREATURE | ENCHANTMENT | LAND | PLANESWALKER", owner: You, from_bf_this_turn: true), optional: true)],
+      effect: Seq([MoveTo(objs: One(Target(0)), to: Hand), RingTempts])),
+  ]),
+  (name: "Overlord of the Balemurk", cost: "{3}{B}{B}", types: "ENCHANTMENT | CREATURE", subtypes: ["Avatar", "Horror"], pt: (5, 5), abilities: [
+    Alt(label: "impending 5", key: "impending", cost: [Mana("{1}{B}")]),
+    Enters(filter: (self_only: true), cast: true, effect: CountersIfWay(Time, 5, 1)),
+    Static(layer: L4, applies_to: (self_only: true), cond: HasCounter(This, Time), effect: RemoveTypes("CREATURE")),
+    Triggered(text: "At the beginning of your end step, if this permanent has a time counter on it, remove a time counter from it.", on: BeginStep(step: End, whose: You), cond: HasCounter(This, Time),
+      effect: AddCounters(objs: One(This), kind: Time, n: Const(-1))),
+    Triggered(text: "Whenever Overlord of the Balemurk enters, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand.", on: Enters(filter: (self_only: true)),
+      effect: Seq([Mill(who: You, n: Const(4)), PutChosen(who: You, from: Graveyard, filter: (zone: Graveyard, owner: You, types_any: "CREATURE", subtypes_not: ["Avatar"], alt: [(zone: Graveyard, owner: You, types_any: "PLANESWALKER")]), to: Hand, optional: true)])),
+    Triggered(text: "Whenever Overlord of the Balemurk attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand.", on: Attacks(filter: (self_only: true)),
+      effect: Seq([Mill(who: You, n: Const(4)), PutChosen(who: You, from: Graveyard, filter: (zone: Graveyard, owner: You, types_any: "CREATURE", subtypes_not: ["Avatar"], alt: [(zone: Graveyard, owner: You, types_any: "PLANESWALKER")]), to: Hand, optional: true)])),
+  ]),
+  (name: "Triumph of Saint Katherine", cost: "{4}{W}", types: "CREATURE", subtypes: ["Human", "Warrior"], pt: (5, 5), keywords: "LIFELINK", abilities: [
+    Alt(label: "miracle", key: "miracle", cost: [Mana("{1}{W}")], cond: Cmp(Const(0), Eq, Const(1))),
+    Triggered(text: "Miracle {1}{W}", on: Draw(who: You, self_only: true, first_this_turn: true), zone: Hand, effect: MiracleCast(1)),
+    Triggered(text: "Praesidium Protectiva - When Triumph of Saint Katherine is put into your graveyard from the battlefield, exile it and the top six cards of your library in a face-down pile. If you do, shuffle that pile and put it back on top of your library.",
+      on: ZoneChange(filter: (self_only: true, owner: You), from: Battlefield, to: Graveyard), effect: PileBack),
+  ]),
+  // ---- wave 15: double-faced and adventure cards, the last of the pool ------------------------------------
+  (name: "Snow-Covered Plains", types: "LAND", supertypes: "BASIC | SNOW", subtypes: ["Plains"]),
+  (name: "Snow-Covered Island", types: "LAND", supertypes: "BASIC | SNOW", subtypes: ["Island"]),
+  (name: "Snow-Covered Swamp", types: "LAND", supertypes: "BASIC | SNOW", subtypes: ["Swamp"]),
+  (name: "Cat Warrior Token", types: "CREATURE", colors: "W", subtypes: ["Cat", "Warrior"], pt: (2, 1), is_token: true),
+  (name: "Clue Token", types: "ARTIFACT", subtypes: ["Clue"], is_token: true, abilities: [
+    Activated(text: "{2}, Sacrifice this token: Draw a card.", cost: [Mana("{2}"), SacrificeSelf], effect: Draw(who: You, n: Const(1))),
+  ]),
+  (name: "Emblem: no maximum hand size", types: "EMBLEM", is_token: true, abilities: [NoHandLimit]),
+  (name: "Ajani, Nacatl Pariah", cost: "{1}{W}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Cat", "Warrior"], pt: (1, 2), back: "Ajani, Nacatl Avenger", back_kind: Transform, abilities: [
+    Triggered(text: "When Ajani enters, create a 2/1 white Cat Warrior creature token.", on: Enters(filter: (self_only: true)), effect: CreateToken(token: "Cat Warrior Token", n: Const(1), who: You)),
+    Triggered(text: "Whenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.",
+      on: ZoneChange(filter: (subtypes_any: ["Cat"], not_self: true, controller: You), from: Battlefield, to: Graveyard), batch: true,
+      effect: May(who: You, then: ExileReturnTransformed)),
+  ]),
+  (name: "Ajani, Nacatl Avenger", types: "PLANESWALKER", colors: "W | R", supertypes: "LEGENDARY", subtypes: ["Ajani"], is_back: true, abilities: [
+    Enters(filter: (self_only: true), effect: Counters(Loyalty, 3)),
+    Activated(text: "+2: Put a +1/+1 counter on each Cat you control.", cost: [Loyalty(2)],
+      effect: ForEach(filter: (subtypes_any: ["Cat"], controller: You), body: AddCounters(objs: One(Each(0)), kind: PlusOne, n: Const(1)))),
+    Activated(text: "0: Create a 2/1 white Cat Warrior creature token. When you do, if you control a red permanent other than Ajani, he deals damage equal to the number of creatures you control to any target.", cost: [Loyalty(0)],
+      effect: Seq([CreateToken(token: "Cat Warrior Token", n: Const(1), who: You), If(cond: Controls(who: You, filter: (colors_any: "R", not_self: true), at_least: 1), then: Reflexive(ability: 4))])),
+    Activated(text: "-4: Each opponent chooses an artifact, a creature, an enchantment, and a planeswalker from among the nonland permanents they control, then sacrifices the rest.", cost: [Loyalty(-4)], effect: KeepOneOfEach),
+    Triggered(text: "Ajani deals damage equal to the number of creatures you control to any target.", on: Delayed, targets: [(objects: (types_any: "CREATURE | PLANESWALKER"), players: Any)],
+      effect: Damage(amount: Count(types_any: "CREATURE", controller: You), to: Target(0))),
+  ]),
+  (name: "Tamiyo, Inquisitive Student", cost: "{U}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Moonfolk", "Wizard"], pt: (0, 3), keywords: "FLYING", back: "Tamiyo, Seasoned Scholar", back_kind: Transform, abilities: [
+    Triggered(text: "Whenever Tamiyo attacks, investigate.", on: Attacks(filter: (self_only: true)), effect: CreateToken(token: "Clue Token", n: Const(1), who: You)),
+    Triggered(text: "Whenever you draw your third card in a turn, exile Tamiyo, then return her to the battlefield transformed under her owner's control.", on: Draw(who: You),
+      cond: Cmp(CardsDrawnThisTurn(You), Eq, Const(3)), event_cond: true, effect: ExileReturnTransformed),
+  ]),
+  (name: "Tamiyo, Seasoned Scholar", types: "PLANESWALKER", colors: "G | U", supertypes: "LEGENDARY", subtypes: ["Tamiyo"], is_back: true, abilities: [
+    Enters(filter: (self_only: true), effect: Counters(Loyalty, 2)),
+    Activated(text: "+2: Until your next turn, whenever a creature an opponent controls attacks you or a planeswalker you control, it gets -1/-0 until end of turn.", cost: [Loyalty(2)],
+      effect: WatchAttacks(ability: 4, until: YourNextTurn)),
+    Activated(text: "-3: Return target instant or sorcery card from your graveyard to your hand. If it's a green card, add one mana of any color.", cost: [Loyalty(-3)],
+      targets: [(objects: (zone: Graveyard, types_any: "INSTANT | SORCERY", owner: You))],
+      effect: Seq([MoveTo(objs: One(Target(0)), to: Hand), If(cond: Matches(Moved(0), (zone: Hand, colors_any: "G")), then: AddManaAny(n: Const(1)))])),
+    Activated(text: "-7: Draw cards equal to half the number of cards in your library, rounded up. You get an emblem with \"You have no maximum hand size.\"", cost: [Loyalty(-7)],
+      effect: Seq([Draw(who: You, n: HalfUp(CardsInLibrary(You))), CreateEmblem("Emblem: no maximum hand size")])),
+    Triggered(text: "Whenever a creature an opponent controls attacks you or a planeswalker you control, it gets -1/-0 until end of turn.", on: Delayed,
+      effect: Continuous(objs: One(EventObj), layer: L7c, effect: ModifyPT(-1, 0), until: EndOfTurn)),
+  ]),
+  (name: "Brazen Borrower", cost: "{1}{U}{U}", types: "CREATURE", subtypes: ["Faerie", "Rogue"], pt: (3, 1), keywords: "FLASH | FLYING | BLOCKS_ONLY_FLYERS", back: "Petty Theft", back_kind: Adventure),
+  (name: "Petty Theft", cost: "{1}{U}", types: "INSTANT", is_back: true, abilities: [
+    Spell(targets: [(objects: (types_not: "LAND", controller: Opp))], effect: Bounce(One(Target(0)))),
+  ]),
+  (name: "Boggart Trawler", cost: "{2}{B}", types: "CREATURE", subtypes: ["Goblin"], pt: (3, 1), back: "Boggart Bog", back_kind: Modal, abilities: [
+    Triggered(text: "When this creature enters, exile target player's graveyard.", on: Enters(filter: (self_only: true)), targets: [(players: Any)], effect: ExileGraveyard(who: Target(0))),
+  ]),
+  (name: "Boggart Bog", types: "LAND", is_back: true, abilities: [
+    Activated(text: "{T}: Add {B}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: B, n: 1)),
+  ]),
+  (name: "Witch Enchanter", cost: "{3}{W}", types: "CREATURE", subtypes: ["Human", "Warlock"], pt: (2, 2), back: "Witch-Blessed Meadow", back_kind: Modal, abilities: [
+    Triggered(text: "When this creature enters, destroy target artifact or enchantment an opponent controls.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_any: "ARTIFACT | ENCHANTMENT", controller: Opp))], effect: Destroy(One(Target(0)))),
+  ]),
+  (name: "Witch-Blessed Meadow", types: "LAND", is_back: true, abilities: [
+    Activated(text: "{T}: Add {W}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: W, n: 1)),
+  ]),
+  (name: "Raph & Mikey, Troublemakers", cost: "{5}{R/G}{R/G}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Mutant", "Ninja", "Turtle"], pt: (7, 7), keywords: "TRAMPLE | HASTE", abilities: [
+    Triggered(text: "Whenever Raph & Mikey attack, reveal cards from the top of your library until you reveal a creature card. Put that card onto the battlefield tapped and attacking and the rest on the bottom of your library in a random order.",
+      on: Attacks(filter: (self_only: true)), effect: DigCreatureAttacking),
+  ]),
+  (name: "Stronghold Gambit", cost: "{1}{R}", types: "SORCERY", abilities: [
+    Spell(effect: GambitReveal),
+  ]),
+]

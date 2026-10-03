@@ -1,0 +1,109 @@
+id: mu-uwx-wasteland-delta-dimir-fetches-in-response-moonshadow-once
+title: UWx Wastelands Dimir's Polluted Delta; Dimir cracks it in response for Underground Sea, Moonshadow triggers once (only for Dimir's own land) and Wasteland's ability does nothing
+area: matchup
+cards: [Wasteland, Polluted Delta, Moonshadow, Underground Sea]
+tags: [matchup, dimir-vs-uwx, wasteland, fetchland, response, fizzle, moonshadow, your-graveyard, stack-lifo]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Moonshadow, text: "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "A target that's no longer in the zone it was in when it was targeted is illegal.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: [{card: Moonshadow, as: moon, counters: {"-1/-1": 6}}, "Polluted Delta @delta"]
+    library: ["Underground Sea @us"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+random: any
+script:
+  - p1: {t: activate, source: "@w", ability: 1, targets: ["@delta"]}
+  - check: {p1: {graveyard: [Wasteland]}, p0: {battlefield_contains: [{card: Moonshadow, counters: {"-1/-1": 6}}]}, stack: [{kind: activated, source: "@w", controller: p1}]}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@delta", ability: 0}
+  - check:
+      stack:
+        - {kind: activated, source: "@w", controller: p1}
+        - {kind: activated, source: "@delta", controller: p0}
+        - {kind: triggered, source: "@moon", controller: p0}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: search, purpose: fetch, found: "@us"}
+  - check: {stack: [{kind: activated, source: "@w", controller: p1}], pending: {actor: p1, kind: priority}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Polluted Delta]
+      library_count: 10
+      battlefield:
+        - {card: Moonshadow, counters: {"-1/-1": 5}, pt: [2, 2]}
+        - {card: Underground Sea, tapped: false}
+    p1:
+      graveyard: [Wasteland]
+      battlefield: []
+notes: >
+  Wasteland's sacrifice puts it into p1's graveyard, not p0's, so Moonshadow ("your graveyard") does not trigger then.
+  The Delta's sacrifice puts a permanent card into p0's graveyard: one trigger, on top. Resolution order: Moonshadow (5
+  counters, 2/2), the fetch (Underground Sea, untapped, shuffle), then Wasteland's ability, whose only target has left
+  the battlefield: it does nothing (608.2b). Life 19. p1 is active and receives priority after each resolution. The
+  fetched Underground Sea is not a target of the old ability. Bugs caught: Moonshadow triggering on the opponent's
+  graveyard, Wasteland destroying the new land, the trigger resolving after the fetch.
+---
+id: mu-uwx-wasteland-underground-sea-goyfs-count-differently
+title: UWx Wastelands Underground Sea; Barrowgoyf grows as soon as Wasteland is sacrificed, Nethergoyf only when Dimir's Sea reaches Dimir's graveyard
+area: matchup
+cards: [Wasteland, Underground Sea, Nethergoyf, Barrowgoyf, Brainstorm]
+tags: [matchup, dimir-vs-uwx, wasteland, nethergoyf, barrowgoyf, characteristic-defining, sacrifice-cost, timing]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: oracle, card: Barrowgoyf, text: "Barrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Nethergoyf @ng", "Barrowgoyf @bg", "Underground Sea @us1"]
+    graveyard: ["Brainstorm @g1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+script:
+  - check: {p0: {battlefield_contains: [{card: Nethergoyf, pt: [1, 2]}, {card: Barrowgoyf, pt: [1, 2]}]}}
+  - p1: {t: activate, source: "@w", ability: 1, targets: ["@us1"]}
+  - check:
+      p0: {battlefield_contains: [{card: Nethergoyf, pt: [1, 2]}, {card: Barrowgoyf, pt: [2, 3]}]}
+      p1: {graveyard: [Wasteland]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Brainstorm, Underground Sea]
+      battlefield: [{card: Nethergoyf, pt: [2, 3]}, {card: Barrowgoyf, pt: [2, 3]}]
+    p1: {graveyard: [Wasteland], battlefield: []}
+notes: >
+  Before: only Brainstorm (instant) in any graveyard, both goyfs 1/2. Paying Wasteland's cost puts a land card into
+  p1's graveyard: Barrowgoyf (all graveyards) is 2/3 immediately, Nethergoyf (its controller's graveyard only) is still
+  1/2. When the ability destroys Underground Sea, the land reaches p0's graveyard and Nethergoyf becomes 2/3; Barrowgoyf
+  stays 2/3 (land was already counted). Bugs caught: Nethergoyf counting p1's graveyard, Barrowgoyf ignoring it,
+  characteristic-defining values cached until resolution.

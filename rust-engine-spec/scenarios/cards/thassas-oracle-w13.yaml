@@ -1,0 +1,127 @@
+id: thassas-oracle-no-win-one-card-above-devotion
+title: Thassa's Oracle does not win when the library holds one card more than the devotion to blue
+area: card
+cards: ["Thassa's Oracle", Island, Ponder, Brainstorm, Lightning Bolt]
+tags: [thassas-oracle, devotion, win-the-game, etb-trigger, boundary, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Thassa's Oracle", text: "When this creature enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thassa's Oracle @to"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library: ["Ponder @a", "Brainstorm @b", "Lightning Bolt @c"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@to", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_on_top, answer: ["@a"], expect_options: {include: ["@a", "@b"], exclude: ["@c"]}}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_count: 3
+      library_top: [Ponder, Lightning Bolt]
+      library_bottom: [Brainstorm]
+      battlefield_contains: [{card: "Thassa's Oracle"}]
+notes: >
+  X = 2 < 3, so no win. Only the top two cards are looked at (Bolt is not offered). Ponder stays on top and Brainstorm
+  goes to the bottom; with a single card the "random order" has one outcome. A wrong engine compares X with the
+  number of cards below the ones looked at, or counts the looked-at cards as removed from the library.
+---
+id: thassas-oracle-hybrid-mana-symbol-counts-toward-devotion
+title: A {W/U} hybrid symbol in Spider-Woman's mana cost adds to devotion to blue, letting Thassa's Oracle win with three cards in library
+area: card
+cards: ["Thassa's Oracle", "Spider-Woman, Stunning Savior", Island, Ponder, Brainstorm, Lightning Bolt]
+tags: [thassas-oracle, devotion, hybrid-mana, win-the-game]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Thassa's Oracle", text: "If X is greater than or equal to the number of cards in your library, you win the game.", verified: true}
+  - {kind: cr, ref: "700.5", text: "A player’s devotion to [color] is equal to the number of mana symbols of that color among the mana costs of permanents that player controls.", verified: true}
+  - {kind: cr, ref: "107.4e", text: "A hybrid mana symbol is all of its component colors.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thassa's Oracle @to"]
+    battlefield: ["Spider-Woman, Stunning Savior @sw", "Island @i1", "Island @i2"]
+    library: ["Ponder @a", "Brainstorm @b", "Lightning Bolt @c"]
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@to", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_on_top, answer: ["@a"], expect_options: {include: ["@a", "@b", "@c"]}}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+notes: >
+  Spider-Woman costs {1}{W/U}; the hybrid symbol is blue (and white), so devotion to blue is 1 + 2 = 3, equal to the
+  library size. The generic {1} does not count. A wrong engine ignores hybrid symbols (devotion 2, no win).
+---
+id: thassas-oracle-devotion-counted-on-resolution
+title: If Thassa's Oracle is exiled in response to its trigger, devotion is counted on resolution and the player does not win
+area: card
+cards: ["Thassa's Oracle", Island, Ponder, Brainstorm, Swords to Plowshares, Plains]
+tags: [thassas-oracle, devotion, resolution-time-information, win-the-game, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Thassa's Oracle", text: "look at the top X cards of your library, where X is your devotion to blue.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "If an effect requires information from the game (such as the number of creatures on the battlefield), the answer is determined only once, when the effect is applied.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thassa's Oracle @to"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library: ["Ponder @a", "Brainstorm @b"]
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@to", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@to"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@to", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {life: 21, exile: ["Thassa's Oracle"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 21
+      library_count: 2
+      library_top: [Ponder, Brainstorm]
+      exile: ["Thassa's Oracle"]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  The trigger has no target, so it still resolves after its source is exiled, but X is computed when it resolves
+  (608.2h): p0 controls no permanent with {U} in its cost, so X = 0, nothing is looked at (no decision), and 0 < 2: no
+  win. Without Swords this setup wins (a sibling scenario). p0 gains 1 from Swords (Oracle is 1/3).
+  A wrong engine locks X in when the ability triggers.

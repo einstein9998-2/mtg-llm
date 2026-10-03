@@ -1,0 +1,130 @@
+id: hide-on-the-ceiling-returned-moonshadow-is-a-new-object
+title: Hide on the Ceiling (X=1) on a damaged-down Moonshadow wearing Cori-Steel Cutter returns it at the end step as a new 1/1 with six fresh -1/-1 counters and no Equipment
+area: card
+cards: [Hide on the Ceiling, Moonshadow, Cori-Steel Cutter, Island]
+tags: [hide-on-the-ceiling, flicker, new-object, delayed-trigger, end-step, enters-with-counters, equipment, layers]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hide on the Ceiling, text: "Exile X target artifacts and/or creatures. Return the exiled cards to the battlefield under their owners' control at the beginning of the next end step.", verified: true}
+  - {kind: oracle, card: Moonshadow, text: "This creature enters with six -1/-1 counters on it.", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence.", verified: true}
+  - {kind: cr, ref: "301.5c", text: "An Equipment that equips an illegal or nonexistent permanent becomes unattached from that permanent but remains on the battlefield.", verified: true}
+  - {kind: cr, ref: "603.7d", text: "If a spell creates a delayed triggered ability, the source of that delayed triggered ability is that spell. The controller of that delayed triggered ability is the player who controlled that spell as it resolved.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main2
+  p0:
+    hand: ["Hide on the Ceiling @hide"]
+    battlefield:
+      - {card: Moonshadow, as: ms, counters: {"-1/-1": 2}}
+      - {card: Cori-Steel Cutter, as: cut, attached_to: "@ms"}
+      - "Island @i1"
+      - "Island @i2"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: Moonshadow, pt: [6, 6], counters: {"-1/-1": 2}}]}
+  - p0: {t: cast, card: "@hide", x: 1, targets: ["@ms"], pay: {tap: ["@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        exile: [Moonshadow]
+        graveyard: [Hide on the Ceiling]
+        battlefield_contains: [{card: Cori-Steel Cutter, attached_to: null}]
+  - advance: {to: end, of: p0}
+  - check:
+      stack: [{kind: triggered, controller: p0}]
+      p0: {exile: [Moonshadow]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: []
+      graveyard: [Hide on the Ceiling]
+      battlefield:
+        - {card: Moonshadow, pt: [1, 1], counters: {"-1/-1": 6}, sick: true, keywords: [menace]}
+        - {card: Cori-Steel Cutter, attached_to: null}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  Moonshadow (printed 7/7) has lost four of its counters: 5/5, plus the Cutter 6/6. Hide (X=1, {1}{U}) exiles it; the
+  Cutter is left equipping a nonexistent permanent and becomes unattached (SBA). At the beginning of p0's end step the
+  delayed trigger (controlled by p0, 603.7d; its source is not asserted) returns the card as a new object (400.7):
+  Moonshadow's "enters with six -1/-1 counters" applies again, so it is a 1/1 with six counters, summoning sick, and the
+  Cutter does not follow it. Hide is p0's first spell this turn, so the Cutter's flurry does not trigger. Cast in main2
+  so no attack declaration interrupts the advance. Wrong engines: counters or attachment kept across the zone change, or
+  the old counter count restored.
+---
+id: hide-on-the-ceiling-cast-in-end-step-returns-at-the-following-end-step
+title: Hide on the Ceiling cast during the opponent's end step returns the creature at the next turn's end step, not during this turn's cleanup
+area: card
+cards: [Hide on the Ceiling, Murktide Regent, Island]
+tags: [hide-on-the-ceiling, delayed-trigger, end-step, next-end-step, turn-structure, new-object]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hide on the Ceiling, text: "Return the exiled cards to the battlefield under their owners' control at the beginning of the next end step.", verified: true}
+  - {kind: cr, ref: "603.7a", text: "A delayed triggered ability won’t trigger until it has actually been created, even if its trigger event occurred just beforehand.", verified: true}
+  - {kind: cr, ref: "603.7b", text: "A delayed triggered ability will trigger only once—the next time its trigger event occurs—unless it has a stated duration", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence.", verified: true}
+  - {kind: oracle, card: Murktide Regent, text: "This creature enters with a +1/+1 counter on it for each instant and sorcery card exiled with it.", verified: true}
+  - {kind: cr, ref: "607.2q", text: "If a permanent spell has an ability printed on it that allows one or more cards to be exiled while paying a cost to cast it and the permanent that spell becomes has an ability that refers to cards “exiled with [this object],” those abilities are linked. The second ability refers only to cards exiled to pay the cost of the spell that became that permanent.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: end
+  priority: p0
+  p0:
+    battlefield:
+      - {card: Murktide Regent, as: murk, counters: {"+1/+1": 2}}
+    library_pad: 10
+  p1:
+    hand: ["Hide on the Ceiling @hide"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@hide", x: 1, targets: ["@murk"], pay: {tap: ["@j1", "@j2"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      phase: end
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [Murktide Regent], battlefield: []}
+  - advance: {to: main1, of: p1}
+  - check:
+      turn: 5
+      stack: []
+      p0: {exile: [Murktide Regent], battlefield: []}
+  - advance: {to: end, of: p1}
+  - check:
+      stack: [{kind: triggered, controller: p1}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 5
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      exile: []
+      battlefield: [{card: Murktide Regent, pt: [3, 3], sick: true}]
+    p1:
+      graveyard: [Hide on the Ceiling]
+notes: >
+  Hide resolves during turn 4's end step, after that step began; its delayed trigger did not exist when "the beginning
+  of the end step" happened (603.7a), so it waits for the next end step: p1's, on turn 5. Murktide stays exiled through
+  p0's cleanup, p1's untap, upkeep, draw and main phase (p1 has no creatures, so the advances raise no attack
+  declaration). The trigger is controlled by p1 (Hide's controller) and returns Murktide under its owner p0's control as
+  a new object: no +1/+1 counters, and none from its own enters ability, which counts cards exiled with it by delve
+  while casting it (it was not cast), so 3/3. Wrong engines: return during turn 4's cleanup, at p0's next end step, or
+  with the old counters.

@@ -1,0 +1,282 @@
+id: flurry-second-spell-makes-monk-and-attach-yes
+title: "Cori-Steel Cutter flurry: the second spell this turn creates a Monk token, and attaching the Equipment gives it +1/+1, trample and haste"
+area: core
+cards: [Cori-Steel Cutter, Lightning Bolt, Mountain, Monk Token]
+tags: [cori-steel-cutter, flurry, triggers, cast-trigger, token, equipment, prowess, optional-choice]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Flurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@b1", controller: p0}
+      p0: {spells_cast_this_turn: 1}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: spell, card: "@b2", controller: p0}
+        - {kind: triggered, source: "@cutter", controller: p0}
+      p0: {spells_cast_this_turn: 2}
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: attach_equipment, answer: true}
+  - bind: {as: monk, find: {name: "Monk Token", controller: p0}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@b1", controller: p0}
+      - {kind: spell, card: "@b2", controller: p0}
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains:
+        - {token: Monk Token, controller: p0, types: [Creature], pt: [2, 2], keywords: [prowess, trample, haste]}
+        - {card: Cori-Steel Cutter, attached_to: "@monk"}
+notes: >
+  The first Bolt is the first spell this turn and does not trigger flurry; the second is the second spell and puts one
+  triggered ability on the stack above both spells. The token appears after the second spell was cast, so its prowess
+  does not fire for that spell. Attaching is a "may": answering yes attaches the Cutter, giving the 1/1 token +1/+1,
+  trample and haste (2/2). A wrong engine would trigger on the first spell, skip the choice, or attach automatically.
+---
+id: flurry-attach-declined-leaves-monk-unequipped
+title: "Cori-Steel Cutter flurry: declining the optional attach leaves a plain 1/1 Monk and an unattached Equipment"
+area: core
+cards: [Cori-Steel Cutter, Lightning Bolt, Mountain, Monk Token]
+tags: [cori-steel-cutter, flurry, optional-choice, token, equipment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Flurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: attach_equipment, answer: false}
+  - bind: {as: monk, find: {name: "Monk Token", controller: p0}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@b1", controller: p0}
+      - {kind: spell, card: "@b2", controller: p0}
+    p0:
+      battlefield_contains:
+        - {token: Monk Token, controller: p0, pt: [1, 1], keywords: [prowess], keywords_exclude: [trample, haste]}
+        - {card: Cori-Steel Cutter}
+notes: >
+  Same line as the previous scenario but p0 answers no. The token keeps its printed 1/1 and gets neither trample nor
+  haste, which shows that the Equipment is not attached (derived P/T and keywords are the observable). Catches an engine
+  that attaches unconditionally.
+---
+id: flurry-third-spell-does-not-trigger-again
+title: "Cori-Steel Cutter flurry triggers only on the second spell; a third spell triggers the Monk's prowess but not flurry"
+area: core
+cards: [Cori-Steel Cutter, Lightning Bolt, Mountain, Monk Token]
+tags: [cori-steel-cutter, flurry, negative-case, spell-count, prowess, triggers]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess.", verified: true}
+  - {kind: cr, ref: "702.108a", text: "Prowess is a triggered ability. \"Prowess\" means \"Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.\"", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2", "Lightning Bolt @b3"]
+    battlefield: ["Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2", "Mountain @m3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: attach_equipment, answer: false}
+  - bind: {as: monk, find: {name: "Monk Token", controller: p0}}
+  - check:
+      stack:
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: spell, card: "@b2", controller: p0}
+      p0: {battlefield_contains: [{token: Monk Token, alias: monk, pt: [1, 1]}]}
+  - p0: {t: cast, card: "@b3", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: spell, card: "@b2", controller: p0}
+        - {kind: spell, card: "@b3", controller: p0}
+        - {kind: triggered, source: "@monk", controller: p0}
+      p0: {spells_cast_this_turn: 3}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@b1", controller: p0}
+      - {kind: spell, card: "@b2", controller: p0}
+      - {kind: spell, card: "@b3", controller: p0}
+    p0:
+      battlefield_contains:
+        - {token: Monk Token, pt: [2, 2]}
+    pending: {actor: p0, kind: priority}
+notes: >
+  After the flurry token exists, the third Bolt produces exactly one new triggered ability, and it belongs to the Monk's
+  prowess (702.108a), not to the Cutter. The stack check pins that the top object's source is the Monk. Prowess then
+  makes the unequipped 1/1 Monk a 2/2 until end of turn. Catches an engine that fires flurry for every spell after the
+  first or on the "second spell" of each additional pair.
+---
+id: flurry-counts-a-countered-first-spell
+title: "Cori-Steel Cutter flurry counts a spell that was countered: cast Bolt (countered by Daze), cast a second spell, flurry triggers"
+area: core
+cards: [Cori-Steel Cutter, Lightning Bolt, Mountain, Daze, Island]
+tags: [cori-steel-cutter, flurry, spell-count, countered-spell, daze]
+derived_from: cr
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Whenever you cast your second spell each turn", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "603.2g", text: "An ability triggers only if its trigger event actually occurs. An event that's prevented or replaced won't trigger anything.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@b1"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false}
+  - check:
+      stack: []
+      p0: {graveyard: [Lightning Bolt], spells_cast_this_turn: 1}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@b2", controller: p0}
+      - {kind: triggered, source: "@cutter", controller: p0}
+    p0: {spells_cast_this_turn: 2}
+    p1: {life: 20, graveyard: [Daze]}
+notes: >
+  Flurry counts spells cast, not spells that resolved. The countered Bolt was cast (the cast event already happened);
+  casting the second Bolt is the second spell this turn, so flurry triggers. p0 holds an untapped Mountain, so Daze's
+  pay-{1} prompt appears and p0 declines (answer false), which counters the first Bolt. Daze itself is p1's spell and does
+  not count for p0. Catches an engine that counts only resolved spells or only spells still on the stack.
+---
+id: flurry-triggers-on-the-opponents-turn
+title: "Cori-Steel Cutter flurry counts spells 'each turn', including two instants cast on the opponent's turn"
+area: core
+cards: [Cori-Steel Cutter, Lightning Bolt, Mountain, Monk Token]
+tags: [cori-steel-cutter, flurry, spell-count, opponents-turn, instant-speed]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Flurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess.", verified: true}
+  - {kind: cr, ref: "117.3d", text: "If a player has priority and chooses not to take any actions, that player passes. If any mana is in that player's mana pool, they announce what mana is there. Then the next player in turn order receives priority.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: spell, card: "@b2", controller: p0}
+        - {kind: triggered, source: "@cutter", controller: p0}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: attach_equipment, answer: true}
+expect:
+  - at: after_script
+    turn: 4
+    active: p1
+    stack:
+      - {kind: spell, card: "@b1", controller: p0}
+      - {kind: spell, card: "@b2", controller: p0}
+    pending: {actor: p1, kind: priority}
+    p0:
+      spells_cast_this_turn: 2
+      battlefield_contains:
+        - {token: Monk Token, controller: p0, pt: [2, 2]}
+notes: >
+  "Each turn" is every turn, not only the Cutter controller's. p1 (active) passes with an empty stack in its main phase,
+  so p0 receives priority and can cast instants. The trigger and the Monk belong to p0. After the flurry trigger resolves
+  the active player (p1) receives priority (117.3b); p0's attach decision comes first because it is part of the resolution.
+---
+id: flurry-spell-count-resets-between-turns
+title: "Cori-Steel Cutter flurry: a spell cast last turn does not count toward this turn's 'second spell'"
+area: core
+cards: [Cori-Steel Cutter, Lightning Bolt, Mountain]
+tags: [cori-steel-cutter, flurry, spell-count, turn-reset, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Whenever you cast your second spell each turn", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield: ["Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@b2", controller: p0}
+      turn: 4
+      p0: {spells_cast_this_turn: 1}
+      pending: {actor: p0, kind: priority}
+expect:
+  - at: after_script
+    turn: 4
+    stack:
+      - {kind: spell, card: "@b2", controller: p0}
+    p1: {life: 17}
+    p0: {spells_cast_this_turn: 1, battlefield: [{card: Cori-Steel Cutter}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]}
+notes: >
+  The first Bolt (turn 3) resolves; the second Bolt is cast on p1's turn 4 at instant speed. It is the first spell p0
+  casts that turn, so no flurry trigger. p0's Mountains do not untap on the opponent's turn: m1 stayed tapped from the
+  first Bolt and m2 pays for the second, so both are tapped at the end. Catches a spell counter that is never reset.

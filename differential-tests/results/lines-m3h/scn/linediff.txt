@@ -1,0 +1,5 @@
+lines 1864  windows 7712  actions played 5916  windows with menu differences 39
+  complete             1782
+  forge_play_failed    14
+  game_over            58
+  unaligned            10

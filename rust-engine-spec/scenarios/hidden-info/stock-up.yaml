@@ -1,0 +1,93 @@
+id: hi-stock-up-two-to-hand-three-to-bottom-in-chosen-order
+title: Stock Up puts two cards in hand and three on the bottom in the owner's chosen order, all hidden from the opponent
+area: hidden-info
+cards: [Stock Up, Aluren, "Atraxa, Grand Unifier", Force of Will, Show and Tell, Lotus Petal, Island, Tropical Island, Hedge Maze, Lightning Bolt, Volcanic Island]
+tags: [hidden-info, stock-up, library-bottom, library-knowledge, redaction]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stock Up, text: "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+  - {kind: cr, ref: "401.4", text: "If an effect puts two or more cards in a specific position in a library at the same time, the owner of those cards may arrange them in any order. That library's owner doesn't reveal the order in which the cards go into the library.", verified: true}
+  - {kind: cr, ref: "701.20e", text: "Looking at a card follows the same rules as revealing a card, except that the card is shown only to the specified player.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: [Lightning Bolt]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su"]
+    battlefield: ["Island @i", "Tropical Island @t", "Hedge Maze @hm"]
+    library: ["Aluren @a", "Atraxa, Grand Unifier @b", "Force of Will @c", "Show and Tell @d", "Lotus Petal @e"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@su", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: stock_up_to_hand, answer: ["@a", "@d"]}
+  - p1: {decision: order_cards, purpose: stock_up_to_bottom, answer: ["@c", "@e", "@b"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: [Aluren, Show and Tell]
+      graveyard: [Stock Up]
+      library_count: 13
+      library_bottom: [Force of Will, Lotus Petal, "Atraxa, Grand Unifier"]
+  - at: after_script
+    observer: p1
+    obs:
+      me: {library_known_top: [], library_known_bottom: [Force of Will, Lotus Petal, "Atraxa, Grand Unifier"]}
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 2, revealed_hand: [], library_count: 13}
+      option_labels_exclude_names: [Aluren, Show and Tell, Force of Will, Lotus Petal, "Atraxa, Grand Unifier"]
+      events_text_exclude: [Aluren, Show and Tell, Force of Will, Lotus Petal, "Atraxa, Grand Unifier"]
+notes: >
+  The order answer lists the bottom three top first, so Atraxa ends bottom-most. The owner knows the three bottom positions
+  (doc 02 section 6: chosen-order bottoming keeps FromBottom knowledge; asserted with library_known_bottom from the SCHEMA
+  addenda, added at review) and knows nothing about the new top card. The opponent learns only that five cards were looked at,
+  two went to hand and three to the bottom: hand 1 -> 0 -> 2, library 15 -> 13. A wrong engine reveals the picks, the
+  bottom order, or uses random bottom order (Stock Up says any order, not random order).
+---
+id: hi-stock-up-opponent-stream-independent-of-cards
+title: The opponent's stream is identical whatever five cards Stock Up looks at
+area: hidden-info
+cards: [Stock Up, Aluren, "Atraxa, Grand Unifier", Force of Will, Show and Tell, Lotus Petal, Brainstorm, Ponder, Acererak the Archlich, Omniscience, Veil of Summer, Island, Tropical Island, Hedge Maze, Lightning Bolt, Volcanic Island]
+tags: [hidden-info, stock-up, non-interference, paired-world]
+derived_from: cr
+source:
+  - {kind: cr, ref: "401.4", text: "That library's owner doesn't reveal the order in which the cards go into the library.", verified: true}
+  - {kind: oracle, card: Stock Up, text: "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: [Lightning Bolt]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su"]
+    battlefield: ["Island @i", "Tropical Island @t", "Hedge Maze @hm"]
+    library: ["Aluren @a", "Atraxa, Grand Unifier @b", "Force of Will @c", "Show and Tell @d", "Lotus Petal @e"]
+    library_pad: 10
+world_b:
+  p1: {library: ["Brainstorm @a", "Ponder @b", "Acererak the Archlich @c", "Omniscience @d", "Veil of Summer @e"]}
+assert_streams_identical: {observer: p0}
+script:
+  - p1: {t: cast, card: "@su", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: stock_up_to_hand, answer: ["@a", "@d"]}
+  - p1: {decision: order_cards, purpose: stock_up_to_bottom, answer: ["@c", "@e", "@b"]}
+expect:
+  - at: after_script
+    stack: []
+    p1: {hand_count: 2, library_count: 13, graveyard: [Stock Up]}
+notes: >
+  The worlds differ only in the five looked-at cards. p0's stream (including p0's option list at its priority decision
+  while Stock Up is on the stack and afterwards) must be byte-identical.

@@ -1,0 +1,13 @@
+[package]
+name = "mtg-view"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+mtg-core.workspace = true
+smallvec.workspace = true
+
+[features]
+# Exposes the raw engine state to harness crates. Never enable for agent builds.
+diff-harness = ["mtg-core/diff-harness"]
+canary = ["mtg-core/canary"]

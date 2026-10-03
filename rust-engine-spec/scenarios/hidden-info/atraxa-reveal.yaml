@@ -1,0 +1,138 @@
+id: hi-atraxa-reveal-picks-public-rest-random-bottom
+title: Atraxa's reveal is public, the picked cards are known to both players, and the rest go to the bottom in an order nobody knows
+area: hidden-info
+cards: ["Atraxa, Grand Unifier", Omniscience, Veil of Summer, Aluren, Show and Tell, Force of Will, Lotus Petal, Hedge Maze, Brainstorm, Island, Tropical Island, Lightning Bolt, Volcanic Island]
+tags: [hidden-info, reveal, atraxa, random-bottom, omniscience, library-knowledge]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "When Atraxa enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order.", verified: true}
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: cr, ref: "701.20a", text: "To reveal a card, show that card to all players for a brief time.", verified: true}
+  - {kind: cr, ref: "205.2a", text: "The card types are artifact, battle, conspiracy, creature, dungeon, enchantment, instant, kindred, land, phenomenon, plane, planeswalker, scheme, sorcery, and vanguard.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: [Lightning Bolt]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Atraxa, Grand Unifier @atx", "Veil of Summer @veil"]
+    battlefield: ["Omniscience @omni", "Island", "Tropical Island"]
+    library: ["Aluren @c1", "Show and Tell @c2", "Force of Will @c3", "Lotus Petal @c4", "Hedge Maze @c5", "Brainstorm @c6", "Island", "Island", "Island", "Island"]
+    library_pad: 10
+random: any
+script:
+  - p1: {t: cast, card: "@atx", alt_cost: {free: omniscience}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@atx", controller: p1}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: atraxa_to_hand, answer: ["@c1", "@c2", "@c3", "@c4", "@c5"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: [Veil of Summer, Aluren, Show and Tell, Force of Will, Lotus Petal, Hedge Maze]
+      battlefield_contains: [{card: "Atraxa, Grand Unifier", sick: true}]
+      library_count: 15
+      library_bottom_multiset: [Brainstorm, Island, Island, Island, Island]
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 6, revealed_hand: [Aluren, Show and Tell, Force of Will, Lotus Petal, Hedge Maze], library_count: 15}
+      option_labels_exclude_names: [Veil of Summer]
+      events_text_exclude: [Veil of Summer]
+  - at: after_script
+    observer: p1
+    obs:
+      me: {library_known_top: [], library_known_bottom: []}
+notes: >
+  Atraxa (from Omniscience, no mana) resolves and its ETB trigger goes on the stack. On resolution the top ten are revealed to
+  both players. One card per card type: Aluren (enchantment), Show and Tell (sorcery), Force of Will (instant), Lotus Petal
+  (artifact), Hedge Maze (land); no creature was revealed, and Brainstorm cannot also be taken because Force of Will already
+  used the instant slot. Brainstorm and the four Islands go to the bottom in a random order, so only the bottom multiset is
+  asserted. The picks were revealed while they moved to hand, so p0 knows them (doc 02 section 6: revealed cards keep
+  known_to = both); Veil of Summer was never revealed and must stay hidden. Hand 2 -> 1 -> 6, library 20 -> 15.
+---
+id: hi-atraxa-reveal-ends-brainstorm-position-knowledge
+title: Atraxa revealing cards the owner put back with Brainstorm makes them public and ends the owner's top knowledge
+area: hidden-info
+cards: ["Atraxa, Grand Unifier", Omniscience, Brainstorm, Stifle, Aluren, Lotus Petal, Show and Tell, Force of Will, Hedge Maze, Island, Tropical Island, Lightning Bolt, Volcanic Island]
+tags: [hidden-info, reveal, atraxa, brainstorm, library-knowledge, random-bottom]
+derived_from: cr
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "Put the rest on the bottom of your library in a random order.", verified: true}
+  - {kind: cr, ref: "701.20a", text: "To reveal a card, show that card to all players for a brief time.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: [Lightning Bolt]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Atraxa, Grand Unifier @atx", "Stifle @st"]
+    battlefield: ["Omniscience @omni", "Island", "Tropical Island"]
+    library: ["Aluren @l1", "Lotus Petal @l2", "Island @l3", "Show and Tell @l4", "Force of Will @l5", "Hedge Maze @l6"]
+    library_pad: 14
+random: any
+script:
+  - p1: {t: cast, card: "@bs", alt_cost: {free: omniscience}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: put_back, answer: ["@st", "@l2"]}
+  - p1: {decision: order_cards, purpose: put_back, answer: ["@st", "@l2"]}
+  - label: after-brainstorm
+    check:
+      stack: []
+      p1: {library_top: [Stifle, Lotus Petal], library_count: 19, hand: ["Atraxa, Grand Unifier", Aluren, Island]}
+  - p1: {t: cast, card: "@atx", alt_cost: {free: omniscience}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: atraxa_to_hand, answer: ["@l2", "@l4", "@l5", "@l6"]}
+expect:
+  - at: after-brainstorm
+    observer: p1
+    obs:
+      me: {library_known_top: [Stifle, Lotus Petal]}
+  - at: after-brainstorm
+    observer: p0
+    obs:
+      opp: {hand_count: 3, revealed_hand: [], library_count: 19}
+      events_text_exclude: [Stifle, Lotus Petal, Aluren]
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: [Aluren, Island, Lotus Petal, Show and Tell, Force of Will, Hedge Maze]
+      library_count: 15
+      library_bottom_multiset: [Stifle, Island, Island, Island, Island, Island]
+  - at: after_script
+    observer: p1
+    obs:
+      me: {library_known_top: [], library_known_bottom: []}
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 6, revealed_hand: [Lotus Petal, Show and Tell, Force of Will, Hedge Maze], library_count: 15}
+      events_text_exclude: [Aluren]
+notes: >
+  Brainstorm (free) draws Aluren, Lotus Petal, Island; p1 puts back Stifle then Lotus Petal (top first), so p1 knows the top
+  two and p0 knows nothing (library 20 -> 17 -> 19). Atraxa (free) then reveals the top ten: Stifle, Lotus Petal, Show and
+  Tell, Force of Will, Hedge Maze and five padding Islands. p1 takes Lotus Petal (artifact), Show and Tell (sorcery), Force of
+  Will (instant), Hedge Maze (land); Stifle loses the instant slot and goes to the bottom with the five Islands in random
+  order (library 19 -> 15). The new top card is a padding Island nobody has seen in that position, so p1's top knowledge is
+  empty. Aluren and the drawn Island were never revealed. p0 now knows Stifle is among the bottom six, which the obs
+  vocabulary cannot express (schema request).

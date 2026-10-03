@@ -1,0 +1,136 @@
+id: brainstorm-with-two-cards-in-library-loses-at-next-check
+title: Brainstorm from a two-card library finishes resolving (the put-back still happens), then the player loses for having attempted a draw from an empty library
+area: card
+cards: [Brainstorm, Island, Lightning Bolt]
+tags: [brainstorm, empty-library, state-based-actions, draw-from-empty-library, game-over]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+  - {kind: cr, ref: "121.4", text: "A player who attempts to draw a card from a library with no cards in it loses the game the next time a player would receive priority. (This is a state-based action. See rule 704.)", verified: true}
+  - {kind: cr, ref: "704.4", text: "Unlike triggered abilities, state-based actions pay no attention to what happens during the resolution of a spell or ability.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Island @i1"]
+    library: ["Island @a", "Island @b"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@a", "@b"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@a", "@b"]}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0:
+      hand: [Lightning Bolt]
+      library_count: 2
+      graveyard: [Brainstorm]
+notes: >
+  Brainstorm draws one card at a time (121.2): the first two draws succeed, the third attempts to draw from an empty library. State-based actions are not
+  checked mid-resolution (704.4), so p0 still puts two cards back and the library is non-empty again when the check finally happens; 704.5b looks at
+  "attempted to draw ... since the last time state-based actions were checked", so p0 loses anyway. A wrong engine ends the game in the middle of
+  resolution (skipping the put-back decisions) or checks "library is empty now" instead of "a draw was attempted". The winner key is a schema request.
+---
+id: brainstorm-then-fetchland-shuffles-away-the-put-back-cards
+title: Cracking a fetchland after Brainstorm shuffles the two put-back cards into the library, destroying the known order
+area: card
+cards: [Brainstorm, Force of Will, Flooded Strand, Island, Ponder, Preordain, Lightning Bolt, Mountain]
+tags: [brainstorm, fetchland, shuffle, library-order, scripted-random, put-back]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Flooded Strand, text: "Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+random:
+  - {kind: shuffle, player: p0, result: [Lightning Bolt, Mountain, Force of Will]}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Force of Will @fow"]
+    battlefield: ["Island @i1", "Flooded Strand @strand"]
+    library: ["Ponder @pond", "Preordain @pre", "Lightning Bolt @bolt", "Island @isl", "Mountain @mtn"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@fow", "@bolt"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@fow", "@bolt"]}
+  - check:
+      p0: {hand: [Ponder, Preordain], library_top: [Force of Will, Lightning Bolt, Island, Mountain], library_count: 4}
+  - p0: {t: activate, source: "@strand", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, purpose: fetch, found: "@isl", expect_options: {include: ["@isl"], exclude: ["@mtn", "@fow", "@bolt"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Ponder, Preordain]
+      graveyard: [Brainstorm, Flooded Strand]
+      library_top: [Lightning Bolt, Mountain, Force of Will]
+      library_count: 3
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: false}]
+notes: >
+  After Brainstorm the library is Force of Will, Lightning Bolt, Island, Mountain (top first). Flooded Strand finds the Island; the remaining three
+  cards (including both put-back cards) are shuffled, scripted to Lightning Bolt, Mountain, Force of Will. The shuffle must include the put-back cards
+  and exclude the found Island (701.24b is the general case: found cards are not part of the shuffle). The random queue has exactly one entry; Brainstorm itself
+  must not shuffle. The fetched Island is untapped; the Island that paid for Brainstorm is tapped.
+---
+id: brainstorm-is-an-instant-castable-on-the-opponents-upkeep
+title: Brainstorm can be cast during the opponent's upkeep when they pass priority, and the caster (not the active player) makes the put-back decisions
+area: card
+cards: [Brainstorm, Island, Ponder, Preordain, Lightning Bolt]
+tags: [brainstorm, instant-speed, priority, non-active-player, put-back]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "117.3d", text: "If a player has priority and chooses not to take any actions, that player passes. If any mana is in that player's mana pool, they announce what mana is there. Then the next player in turn order receives priority.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: upkeep
+  priority: p1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1"]
+    library: ["Ponder @a", "Preordain @b", "Lightning Bolt @c"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@b", "@c"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@c", "@b"]}
+expect:
+  - at: after_script
+    turn: 4
+    phase: upkeep
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Brainstorm]
+      library_top: [Lightning Bolt, Preordain]
+      spells_cast_this_turn: 1
+    p1: {library_count: 10}
+notes: >
+  p1 (active) passes priority in their upkeep, so p0 receives priority with an empty stack and may cast an instant. p0 makes both put-back decisions even
+  though it is not p0's turn. p1 has not drawn yet (draw step is after upkeep): p1's library is untouched. After Brainstorm resolves the active player p1
+  receives priority (117.3b). A wrong engine skips p0's priority window or gives the put-back decision to the active player.

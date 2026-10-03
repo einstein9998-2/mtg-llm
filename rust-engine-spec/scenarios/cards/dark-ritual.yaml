@@ -1,0 +1,84 @@
+id: dark-ritual-is-a-spell-and-can-be-countered
+title: Dark Ritual uses the stack, so Daze can counter it and no mana is added
+area: card
+cards: [Dark Ritual, Daze, Swamp, Island]
+tags: [dark-ritual, instant, stack, counterspell, daze, mana]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dark Ritual, text: "Add {B}{B}{B}.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @dr"]
+    battlefield: ["Swamp @s"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @dz"]
+    battlefield: ["Island @j"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dr", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@dr", controller: p0}]
+      p0: {mana_pool: {}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@dz", alt_cost: {return_island: "@j"}, targets: ["@dr"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      graveyard: [Dark Ritual]
+      battlefield: [{card: Swamp, tapped: true}]
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+notes: >
+  Dark Ritual is an instant spell; only activated (and some triggered) abilities can be mana abilities (605.1a), so the
+  Ritual goes on the stack and can be targeted. p0's only land paid for it, so Daze's {1} cannot be paid and no prompt
+  appears; the Ritual is countered and no mana is added. Wrong engine: resolve Ritual immediately like a mana ability.
+---
+id: dark-ritual-mana-empties-at-end-of-main-phase
+title: Unspent mana from Dark Ritual is lost when the main phase ends
+area: card
+cards: [Dark Ritual, Swamp, Island]
+tags: [dark-ritual, mana-pool, phase-end]
+derived_from: cr
+source:
+  - {kind: cr, ref: "106.4", text: "Each player’s mana pool empties at the end of each step and phase, and the player is said to lose this mana.", verified: true}
+  - {kind: oracle, card: Dark Ritual, text: "Add {B}{B}{B}.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @dr"]
+    battlefield: ["Swamp @s"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dr", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {mana_pool: {B: 3}}
+      pending: {actor: p0, kind: priority}
+  - advance: {to: begin_combat, of: p0}
+expect:
+  - at: after_script
+    phase: begin_combat
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      graveyard: [Dark Ritual]
+notes: >
+  {B}{B}{B} floats after Ritual resolves; both players pass with an empty stack, main1 ends, and the pool empties.
+  Neither player controls a creature, so nothing interrupts the advance. Wrong engine: carry mana across phases.

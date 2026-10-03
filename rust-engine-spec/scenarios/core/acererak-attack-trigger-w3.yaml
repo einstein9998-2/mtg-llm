@@ -1,0 +1,121 @@
+id: acererak-attack-trigger-opponent-sacrifices-no-zombie
+title: Acererak's attack trigger goes on the stack after attackers are declared; the defending player sacrifices a creature and p0 gets no Zombie
+area: core
+cards: [Acererak the Archlich, "Goblin Token", "Skeleton Token", "Zombie Token"]
+tags: [combat, attack-trigger, triggers, stack, opponent-decision, acererak, sacrifice, apnap]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Acererak the Archlich", text: "Whenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice.", verified: true}
+  - {kind: cr, ref: "508.3a", text: "An ability that reads “Whenever [a creature] attacks, . . .” triggers if that creature is declared as an attacker.", verified: true}
+  - {kind: cr, ref: "508.2b", text: "Any abilities that triggered on attackers being declared or that triggered during the process described in rules 508.1 are put onto the stack before the active player gets priority", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that’s not a card the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Acererak the Archlich @acer"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}, {token: Skeleton Token, as: skel}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@acer", target: {player: p1}}]}
+  - check:
+      phase: declare_attackers
+      priority: p0
+      stack: [{kind: triggered, source: "@acer", controller: p0, text_contains: "Zombie"}]
+      p0: {battlefield: [{card: Acererak the Archlich, tapped: true, pt: [5, 5]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: sacrifice_creature_instead_of_zombie, answer: true, expect_options: {include: [true, false]}}
+  - p1: {decision: choose_cards, purpose: sacrifice, answer: ["@gob"], expect_options: {include: ["@gob", "@skel"]}}
+  - check:
+      phase: declare_attackers
+      priority: p0
+      stack: []
+      p0: {battlefield: [{card: Acererak the Archlich, tapped: true}]}
+      p1: {battlefield: [{token: Skeleton Token}], graveyard: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [], expect_options: {include: ["@skel"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p0: {life: 20, battlefield: [{card: Acererak the Archlich, tapped: true}]}
+    p1: {life: 15, battlefield: [{token: Skeleton Token, damage: 0}]}
+notes: >
+  Acererak's controller is p0, but the choice "that player sacrifices a creature of their choice" belongs to the defending
+  player p1 (the opponent; both the yes/no and the choice of creature are p1's decisions). The trigger is put on the stack
+  after attackers are declared and before p0 receives priority (508.2b); it resolves after both pass, and p0 gets priority
+  after it resolves (117.3b). p1 chooses to sacrifice the Goblin, so no Zombie is created for p0. Acererak then connects
+  (p1: 20 to 15). The decomposition of the "unless that player sacrifices" choice into a yes/no followed by a card choice is
+  the scenario author's assumption; the rules text fixes only who chooses and the outcomes (see report ambiguities).
+  NORMATIVE PARTS (reviewer): only (a) every decision of this choice belongs to p1, (b) no decision of it goes to p0, and
+  (c) the checked outcomes. If the runner's canonical shape is a single choose_cards in which choosing nothing declines,
+  replace the two p1 steps with {decision: choose_cards, answer: ["@gob"]} and keep everything else unchanged.
+---
+id: acererak-attack-trigger-opponent-declines-zombie-is-not-attacking
+title: When the defending player declines to sacrifice, p0 creates a 2/2 Zombie that is not attacking and deals no combat damage
+area: core
+cards: [Acererak the Archlich, "Goblin Token", "Skeleton Token", "Zombie Token"]
+tags: [combat, attack-trigger, triggers, stack, opponent-decision, acererak, not-attacking, token]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Acererak the Archlich", text: "Whenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice.", verified: true}
+  - {kind: cr, ref: "508.3a", text: "An ability that reads “Whenever [a creature] attacks, . . .” triggers if that creature is declared as an attacker.", verified: true}
+  - {kind: cr, ref: "508.1k", text: "Each chosen creature still controlled by the active player becomes an attacking creature.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Acererak the Archlich @acer"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}, {token: Skeleton Token, as: skel}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@acer", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: sacrifice_creature_instead_of_zombie, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      priority: p0
+      stack: []
+      p0:
+        battlefield:
+          - {card: Acererak the Archlich, tapped: true}
+          - {token: Zombie Token, tapped: false, pt: [2, 2]}
+      p1: {battlefield: [{token: Goblin Token}, {token: Skeleton Token}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [], expect_options: {include: ["@skel", "@gob"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p0:
+      life: 20
+      battlefield:
+        - {card: Acererak the Archlich, tapped: true}
+        - {token: Zombie Token, tapped: false, damage: 0}
+    p1: {life: 15, battlefield: [{token: Goblin Token}, {token: Skeleton Token}]}
+notes: >
+  p1 declines the sacrifice, so p0 creates a 2/2 black Zombie token. The token enters after attackers were declared, so it is
+  not an attacking creature (508.1k: only creatures chosen in the declaration become attackers) and is untapped. In the combat
+  damage step only Acererak (5) deals damage: p1 goes from 20 to 15, not to 13. p1 keeps both creatures, which are the only
+  possible blockers (the Zombie belongs to p0).
+  NORMATIVE PARTS (reviewer): the decliner is p1 and the outcomes; the yes_no shape is the author's assumption. If the
+  runner's canonical shape is a single choose_cards in which choosing nothing declines, replace the yes_no step with
+  {decision: choose_cards, answer: []} and keep everything else unchanged.

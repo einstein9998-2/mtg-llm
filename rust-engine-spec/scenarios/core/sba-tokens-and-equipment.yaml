@@ -1,0 +1,76 @@
+id: sba-token-dies-and-ceases-to-exist
+title: A Monk token killed by Lightning Bolt goes to the graveyard and then ceases to exist
+area: core
+cards: [Lightning Bolt, Mountain, Monk Token]
+tags: [state-based-actions, tokens, lethal-damage]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5d", text: "If a token is in a zone other than the battlefield, it ceases to exist.", verified: true}
+  - {kind: cr, ref: "111.7", text: "A token that's in a zone other than the battlefield ceases to exist. This is a state-based action; see rule 704. (Note that if a token changes zones, applicable triggered abilities will trigger before the token ceases to exist.)", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Monk Token, as: monk}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: ["@monk"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1: {battlefield: [], graveyard: []}
+notes: >
+  The token is destroyed (704.5g) and put into the graveyard; the repeated SBA check makes it cease to exist (704.5d),
+  so p1's graveyard is empty when p0 gets priority. A wrong engine leaves a token object in the graveyard, where it
+  could be counted by graveyard-size effects or targeted.
+---
+id: sba-equipment-stays-unattached-when-creature-dies
+title: Cori-Steel Cutter stays on the battlefield unattached when the equipped creature dies
+area: core
+cards: [Cori-Steel Cutter, "Dragon's Rage Channeler", Lightning Bolt, Mountain]
+tags: [state-based-actions, equipment, layers]
+derived_from: cr
+source:
+  - {kind: cr, ref: "704.5n", text: "If an Equipment or Fortification is attached to an illegal permanent or to a player, it becomes unattached from that permanent or player. It remains on the battlefield.", verified: true}
+  - {kind: cr, ref: "301.5c", text: "An Equipment that equips an illegal or nonexistent permanent becomes unattached from that permanent but remains on the battlefield. (This is a state-based action. See rule 704.)", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    battlefield:
+      - "Dragon's Rage Channeler @drc"
+      - {card: Cori-Steel Cutter, as: cut, attached_to: "@drc"}
+    library_pad: 10
+script:
+  - check:
+      p1: {battlefield_contains: [{card: "Dragon's Rage Channeler", pt: [2, 2], keywords: [trample, haste]}]}
+  - p0: {t: cast, card: "@bolt", targets: ["@drc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      battlefield: [{card: Cori-Steel Cutter, attached_to: null}]
+      graveyard: ["Dragon's Rage Channeler"]
+notes: >
+  DRC with the Cutter is 2/2; Bolt kills it. The Equipment does not follow the creature to the graveyard (unlike an
+  Aura, 704.5m); it becomes unattached and stays (704.5n). A wrong engine puts the Equipment into the graveyard or
+  leaves it "attached" to a nonexistent object. `attached_to: null` means unattached.

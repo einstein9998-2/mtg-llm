@@ -1,0 +1,177 @@
+id: moonshadow-enters-with-six-minus-counters-as-one-one
+title: Moonshadow (7/7) enters with six -1/-1 counters and is a 1/1 with menace
+area: card
+cards: [Moonshadow, Swamp]
+tags: [moonshadow, enters-with-counters, replacement-effect, counters, layer-7c]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Moonshadow, text: "Menace\nThis creature enters with six -1/-1 counters on it.", verified: true}
+  - {kind: cr, ref: "614.1c", text: "Effects that read \"[This permanent] enters with . . . ,\" \"As [this permanent] enters . . . ,\" or \"[This permanent] enters as . . . \" are replacement effects.", verified: true}
+  - {kind: cr, ref: "122.1a", text: "Similarly, -X/-Y counters subtract from power and toughness.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Moonshadow @moon"]
+    battlefield: ["Swamp @s1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@moon", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Moonshadow, counters: {"-1/-1": 6}, pt: [1, 1], keywords: [menace]}
+        - {card: Swamp, tapped: true}
+notes: >
+  The counters are placed as it enters (a replacement, not a trigger), so no stack object appears and Moonshadow never
+  exists as a 7/7. Printed 7/7 minus six is 1/1.
+---
+id: moonshadow-fetchland-to-graveyard-removes-one-counter
+title: Sacrificing Bloodstained Mire puts a permanent card into the graveyard and Moonshadow loses a -1/-1 counter
+area: card
+cards: [Moonshadow, Bloodstained Mire, Swamp]
+tags: [moonshadow, triggered-ability, fetchland, sacrifice-cost, counters, stack-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Moonshadow, text: "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.", verified: true}
+  - {kind: oracle, card: Bloodstained Mire, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: Moonshadow, as: moon, counters: {"-1/-1": 6}}, "Bloodstained Mire @mire"]
+    library: ["Swamp @sw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: activate, source: "@mire", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@mire"}, {kind: triggered, source: "@moon"}]
+      p0: {life: 19, graveyard: [Bloodstained Mire]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: activated, source: "@mire"}]
+      p0: {battlefield: [{card: Moonshadow, counters: {"-1/-1": 5}, pt: [2, 2]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@sw"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Bloodstained Mire]
+      library_count: 10
+      battlefield:
+        - {card: Moonshadow, counters: {"-1/-1": 5}, pt: [2, 2]}
+        - {card: Swamp, tapped: false}
+notes: >
+  The Mire is sacrificed as a cost, so it is in the graveyard (a land is a permanent card) while its ability waits on the
+  stack. Moonshadow's trigger is put on the stack the next time a player would receive priority, which is after the
+  activation, so it sits above the Mire ability and resolves first: 5 counters, 2/2. Then the search finds the Swamp.
+  1 life paid. A wrong engine misses the trigger because the card came from the battlefield as a cost, or resolves it
+  after the search.
+---
+id: moonshadow-two-creatures-dying-at-once-remove-one-counter
+title: Two of p0's creatures dying to one Pyroclasm trigger Moonshadow once, removing a single counter
+area: card
+cards: [Moonshadow, "Dragon's Rage Channeler", Pyroclasm, Mountain]
+tags: [moonshadow, one-or-more-trigger, batch-trigger, simultaneous-events, state-based-actions]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Moonshadow, text: "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.", verified: true}
+  - {kind: oracle, card: Pyroclasm, text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+  - {kind: cr, ref: "603.2c", text: "An ability triggers only once each time its trigger event occurs. However, it can trigger repeatedly if one event contains multiple occurrences.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, \"Timing and Priority\"), the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield:
+      - {card: Moonshadow, as: moon, counters: {"-1/-1": 4}}
+      - "Dragon's Rage Channeler @d1"
+      - "Dragon's Rage Channeler @d2"
+    library_pad: 10
+  p1:
+    hand: ["Pyroclasm @pyro"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pyro", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@moon", controller: p0}]
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: ["Dragon's Rage Channeler", "Dragon's Rage Channeler"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: ["Dragon's Rage Channeler", "Dragon's Rage Channeler"]
+      battlefield: [{card: Moonshadow, counters: {"-1/-1": 3}, pt: [4, 4], damage: 2}]
+    p1:
+      graveyard: [Pyroclasm]
+notes: >
+  Moonshadow with four counters is 3/3 and survives 2 damage; both 1/1 Channelers are destroyed by the same state-based
+  action event (704.3). "One or more" makes that one trigger, so exactly one Moonshadow trigger is on the stack and one
+  counter comes off (3 left: 4/4 with 2 damage). An engine that moves the two cards one at a time and triggers per card
+  ends with 2 counters (5/5). The setup's four counters are reachable (two earlier removals).
+---
+id: moonshadow-opponents-creature-and-own-instant-no-trigger
+title: Fatal Push killing the opponent's creature does not trigger Moonshadow (wrong graveyard, and Push is not a permanent card)
+area: card
+cards: [Moonshadow, Fatal Push, Swamp, "Dragon's Rage Channeler"]
+tags: [moonshadow, triggered-ability, negative-case, your-graveyard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Moonshadow, text: "Whenever one or more permanent cards are put into your graveyard from anywhere", verified: true}
+  - {kind: oracle, card: Fatal Push, text: "Destroy target creature if it has mana value 2 or less.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Fatal Push @push"]
+    battlefield: [{card: Moonshadow, as: moon, counters: {"-1/-1": 6}}, "Swamp @s1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@push", targets: ["@drc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Fatal Push]
+      battlefield:
+        - {card: Moonshadow, counters: {"-1/-1": 6}, pt: [1, 1]}
+        - {card: Swamp, tapped: true}
+    p1:
+      battlefield: []
+      graveyard: ["Dragon's Rage Channeler"]
+notes: >
+  The creature card goes to p1's graveyard, not "your graveyard"; the card that goes to p0's graveyard is an instant.
+  Neither event triggers Moonshadow. A wrong engine watches every graveyard or every card.

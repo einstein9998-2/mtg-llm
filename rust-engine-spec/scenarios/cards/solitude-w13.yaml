@@ -1,0 +1,92 @@
+id: solitude-evoke-on-opponents-turn-exiles-and-is-sacrificed
+title: Solitude evoked at instant speed by exiling a white card exiles a creature and is sacrificed by the evoke trigger
+area: card
+cards: [Solitude, Swords to Plowshares, "Phelia, Exuberant Shepherd"]
+tags: [solitude, evoke, alternative-cost, flash, etb-trigger, order-triggers, lifegain]
+derived_from: cr
+source:
+  - {kind: oracle, card: Solitude, text: "Evoke—Exile a white card from your hand.", verified: true}
+  - {kind: oracle, card: Solitude, text: "When this creature enters, exile up to one other target creature. That creature's controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "702.74a", text: "“When this permanent enters, if its evoke cost was paid, its controller sacrifices it.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+  p1:
+    hand: ["Solitude @sol", "Swords to Plowshares @stp"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@stp"}}}], exclude: [{t: cast, card: "@sol", alt_cost: null}]}}
+  - p1: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@stp"}}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: order_triggers, answer: [{source: "@sol", text_contains: "exile up to one"}, {source: "@sol", text_contains: "sacrifices it"}]}
+  - p1: {decision: choose_target, slot: 0, answer: "@ph"}
+  - check:
+      pending: {actor: p0, kind: priority}
+      stack:
+        - {kind: triggered, source: "@sol", controller: p1, text_contains: "exile up to one"}
+        - {kind: triggered, source: "@sol", controller: p1, text_contains: "sacrifices it"}
+  - resolve_top: true
+  - check:
+      p1: {graveyard: [Solitude], battlefield: []}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: begin_combat
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      battlefield: []
+      exile: ["Phelia, Exuberant Shepherd"]
+    p1:
+      life: 20
+      hand: []
+      exile: [Swords to Plowshares]
+      graveyard: [Solitude]
+      battlefield: []
+notes: >
+  Evoke is an alternative cost (exile a white card, here Swords). Solitude has flash, so p1 casts it in p0's beginning
+  of combat. On entering, both the enter trigger and the evoke sacrifice trigger are p1's; p1 orders them (exile
+  trigger first, so the sacrifice resolves first) and targets Phelia when the trigger goes on the stack. The exile
+  trigger still resolves after Solitude is gone; Phelia's controller p0 gains 2 (Phelia is 2/2). The active player
+  receives priority after each resolution. A wrong engine skips the evoke trigger, or cancels the exile trigger.
+---
+id: solitude-evoke-not-offered-without-another-white-card
+title: Solitude's evoke is not offered when the only other card in hand is not white, and Solitude cannot exile itself
+area: card
+cards: [Solitude, Brainstorm]
+tags: [solitude, evoke, legal-action-mask, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: Solitude, text: "Evoke—Exile a white card from your hand.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    library_pad: 10
+  p1:
+    hand: ["Solitude @sol", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - expect_illegal: {p1: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@bs"}}}}
+  - expect_illegal: {p1: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@sol"}}}}
+  - check:
+      legal: {p1: {include: [{t: pass}], exclude: [{t: cast, card: "@sol"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1: {hand: [Solitude, Brainstorm], exile: []}
+notes: >
+  Brainstorm is blue; Solitude is on the stack while its cost is paid, so it cannot exile itself. With no lands the
+  hard cast is unaffordable too. Negative pair of solitude-evoke-on-opponents-turn-exiles-and-is-sacrificed.

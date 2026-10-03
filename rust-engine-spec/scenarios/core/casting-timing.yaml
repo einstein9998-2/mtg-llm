@@ -1,0 +1,49 @@
+id: sorcery-needs-empty-stack-and-main-phase-instant-does-not
+title: "A sorcery cannot be cast with a spell on the stack or outside a main phase, while an instant can"
+area: core
+cards: [Lightning Bolt, Ponder, Mountain, Island]
+tags: [casting-timing, sorcery-timing, instant-timing, stack, mask-validity, expect-illegal]
+derived_from: cr
+source:
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority. A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+  - {kind: cr, ref: "601.2", text: "A player must be legally allowed to cast the spell to begin this process (see rule 601.3).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2", "Ponder @pond"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Island @i"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - expect_illegal: {p0: {t: cast, card: "@pond", pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p1: {life: 17}
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: cast, card: "@pond"}, {t: cast, card: "@b2"}]}}
+  - advance: {to: begin_combat, of: p0}
+  - expect_illegal: {p0: {t: cast, card: "@pond", pay: auto}}
+  - check:
+      phase: begin_combat
+      legal: {p0: {include: [{t: cast, card: "@b2"}], exclude: [{t: cast, card: "@pond"}]}}
+expect:
+  - at: after_script
+    phase: begin_combat
+    active: p0
+    priority: p0
+    stack: []
+    p0:
+      hand: [Lightning Bolt, Ponder]
+      graveyard: [Lightning Bolt]
+    p1: {life: 17}
+notes: >
+  Ponder is a sorcery: it is castable in p0's main phase with an empty stack, not while Lightning Bolt is on the stack
+  (even though p0 holds priority and has the mana) and not in the beginning-of-combat step. The second Lightning Bolt is an instant
+  and is available both in the main phase and in the beginning-of-combat step. The legal-action checks make the same
+  point without changing state. A wrong engine that only checks "has priority" lets sorceries be cast in response.

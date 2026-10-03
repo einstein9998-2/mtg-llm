@@ -1,0 +1,124 @@
+id: aluren-nonactive-non-controller-casts-free-creature-at-instant-speed
+title: The player who does not control Aluren may use it on the other player's turn to cast a creature for free at instant speed
+area: card
+symmetric: true
+cards: [Aluren, Ocelot Pride]
+tags: [aluren, free-cast, flash, any-player, seat-symmetry, symmetric]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+  p1:
+    hand: ["Ocelot Pride @op"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@op", alt_cost: {free: aluren}}]}}
+  - p1: {t: cast, card: "@op", alt_cost: {free: aluren}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      hand: []
+      battlefield: [{card: Ocelot Pride, controller: p1}]
+notes: >
+  "Any player": p1 neither controls Aluren nor is the active player, has no lands, and casts Ocelot Pride (no flash
+  of its own) in p0's main phase. The runner repeats this with seats swapped (symmetric: true); a Forge bug made Aluren
+  usable only by the first seat, which this pair catches.
+---
+id: aluren-mana-value-limit
+title: Aluren's controller may cast a creature with mana value 3 or less for free but not Griselbrand
+area: card
+symmetric: true
+cards: [Aluren, Ocelot Pride, Griselbrand]
+tags: [aluren, free-cast, mana-value, legal-action-mask, symmetric]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @op", "Griselbrand @gris"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@gris", alt_cost: {free: aluren}}}
+  - check:
+      legal:
+        p0:
+          include: [{t: cast, card: "@op", alt_cost: {free: aluren}}]
+          exclude: [{t: cast, card: "@gris"}]
+  - p0: {t: cast, card: "@op", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Griselbrand]
+      battlefield: [{card: Aluren}, {card: Ocelot Pride}]
+notes: >
+  Griselbrand's mana value is 8, so Aluren does not apply to it and p0 has no mana for it. Ocelot Pride (mana value 1)
+  is offered free.
+---
+id: aluren-blocked-by-opponents-voice-of-victory
+title: On the turn of Voice of Victory's controller the opponent cannot use Aluren, while the Voice's controller can
+area: card
+symmetric: true
+cards: [Aluren, Voice of Victory, Ocelot Pride]
+tags: [aluren, voice-of-victory, casting-restriction, cant-beats-can, legal-action-mask, symmetric]
+derived_from: cr
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Voice of Victory, text: "Your opponents can't cast spells during your turn.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @op0"]
+    battlefield: ["Voice of Victory @vov"]
+    library_pad: 10
+  p1:
+    hand: ["Ocelot Pride @op1"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@op0", alt_cost: {free: aluren}}]}}
+  - p0: {t: cast, card: "@op0", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@op1", alt_cost: {free: aluren}}}
+  - check:
+      legal: {p1: {include: [{t: pass}], exclude: [{t: cast, card: "@op1"}]}}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Voice of Victory}, {card: Ocelot Pride, controller: p0}]
+    p1:
+      hand: [Ocelot Pride]
+      battlefield: [{card: Aluren}]
+notes: >
+  Aluren (controlled by p1) lets any player cast, and p0 uses it on p0's own turn. p1 owns Aluren but it is p0's turn
+  and p0 controls Voice of Victory: the "can't" wins (101.2), so p1's free cast is not offered, even in response.

@@ -1,0 +1,40 @@
+id: swords-to-plowshares-life-uses-current-power-with-counters
+title: Swords to Plowshares gives the exiled creature's controller life equal to its current power, counters included
+area: card
+cards: [Swords to Plowshares, "Phelia, Exuberant Shepherd", Plains]
+tags: [swords-to-plowshares, exile, life-gain, counters, derived-power]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "if it’s no longer in that zone, or if the effect has moved it from a public zone to a hidden zone, the effect uses the object’s last known information.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @w1"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: "Phelia, Exuberant Shepherd", as: ph, counters: {"+1/+1": 2}}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@stp", targets: ["@ph"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Swords to Plowshares]
+    p1:
+      life: 24
+      exile: ["Phelia, Exuberant Shepherd"]
+      battlefield: []
+notes: >
+  Phelia is printed 2/2 with two +1/+1 counters, so its power is 4 when Swords resolves; p1 gains 4. The exiled card has
+  no counters in exile, so an engine reading the exiled card after the move would give 2: the power is the creature's
+  last known information on the battlefield (608.2h). A wrong engine gives life to the
+  caster or uses printed power.

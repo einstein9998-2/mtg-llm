@@ -1,0 +1,156 @@
+id: wasteland-taps-for-colorless-only-and-needs-untapped-for-its-second-ability
+title: Wasteland's mana ability makes only {C}, and once tapped for mana its destroy ability cannot be activated
+area: card
+cards: [Wasteland, Lightning Bolt, Volcanic Island, Mountain]
+tags: [wasteland, mana-ability, colorless, tap-cost, activation-legality]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}: Add {C}.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "205.4c", text: "Any land with the supertype “basic” is a basic land. Any land that doesn’t have this supertype is a nonbasic land, even if it has a basic land type.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @volc", "Mountain @pmtn"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@w", ability: 1, targets: ["@pmtn"]}}
+  - p0: {t: activate, source: "@w", ability: 0}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}}
+  - expect_illegal: {p0: {t: activate, source: "@w", ability: 1, targets: ["@volc"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 1}
+      hand: [Lightning Bolt]
+      battlefield: [{card: Wasteland, tapped: true}]
+    p1: {battlefield: [{card: Volcanic Island, tapped: false}, {card: Mountain, tapped: false}]}
+notes: >
+  Colorless mana cannot pay Lightning Bolt's {R}, so the cast is not offered. Both of Wasteland's abilities have {T} in the cost, so after the land is
+  tapped for mana the destroy ability is not activatable (the floating {C} does not change that). The target (Volcanic Island) is a legal nonbasic land
+  and is untouched. Ability index 0 is the mana ability, index 1 the destroy ability (SCHEMA 3.1).
+  The first probe (added at review) is made while Wasteland is still untapped: p1's basic Mountain is not a legal target because it has the basic
+  supertype (205.4c), so the only reason that activation is illegal is the target restriction. A wrong engine lets Wasteland hit any land.
+---
+id: wasteland-ancient-tomb-mana-produced-before-destruction-stays
+title: Ancient Tomb tapped in response to Wasteland still produces its mana (and its 2 damage); the mana stays in the pool after the Tomb is destroyed until the phase ends
+area: card
+cards: [Wasteland, Ancient Tomb, Lightning Bolt, Mountain]
+tags: [wasteland, ancient-tomb, mana-ability, stack, response, mana-pool, phase-end]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn't require a target (see rule 115.6), it could add mana to a player's mana pool when it resolves, and it's not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "500.5", text: "As a step or phase ends, if there are effects that last until the end of that step or phase, those effects expire. Then any unspent mana left in a player's mana pool empties.", verified: true}
+  - {kind: cr, ref: "117.4", text: "If all players pass in succession (that is, if all players pass without taking any actions in between passing), the spell or ability on top of the stack resolves or, if the stack is empty, the phase or step ends.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Ancient Tomb @tomb", "Mountain @pm"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@w", ability: 1, targets: ["@tomb"]}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@tomb", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@w"}]
+      p1: {mana_pool: {C: 2}, life: 18, battlefield_contains: [{card: Ancient Tomb, tapped: true}]}
+      priority: p1
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: {tap: ["@pm"]}}
+  - check:
+      stack: [{kind: activated, source: "@w"}, {kind: spell, card: "@bolt", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p1: {mana_pool: {C: 2}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: activated, source: "@w"}]
+      pending: {actor: p0, kind: priority}
+      p0: {life: 17}
+      p1: {mana_pool: {C: 2}, life: 18}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Wasteland]}
+      p1: {graveyard: [Lightning Bolt, Ancient Tomb], battlefield: [{card: Mountain, tapped: true}], mana_pool: {C: 2}, life: 18}
+  - advance: {to: begin_combat, of: p0}
+expect:
+  - at: after_script
+    phase: begin_combat
+    p1: {mana_pool: {}, life: 18, graveyard: [Lightning Bolt, Ancient Tomb]}
+    p0: {life: 17, graveyard: [Wasteland]}
+notes: >
+  Ancient Tomb's ability does not target and adds mana, so it is a mana ability (605.1a): it resolves immediately, cannot be responded to, and the
+  2 damage happens with it (p1 20 -> 18) even though the Tomb is about to be destroyed. The floating {C}{C} cannot pay Lightning Bolt's {R}, so p1
+  pays Bolt with the Mountain and the {C}{C} stays in the pool through the Bolt's resolution and through the Wasteland ability's resolution (the
+  Tomb is destroyed but its mana is not removed), and only empties when main phase 1 ends (500.5). A wrong engine would empty the pool when the
+  source leaves, or skip the 2 damage.
+  Review rewrite: the original script had p1 tap the Tomb and then pass straight after p0's pass, expecting the Wasteland ability to resolve.
+  Under 117.4 ("pass without taking any actions in between passing") a mana-ability activation between the two passes arguably breaks the
+  succession, so p0 would get priority again; the rules question is logged in REVIEW-B.md. The Bolt cast (an action under every reading) makes the
+  passes after it unambiguous: p1 passes, p0 passes, Bolt resolves; p0 passes, p1 passes, the Wasteland ability resolves.
+---
+id: wasteland-fizzles-when-fetchland-is-cracked-in-response
+title: Cracking a fetchland in response to Wasteland makes Wasteland's ability fizzle, leaving the Wasteland player down a land
+area: card
+cards: [Wasteland, Polluted Delta, Island]
+tags: [wasteland, fetchland, fizzle, target-legality, stack, response]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve. It's removed from the stack and, if it's a spell, put into its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @w"]
+    library_pad: 10
+  p1:
+    battlefield: ["Polluted Delta @delta"]
+    library: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@w", ability: 1, targets: ["@delta"]}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@delta", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@w"}, {kind: activated, source: "@delta"}]
+      p1: {life: 19, graveyard: [Polluted Delta], battlefield: []}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, purpose: fetch, found: "@isl"}
+  - check:
+      stack: [{kind: activated, source: "@w"}]
+      pending: {actor: p0, kind: priority}
+      p1: {battlefield: [{card: Island, tapped: false}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Wasteland], battlefield: []}
+    p1: {graveyard: [Polluted Delta], battlefield: [{card: Island, tapped: false}], life: 19}
+notes: >
+  Wasteland was sacrificed as a cost, so p0 has already spent it. p1 sacrifices Polluted Delta as a cost in response, so the Wasteland ability's only
+  target has left the battlefield and the ability is removed without effect when it resolves (608.2b). The fetched basic Island is untouched
+  (it was never a target). The Delta ability resolves first (top of the stack), then p0 as the active player gets priority again.

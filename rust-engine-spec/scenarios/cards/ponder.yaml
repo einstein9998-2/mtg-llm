@@ -1,0 +1,112 @@
+id: ponder-reorder-no-shuffle-then-draw-the-new-top
+title: Ponder looks at the top three, reorders them, declines to shuffle, and draws the new top card
+area: card
+cards: [Ponder, Lightning Bolt, Preordain, Daze, Island]
+tags: [ponder, library-order, order-cards, optional-shuffle, draw, yes-no-decision]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ponder, text: "Look at the top three cards of your library, then put them back in any order. You may shuffle.", verified: true}
+  - {kind: oracle, card: Ponder, text: "Draw a card.", verified: true}
+random: []
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ponder @pond"]
+    battlefield: ["Island @i1"]
+    library: ["Lightning Bolt @a", "Preordain @b", "Daze @c", "Island @d", "Island @e"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pond", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: order_cards, purpose: ponder_reorder, answer: ["@c", "@a", "@b"], expect_options: {include: ["@a", "@b", "@c"], exclude: ["@d", "@e"]}}
+  - p0: {decision: yes_no, purpose: may_shuffle, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Daze]
+      graveyard: [Ponder]
+      library_top: [Lightning Bolt, Preordain, Island, Island]
+      library_count: 4
+notes: >
+  Only the top three cards are offered for reordering (the fourth and fifth are not). The answer lists the new top first: Daze, Lightning Bolt, Preordain.
+  The shuffle is optional and declined, then "Draw a card" draws the new top (Daze). A wrong engine draws before reordering or does not give the shuffle option.
+  No random event may occur (random is an EMPTY queue, so an engine that shuffles although the player declined fails deterministically).
+---
+id: ponder-with-two-cards-in-library-looks-at-both
+title: Ponder with only two cards in the library looks at both, reorders, and draws one without losing the game
+area: card
+cards: [Ponder, Lightning Bolt, Island]
+tags: [ponder, small-library, library-order, draw, boundary]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ponder, text: "Look at the top three cards of your library, then put them back in any order. You may shuffle.", verified: true}
+  - {kind: oracle, card: Ponder, text: "Draw a card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ponder @pond"]
+    battlefield: ["Island @i1"]
+    library: ["Lightning Bolt @a", "Island @b"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pond", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: order_cards, purpose: ponder_reorder, answer: ["@b", "@a"], expect_options: {count: 2}}
+  - p0: {decision: yes_no, purpose: may_shuffle, answer: false}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Island], library_top: [Lightning Bolt], library_count: 1, graveyard: [Ponder]}
+notes: >
+  "The top three cards" of a two-card library is both cards. The draw succeeds because the library has a card, so no state-based loss. A wrong engine
+  refuses to cast, errors on the short library, or loses the game.
+---
+id: ponder-is-a-sorcery-opponents-turn
+title: Ponder is not castable on the opponent's turn even with priority and an empty stack, while Brainstorm is
+area: card
+cards: [Ponder, Brainstorm, Island]
+tags: [ponder, sorcery-timing, priority, mask-validity, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ponder, text: "Draw a card.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  priority: p1
+  p0:
+    hand: ["Ponder @ponder", "Brainstorm @bs"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@ponder", pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    legal:
+      p0:
+        include: [{t: pass}, {t: cast, card: "@bs"}]
+        exclude: [{t: cast, card: "@ponder"}]
+    p0: {hand: [Ponder, Brainstorm]}
+notes: >
+  Sorceries may be cast only by the active player in their own main phase with an empty stack. p0 holds priority in p1's main phase with an empty stack
+  but is not the active player, so Ponder (a sorcery) is not offered; the instant Brainstorm is.

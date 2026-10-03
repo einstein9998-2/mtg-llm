@@ -1,0 +1,53 @@
+id: archon-of-cruelty-attack-trigger-with-nothing-to-sacrifice
+title: Archon of Cruelty's attack trigger against an opponent with no creature or planeswalker still makes them discard and lose 3, and its controller draws and gains 3
+area: card
+cards: [Archon of Cruelty, Daze, Island, Ponder, Swamp]
+tags: [archon-of-cruelty, attack-trigger, discard, life-loss, lifegain, impossible-instruction]
+derived_from: cr
+source:
+  - {kind: oracle, card: Archon of Cruelty, text: "Whenever this creature enters or attacks, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.", verified: true}
+  - {kind: cr, ref: "609.3", text: "If an effect attempts to do something impossible, it does only as much as possible.", verified: true}
+setup:
+  turn: 6
+  active: p0
+  phase: begin_combat
+  p0:
+    life: 20
+    battlefield: [{card: Archon of Cruelty, as: arch}, "Swamp"]
+    library: ["Ponder @pd"]
+    library_pad: 10
+  p1:
+    life: 20
+    hand: ["Daze @dz", "Island @hi"]
+    battlefield: ["Island @bi"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@arch", target: {player: p1}}]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack: [{kind: triggered, source: "@arch", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: choose_cards, purpose: discard, answer: ["@dz"], expect_options: {include: ["@dz", "@hi"]}}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      hand: [Ponder]
+      battlefield_contains: [{card: Archon of Cruelty, tapped: true}]
+    p1:
+      life: 17
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: [{card: Island}]
+notes: >
+  p1 controls only a land, so the sacrifice part does nothing and raises no decision (609.3); the discard (p1 chooses)
+  and the life changes still happen. The trigger fires on the attack declaration and resolves in the declare attackers
+  step, before blockers or damage. Wrong engines: skip the whole trigger when no sacrifice is possible, sacrifice the
+  land, or let p0 choose the discard.

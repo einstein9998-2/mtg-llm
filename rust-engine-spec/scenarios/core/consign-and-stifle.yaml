@@ -1,0 +1,145 @@
+id: consign-to-memory-counters-colorless-spell-not-colored-spell
+title: "Consign to Memory counters a colorless spell (Mishra's Bauble) lower on the stack but cannot target a colored spell (Brainstorm)"
+area: core
+cards: [Consign to Memory, Island, Mishra's Bauble, Brainstorm]
+tags: [consign-to-memory, counterspell, colorless, targeting, mask-validity, stack, not-top-of-stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: cr, ref: "202.2b", text: "Objects with no colored mana symbols in their mana costs are colorless.", verified: true}
+  - {kind: cr, ref: "405.5", text: "When all players pass in succession, the top (last-added) spell or ability on the stack resolves.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mishra's Bauble @bauble", "Brainstorm @bs"]
+    battlefield: ["Island @i"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @consign"]
+    battlefield: ["Island @j"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bauble", pay: auto}
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@consign", targets: ["@bs"], pay: auto}}
+  - p1: {t: cast, card: "@consign", targets: ["@bauble"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bauble", controller: p0}
+        - {kind: spell, card: "@bs", controller: p0}
+        - {kind: spell, card: "@consign", controller: p1, targets: ["@bauble"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@bs", controller: p0}
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Mishra's Bauble], hand: []}
+    p1: {graveyard: [Consign to Memory]}
+notes: >
+  p0 casts the artifact first (sorcery timing, empty stack) and the instant on top of it. Mishra's Bauble is colorless
+  (no colored mana symbol in {0}) so Consign to Memory may target it even though it is not the top object; Brainstorm is
+  blue, so targeting it is illegal. Consign resolves and counters the Bauble to the graveyard; Brainstorm remains on the
+  stack, untouched.
+---
+id: stifle-counters-wasteland-ability-target-survives
+title: "Stifle counters Wasteland's activated ability; Wasteland stays sacrificed and the targeted land survives"
+area: core
+cards: [Stifle, Island, Wasteland]
+tags: [stifle, counterspell, activated-ability, ability-on-stack, sacrifice-cost, wasteland]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn’t get a “refund” of any costs that were paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Wasteland @w2", "Island @j"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@waste", ability: 1, targets: ["@w2"]}
+  - check:
+      stack: [{kind: activated, source: "@waste", controller: p0}]
+      p0: {graveyard: [Wasteland], battlefield: []}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@waste", nth: 0}], pay: auto}
+  - check:
+      stack:
+        - {kind: activated, source: "@waste", controller: p0}
+        - {kind: spell, card: "@stifle", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Wasteland], battlefield: []}
+    p1: {graveyard: [Stifle], battlefield: [{card: Wasteland}, {card: Island, tapped: true}]}
+notes: >
+  Stifle targets the ability on the stack, not the Wasteland. The sacrifice was a cost, so Wasteland is already in
+  p0's graveyard and does not come back (701.6b); the countered ability does not resolve and p1's Wasteland survives. The
+  opponent's mana comes only from the Island (the other land taps for {C}), so payment is deterministic.
+---
+id: stifle-cannot-target-a-spell-or-a-mana-ability
+title: "Stifle cannot target a spell, and a mana ability (Lotus Petal) never uses the stack so it cannot be responded to"
+area: core
+cards: [Stifle, Island, Lotus Petal, Brainstorm]
+tags: [stifle, mask-validity, mana-ability, stack, targeting, lotus-petal]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Stifle, text: "(Mana abilities can't be targeted.)", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "115.1c", text: "An activated ability is targeted if it identifies something it will affect by using the phrase “target [something],” where the “something” is a phrase that describes an object and/or player.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Lotus Petal @petal"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: U}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {mana_pool: {U: 1}, graveyard: [Lotus Petal], battlefield: []}
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bs", controller: p0}]
+      p0: {mana_pool: {}}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@stifle", targets: ["@bs"], pay: auto}}
+  - check:
+      legal: {p1: {exclude: [{t: cast, card: "@stifle"}]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bs", controller: p0}]
+    pending: {actor: p1, kind: priority}
+    p1: {hand: [Stifle], battlefield: [{card: Island, tapped: false}]}
+    p0: {mana_pool: {}, graveyard: [Lotus Petal]}
+notes: >
+  Activating Lotus Petal's mana ability resolves immediately and does not use the stack: the stack is empty right
+  after, p0 still has priority, and the mana is in p0's pool, so p1 never had a chance to respond to it (and "mana
+  abilities can't be targeted"). Brainstorm is a spell, not an activated or triggered ability, so Stifle has no legal
+  target at all: with nothing else on the stack, Stifle is not castable even though p1 has an untapped Island. A wrong
+  engine puts mana abilities on the stack or allows Stifle to target a spell.

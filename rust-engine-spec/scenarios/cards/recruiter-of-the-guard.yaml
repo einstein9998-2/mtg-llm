@@ -1,0 +1,83 @@
+id: recruiter-search-uses-toughness-not-power-or-mana-value
+title: Recruiter of the Guard finds a creature card with toughness 2 or less, whatever its power or mana value
+area: card
+cards: [Recruiter of the Guard, "Phelia, Exuberant Shepherd", Solitude, Flickerwisp, Overlord of the Balemurk, Thoughtseize, Plains]
+tags: [recruiter-of-the-guard, etb-trigger, search, may-choice, toughness]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Recruiter of the Guard, text: "When this creature enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn’t required to find some or all of those cards even if they’re present in that zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Recruiter of the Guard @rec"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library: ["Phelia, Exuberant Shepherd @ph", "Solitude @sl", "Flickerwisp @fw", "Overlord of the Balemurk @ov", "Thoughtseize @ts"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rec", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@rec", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: may_search, answer: true}
+  - p0: {decision: search, found: "@sl", expect_options: {include: ["@ph", "@sl", "@fw"], exclude: ["@ov", "@ts"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Solitude]
+      library_count: 14
+      battlefield:
+        - {card: Recruiter of the Guard, pt: [1, 1]}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  Printed P/T from oracle.json: Phelia 2/2, Solitude 3/2, Flickerwisp 3/1 (toughness 2 or less: legal even with power 3
+  or mana value 5); Overlord 5/5 (too tough); Thoughtseize is not a creature card. A wrong engine filters by power or
+  mana value and drops Solitude or Flickerwisp. Library 15 cards minus the found one = 14; order after the shuffle is
+  not asserted.
+---
+id: recruiter-search-may-be-declined
+title: Recruiter of the Guard's search is optional; declining leaves hand and library size unchanged
+area: card
+cards: [Recruiter of the Guard, "Phelia, Exuberant Shepherd", Plains]
+tags: [recruiter-of-the-guard, etb-trigger, may-choice]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Recruiter of the Guard, text: "When this creature enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Recruiter of the Guard @rec"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rec", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: may_search, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      library_count: 11
+notes: >
+  Pair of recruiter-search-uses-toughness-not-power-or-mana-value. Whether a declined "may search ..., then shuffle"
+  still shuffles is open (see W5 review), so library order is not asserted (random: any).

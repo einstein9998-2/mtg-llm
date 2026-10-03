@@ -1,0 +1,90 @@
+id: marsh-flats-fetches-plains-swamp-dual-untapped
+title: Marsh Flats finds any card with the Plains or Swamp land type, including a nonbasic dual, and it enters untapped
+area: card
+cards: [Marsh Flats, Scrubland, Swamp, Island, Wasteland]
+tags: [marsh-flats, fetchland, search, land-types, life-payment, sacrifice-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Marsh Flats, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Scrubland, text: "({T}: Add {W} or {B}.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Marsh Flats @mf"]
+    library: ["Scrubland @scrub", "Swamp @sw", "Island @isl", "Wasteland @wl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@mf", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@mf", controller: p0}]
+      p0: {life: 19, graveyard: [Marsh Flats], battlefield: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@scrub", expect_options: {include: ["@scrub", "@sw"], exclude: ["@isl", "@wl"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      lands_played: 0
+      graveyard: [Marsh Flats]
+      library_count: 13
+      battlefield: [{card: Scrubland, tapped: false}]
+notes: >
+  Scrubland's type line is "Land — Plains Swamp", so it is a Plains card and a Swamp card for the search. The 1 life and
+  the sacrifice are costs (paid before the ability is on the stack). The found land is put onto the battlefield, not
+  played (lands_played stays 0), and untapped. Library: 4 + 10 padding - 1 = 13.
+---
+id: marsh-flats-fetches-shadowy-backstreet-tapped-then-surveil
+title: Shadowy Backstreet fetched by Marsh Flats enters tapped and its surveil trigger looks at the top card after the shuffle
+area: card
+cards: [Marsh Flats, Shadowy Backstreet, Plains, Swamp]
+tags: [marsh-flats, shadowy-backstreet, fetchland, enters-tapped, surveil, etb-trigger, shuffle]
+derived_from: cr
+source:
+  - {kind: oracle, card: Shadowy Backstreet, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Shadowy Backstreet, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: oracle, card: Marsh Flats, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Marsh Flats @mf"]
+    library: ["Shadowy Backstreet @sb", "Plains @pl", "Swamp @sw"]
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Plains, Swamp]}
+script:
+  - p0: {t: activate, source: "@mf", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@sb"}
+  - check:
+      stack: [{kind: triggered, source: "@sb", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [{card: Shadowy Backstreet, tapped: true}], library_top: [Plains, Swamp]}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: ["@pl"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Marsh Flats, Plains]
+      library_count: 1
+      library_top: [Swamp]
+      battlefield: [{card: Shadowy Backstreet, tapped: true}]
+notes: >
+  Shadowy Backstreet is "Land — Plains Swamp", so Marsh Flats can find it; its "enters tapped" replacement applies to
+  any entry, not only a land play. Its ETB trigger goes on the stack after the fetch finishes (including the shuffle),
+  so the surveil sees the post-shuffle top card, fixed here by the scripted shuffle (Plains on top). p0's library has no
+  padding and nobody draws. A wrong engine puts it in untapped or surveils before the shuffle.

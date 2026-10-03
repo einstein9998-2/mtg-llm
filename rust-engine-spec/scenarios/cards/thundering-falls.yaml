@@ -1,0 +1,72 @@
+id: thundering-falls-surveil-keep-card-on-top
+title: Surveil 1 from Thundering Falls may leave the card on top of the library
+area: card
+cards: [Thundering Falls, Lightning Bolt, Ponder]
+tags: [surveil, enters-tapped, etb-trigger]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Thundering Falls, text: "When this land enters, surveil 1.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Thundering Falls @falls"]
+    library: ["Lightning Bolt @bolt", "Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@falls"}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@bolt"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: []
+      library_top: [Lightning Bolt, Ponder]
+      library_count: 12
+notes: >
+  "Put any number of them into your graveyard" includes zero. The card stays on top; nothing is drawn or moved to the bottom.
+---
+id: thundering-falls-is-an-island-so-daze-may-return-it
+title: Daze may return a tapped Thundering Falls because it has the Island subtype
+area: card
+cards: [Thundering Falls, Daze, Lightning Bolt, Mountain]
+tags: [daze, alternative-cost, land-types, dual-land]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Thundering Falls, text: "({T}: Add {U} or {R}.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield:
+      - {card: Thundering Falls, as: falls, tapped: true}
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@falls"}, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt], life: 20}
+    p1: {hand: [Thundering Falls], graveyard: [Daze], battlefield: [], life: 20}
+notes: >
+  Thundering Falls is a Land - Island Mountain, so it is "an Island you control". Tapped lands may be returned (nothing requires untapped). p0's
+  only Mountain was tapped for Lightning Bolt, so p0 cannot pay Daze's {1}: Bolt is countered with no prompt. p1 ends with the land in hand,
+  not on the battlefield, and Daze in the graveyard.

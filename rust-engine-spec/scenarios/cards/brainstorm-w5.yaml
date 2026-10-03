@@ -1,0 +1,96 @@
+id: brainstorm-then-misty-rainforest-shuffles-away-put-back-cards
+title: Brainstorm followed by cracking Misty Rainforest shuffles the two put-back cards away
+area: card
+cards: [Brainstorm, Misty Rainforest, Island, Show and Tell, Aluren, Veil of Summer, Forest, Tropical Island]
+tags: [brainstorm, misty-rainforest, shuffle, random, library-order, fetchland, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Misty Rainforest, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 1
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @isl", "Misty Rainforest @misty"]
+    library: ["Show and Tell @st", "Aluren @al", "Veil of Summer @vs", "Island @is1", "Forest @fo", "Tropical Island @ti"]
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Forest, Tropical Island, Veil of Summer, Aluren]}
+script:
+  - p0: {t: cast, card: "@bs", pay: {tap: ["@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@al", "@vs"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@al", "@vs"]}
+  - check:
+      p0: {hand: [Show and Tell], library_top: [Aluren, Veil of Summer, Island, Forest, Tropical Island], library_count: 5}
+  - p0: {t: activate, source: "@misty", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@is1", expect_options: {include: ["@is1", "@fo", "@ti"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Show and Tell]
+      graveyard: [Brainstorm, Misty Rainforest]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: false}]
+      library_count: 4
+      library_top: [Forest, Tropical Island, Veil of Summer, Aluren]
+notes: >
+  Brainstorm draws Show and Tell, Aluren and Veil of Summer and puts Aluren and Veil back (Aluren on top). The mid-script
+  check pins the Brainstorm result (library has 5 cards: the two put-back cards on top of the 3 unseen ones). Cracking
+  Misty fetches the Island and shuffles the remaining four cards; the scripted shuffle is consumed once and its result
+  (Forest on top) shows the engine used the random event rather than keeping the put-back order. The fetched Island
+  enters untapped.
+---
+id: brainstorm-paid-with-lotus-petal-mana
+title: Brainstorm cast with blue mana from Lotus Petal draws three and puts two back on top in the chosen order
+area: card
+cards: [Brainstorm, Lotus Petal, "Atraxa, Grand Unifier", Aluren, Island]
+tags: [brainstorm, lotus-petal, mana-pool, choose-cards, order-cards, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "401.4", text: "If an effect puts two or more cards in a specific position in a library at the same time, the owner of those cards may arrange them in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Lotus Petal @lp"]
+    library: ["Atraxa, Grand Unifier @atx", "Aluren @al", "Island @is1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@lp", ability: 0, choose_color: U}
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bs"}]
+      p0: {mana_pool: {}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@is1", "@al"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@is1", "@al"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Atraxa, Grand Unifier"]
+      graveyard: [Brainstorm, Lotus Petal]
+      library_top: [Island, Aluren]
+      library_count: 12
+notes: >
+  The floating {U} from the Petal pays Brainstorm's {U}. Three cards are drawn (Atraxa, Aluren, Island); the two put back
+  are Island (top) and Aluren, leaving Atraxa in hand; library 13 - 3 + 2 = 12.

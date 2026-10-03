@@ -1,0 +1,186 @@
+id: mu-wasteland-ancient-tomb-mana-floated-in-response
+title: Tapping Ancient Tomb in response to Wasteland keeps the mana until the step ends, and the Tomb still deals its damage
+area: matchup
+cards: [Wasteland, Ancient Tomb, Tropical Island, Lightning Bolt]
+tags: [matchup, wasteland, mana-ability, mana-pool-empties, priority, sacrifice-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: cr, ref: "605.3a", text: "A player may activate an activated mana ability whenever they have priority, whenever they are casting a spell or activating an ability that requires a mana payment, or whenever a rule or effect asks for a mana payment, even if it's in the middle of casting or resolving a spell or activating or resolving an ability.", verified: true}
+  - {kind: cr, ref: "106.4", text: "Each player's mana pool empties at the end of each step and phase, and the player is said to lose this mana.", verified: true}
+  - {kind: cr, ref: "117.4", text: "If all players pass in succession (that is, if all players pass without taking any actions in between passing), the spell or ability on top of the stack resolves or, if the stack is empty, the phase or step ends.", verified: true}
+  - {kind: cr, ref: "120.3a", text: "Damage dealt to a player by a source without infect causes that player to lose that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Lightning Bolt]
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+  p1:
+    battlefield: ["Ancient Tomb @tomb", "Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@waste", ability: 1, targets: ["@tomb"]}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@tomb", ability: 0}
+  - label: floated
+    check:
+      stack: [{kind: activated, source: "@waste", controller: p0}]
+      pending: {actor: p1, kind: priority}
+      p1: {life: 18, mana_pool: {C: 2}, battlefield: [{card: Ancient Tomb, tapped: true}, {card: Tropical Island, tapped: false}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: resolved
+    check:
+      stack: []
+      phase: main1
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Ancient Tomb], battlefield: [{card: Tropical Island}], mana_pool: {C: 2}}
+      p0: {graveyard: [Wasteland], battlefield: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: begin_combat
+    pending: {actor: p0, kind: priority}
+    p1: {life: 18, mana_pool: {}, graveyard: [Ancient Tomb]}
+notes: >
+  The mana ability does not use the stack, and p1 keeps priority after activating it (117.3c), so p1 must pass again; only
+  then does p0's pass complete "all players pass in succession" (117.4) and the Wasteland ability resolves. Ancient Tomb's
+  damage is part of the mana ability, so p1 is at 18. The {C}{C} stays in p1's pool through the rest of main1 (p1 has no
+  instant to spend it on) and is lost when main1 ends (106.4). A wrong engine resolves Wasteland after p1's first pass
+  without p1 passing again, empties the pool when the ability resolves, or skips the Tomb damage.
+---
+id: mu-wasteland-ancient-tomb-after-stock-up-cast
+title: Destroying Ancient Tomb after its mana paid for Stock Up does not affect Stock Up
+area: matchup
+cards: [Wasteland, Ancient Tomb, Island, Stock Up, Aluren, Show and Tell, "Atraxa, Grand Unifier", Force of Will, Lotus Petal]
+tags: [matchup, wasteland, costs-already-paid, stack, stock-up]
+derived_from: cr
+source:
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: oracle, card: Stock Up, text: "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su"]
+    battlefield: ["Ancient Tomb @tomb", "Island @isl"]
+    library: ["Aluren @a", "Show and Tell @b", "Atraxa, Grand Unifier @c", "Force of Will @d", "Lotus Petal @e"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@su", pay: {tap: ["@tomb", "@isl"]}}
+  - check:
+      p1: {life: 18}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@waste", ability: 1, targets: ["@tomb"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@su", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p1: {graveyard: [Ancient Tomb], battlefield: [{card: Island, tapped: true}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: stock_up_to_hand, answer: ["@a", "@b"]}
+  - p1: {decision: order_cards, purpose: stock_up_to_bottom, answer: ["@c", "@d", "@e"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 18
+      hand: [Aluren, Show and Tell]
+      graveyard: [Ancient Tomb, Stock Up]
+      library_count: 13
+      library_bottom: ["Atraxa, Grand Unifier", Force of Will, Lotus Petal]
+    p0: {graveyard: [Wasteland], battlefield: []}
+notes: >
+  Ancient Tomb's {C}{C} and the Island's {U} paid Stock Up's {2}{U} during casting; the costs are paid and done (601.2h),
+  and nothing in Wasteland's effect touches the spell. The Wasteland ability resolves first (top of stack), then the active
+  player p1 gets priority with Stock Up still on the stack (117.3b), both pass, and Stock Up resolves normally.
+---
+id: mu-wasteland-tropical-island-after-land-drop-used
+title: A land destroyed after the turn's land play does not give back the land drop
+area: matchup
+cards: [Wasteland, Tropical Island, Island, Hedge Maze]
+tags: [matchup, wasteland, land-drop, illegal-action]
+derived_from: cr
+source:
+  - {kind: cr, ref: "305.2b", text: "A player can't play a land, for any reason, if the number of lands the player can play this turn is equal to or less than the number of lands they have already played this turn.", verified: true}
+  - {kind: cr, ref: "305.2", text: "A player can normally play one land during their turn; however, continuous effects may increase this number.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+  p1:
+    lands_played: 0
+    hand: ["Tropical Island @trop", "Hedge Maze @hm"]
+    battlefield: ["Island"]
+    library_pad: 10
+script:
+  - p1: {t: play_land, card: "@trop"}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@waste", ability: 1, targets: ["@trop"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p1: {t: play_land, card: "@hm"}}
+expect:
+  - at: after_script
+    stack: []
+    phase: main1
+    pending: {actor: p1, kind: priority}
+    p1: {lands_played: 1, hand: [Hedge Maze], graveyard: [Tropical Island], battlefield: [{card: Island}]}
+    legal:
+      p1:
+        exclude: [{t: play_land, card: "@hm"}]
+notes: >
+  The count of lands played this turn stays 1 even though that land is gone; one land per turn means Hedge Maze cannot be
+  played (305.2b). A wrong engine counts lands on the battlefield or resets the counter when the land leaves.
+---
+id: mu-wasteland-hedge-maze-legal-basic-island-not
+title: Wasteland may target Hedge Maze (nonbasic despite its basic land types) but not a basic Island
+area: matchup
+cards: [Wasteland, Hedge Maze, Island]
+tags: [matchup, wasteland, targeting, nonbasic-land, supertype]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "({T}: Add {G} or {U}.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @isl", {card: Hedge Maze, as: hm, tapped: true}]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@waste", ability: 1, targets: ["@isl"]}}
+  - p0: {t: activate, source: "@waste", ability: 1, targets: ["@hm"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {battlefield: [{card: Island}], graveyard: [Hedge Maze]}
+    p0: {graveyard: [Wasteland], battlefield: []}
+notes: >
+  Hedge Maze's type line is "Land - Forest Island" with no basic supertype, so it is nonbasic; the basic Island is not a
+  legal target. A wrong engine treats a land with basic land types as basic. Being tapped does not matter for targeting.
+  The supertypes (205.4a) are printed before the card types; Hedge Maze has none.

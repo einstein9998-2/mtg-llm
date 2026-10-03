@@ -1,0 +1,93 @@
+id: meticulous-archive-played-enters-tapped-surveil-keep-on-top
+title: Meticulous Archive played as the land drop enters tapped, triggers surveil 1, and the card can stay on top
+area: card
+cards: [Meticulous Archive, Ponder, Island, Plains]
+tags: [meticulous-archive, enters-tapped, etb-trigger, surveil, land-drop]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Meticulous Archive, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Meticulous Archive, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Meticulous Archive @ma"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@ma"}
+  - check:
+      stack: [{kind: triggered, source: "@ma", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [{card: Meticulous Archive, tapped: true}], lands_played: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@pond"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      library_top: [Ponder]
+      library_count: 11
+      graveyard: []
+      battlefield: [{card: Meticulous Archive, tapped: true, subtypes: [Plains, Island]}]
+notes: >
+  Playing a land is a special action that does not use the stack, but the enters trigger does: p0 receives priority with
+  it on the stack. Keeping Ponder on top leaves the library unchanged. Bugs caught: the land entering untapped when played
+  (enters-tapped applied only to "put onto"), the surveil happening without the stack.
+---
+id: meticulous-archive-cannot-tap-for-mana-the-turn-it-enters
+title: Meticulous Archive cannot pay for a spell the turn it is played because it is tapped; an untapped Archive pays white or blue
+area: card
+cards: [Meticulous Archive, Swords to Plowshares, Brainstorm, "Dragon's Rage Channeler", Ponder, Island]
+tags: [meticulous-archive, enters-tapped, mana-ability, dual-land]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Meticulous Archive, text: "({T}: Add {W} or {U}.)", verified: true}
+  - {kind: oracle, card: Meticulous Archive, text: "This land enters tapped.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Meticulous Archive @ma2", "Swords to Plowshares @stp", "Brainstorm @bs"]
+    battlefield: ["Meticulous Archive @ma1"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@ma2"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@pond"]}
+  - p0: {t: activate, source: "@ma1", ability: 0, choose_color: W}
+  - expect_illegal: {p0: {t: activate, source: "@ma2", ability: 0, choose_color: U}}
+  - p0: {t: cast, card: "@stp", targets: ["@drc"], pay: auto}
+  - check:
+      p0: {mana_pool: {}, hand: [Brainstorm]}
+      stack: [{kind: spell, card: "@stp", controller: p0}]
+  - expect_illegal: {p0: {t: cast, card: "@bs"}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      battlefield:
+        - {card: Meticulous Archive, tapped: true}
+        - {card: Meticulous Archive, tapped: true}
+    p1: {life: 21, exile: ["Dragon's Rage Channeler"]}
+notes: >
+  The Archive played this turn enters tapped, so its mana ability cannot be activated ({T} in the cost). The older Archive
+  taps for {W} to pay for Swords; after that no untapped source remains, so Brainstorm is not castable. Swords exiles DRC
+  (power 1), p1 gains 1. Bug caught: an enters-tapped land still usable for mana the turn it is played.

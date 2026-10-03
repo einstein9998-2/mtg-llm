@@ -1,0 +1,97 @@
+id: phelia-attack-exiles-opponents-permanent-returns-to-owner-no-counter
+title: Phelia's attack trigger exiles an opponent's nonland permanent, which returns at the end step under its owner's control as a new object, and Phelia gets no counter
+area: card
+cards: ["Phelia, Exuberant Shepherd", Aether Vial, Plains]
+tags: [phelia, attack-trigger, flicker, delayed-trigger, new-object, counters, combat]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "Whenever Phelia attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.", verified: true}
+  - {kind: cr, ref: "508.1m", text: "Any abilities that trigger on attackers being declared trigger.", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Phelia, Exuberant Shepherd @ph", "Plains @w1"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Aether Vial, as: pv, counters: {charge: 2}}, "Plains @pw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@ph", target: {player: p1}}]}
+  - p0: {decision: choose_target, slot: 0, answer: "@pv", expect_options: {include: ["@pv"], exclude: ["@pw", "@w1", "@ph"]}}
+  - check:
+      stack: [{kind: triggered, source: "@ph", controller: p0, targets: ["@pv"]}]
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - check:
+      p1: {exile: [Aether Vial], battlefield: [{card: Plains}]}
+  - advance: {to: end, of: p0}
+  - check:
+      phase: end
+      stack: [{kind: triggered, source: "@ph", controller: p0}]
+      p1: {life: 18}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: "Phelia, Exuberant Shepherd", tapped: true, counters: {}, pt: [2, 2]}, {card: Plains}]
+    p1:
+      life: 18
+      exile: []
+      battlefield: [{card: Aether Vial, controller: p1, counters: {}}, {card: Plains}]
+notes: >
+  The trigger targets "other" nonland permanents: lands and Phelia herself are excluded. Unblocked Phelia (p1 has no
+  creature, so no block decision) deals 2. At p0's end step the Vial returns under its owner p1's control as a new
+  object with no charge counters (400.7). It entered under p1's control, so Phelia gets no counter. A wrong engine keeps
+  the counters, returns it under p0's control, or always gives Phelia the counter.
+---
+id: phelia-exiles-own-permanent-returns-under-your-control-counter
+title: When Phelia exiles her controller's own permanent, it returns under that player's control and Phelia gets a +1/+1 counter
+area: card
+cards: ["Phelia, Exuberant Shepherd", Aether Vial, Plains]
+tags: [phelia, attack-trigger, flicker, delayed-trigger, counters, new-object]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Phelia, Exuberant Shepherd @ph", {card: Aether Vial, as: mv, counters: {charge: 3}}]
+    library_pad: 10
+  p1:
+    battlefield: ["Plains @pw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@ph", target: {player: p1}}]}
+  - p0: {decision: choose_target, slot: 0, answer: "@mv"}
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: []
+      battlefield:
+        - {card: "Phelia, Exuberant Shepherd", counters: {"+1/+1": 1}, pt: [3, 3]}
+        - {card: Aether Vial, controller: p0, counters: {}}
+    p1:
+      life: 18
+notes: >
+  Phelia's controller owns the Vial, so it returns under p0's control and Phelia gets the counter (3/3). The Vial comes
+  back with no charge counters. Positive pair of the opponent's-permanent scenario. The advance from the declare
+  attackers step crosses blockers (p1 has no creature) and damage (2 to p1) with no decision.

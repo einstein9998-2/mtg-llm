@@ -1,0 +1,131 @@
+id: dismember-kills-five-five-paying-mana-for-both-symbols
+title: Dismember paid entirely with mana gives -5/-5 and kills Acererak (5/5) without costing life
+area: card
+cards: [Dismember, Acererak the Archlich, Swamp]
+tags: [dismember, phyrexian-mana, mana-payment, toughness-zero, state-based-actions]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dismember, text: "({B/P} can be paid with either {B} or 2 life.)", verified: true}
+  - {kind: oracle, card: Dismember, text: "Target creature gets -5/-5 until end of turn.", verified: true}
+  - {kind: cr, ref: "107.4f", text: "A Phyrexian mana symbol represents a cost that can be paid either with one mana of its color or by paying 2 life.", verified: true}
+  - {kind: cr, ref: "704.5f", text: "If a creature has toughness 0 or less, it's put into its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dismember @dm"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Acererak the Archlich @ac"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dm", phyrexian: [mana, mana], targets: ["@ac"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Dismember]
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+    p1:
+      life: 20
+      battlefield: []
+      graveyard: [Acererak the Archlich]
+notes: >
+  {1}{B}{B} paid with three Swamps, no life. Acererak 5/5 becomes 0/0 and dies to state-based actions after Dismember
+  resolves. Acererak never entered here (it is placed directly), so its ETB does not matter.
+---
+id: dismember-pays-two-life-for-one-symbol-and-leaves-seven-seven-at-two-two
+title: Dismember with one Phyrexian symbol paid by life leaves Atraxa a 2/2 until end of turn and 7/7 again next turn
+area: card
+cards: [Dismember, "Atraxa, Grand Unifier", Swamp]
+tags: [dismember, phyrexian-mana, life-payment, until-end-of-turn, atraxa, cleanup]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dismember, text: "Target creature gets -5/-5 until end of turn.", verified: true}
+  - {kind: cr, ref: "107.4f", text: "A Phyrexian mana symbol represents a cost that can be paid either with one mana of its color or by paying 2 life.", verified: true}
+  - {kind: cr, ref: "514.2", text: "Second, the following actions happen simultaneously: all damage marked on permanents (including phased-out permanents) is removed and all \"until end of turn\" and \"this turn\" effects end.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dismember @dm"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Atraxa, Grand Unifier @atx"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dm", phyrexian: [life, mana], targets: ["@atx"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {life: 18}
+      p1:
+        battlefield: [{card: "Atraxa, Grand Unifier", pt: [2, 2]}]
+  - advance: {to: main1, of: p1}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Dismember]
+    p1:
+      battlefield: [{card: "Atraxa, Grand Unifier", pt: [7, 7]}]
+notes: >
+  {1}{B/P}{B/P} with the cast naming [life, mana]: one {B/P} is paid with a Swamp, the other with 2 life, and the generic
+  {1} with the second Swamp, so two Swamps suffice and p0 goes to 18. Atraxa 7/7 gets -5/-5 and is a 2/2 and survives.
+  The effect ends in the cleanup step (514.2), so on p1's turn Atraxa is 7/7 again. The advance passes p0's
+  remaining steps with no decisions (p0 has no creatures and an empty hand).
+---
+id: dismember-life-payment-limits-at-three-life
+title: With 3 life Dismember cannot pay 4 life but can pay 2 life for one symbol, leaving 1
+area: card
+cards: [Dismember, Acererak the Archlich, Swamp]
+tags: [dismember, phyrexian-mana, life-payment, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Dismember, text: "({B/P} can be paid with either {B} or 2 life.)", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so only if their life total is greater than or equal to the amount of the payment.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 3
+    hand: ["Dismember @dm"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Acererak the Archlich @ac"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@dm", phyrexian: [life, life], targets: ["@ac"], pay: auto}}
+  - p0: {t: cast, card: "@dm", phyrexian: [life, mana], targets: ["@ac"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    game: {over: false}
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 1
+      graveyard: [Dismember]
+    p1:
+      battlefield: []
+      graveyard: [Acererak the Archlich]
+notes: >
+  Paying 4 life with 3 life total is not allowed (119.4), so [life, life] is illegal and must change nothing. [life, mana]
+  pays 2 life (3 to 1), one Swamp for {B} and one for the generic {1}. The game continues; Acererak dies.

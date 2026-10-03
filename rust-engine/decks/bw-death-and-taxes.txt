@@ -1,0 +1,41 @@
+# BW Death and Taxes | Midrange / taxes (non-combo)
+# Source: Federodi, 5th-8th, 1 Tappa Tigullio League 2026/27, 2026-09-27 (23 players)
+# https://mtgtop8.com/event?e=91360&d=893865&f=LE
+# Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.
+
+1 Flooded Strand
+2 Karakas
+4 Marsh Flats
+3 Plains
+1 Prismatic Vista
+2 Scrubland
+1 Shadowy Backstreet
+1 Swamp
+4 Wasteland
+1 Boggart Trawler
+1 Cloak and Dagger, Entwined
+2 Flickerwisp
+2 Orcish Bowmasters
+3 Overlord of the Balemurk
+4 Phelia, Exuberant Shepherd
+3 Recruiter of the Guard
+2 Samwise the Stouthearted
+2 Skyclave Apparition
+4 Solitude
+3 White Orchid Phantom
+2 Witch Enchanter
+4 Swords to Plowshares
+4 Thoughtseize
+4 Aether Vial
+
+1 Containment Priest
+3 Deafening Silence
+2 Disruptor Flute
+1 Erode
+1 Faerie Macabre
+1 Grafdigger's Cage
+1 Loran of the Third Path
+1 Path to Exile
+1 Surgical Extraction
+1 White Orchid Phantom
+2 Wrath of the Skies

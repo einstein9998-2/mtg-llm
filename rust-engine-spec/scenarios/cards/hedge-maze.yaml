@@ -1,0 +1,110 @@
+id: hedge-maze-surveil-keep-on-top
+title: Surveil 1 from Hedge Maze may leave the card on top of the library
+area: card
+cards: [Hedge Maze, Lightning Bolt]
+tags: [hedge-maze, surveil, library-order]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@hm"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@bolt"]}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      graveyard: []
+      library_top: [Lightning Bolt]
+      library_count: 11
+notes: >
+  Counterpart of the previous scenario, "any number" includes zero, so the card stays on top and the graveyard stays empty.
+---
+id: hedge-maze-taps-for-green-or-blue-only
+title: Hedge Maze (Forest Island) taps for {G} or {U} but never red
+area: card
+cards: [Hedge Maze, Forest, Island]
+tags: [hedge-maze, mana-ability, basic-land-types, choose-color]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hedge Maze, text: "({T}: Add {G} or {U}.)", verified: true}
+  - {kind: cr, ref: "305.6", text: "An object with the land card type and a basic land type has the intrinsic ability \"{T}: Add [mana symbol],\" ... For Plains, [mana symbol] is {W}; for Islands, {U}; for Swamps, {B}; for Mountains, {R}; and for Forests, {G}.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Hedge Maze @hm"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@hm", ability: 0, choose_color: R}}
+  - p0: {t: activate, source: "@hm", ability: 0, choose_color: U}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {U: 1}
+      battlefield: [{card: Hedge Maze, tapped: true, subtypes: [Forest, Island]}]
+notes: >
+  The reminder-text mana ability is index 0. It offers exactly G or U. The red probe must not tap the land.
+---
+id: hedge-maze-daze-returns-it-as-an-island
+title: Hedge Maze is an Island, so Daze's alternative cost may return it (a Forest alone may not be returned)
+area: card
+cards: [Hedge Maze, Forest, Daze, Brainstorm, Island]
+tags: [hedge-maze, daze, alternative-cost, island-subtype, counter-unless-pay]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "({T}: Add {G} or {U}.)", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text ... that its controller may pay rather than paying the spell's mana cost.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Daze @daze"]
+    battlefield: ["Hedge Maze @hm", "Forest @fo"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @pisl"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@daze", alt_cost: {return_island: "@fo"}, targets: ["@bs"]}}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@hm"}, targets: ["@bs"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Hedge Maze]
+      graveyard: [Daze]
+      battlefield: [{card: Forest}]
+    p1:
+      hand_count: 0
+      graveyard: [Brainstorm]
+notes: >
+  Hedge Maze has the subtype Island, so it can be returned as Daze's alternative cost; a Forest cannot. p1's only
+  Island is tapped for Brainstorm, so p1 cannot pay {1} and there is no pay prompt: Brainstorm is countered. The
+  returned Hedge Maze is a card in p0's hand again (it will enter tapped and surveil again if replayed). Daze comes
+  from the opposing deck; the interaction with a dual land that has the Island type is the point.

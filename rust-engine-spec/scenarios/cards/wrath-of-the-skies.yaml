@@ -1,0 +1,90 @@
+id: wrath-of-the-skies-x-two-destroys-mana-value-two-or-less
+title: Wrath of the Skies with X=2, paying both energy, destroys each artifact, creature and enchantment with mana value 2 or less (tokens included, lands spared)
+area: card
+cards: [Wrath of the Skies, "Phelia, Exuberant Shepherd", Aether Vial, Deafening Silence, Flickerwisp, Plains]
+tags: [wrath-of-the-skies, energy, x-spell, mana-value, mass-destroy, token]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wrath of the Skies, text: "You get X {E} (energy counters), then you may pay any amount of {E}. Destroy each artifact, creature, and enchantment with mana value less than or equal to the amount of {E} paid this way.", verified: true}
+  - {kind: cr, ref: "107.14", text: "The energy symbol is {E}. It represents one energy counter. To pay {E}, a player removes one energy counter from themselves.", verified: true}
+  - {kind: cr, ref: "202.3a", text: "The mana value of an object with no mana cost is 0", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Wrath of the Skies @wr"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3", "Plains @w4"]
+    library_pad: 10
+  p1:
+    battlefield:
+      - "Phelia, Exuberant Shepherd @ph"
+      - "Aether Vial @pv"
+      - "Deafening Silence @ds"
+      - "Flickerwisp @wisp"
+      - "Plains @pw"
+      - {token: Goblin Token, as: gob}
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wr", x: 2, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_number, purpose: pay_energy, answer: 2}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 0
+      graveyard: [Wrath of the Skies]
+      battlefield: [{card: Plains, tapped: true}, {card: Plains, tapped: true}, {card: Plains, tapped: true}, {card: Plains, tapped: true}]
+    p1:
+      battlefield: [{card: Flickerwisp}, {card: Plains}]
+      graveyard: ["Phelia, Exuberant Shepherd", Aether Vial, Deafening Silence]
+      exile: []
+notes: >
+  {X}{W}{W} with X=2 taps four Plains (Wrath is p0's first noncreature spell, so p1's Deafening Silence allows it).
+  p0 gets 2 energy and pays 2. Phelia (2), Vial (1), Silence (1) and the Goblin token (no mana cost, so 0) are
+  destroyed; the token ceases to exist. Flickerwisp (3) survives; lands are not artifacts, creatures or enchantments.
+  A wrong engine uses X instead of the energy paid, spares tokens, or destroys lands.
+---
+id: wrath-of-the-skies-x-zero-pays-nothing-still-destroys-tokens
+title: Wrath of the Skies for X=0 with no energy destroys mana value 0 permanents such as tokens and nothing else
+area: card
+cards: [Wrath of the Skies, Aether Vial, Plains]
+tags: [wrath-of-the-skies, energy, x-spell, token, mana-value, no-legal-choice]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wrath of the Skies, text: "Destroy each artifact, creature, and enchantment with mana value less than or equal to the amount of {E} paid this way.", verified: true}
+  - {kind: cr, ref: "202.3a", text: "The mana value of an object with no mana cost is 0", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Wrath of the Skies @wr"]
+    battlefield: ["Plains @w1", "Plains @w2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aether Vial @pv", {token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wr", x: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 0
+      graveyard: [Wrath of the Skies]
+    p1:
+      battlefield: [{card: Aether Vial}]
+      graveyard: []
+notes: >
+  With X=0 p0 gets no energy and has none, so the only amount it can pay is 0 and no decision is raised. "Less than or
+  equal to 0" still catches the Goblin token (mana value 0); the Vial (1) survives. A wrong engine treats "paid 0" as
+  "destroy nothing".

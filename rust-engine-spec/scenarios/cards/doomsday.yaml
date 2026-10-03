@@ -1,0 +1,200 @@
+id: doomsday-pile-from-library-and-graveyard-exiles-the-rest
+title: Doomsday builds a five-card pile from library and graveyard, exiles every other library and graveyard card, keeps the hand, and halves life
+area: card
+cards: [Doomsday, Daze, Brainstorm, Dark Ritual, "Thassa's Oracle", Ponder, Street Wraith, Consider, Lotus Petal, Island, Swamp]
+tags: [doomsday, search, library-order, exile, life-loss, hidden-info]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Doomsday, text: "Search your library and graveyard for five cards and exile the rest. Put the chosen cards on top of your library in any order. You lose half your life, rounded up.", verified: true}
+  - {kind: cr, ref: "401.4", text: "If an effect puts two or more cards in a specific position in a library at the same time, the owner of those cards may arrange them in any order. That library’s owner doesn’t reveal the order in which the cards go into the library.", verified: true}
+  - {kind: cr, ref: "406.3", text: "Exiled cards are, by default, kept face up and may be examined by any player at any time.", verified: true}
+  - {kind: cr, ref: "701.23d", text: "If a player is searching a hidden zone simply for a quantity of cards, such as “a card” or “three cards,” that player must find that many cards (or as many as possible, if the zone doesn’t contain enough cards).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Doomsday @dd", "Daze @dz"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    graveyard: ["Brainstorm @gbs", "Dark Ritual @gdr"]
+    library: ["Thassa's Oracle @to", "Ponder @pd", "Street Wraith @sw", "Consider @cs", "Lotus Petal @lp", "Island @li"]
+  p1:
+    library_pad: 10
+random: []
+script:
+  - p0: {t: cast, card: "@dd", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@dd", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_cards
+      purpose: doomsday_pile
+      answer: ["@to", "@sw", "@cs", "@lp", "@gbs"]
+      expect_options: {include: ["@to", "@pd", "@sw", "@cs", "@lp", "@li", "@gbs", "@gdr"], exclude: ["@dz", "@dd"]}
+  - p0: {decision: order_cards, purpose: doomsday_order, answer: ["@sw", "@cs", "@gbs", "@lp", "@to"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 10
+      hand: [Daze]
+      library_count: 5
+      library_top: [Street Wraith, Consider, Brainstorm, Lotus Petal, "Thassa's Oracle"]
+      graveyard: [Doomsday]
+      exile: [Ponder, Island, Dark Ritual]
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: [Street Wraith, Consider, Brainstorm, Lotus Petal, "Thassa's Oracle"]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {library_count: 5, library_known_top: [], hand_count: 1}
+notes: >
+  Library 6 + graveyard 2 = 8 candidates; five are kept (four from the library, Brainstorm from the graveyard) and the other
+  three (Ponder, Island, Dark Ritual) are exiled face up. The hand card (Daze) is not searched and stays in hand, and
+  Doomsday itself is on the stack while it resolves, so it is neither a candidate nor exiled: it goes to the graveyard
+  afterwards (graveyard is exactly [Doomsday]). Life 20 -> 10. There is no shuffle anywhere in the text, so random: []
+  catches an engine that shuffles the pile. Hidden information: the owner arranged the pile (401.4) so p0 knows all five
+  positions; p1 sees the count, the exiled cards and the graveyard, but no position (p1 knows Brainstorm is in the pile,
+  not where). Wrong engines: exile the hand, exile or keep Doomsday, search only the library, skip the order decision,
+  or round the life loss down. Decision shape (one choose_cards then one order_cards, top first) follows design doc 02
+  section 2.2 ("Doomsday pile selection", "Doomsday pile order"); the runner adapter owns the exact shape.
+---
+id: doomsday-life-loss-rounds-up-from-odd-total
+title: Doomsday at 7 life loses 4 (half rounded up), leaving 3
+area: card
+cards: [Doomsday, Ponder, Consider, Brainstorm, Daze, Island, Dark Ritual, Swamp]
+tags: [doomsday, life-loss, rounding]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Doomsday, text: "You lose half your life, rounded up.", verified: true}
+  - {kind: cr, ref: "107.1a", text: "If a spell or ability could generate a fractional number, the spell or ability will tell you whether to round up or down.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 7
+    hand: ["Doomsday @dd"]
+    battlefield: ["Swamp", "Swamp", "Swamp"]
+    library: ["Ponder @a", "Consider @b", "Brainstorm @c", "Daze @d", "Island @e", "Dark Ritual @f"]
+  p1:
+    library_pad: 10
+random: []
+script:
+  - p0: {t: cast, card: "@dd", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: doomsday_pile, answer: ["@a", "@b", "@c", "@d", "@e"]}
+  - p0: {decision: order_cards, purpose: doomsday_order, answer: ["@a", "@b", "@c", "@d", "@e"]}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 3
+      library_count: 5
+      library_top: [Ponder, Consider, Brainstorm, Daze, Island]
+      exile: [Dark Ritual]
+      graveyard: [Doomsday]
+notes: >
+  Half of 7 is 3.5; Doomsday says rounded up, so p0 loses 4 and ends at 3. An engine using integer division (loses 3,
+  ends at 4) or rounding the remaining life instead of the loss fails here.
+---
+id: doomsday-at-one-life-loses-the-game
+title: Doomsday cast at 1 life loses 1 (half of 1 rounded up) and its caster loses the game
+area: card
+cards: [Doomsday, Ponder, Consider, Brainstorm, Daze, Island, Dark Ritual, Swamp]
+tags: [doomsday, life-loss, rounding, state-based-actions, game-loss]
+derived_from: cr
+source:
+  - {kind: oracle, card: Doomsday, text: "You lose half your life, rounded up.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    hand: ["Doomsday @dd"]
+    battlefield: ["Swamp", "Swamp", "Swamp"]
+    library: ["Ponder @a", "Consider @b", "Brainstorm @c", "Daze @d", "Island @e", "Dark Ritual @f"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dd", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: doomsday_pile, answer: ["@a", "@b", "@c", "@d", "@e"]}
+  - p0: {decision: order_cards, purpose: doomsday_order, answer: ["@a", "@b", "@c", "@d", "@e"]}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0: {life: 0}
+notes: >
+  Half of 1 is 0.5, rounded up to 1, so p0 goes to 0 and loses when state-based actions are checked before anyone gets
+  priority after Doomsday resolves. An engine rounding down (loses 0) keeps p0 alive at 1.
+---
+id: doomsday-sorcery-timing-then-cast-with-dark-ritual-mana
+title: Doomsday cannot be cast while Dark Ritual is on the stack, and can be cast with Ritual's mana once Ritual resolves
+area: card
+cards: [Doomsday, Dark Ritual, Swamp, Island]
+tags: [doomsday, dark-ritual, sorcery-timing, mana-pool, stack]
+derived_from: cr
+source:
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: oracle, card: Dark Ritual, text: "Add {B}{B}{B}.", verified: true}
+  - {kind: cr, ref: "106.4", text: "Each player’s mana pool empties at the end of each step and phase, and the player is said to lose this mana.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @dr", "Doomsday @dd"]
+    battlefield: ["Swamp @s1"]
+    mana_pool: {B: 3}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@dr", pay: {tap: ["@s1"]}}
+  - check:
+      stack: [{kind: spell, card: "@dr", controller: p0}]
+      p0: {mana_pool: {B: 3}}
+  - expect_illegal: {p0: {t: cast, card: "@dd"}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {mana_pool: {B: 6}, graveyard: [Dark Ritual]}
+      legal: {p0: {include: [{t: cast, card: "@dd"}]}}
+  - p0: {t: cast, card: "@dd", pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@dd", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {B: 3}
+      hand: []
+      graveyard: [Dark Ritual]
+      battlefield: [{card: Swamp, tapped: true}]
+notes: >
+  Dark Ritual is an instant spell, not a mana ability: it uses the stack, and while it is there p0 (who gets priority
+  back after casting, 117.3c) may not cast the sorcery Doomsday (307.1: stack must be empty). p0 starts with {B}{B}{B}
+  already floating (made earlier in this main phase) and pays Ritual with the Swamp, so during the probe Doomsday is
+  affordable and only the timing rule forbids it (reviewer fix: originally p0 had no mana left during the probe, so a
+  do-nothing or timing-blind engine passed it). After both pass, Ritual resolves, the active player gets priority with
+  six black floating in the same main phase, and Doomsday is cast from the pool (the only remaining source), leaving
+  {B}{B}{B}. Wrong engines: treat Ritual as a mana ability (no stack), let sorceries
+  be cast over a non-empty stack, or empty the pool when priority passes.

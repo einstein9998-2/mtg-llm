@@ -1,0 +1,191 @@
+id: mu-bdt-karakas-bounces-attacking-phlage-trigger-still-resolves
+title: D&T's Karakas returns an attacking Phlage to Boros' hand, its attack trigger still resolves, and Karakas cannot target the nonlegendary Ocelot Pride
+area: matchup
+cards: [Karakas, "Phlage, Titan of Fire's Fury", Ocelot Pride]
+tags: [matchup, boros-vs-dt, karakas, phlage, legendary, bounce, attack-trigger, trigger-independence, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Karakas, text: "{T}: Return target legendary creature to its owner's hand.", verified: true}
+  - {kind: oracle, card: "Phlage, Titan of Fire's Fury", text: "Whenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+  - {kind: cr, ref: "506.4", text: "A permanent is removed from combat if it leaves the battlefield", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Phlage, Titan of Fire's Fury @ph", "Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    battlefield: ["Karakas @k"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks:
+        - {creature: "@ph", target: {player: p1}}
+        - {creature: "@oc", target: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: activate, source: "@k", ability: 1, targets: ["@oc"]}}
+  - p1: {t: activate, source: "@k", ability: 1, targets: ["@ph"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@ph", controller: p0, targets: [{player: p1}]}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand: ["Phlage, Titan of Fire's Fury"], life: 20}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      hand: ["Phlage, Titan of Fire's Fury"]
+      battlefield: [{card: Ocelot Pride, tapped: true, attacking: true}]
+    p1:
+      life: 17
+      battlefield: [{card: Karakas, tapped: true}]
+notes: >
+  Ability index 1 is the bounce ({T}: Add {W} is 0). Ocelot Pride is not legendary, so it is not a legal Karakas target
+  (negative probe); Phlage is a legendary creature and goes back to its owner's hand, leaving combat (506.4). Its attack
+  trigger was already on the stack and still resolves (113.7a): p1 17, p0 23. Ocelot is still attacking. Setup Phlage
+  escaped earlier. A wrong engine lets Karakas target any creature, or drops the trigger when Phlage leaves.
+---
+id: mu-bdt-boros-karakas-bounces-attacking-phelia-trigger-still-exiles
+title: Boros' Karakas returns D&T's attacking Phelia to hand; Phelia's attack trigger still exiles Goblin Bombardment, which comes back at the end step
+area: matchup
+cards: [Karakas, "Phelia, Exuberant Shepherd", Goblin Bombardment]
+tags: [matchup, boros-vs-dt, karakas, phelia, legendary, bounce, attack-trigger, delayed-trigger, trigger-independence]
+derived_from: cr
+source:
+  - {kind: oracle, card: Karakas, text: "{T}: Return target legendary creature to its owner's hand.", verified: true}
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "Whenever Phelia attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+  - {kind: cr, ref: "603.7e", text: "The controller of that delayed triggered ability is the player who controlled that other ability as it resolved.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: begin_combat
+  p0:
+    battlefield: ["Karakas @k", "Goblin Bombardment @bomb"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @phe"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@phe", target: {player: p0}}]}
+  - p1: {decision: choose_target, slot: 0, answer: "@bomb", expect_options: {include: ["@bomb"], exclude: ["@k", "@phe"]}}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@k", ability: 1, targets: ["@phe"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@phe", controller: p1, targets: ["@bomb"]}]
+      pending: {actor: p1, kind: priority}
+      p1: {hand: ["Phelia, Exuberant Shepherd"], battlefield: []}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      p0: {exile: [Goblin Bombardment], battlefield: [{card: Karakas, tapped: true}]}
+  - advance: {to: end, of: p1}
+  - check:
+      stack: [{kind: triggered, controller: p1}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      exile: []
+      battlefield: [{card: Karakas, tapped: true}, {card: Goblin Bombardment, controller: p0}]
+    p1:
+      hand: ["Phelia, Exuberant Shepherd"]
+      battlefield: []
+notes: >
+  p0 bounces Phelia in response to her attack trigger; Phelia leaves combat and deals no damage (p0 stays at 20). The
+  trigger still resolves: Bombardment is exiled and a delayed trigger controlled by p1 is created. At p1's end step
+  Bombardment returns under its owner p0's control. It did not enter under p1's control, so no counter is put on
+  anything (Phelia is in p1's hand anyway). The advance crosses combat damage and main 2 with no decision (no creature
+  remains). A wrong engine cancels Phelia's trigger with its source, returns Bombardment under p1's control, or never
+  returns it.
+---
+id: mu-bdt-wasteland-on-karakas-bounce-ability-still-resolves
+title: Boros Wastelands D&T's Karakas in response to its bounce; the bounce ability still returns Phlage, and Phlage's attack trigger still resolves
+area: matchup
+cards: [Karakas, Wasteland, "Phlage, Titan of Fire's Fury", Plains]
+tags: [matchup, boros-vs-dt, karakas, wasteland, activated-ability, trigger-independence, stack, lifo]
+derived_from: cr
+source:
+  - {kind: oracle, card: Karakas, text: "{T}: Return target legendary creature to its owner's hand.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Phlage, Titan of Fire's Fury @ph", "Wasteland @waste"]
+    library_pad: 10
+  p1:
+    battlefield: ["Karakas @k", "Plains @w"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@ph", target: {player: p1}}]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@k", ability: 1, targets: ["@ph"]}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@waste", ability: 1, targets: ["@k"]}
+  - check:
+      stack:
+        - {kind: triggered, source: "@ph", controller: p0}
+        - {kind: activated, source: "@k", controller: p1, targets: ["@ph"]}
+        - {kind: activated, source: "@waste", controller: p0, targets: ["@k"]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p1: {graveyard: [Karakas], battlefield: [{card: Plains}]}
+      p0: {graveyard: [Wasteland]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {hand: ["Phlage, Titan of Fire's Fury"], battlefield: []}
+      stack: [{kind: triggered, source: "@ph", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      hand: ["Phlage, Titan of Fire's Fury"]
+      graveyard: [Wasteland]
+      battlefield: []
+    p1:
+      life: 17
+      graveyard: [Karakas]
+      battlefield: [{card: Plains, tapped: false}]
+notes: >
+  Three objects stack up: Phlage's attack trigger, Karakas' bounce, Wasteland's destroy (top). Wasteland resolves first
+  and destroys Karakas, but the bounce ability already exists independently of its source (113.7a) and still returns
+  Phlage to p0's hand. Then the attack trigger resolves (p1 17, p0 23). After each resolution the active player p0
+  receives priority. A wrong engine fizzles an ability whose source was destroyed.

@@ -1,0 +1,101 @@
+id: meltdown-x-zero-destroys-mana-value-zero-artifacts-on-both-sides
+title: Meltdown with X=0 destroys Mishra's Bauble, Lotus Petal and a Treasure token, but not Cori-Steel Cutter or a Monk token
+area: card
+cards: [Meltdown, Mishra's Bauble, Lotus Petal, Cori-Steel Cutter, Treasure Token, Monk Token, Mountain]
+tags: [meltdown, mana-value, x-spell, tokens, artifact, destroy, each-player]
+derived_from: cr
+source:
+  - {kind: oracle, card: Meltdown, text: "Destroy each artifact with mana value X or less.", verified: true}
+  - {kind: cr, ref: "202.3a", text: "The mana value of an object with no mana cost is 0, unless that object is the back face of a nonmodal double-faced permanent or spell, or it is a melded permanent.", verified: true}
+  - {kind: cr, ref: "202.3e", text: "When calculating the mana value of an object with an {X} in its mana cost, X is treated as 0 while the object is not on the stack, and X is treated as the number chosen for it while the object is on the stack.", verified: true}
+  - {kind: cr, ref: "702.108a", text: "Prowess is a triggered ability. “Prowess” means “Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Meltdown @melt"]
+    battlefield: ["Mountain @mtn", "Mishra's Bauble @bb", "Cori-Steel Cutter @cut", {token: Monk Token, as: monk}]
+    library_pad: 10
+  p1:
+    battlefield: ["Lotus Petal @petal", {token: Treasure Token, as: tr}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@melt", x: 0, pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@melt", x: 0}, {kind: triggered, source: "@monk"}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@melt", x: 0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{token: Monk Token, pt: [2, 2]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Meltdown, Mishra's Bauble]
+      battlefield: [{card: Mountain, tapped: true}, {card: Cori-Steel Cutter}, {token: Monk Token}]
+    p1: {graveyard: [Lotus Petal], battlefield: []}
+notes: >
+  X=0 costs just {R}. Mishra's Bauble and Lotus Petal have mana value 0, and a Treasure token has no mana cost so its mana value is 0 (202.3a): all three are destroyed,
+  whoever controls them. Cori-Steel Cutter has mana value 2 and survives. The Monk token is a creature, not an artifact, and survives. The Treasure token ceases
+  to exist, so it is in no graveyard (p1's graveyard holds only Lotus Petal). A wrong engine skips tokens, only hits the caster's artifacts, or destroys by
+  comparing to the wrong value. Reviewer fix: the Monk token has prowess and Meltdown is a noncreature spell cast by its controller, so a prowess trigger
+  goes on the stack above Meltdown and resolves first (Monk 2/2 until end of turn); the original script had no step for it.
+---
+id: meltdown-destroying-equipment-leaves-the-creature-and-drops-the-bonus
+title: Meltdown destroys an attached Cori-Steel Cutter, so the equipped creature survives as a plain 1/1
+area: card
+cards: [Meltdown, Cori-Steel Cutter, Dragon's Rage Channeler, Mountain, Island]
+tags: [meltdown, equipment, destroy, derived-stats, state-based-actions, cori-steel-cutter, drc, surveil]
+derived_from: cr
+source:
+  - {kind: oracle, card: Meltdown, text: "Destroy each artifact with mana value X or less.", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: cr, ref: "701.3d", text: "If an Aura, Equipment, or Fortification that was attached to an object or player ceases to be attached to it, that counts as “becoming unattached [from that object or player]”; this includes if that Aura, Equipment, or Fortification leaves the battlefield, the object leaves the zone it was in, or that player leaves the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Meltdown @melt"]
+    battlefield:
+      - "Mountain @m1"
+      - "Mountain @m2"
+      - "Mountain @m3"
+      - {card: Dragon's Rage Channeler, as: drc}
+      - {card: Cori-Steel Cutter, as: cut, attached_to: "@drc"}
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: Dragon's Rage Channeler, alias: drc, pt: [2, 2], keywords: [trample, haste]}]}
+  - p0: {t: cast, card: "@melt", x: 2, pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@melt"}, {kind: triggered, source: "@drc"}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@top"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Meltdown, Cori-Steel Cutter]
+      battlefield_contains: [{card: Dragon's Rage Channeler, alias: drc, pt: [1, 1], keywords_exclude: [trample, haste]}]
+notes: >
+  Before the spell the channeler is a 2/2 with trample and haste thanks to the attached Cutter. Meltdown (X=2) destroys the Cutter (mana value 2), which stops
+  granting its bonus; the creature is untouched and returns to its printed 1/1. A wrong engine keeps the stale bonus after the equipment leaves, or destroys the creature too.
+  Reviewer fix: Meltdown is a noncreature spell cast by the channeler's controller, so DRC's surveil 1 triggers above Meltdown and resolves first
+  (Island kept on top, so the graveyard ends with only sorcery + artifact, no delirium).

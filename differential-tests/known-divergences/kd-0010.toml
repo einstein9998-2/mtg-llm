@@ -1,0 +1,12 @@
+id = "kd-0010"
+title = "Engine design: Cavern of Souls mana must be tapped explicitly before the creature cast is offered"
+status = "accepted"
+who_is_right = "design"
+cr_citation = "CR 106.6 (restricted mana), 605.3a (mana abilities can be activated while casting); doc 01 line 272 (costed mana abilities in the payability solver)"
+rulings = []
+affected_oracles = ["engine"]
+match = { sides = ["FORGE_ONLY"], kinds = ["cast"], zones = ["Hand"], feature_tags = ["cavern-on-bf"] }
+suppress = true
+regression_scenario = "repros/e4-cavern-restricted-mana-cast-offer.scn"
+approved_by = "Brady, 2026-10-01 (project chat: yes to all)"
+notes = "Forge's priority menu offers a creature spell that only Cavern of Souls' restricted mana can pay for (Island + Cavern for Thassa's Oracle with Merfolk named) and auto-pays with the Cavern. The engine's payability solver leaves AddManaRestricted out (legal.rs simple_mana_ability returns None for it), so the cast appears only after the player taps the Cavern, which is its own priority option. Nothing becomes unreachable (the sequence tap Cavern then cast works, and Cavern's mana empties at end of step), but the action set at the first window differs from Forge's. It is a design choice, not a rules error: the engine thread should confirm it is intentional, and if so it should be accepted. The line follower retries with restricted mana tapped first, so the lines continue. Needs Brady's approval (spec-ambiguity verdict, doc 04 6.4)."

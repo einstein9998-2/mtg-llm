@@ -1,0 +1,123 @@
+id: unholy-heat-deals-two-without-delirium-and-does-not-count-itself
+title: Unholy Heat deals 2 damage with three card types in the graveyard, because the resolving Heat is not in the graveyard yet
+area: card
+cards: [Unholy Heat, Murktide Regent, Island, Ponder, Mishra's Bauble, Mountain]
+tags: [unholy-heat, delirium, card-types, graveyard-count, resolution-order]
+derived_from: cr
+source:
+  - {kind: oracle, card: Unholy Heat, text: "Unholy Heat deals 2 damage to target creature or planeswalker.", verified: true}
+  - {kind: oracle, card: Unholy Heat, text: "Delirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Unholy Heat @heat"]
+    battlefield: ["Mountain @m1"]
+    graveyard: ["Island", "Ponder", "Mishra's Bauble"]
+    library_pad: 10
+  p1:
+    battlefield:
+      - {card: Murktide Regent, as: mur, counters: {"+1/+1": 4}}
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@heat", targets: ["@mur"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Island, Ponder, Mishra's Bauble, Unholy Heat]}
+    p1: {battlefield: [{card: Murktide Regent, pt: [7, 7], damage: 2}]}
+notes: >
+  The graveyard holds a land, a sorcery and an artifact (three types). Unholy Heat is an instant, which would make a fourth type if it counted, but it is
+  on the stack while it resolves and only reaches the graveyard at the end of its resolution (608.2n), so there is no delirium: 2 damage, not 6. The 7/7
+  Murktide (four +1/+1 counters) survives with 2 marked damage. A wrong engine counts the resolving spell and deals 6.
+---
+id: unholy-heat-deals-six-with-delirium
+title: Unholy Heat deals exactly 6 damage with four card types in the graveyard
+area: card
+cards: [Unholy Heat, Murktide Regent, Island, Ponder, Mishra's Bauble, Lightning Bolt, Mountain]
+tags: [unholy-heat, delirium, card-types, graveyard-count]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Unholy Heat, text: "Delirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Unholy Heat @heat"]
+    battlefield: ["Mountain @m1"]
+    graveyard: ["Island", "Ponder", "Mishra's Bauble", "Lightning Bolt"]
+    library_pad: 10
+  p1:
+    battlefield:
+      - {card: Murktide Regent, as: mur, counters: {"+1/+1": 4}}
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@heat", targets: ["@mur"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Island, Ponder, Mishra's Bauble, Lightning Bolt, Unholy Heat]}
+    p1: {battlefield: [{card: Murktide Regent, pt: [7, 7], damage: 6}]}
+notes: >
+  Land, sorcery, artifact and instant are four distinct card types (the Bolt is the instant), so delirium is on and Heat deals 6, not 2. The 7/7 Murktide
+  survives with exactly 6 damage marked, which proves the amount (a 3/3 would not distinguish 6 from a larger number). A wrong engine that counts cards instead of types would also pass here; the four-cards-three-types scenario in dragons-rage-channeler.yaml is the one that catches it.
+---
+id: unholy-heat-delirium-turned-on-by-a-dragons-rage-channeler-surveil-in-response-to-itself
+title: Casting Unholy Heat triggers Dragon's Rage Channeler, whose surveil adds the fourth card type before Heat resolves, so Heat deals 6
+area: card
+cards: [Unholy Heat, Dragon's Rage Channeler, Murktide Regent, Island, Ponder, Mishra's Bauble, Lightning Bolt, Mountain]
+tags: [unholy-heat, drc, delirium, surveil, stack-order, graveyard-count]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: oracle, card: Unholy Heat, text: "Delirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Unholy Heat @heat"]
+    battlefield: ["Mountain @m1", "Dragon's Rage Channeler @drc"]
+    graveyard: ["Island", "Ponder", "Mishra's Bauble"]
+    library: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    battlefield:
+      - {card: Murktide Regent, as: mur, counters: {"+1/+1": 4}}
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@heat", targets: ["@mur"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@heat"}, {kind: triggered, source: "@drc"}]
+      p0: {battlefield_contains: [{card: Dragon's Rage Channeler, pt: [1, 1]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@bolt"], on_top_order: []}
+  - check:
+      stack: [{kind: spell, card: "@heat"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: [Island, Ponder, Mishra's Bauble, Lightning Bolt]
+        battlefield_contains: [{card: Dragon's Rage Channeler, pt: [3, 3], keywords: [flying]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Island, Ponder, Mishra's Bauble, Lightning Bolt, Unholy Heat]}
+    p1: {battlefield: [{card: Murktide Regent, pt: [7, 7], damage: 6}]}
+notes: >
+  Before the cast the graveyard has three types (land, sorcery, artifact), so the channeler is a plain 1/1. Casting Unholy Heat triggers the channeler; the trigger
+  is above Heat on the stack and resolves first. Surveilling the Lightning Bolt into the graveyard makes the fourth type (instant): the channeler becomes a
+  3/3 flier and, when Heat later resolves, delirium is checked then, so Heat deals 6. A wrong engine fixes the damage when Heat is cast, and deals 2.

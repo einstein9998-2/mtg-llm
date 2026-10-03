@@ -1,0 +1,314 @@
+id: order-triggers-active-player-drc-and-flurry
+title: "Two different triggers for the active player (DRC surveil and Cutter flurry): the controller orders them, the first listed goes on the stack first"
+area: core
+cards: [Dragon's Rage Channeler, Cori-Steel Cutter, Lightning Bolt, Mountain, Ponder]
+tags: [apnap, order-triggers, drc, cori-steel-cutter, flurry, simultaneous-triggers]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.3b", text: "If multiple abilities have triggered since the last time a player received priority, the abilities are placed on the stack in a two-part process. First, each player, in APNAP order, puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Whenever you cast your second spell each turn", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dragon's Rage Channeler @drc2", "Lightning Bolt @b1"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Cori-Steel Cutter @cutter", "Mountain @m1", "Mountain @m2"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@drc2", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@drc2", controller: p0}
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: auto}
+  - p0: {decision: order_triggers, answer: ["@drc", "@cutter"], expect_options: {include: ["@drc", "@cutter"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@drc2", controller: p0}
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: triggered, source: "@drc", controller: p0}
+        - {kind: triggered, source: "@cutter", controller: p0}
+      pending: {actor: p0, kind: priority}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@drc2", controller: p0}
+      - {kind: spell, card: "@b1", controller: p0}
+      - {kind: triggered, source: "@drc", controller: p0}
+      - {kind: triggered, source: "@cutter", controller: p0}
+    p0: {spells_cast_this_turn: 2}
+notes: >
+  The creature spell first (spell number one, no DRC trigger because it is a creature spell, no flurry because it is the
+  first spell). Casting the noncreature Bolt as the second spell triggers both abilities at once. They are different
+  abilities, so p0 (the only player with triggers) gets an order_triggers decision (doc 01 section 7.3). The answer lists
+  the source put on the stack first; so the Cutter trigger ends on top and would resolve first. Catches an engine that
+  never asks, orders by internal id, or lets the opponent order p0's triggers.
+---
+id: order-triggers-nonactive-player-chooses-own-order
+title: "The non-active player with two different triggers makes the ordering decision, not the active player"
+area: core
+cards: [Dragon's Rage Channeler, Cori-Steel Cutter, Containment Priest, Lightning Bolt, Mountain, Plains, Ponder]
+tags: [apnap, order-triggers, drc, cori-steel-cutter, nonactive-player, flash]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.3b", text: "First, each player, in APNAP order, puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+  - {kind: oracle, card: Containment Priest, text: "Flash", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Whenever you cast a noncreature spell, surveil 1.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Whenever you cast your second spell each turn", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    library_pad: 10
+  p1:
+    hand: ["Containment Priest @priest", "Lightning Bolt @b1"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Cori-Steel Cutter @cutter", "Plains @pl", "Mountain @m1", "Mountain @m2"]
+    library: ["Ponder @pond"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@priest", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@priest", controller: p1}
+  - p1: {t: cast, card: "@b1", targets: [{player: p0}], pay: auto}
+  - p1: {decision: order_triggers, answer: ["@cutter", "@drc"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@priest", controller: p1}
+        - {kind: spell, card: "@b1", controller: p1}
+        - {kind: triggered, source: "@cutter", controller: p1}
+        - {kind: triggered, source: "@drc", controller: p1}
+      pending: {actor: p1, kind: priority}
+expect:
+  - at: after_script
+    active: p0
+    stack:
+      - {kind: spell, card: "@priest", controller: p1}
+      - {kind: spell, card: "@b1", controller: p1}
+      - {kind: triggered, source: "@cutter", controller: p1}
+      - {kind: triggered, source: "@drc", controller: p1}
+    p1: {spells_cast_this_turn: 2}
+    p0: {spells_cast_this_turn: 0}
+notes: >
+  The ordering choice belongs to the controller of the triggers even when it is not their turn (CR 603.3b: each player
+  orders the triggers they control). p0 is the active player but controls no trigger here and is never asked. Containment
+  Priest (flash creature) is the first spell, so only the second spell (Bolt, noncreature) triggers both abilities. Here
+  p1 puts the Cutter trigger on first and the DRC trigger on top, the opposite of the previous scenario, so DRC's surveil
+  would resolve first. Mana: Priest {1}{W} needs the Plains plus one Mountain; the other Mountain pays for Bolt.
+---
+id: murktide-two-identical-triggers-no-ordering-decision
+title: "Two identical Murktide Regent triggers for one player are interchangeable: no order_triggers decision is offered"
+area: core
+cards: [Murktide Regent, Faerie Macabre, Lightning Bolt, Ponder]
+tags: [apnap, order-triggers, interchangeable-triggers, murktide-regent, faerie-macabre, leaves-graveyard, design-doc-decision-shape]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.2c", text: "An ability triggers only once each time its trigger event occurs. However, it can trigger repeatedly if one event contains multiple occurrences.", verified: true}
+  - {kind: cr, ref: "603.3b", text: "each player, in APNAP order, puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+  - {kind: oracle, card: Murktide Regent, text: "Whenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on this creature.", verified: true}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Faerie Macabre @fm"]
+    battlefield: ["Murktide Regent @m0"]
+    graveyard: ["Lightning Bolt @g1", "Ponder @g2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@g1", "@g2"]}
+  - resolve_top: true
+  - check:
+      stack:
+        - {kind: triggered, source: "@m0", controller: p0}
+        - {kind: triggered, source: "@m0", controller: p0}
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [Lightning Bolt, Ponder], graveyard: [Faerie Macabre]}
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {battlefield: [{card: Murktide Regent, counters: {"+1/+1": 2}, pt: [5, 5]}]}
+notes: >
+  Two instant/sorcery cards leave the graveyard in one event, so the ability triggers once per card (603.2c): two
+  triggers from the same source with the same text and no differing parameters. Design doc 01 section 7.3 says such
+  interchangeable triggers are placed on the stack in canonical order without asking, so the script has no order_triggers
+  step and the next pending decision after the exile is plain priority. (The CR itself would let p0 order them; the
+  outcome is identical either way, which is why the engine need not ask.) Catches an engine that asks a meaningless
+  question, or that triggers only once for a two-card event. Reviewer note: the no-prompt half rests on doc 01
+  section 7.3 ("interchangeable means identical source definition and identical captured parameters"), not on the CR;
+  it holds only if the triggering card (Bolt vs Ponder) is not a captured parameter, which is right for this ability
+  because its effect never refers to the card that left. If the engine design changes, relax this scenario, not the engine.
+---
+id: murktide-no-trigger-for-card-that-is-not-instant-or-sorcery
+title: "Murktide Regent triggers only for the instant that left the graveyard, not for the Island exiled with it"
+area: core
+cards: [Murktide Regent, Faerie Macabre, Lightning Bolt, Island]
+tags: [murktide-regent, faerie-macabre, leaves-graveyard, negative-case, triggers]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Murktide Regent, text: "Whenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on this creature.", verified: true}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Faerie Macabre @fm"]
+    battlefield: ["Murktide Regent @m0"]
+    graveyard: ["Island @gi", "Lightning Bolt @gb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@gi", "@gb"]}
+  - resolve_top: true
+  - check:
+      stack:
+        - {kind: triggered, source: "@m0", controller: p0}
+      p0: {exile: [Island, Lightning Bolt]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    p0: {battlefield: [{card: Murktide Regent, counters: {"+1/+1": 1}, pt: [4, 4]}]}
+notes: >
+  Two cards leave the graveyard but only the instant matches "instant or sorcery card", so exactly one trigger goes on
+  the stack and Murktide gets exactly one counter. Catches an engine that triggers for every card leaving the graveyard.
+---
+id: apnap-bauble-delayed-triggers-two-players-upkeep
+title: "Delayed Bauble draws from both players fire in the same upkeep: the active player's goes on first, the opponent's resolves first"
+area: core
+cards: [Mishra's Bauble, Island]
+tags: [apnap, delayed-triggers, mishras-bauble, upkeep, simultaneous-triggers]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.7e", text: "If an activated or triggered ability creates a delayed triggered ability, the source of that delayed triggered ability is the same as the source of that other ability. The controller of that delayed triggered ability is the player who controlled that other ability as it resolved.", verified: true}
+  - {kind: cr, ref: "603.2b", text: "When a phase or step begins, all abilities that trigger \"at the beginning of\" that phase or step trigger.", verified: true}
+  - {kind: cr, ref: "603.3b", text: "each player, in APNAP order, puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+  - {kind: oracle, card: Mishra's Bauble, text: "Draw a card at the beginning of the next turn's upkeep.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Bauble @a"]
+    library_pad: 10
+  p1:
+    battlefield: ["Mishra's Bauble @b"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@a", ability: 0, targets: [{player: p0}]}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@b", ability: 0, targets: [{player: p1}]}
+  - check:
+      stack:
+        - {kind: activated, source: "@a", controller: p0}
+        - {kind: activated, source: "@b", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - resolve_top: true
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {hand_count: 0, graveyard: [Mishra's Bauble]}
+      p1: {hand_count: 0, graveyard: [Mishra's Bauble]}
+  - advance: {to: upkeep, of: p1}
+  - check:
+      stack:
+        - {kind: triggered, controller: p1}
+        - {kind: triggered, controller: p0}
+      turn: 4
+      active: p1
+      pending: {actor: p1, kind: priority}
+  - resolve_top: true
+  - check:
+      stack:
+        - {kind: triggered, controller: p1}
+      p0: {hand_count: 1}
+      p1: {hand_count: 0}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 4
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {hand_count: 1}
+    p1: {hand_count: 1}
+notes: >
+  Two Bauble abilities resolve in turn 3 (top first: p1's, then p0's); each creates a delayed trigger controlled by
+  whoever controlled the ability (603.7e). Both trigger at the beginning of turn 4's upkeep, simultaneously. APNAP:
+  p1 (active in turn 4) puts its draw on first and p0's goes on top, so p0's resolves first (the intermediate check shows
+  p0 has drawn while p1 has not). p1's draw-step draw has not happened yet. Catches an engine that puts the non-active
+  player's trigger first, or that keys "next turn" to the Bauble controller's own next turn. (Reviewer edit: the original
+  gave p1 two Baubles and relied on no order_triggers prompt for p1's two delayed triggers, a design-doc 01 section 7.3
+  behavior whose "interchangeable" test is unclear for triggers from two different source objects; an order_triggers
+  prompt would have failed the advance step. One Bauble per player keeps the APNAP point without that dependency.)
+---
+id: show-and-tell-nonactive-players-surveil-resolves-first
+title: "Show and Tell cast by p1 on p1's own turn: p1's land trigger goes on first and p0's non-active surveil resolves first"
+area: core
+cards: [Show and Tell, Thundering Falls, Hedge Maze, Island, Lightning Bolt, Ponder]
+tags: [apnap, show-and-tell, simultaneous-secret-choice, surveil, etb, enters-tapped, nonactive-player]
+derived_from: cr
+source:
+  - {kind: cr, ref: "603.3b", text: "each player, in APNAP order, puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+  - {kind: cr, ref: "101.4", text: "the active player ... makes any choices required, then the next player in turn order", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: Thundering Falls, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Hedge Maze @hm"]
+    library: ["Lightning Bolt @pb"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @snt", "Thundering Falls @tf"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Ponder @pp"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@snt", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: simultaneous_secret_choice, answer: "@tf"}
+  - p0: {decision: simultaneous_secret_choice, answer: "@hm"}
+  - check:
+      stack:
+        - {kind: triggered, source: "@tf", controller: p1}
+        - {kind: triggered, source: "@hm", controller: p0}
+      pending: {actor: p1, kind: priority}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: ["@pb"], on_top_order: []}
+  - check:
+      stack:
+        - {kind: triggered, source: "@tf", controller: p1}
+      p0: {graveyard: [Lightning Bolt]}
+      p1: {library_top: [Ponder]}
+  - resolve_top: true
+  - p1: {decision: surveil, to_graveyard: [], on_top_order: ["@pp"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {graveyard: [Lightning Bolt], battlefield: [{card: Hedge Maze, tapped: true}]}
+    p1: {graveyard: [Show and Tell], library_top: [Ponder], battlefield_contains: [{card: Thundering Falls, tapped: true}]}
+notes: >
+  Mirror of the show-and-tell exemplar with p1 as the active player. Both lands enter simultaneously; p1 (active) puts its
+  trigger on first, p0's goes on top and resolves first, so the first surveil decision belongs to p0 (non-active).
+  The secret choices are given active player first (APNAP, CR 101.4), as in the exemplar. After each resolution the active
+  player (p1) holds priority.

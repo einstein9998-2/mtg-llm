@@ -1,0 +1,264 @@
+id: boseiju-legend-rule-second-copy
+title: A second Boseiju (legendary land) played while one is controlled triggers the legend rule
+area: card
+cards: ["Boseiju, Who Endures"]
+tags: [boseiju, legend-rule, land-play, state-based-actions]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "{T}: Add {G}.", verified: true}
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners' graveyards.", verified: true}
+  - {kind: cr, ref: "305.1", text: "Playing a land is a special action", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @b2"]
+    battlefield: ["Boseiju, Who Endures @b1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@b2"}
+  - p0: {decision: legend_rule, keep: "@b1", expect_options: {include: ["@b1", "@b2"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      battlefield: [{card: "Boseiju, Who Endures", alias: b1}]
+      graveyard: ["Boseiju, Who Endures"]
+notes: >
+  Boseiju is a Legendary Land (the deck plays one main and one side), so the legend rule applies to lands. The land
+  play is legal (no rule forbids it); the controller then chooses which to keep. Keeping the old copy (@b1) pins that
+  the choice is really offered and honored.
+---
+id: boseiju-channel-destroys-nonbasic-land-opponent-searches
+title: Channel destroys an opponent's nonbasic land; that player may then fetch a basic-land-type land onto the battlefield
+area: card
+cards: ["Boseiju, Who Endures", Forest, Island, Volcanic Island, Mountain]
+tags: [boseiju, channel, activated-from-hand, destroy, search, not-a-land-drop, opponent-decision]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "Channel — {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls.", verified: true}
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.4", text: "Effects may also allow players to \"put\" lands onto the battlefield. This isn't the same as \"playing a land\"", verified: true}
+  - {kind: cr, ref: "113.6j", text: "An object's activated ability that has a cost that can't be paid while the object is on the battlefield functions from any zone in which its cost can be paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Forest @fo", "Island @isl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @volc"]
+    library: ["Forest @p1f", "Island @p1i", "Mountain @p1m"]
+    library_pad: 10
+script:
+  - p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@volc"], pay: auto}
+  - check:
+      stack: [{kind: activated, source: "@bos", controller: p0}]
+      p0:
+        hand: []
+        graveyard: ["Boseiju, Who Endures"]
+        lands_played: 0
+        battlefield: [{card: Forest, tapped: true}, {card: Island, tapped: true}]
+      p1: {battlefield: [{card: Volcanic Island}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: true}
+  - p1: {decision: search, found: "@p1f", expect_options: {include: ["@p1f", "@p1i", "@p1m"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 0
+      graveyard: ["Boseiju, Who Endures"]
+    p1:
+      battlefield: [{card: Forest, tapped: false}]
+      graveyard: [Volcanic Island]
+      library_count: 12
+notes: >
+  Channel is activated from the hand with the discard as part of the cost, so Boseiju is already in the graveyard while
+  the ability is on the stack and the ability resolves independently of it. It is ability index 1 (index 0 is the {T}
+  mana ability). The destroyed permanent's controller (p1) makes the "may search" choice, modelled as yes_no then search
+  (see report schema-requests). The basic Forest is put onto the battlefield untapped (no enters-tapped text), p1's
+  library shrinks by one (13 -> 12), and nothing counts as a land drop for either player. p0's {1}{G} was paid with
+  both of p0's lands.
+---
+id: boseiju-channel-illegal-targets
+title: Channel can only target an artifact, enchantment or nonbasic land an opponent controls
+area: card
+cards: ["Boseiju, Who Endures", Forest, Island, Ancient Tomb, Lotus Petal, Null Rod, "Atraxa, Grand Unifier"]
+tags: [boseiju, channel, targeting, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "Channel — {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Forest @fo", "Island @isl", "Ancient Tomb @mytomb", "Lotus Petal @mypetal"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @pisl", "Null Rod @rod", "Atraxa, Grand Unifier @atx"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@pisl"]}}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@mytomb"]}}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@mypetal"]}}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@atx"]}}
+  - p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@rod"], pay: {tap: ["@fo", "@isl"]}}
+expect:
+  - at: after_script
+    stack: [{kind: activated, source: "@bos"}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: ["Boseiju, Who Endures"]
+notes: >
+  Illegal: an opponent's basic land (basic), p0's own nonbasic land and own artifact ("an opponent controls"), an
+  opponent's creature (wrong type). Legal: the opponent's artifact (Null Rod). Each illegal probe must leave the
+  state unchanged (Boseiju still in hand, lands untapped) so the final legal activation works.
+---
+id: boseiju-channel-cost-reduced-by-legendary-creature
+title: Boseiju's channel costs {1} less with a legendary creature, so a single {G} source pays for it
+area: card
+cards: ["Boseiju, Who Endures", Forest, "Atraxa, Grand Unifier", Volcanic Island]
+tags: [boseiju, channel, cost-reduction, legendary]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "This ability costs {1} less to activate for each legendary creature you control.", verified: true}
+  - {kind: cr, ref: "118.7a", text: "Effects that reduce a cost by an amount of generic mana affect only the generic mana component of that cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost ..., plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Forest @fo", "Atraxa, Grand Unifier @atx"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+script:
+  - p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@volc"], pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: activated, source: "@bos"}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Boseiju, Who Endures"]
+      battlefield: [{card: Forest, tapped: true}, {card: "Atraxa, Grand Unifier"}]
+notes: >
+  Atraxa is a Legendary Creature, so {1}{G} becomes {G}; the lone Forest pays it. Without the reduction the activation
+  would be illegal with one land (see the next scenarios). Atraxa's presence on the battlefield from setup causes no
+  triggers.
+---
+id: boseiju-cost-reduction-never-removes-colored
+title: Even with two legendary creatures Boseiju's channel still needs {G}
+area: card
+cards: ["Boseiju, Who Endures", Island, Forest, "Atraxa, Grand Unifier", Acererak the Archlich, Volcanic Island]
+tags: [boseiju, channel, cost-reduction, legendary, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "This ability costs {1} less to activate for each legendary creature you control.", verified: true}
+  - {kind: cr, ref: "118.7a", text: "Effects that reduce a cost by an amount of generic mana affect only the generic mana component of that cost. They can't affect the colored or colorless mana components of that cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Island @isl", {card: Forest, as: fo, tapped: true}, "Atraxa, Grand Unifier @atx", "Acererak the Archlich @ac"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@volc"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Boseiju, Who Endures"]
+      graveyard: []
+notes: >
+  Two legendary creatures reduce the generic {1} (only one is reducible) but cannot reduce {G}. The only untapped land
+  is an Island, which cannot make {G}, so the activation must not be offered and the discard must not happen.
+  A wrong engine would let the reduction eat the colored symbol and allow a free activation.
+---
+id: boseiju-channel-without-legend-needs-two-mana
+title: Without a legendary creature Boseiju's channel costs the full {1}{G}
+area: card
+cards: ["Boseiju, Who Endures", Forest, Volcanic Island]
+tags: [boseiju, channel, cost-reduction, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "Channel — {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Forest @fo"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@volc"]}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      hand: ["Boseiju, Who Endures"]
+      battlefield: [{card: Forest, tapped: false}]
+notes: A single land is not enough for {1}{G}; with no legendary creature there is no reduction. Nothing may be spent.
+---
+id: boseiju-channel-opponent-declines-search
+title: The opponent may decline Boseiju's search; no land enters
+area: card
+cards: ["Boseiju, Who Endures", Forest, Island, Volcanic Island]
+tags: [boseiju, channel, search, opponent-decision, optional]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boseiju, Who Endures @bos"]
+    battlefield: ["Forest @fo", "Island @isl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @volc"]
+    library: ["Forest @p1f"]
+    library_pad: 10
+script:
+  - p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@volc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1:
+      battlefield: []
+      graveyard: [Volcanic Island]
+      library_count: 11
+notes: >
+  The search is optional ("may"). Declining leaves p1's library at 11 cards (1 + 10 pad) and no land enters. Whether a
+  library is shuffled when the player declines to search is NOT asserted (see ambiguities in the report); only the
+  count is checked.

@@ -1,0 +1,135 @@
+id: solitude-hardcast-etb-exiles-other-creature-and-stays
+title: Solitude cast for its mana cost exiles another target creature, the creature's controller gains life equal to its power, and Solitude stays
+area: card
+cards: [Solitude, Plains, Murktide Regent]
+tags: [solitude, etb-trigger, exile, life-gain, evoke, intervening-if, targeting]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Solitude, text: "When this creature enters, exile up to one other target creature. That creature's controller gains life equal to its power.", verified: true}
+  - {kind: oracle, card: Solitude, text: "Evoke—Exile a white card from your hand.", verified: true}
+  - {kind: cr, ref: "702.74a", text: "\"When this permanent enters, if its evoke cost was paid, its controller sacrifices it.\"", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Solitude @sol"]
+    battlefield: ["Plains @p1a", "Plains @p2a", "Plains @p3a", "Plains @p4a", "Plains @p5a"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sol", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@murk", expect_options: {include: ["@murk"], exclude: ["@sol"]}}
+  - check:
+      stack: [{kind: triggered, source: "@sol", controller: p0, targets: ["@murk"]}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      battlefield:
+        - {card: Solitude, sick: true, pt: [3, 2], keywords: [lifelink]}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+      graveyard: []
+    p1:
+      life: 23
+      battlefield: []
+      exile: [Murktide Regent]
+notes: >
+  Paid with five Plains ({3}{W}{W}), so the evoke cost was not paid: the evoke sacrifice trigger has an intervening "if"
+  (702.74a, 603.4) and does not trigger at all, so only one trigger appears and no order_triggers decision is raised.
+  "Other" target: Solitude cannot target itself (the mask excludes it). The 3/3 Murktide's controller p1 gains 3. A wrong
+  engine also puts an evoke-sacrifice trigger on the stack, sacrifices Solitude, offers Solitude as its own target, or
+  gives the life to p0.
+---
+id: solitude-evoked-at-instant-speed-exiles-attacker-then-sacrificed
+title: Solitude evoked by exiling Swords to Plowshares during the opponent's attack exiles the attacker, then is sacrificed
+area: card
+cards: [Solitude, Swords to Plowshares, Murktide Regent]
+tags: [solitude, evoke, alternative-cost, flash, trigger-ordering, etb-trigger, exile, sacrifice]
+derived_from: cr
+source:
+  - {kind: oracle, card: Solitude, text: "Flash", verified: true}
+  - {kind: oracle, card: Solitude, text: "Evoke—Exile a white card from your hand.", verified: true}
+  - {kind: oracle, card: Solitude, text: "When this creature enters, exile up to one other target creature. That creature's controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "702.74a", text: "\"Evoke [cost]\" means \"You may cast this card by paying [cost] rather than paying its mana cost\" and \"When this permanent enters, if its evoke cost was paid, its controller sacrifices it.\"", verified: true}
+  - {kind: cr, ref: "603.3b", text: "First, each player, in APNAP order, puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+  - {kind: cr, ref: "702.8a", text: "\"Flash\" means \"You may play this card any time you could cast an instant.\"", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: begin_combat
+  p0:
+    hand: ["Solitude @sol", "Swords to Plowshares @stp"]
+    battlefield: []
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@murk", target: {player: p0}}]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@sol", alt_cost: {evoke: {exile_white_card: "@stp"}}}
+  - check:
+      stack: [{kind: spell, card: "@sol", controller: p0}]
+      p0: {hand: [], exile: [Swords to Plowshares]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: order_triggers
+      answer:
+        - {source: "@sol", text_contains: "sacrifices"}
+        - {source: "@sol", text_contains: "exile up to one"}
+      note: "first listed goes on the stack first (resolves last): the sacrifice trigger is put on the stack first, the exile trigger on top"
+  - p0: {decision: choose_target, slot: 0, answer: "@murk"}
+  - check:
+      stack:
+        - {kind: triggered, source: "@sol", controller: p0, text_contains: "sacrifices"}
+        - {kind: triggered, source: "@sol", controller: p0, text_contains: "exile", targets: ["@murk"]}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p1: {life: 23, exile: [Murktide Regent], battlefield: []}
+      p0: {battlefield: [{card: Solitude}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      battlefield: []
+      graveyard: [Solitude]
+      exile: [Swords to Plowshares]
+      hand: []
+    p1:
+      life: 23
+      battlefield: []
+      exile: [Murktide Regent]
+notes: >
+  p0 has no lands: evoke needs no mana, and flash lets Solitude be cast in the opponent's declare attackers step.
+  Solitude enters and both of its enters abilities trigger; p0 controls both and chooses their order (603.3b). Putting
+  the sacrifice trigger on the stack first lets the exile trigger resolve first, but either order gives the same final
+  state: the exile ability exists independently of Solitude (113.7a). After each resolution the active player p1 gets
+  priority. The order_triggers answer names the two triggers by source plus text fragment because both come from the
+  same object (format request in REPORT.md). A wrong engine demands mana for evoke, refuses the cast outside p0's main
+  phase, skips the sacrifice, or lets the exile fail once Solitude is gone.

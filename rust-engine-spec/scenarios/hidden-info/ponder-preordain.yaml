@@ -1,0 +1,128 @@
+id: hi-ponder-opponent-stream-independent-of-cards
+title: The opponent's stream is identical whatever three cards Ponder looks at
+area: hidden-info
+cards: [Ponder, Daze, Lightning Bolt, Murktide Regent, Brainstorm, Preordain, Force of Will, Volcanic Island, Aluren, Tropical Island]
+tags: [hidden-info, ponder, non-interference, paired-world]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.20e", text: "Looking at a card follows the same rules as revealing a card, except that the card is shown only to the specified player.", verified: true}
+  - {kind: cr, ref: "402.3", text: "A player can't look at the cards in another player's hand but may count those cards at any time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ponder @p"]
+    battlefield: ["Volcanic Island @v"]
+    library: ["Daze @a", "Lightning Bolt @b", "Murktide Regent @c"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+world_b:
+  p0: {library: ["Brainstorm @a", "Preordain @b", "Force of Will @c"]}
+assert_streams_identical: {observer: p1}
+script:
+  - p0: {t: cast, card: "@p", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: order_cards, purpose: ponder_put_back, answer: ["@c", "@a", "@b"]}
+  - p0: {decision: yes_no, purpose: ponder_shuffle, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    p0: {hand_count: 1, library_count: 12}
+notes: >
+  The worlds differ only in the identities of p0's top three cards. Look-at events go only to the looker (701.20e), so p1's
+  stream must be byte-identical.
+---
+id: hi-preordain-both-on-top-knows-remaining-card
+title: Preordain keeping both cards on top leaves the caster knowing the card under the one drawn
+area: hidden-info
+cards: [Preordain, Daze, Lightning Bolt, Volcanic Island, Aluren, Tropical Island]
+tags: [hidden-info, preordain, scry, library-knowledge]
+derived_from: cr
+source:
+  - {kind: oracle, card: Preordain, text: "Scry 2, then draw a card.", verified: true}
+  - {kind: cr, ref: "701.22a", text: "To \"scry N\" means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Preordain @pre"]
+    battlefield: ["Volcanic Island @v"]
+    library: ["Daze @a", "Lightning Bolt @b"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pre", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: scry, to_bottom: [], on_top_order: ["@b", "@a"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Lightning Bolt], graveyard: [Preordain], library_top: [Daze], library_count: 11}
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: [Daze]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 1, library_count: 11}
+      events_text_exclude: [Daze, Lightning Bolt]
+notes: >
+  p0 scries Bolt over Daze, then draws Bolt; Daze is now the known top card. p1 learns only that p0 scried 2 and drew.
+---
+id: hi-preordain-bottomed-card-and-drawn-card-hidden-from-opponent
+title: Preordain bottoming one card and drawing the other leaves no known top card and nothing visible to the opponent
+area: hidden-info
+cards: [Preordain, Daze, Lightning Bolt, Volcanic Island, Aluren, Tropical Island]
+tags: [hidden-info, preordain, scry, bottom, redaction]
+derived_from: cr
+source:
+  - {kind: oracle, card: Preordain, text: "Scry 2, then draw a card.", verified: true}
+  - {kind: cr, ref: "701.22a", text: "To \"scry N\" means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Preordain @pre"]
+    battlefield: ["Volcanic Island @v"]
+    library: ["Daze @a", "Lightning Bolt @b"]
+    library_pad: 10
+  p1:
+    hand: [Aluren]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pre", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: scry, to_bottom: ["@a"], on_top_order: ["@b"]}
+expect:
+  - at: after_script
+    stack: []
+    p0: {hand: [Lightning Bolt], library_bottom: [Daze], library_count: 11}
+  - at: after_script
+    observer: p0
+    obs:
+      me: {library_known_top: [], library_known_bottom: [Daze]}
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 1, library_count: 11}
+      option_labels_exclude_names: [Daze, Lightning Bolt]
+      events_text_exclude: [Daze, Lightning Bolt]
+notes: >
+  Daze goes under the ten padding Islands; Bolt is drawn. The caster knows Daze is the bottom card (library_known_bottom,
+  SCHEMA addenda; added at review) but knows nothing about the new top.
+  The opponent sees that p0 scried 2 and drew a card, never the identities of the two cards.

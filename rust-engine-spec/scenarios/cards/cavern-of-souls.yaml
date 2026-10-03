@@ -1,0 +1,145 @@
+id: cavern-of-souls-creature-cannot-be-countered-by-force-of-will
+title: A creature spell of the chosen type cast with Cavern of Souls' colored mana survives a Force of Will
+area: card
+cards: [Cavern of Souls, Plains, "Phelia, Exuberant Shepherd", Force of Will, Brainstorm]
+tags: [cavern-of-souls, uncounterable, mana-restriction, force-of-will, alternative-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Cavern of Souls, text: "{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn’t get a “refund” of any costs that were paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Phelia, Exuberant Shepherd @ph"]
+    battlefield: [{card: Cavern of Souls, as: cav, flags: {chosen_type: Dog}}, "Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@cav", ability: 1, choose_color: W}
+  - check:
+      pending: {actor: p0, kind: priority}
+  - p0: {t: cast, card: "@ph", pay: auto}
+  - p0: {t: pass}
+  - check:
+      legal: {p1: {include: [{t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@ph"]}]}}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@ph"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@ph", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Force of Will], life: 19}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      graveyard: []
+      battlefield:
+        - {card: Cavern of Souls, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: "Phelia, Exuberant Shepherd", controller: p0}
+    p1:
+      life: 19
+      hand: []
+      exile: [Brainstorm]
+      graveyard: [Force of Will]
+notes: >
+  Cavern's chosen type (Dog) is fixed as it entered (setup flag). Its colored mana (ability index 1; index 0 is the
+  {C} ability) pays Phelia's {W}; Plains pays {1}. Force of Will may still target Phelia (any spell is a legal target)
+  and resolves, but the "can't be countered" effect wins (101.2), so Phelia stays on the stack and then resolves.
+  p1 still paid 1 life and exiled Brainstorm (no refund). A wrong engine counters the spell, forbids targeting it, or
+  refunds the cost. Paired with cavern-of-souls-colorless-mana-gives-no-protection.
+---
+id: cavern-of-souls-colorless-mana-gives-no-protection
+title: A creature cast with Cavern of Souls' colorless mana can be countered
+area: card
+cards: [Cavern of Souls, Plains, "Phelia, Exuberant Shepherd", Force of Will, Brainstorm]
+tags: [cavern-of-souls, counterspell, control-case, force-of-will]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cavern of Souls, text: "{T}: Add {C}.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Phelia, Exuberant Shepherd @ph"]
+    battlefield: [{card: Cavern of Souls, as: cav, flags: {chosen_type: Dog}}, "Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@cav", ability: 0}
+  - p0: {t: cast, card: "@ph", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@ph"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Phelia, Exuberant Shepherd"]
+      battlefield: [{card: Cavern of Souls, tapped: true}, {card: Plains, tapped: true}]
+    p1: {life: 19, graveyard: [Force of Will], exile: [Brainstorm]}
+notes: >
+  The {C} from ability 0 pays Phelia's generic {1}, the Plains pays {W}. No Cavern colored mana was spent, so the spell
+  has no protection and Force of Will counters it.
+---
+id: cavern-of-souls-mana-only-for-creature-of-chosen-type
+title: Cavern of Souls' colored mana can pay for a creature spell of the chosen type but not for a noncreature spell
+area: card
+cards: [Cavern of Souls, Ocelot Pride, Swords to Plowshares, "Phelia, Exuberant Shepherd"]
+tags: [cavern-of-souls, mana-restriction, legal-action-mask, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: Cavern of Souls, text: "Spend this mana only to cast a creature spell of the chosen type", verified: true}
+  - {kind: cr, ref: "106.6", text: "Some spells or abilities that produce mana restrict how that mana can be spent", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @op", "Swords to Plowshares @stp"]
+    battlefield: [{card: Cavern of Souls, as: cav, flags: {chosen_type: Cat}}]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@cav", ability: 1, choose_color: W}
+  - expect_illegal: {p0: {t: cast, card: "@stp", targets: ["@ph"], pay: auto}}
+  - check:
+      legal:
+        p0:
+          include: [{t: cast, card: "@op"}]
+          exclude: [{t: cast, card: "@stp"}]
+  - p0: {t: cast, card: "@op", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      hand: [Swords to Plowshares]
+      battlefield: [{card: Cavern of Souls, tapped: true}, {card: Ocelot Pride, controller: p0}]
+    p1: {battlefield: [{card: "Phelia, Exuberant Shepherd"}]}
+notes: >
+  The only mana p0 has is one restricted {W} from Cavern (chosen type Cat). Ocelot Pride is a Cat creature spell and
+  may use it; Swords to Plowshares is an instant and may not, so it is not offered. A wrong engine treats the
+  restricted mana as ordinary {W}.

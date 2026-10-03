@@ -1,0 +1,12 @@
+id = "kd-0006"
+title = "Harness: the Forge AI mana payer refuses Ancient Tomb at low life, which hides casts that need it"
+status = "scope-cut"
+who_is_right = "engine"
+cr_citation = "Ancient Tomb: {T}: Add {C}{C}. Ancient Tomb deals 2 damage to you. A player at 5 life or less may still tap it (CR 117.1)"
+rulings = []
+affected_oracles = ["forge"]
+match = { sides = ["RUST_ONLY"], kinds = ["cast"], zones = ["Hand"], feature_tags = ["tomb-low-life"] }
+suppress = true
+regression_scenario = "none needed: the engine offers the casts; the Forge side is the probe's use of ComputerUtilMana (AI payment preferences leak into the playability check)"
+approved_by = ""
+notes = "The probe asks Forge whether a spell is affordable with ComputerUtilMana.canPayManaCost, which applies the AI's own payment preferences: it will not tap a damage-dealing source at 5 life or less. A human player can. Rust-only casts that depend on Ancient Tomb while a player is at 5 life or less are therefore unverified, and step runs of those actions end as forge_error ('action not offered'). Revisit condition: a probe affordability check that ignores AI payment preferences (a custom ComputerUtilMana mode)."

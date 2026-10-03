@@ -1,0 +1,148 @@
+id: multiblock-assign-all-damage-to-second-blocker-no-order
+title: An attacker blocked by two creatures divides its damage as its controller chooses, including all of it to either blocker (no damage assignment order)
+area: core
+cards: [Murktide Regent, Faerie Macabre, "Spider-Woman, Stunning Savior"]
+tags: [combat, multiple-blockers, combat-damage-assignment, no-damage-assignment-order, kd-0001, assign-combat-damage-decision]
+derived_from: cr
+source:
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: cr, ref: "510.1a", text: "Each attacking creature and each blocking creature assigns combat damage equal to its power.", verified: true}
+  - {kind: cr, ref: "510.1d", text: "A blocking creature assigns combat damage to the creatures it’s blocking. If it isn’t currently blocking any creatures (if, for example, they were destroyed or removed from combat), it assigns no combat damage.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: cr, ref: "702.9b", text: "A creature with flying can’t be blocked except by creatures with flying and/or reach. A creature with flying can block a creature with or without flying.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+  p1:
+    battlefield: ["Faerie Macabre @fm", "Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@murk", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1:
+      decision: declare_blockers
+      blocks: [{blocker: "@fm", attacker: "@murk"}, {blocker: "@sw", attacker: "@murk"}]
+      expect_options: {include: ["@fm", "@sw"]}
+  - check: {phase: declare_blockers, priority: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: assign_combat_damage
+      assignment: {"@fm": 0, "@sw": 3}
+      expect_options: {include: ["@fm", "@sw"], exclude: [{player: p1}]}
+expect:
+  - at: after_script
+    p0: {life: 20, battlefield: [], graveyard: [Murktide Regent]}
+    p1:
+      life: 20
+      battlefield: [{card: Faerie Macabre, damage: 0, tapped: false}]
+      graveyard: ["Spider-Woman, Stunning Savior"]
+notes: >
+  Known divergence kd-0001. Under the pinned CR (effective 2025-11-14) there is NO damage assignment order: with two or
+  more blockers the attacker's controller divides the damage as they choose among them (510.1c). Here p0 assigns all 3
+  damage to the second blocker and none to the first. Under the old ordering rules (which Forge still implements) this
+  is illegal if Faerie Macabre came first in the order. Spider-Woman (toughness 2) dies; Faerie Macabre takes nothing and
+  survives undamaged. The two 2-power blockers each assign 2 to Murktide (a single-attacker, single-blocker assignment is
+  automatic), 4 total >= 3 toughness, so the Regent dies too. The assignment recipients offered are the two blockers
+  only: the defending player is not a legal recipient without trample. No damage reaches p1.
+---
+id: multiblock-split-damage-one-lethal-one-partial
+title: Splitting 3 damage as 2 to one blocker and 1 to the other kills only the first and leaves damage marked on the second
+area: core
+cards: [Murktide Regent, Faerie Macabre, "Spider-Woman, Stunning Savior"]
+tags: [combat, multiple-blockers, combat-damage-assignment, no-damage-assignment-order, kd-0001, damage-marked, assign-combat-damage-decision]
+derived_from: cr
+source:
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: cr, ref: "510.1a", text: "Each attacking creature and each blocking creature assigns combat damage equal to its power.", verified: true}
+  - {kind: cr, ref: "120.3e", text: "Damage dealt to a creature by a source with neither wither nor infect causes that much damage to be marked on that creature.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+  p1:
+    battlefield: ["Faerie Macabre @fm", "Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@murk", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@fm", attacker: "@murk"}, {blocker: "@sw", attacker: "@murk"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: assign_combat_damage
+      assignment: {"@fm": 2, "@sw": 1}
+      expect_options: {include: ["@fm", "@sw"]}
+expect:
+  - at: after_script
+    p0: {battlefield: [], graveyard: [Murktide Regent]}
+    p1:
+      life: 20
+      battlefield: [{card: "Spider-Woman, Stunning Savior", damage: 1, tapped: false}]
+      graveyard: [Faerie Macabre]
+notes: >
+  Same board as the previous scenario but p0 assigns 2 to Faerie Macabre (lethal, it dies) and 1 to Spider-Woman (not
+  lethal: she survives with 1 damage marked). The divisions are chosen freely by the attacking creature's controller
+  (510.1c); the engine must apply exactly what was assigned. The Regent takes 2 + 2 and dies.
+---
+id: multiblock-illegal-damage-assignments-are-rejected
+title: An attacker's combat damage must be assigned in full among its blockers; assigning less, more, or to the player without trample is illegal
+area: core
+cards: [Murktide Regent, Faerie Macabre, "Spider-Woman, Stunning Savior"]
+tags: [combat, multiple-blockers, combat-damage-assignment, mask-validity, assign-combat-damage-decision, kd-0001]
+derived_from: cr
+source:
+  - {kind: cr, ref: "510.1a", text: "Each attacking creature and each blocking creature assigns combat damage equal to its power.", verified: true}
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+  - {kind: cr, ref: "510.1e", text: "Once a player has assigned combat damage from each attacking or blocking creature they control, the total damage assignment (not solely the damage assignment of any individual attacking or blocking creature) is checked to see if it complies with the above rules. If it doesn’t, the combat damage assignment is illegal", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+  p1:
+    battlefield: ["Faerie Macabre @fm", "Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@murk", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@fm", attacker: "@murk"}, {blocker: "@sw", attacker: "@murk"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {decision: assign_combat_damage, assignment: {"@fm": 1, "@sw": 1}}}
+  - expect_illegal: {p0: {decision: assign_combat_damage, assignment: {"@fm": 2, "@sw": 2}}}
+  - expect_illegal: {p0: {decision: assign_combat_damage, assignment: {"@fm": 1, "@sw": 1, player: 1}}}
+  - p0:
+      decision: assign_combat_damage
+      assignment: {"@fm": 1, "@sw": 2}
+expect:
+  - at: after_script
+    p0: {battlefield: [], graveyard: [Murktide Regent]}
+    p1:
+      life: 20
+      battlefield: [{card: Faerie Macabre, damage: 1, tapped: false}]
+      graveyard: ["Spider-Woman, Stunning Savior"]
+notes: >
+  The 3/3 Regent assigns damage equal to its power (510.1a): 1 + 1 = 2 is too little, 2 + 2 = 4 is too much, and sending 1 to
+  the defending player is not allowed because it has no trample (a blocked creature assigns only to its blockers, 510.1c).
+  Any total of 3 divided among the two blockers is legal; here 1 to Faerie Macabre (survives with 1 damage) and 2 to
+  Spider-Woman (dies). The whole assignment is checked together (510.1e).

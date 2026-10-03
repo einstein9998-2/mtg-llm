@@ -1,0 +1,143 @@
+id: grafdigger-cage-stops-flashback-for-its-own-controller
+title: Grafdigger's Cage removes flashback casts from the legal actions, for its controller too, while casting from hand stays legal
+area: card
+cards: ["Grafdigger's Cage", Faithless Looting, Lightning Bolt, Mountain]
+tags: [grafdigger-cage, casting-restriction, flashback, cast-from-graveyard, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Grafdigger's Cage", text: "Players can't cast spells from graveyards or libraries.", verified: true}
+  - {kind: oracle, card: Faithless Looting, text: "Flashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)", verified: true}
+  - {kind: cr, ref: "702.34a", text: "“Flashback [cost]” means “You may cast this card from your graveyard if the resulting spell is an instant or sorcery spell by paying [cost] rather than paying its mana cost”", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Grafdigger's Cage @cage", "Mountain @m1", "Mountain @m2", "Mountain @m3"]
+    graveyard: ["Faithless Looting @loot"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@loot", alt_cost: {flashback: true}, pay: auto}}
+  - check:
+      legal:
+        p0:
+          include: [{t: cast, card: "@bolt"}]
+          exclude: [{t: cast, card: "@loot"}]
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@loot", alt_cost: {flashback: true}, pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Faithless Looting, Lightning Bolt]
+      exile: []
+      battlefield:
+        - {card: "Grafdigger's Cage"}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: false}
+        - {card: Mountain, tapped: false}
+    p1: {life: 17}
+notes: >
+  The Cage says "Players", so its own controller cannot flash back Looting either, although three Mountains would pay
+  {2}{R} at sorcery timing. Casting from hand (Bolt) is untouched. Paired with
+  grafdigger-cage-absent-flashback-resolves-and-exiles (positive case without the Cage).
+---
+id: grafdigger-cage-absent-flashback-resolves-and-exiles
+title: Without Grafdigger's Cage, Faithless Looting is cast from the graveyard for its flashback cost and is exiled after resolving
+area: card
+cards: [Faithless Looting, Lightning Bolt, Ponder, Island, Mountain]
+tags: [flashback, cast-from-graveyard, alternative-cost, discard, control-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: Faithless Looting, text: "Draw two cards, then discard two cards.", verified: true}
+  - {kind: oracle, card: Faithless Looting, text: "Flashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)", verified: true}
+  - {kind: cr, ref: "702.34a", text: "“If the flashback cost was paid, exile this card instead of putting it anywhere else any time it would leave the stack.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @hb"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3"]
+    graveyard: ["Faithless Looting @loot"]
+    library: ["Island @d1", "Ponder @d2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@loot", alt_cost: {flashback: true}}]}}
+  - p0: {t: cast, card: "@loot", alt_cost: {flashback: true}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@d1", "@hb"], expect_options: {include: ["@d1", "@d2", "@hb"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Island, Lightning Bolt]
+      exile: [Faithless Looting]
+      library_count: 10
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+notes: >
+  Control case for the Cage scenarios. Flashback is an alternative cost ({2}{R}, three Mountains). Looting draws Island
+  and Ponder, p0 discards Island and Bolt (three cards in hand, so the discard is a real choice), and Looting is exiled
+  instead of going to the graveyard. A wrong engine leaves Looting in the graveyard (castable again) or charges {R}.
+---
+id: grafdigger-cage-reanimate-resolves-but-creature-stays
+title: Under Grafdigger's Cage Reanimate still resolves and its caster loses life, but the creature card stays in the graveyard
+area: card
+cards: ["Grafdigger's Cage", Reanimate, Griselbrand, Swamp]
+tags: [grafdigger-cage, reanimate, impossible-effect, life-loss, cant-enter]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Grafdigger's Cage", text: "Creature cards in graveyards and libraries can't enter the battlefield.", verified: true}
+  - {kind: oracle, card: Reanimate, text: "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to that card's mana value.", verified: true}
+  - {kind: cr, ref: "609.3", text: "If an effect attempts to do something impossible, it does only as much as possible.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Reanimate @rean"]
+    battlefield: ["Swamp @sw"]
+    graveyard: ["Griselbrand @gris"]
+    library_pad: 10
+  p1:
+    battlefield: ["Grafdigger's Cage @cage"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@rean", targets: ["@gris"]}]}}
+  - p0: {t: cast, card: "@rean", targets: ["@gris"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 12
+      graveyard: [Griselbrand, Reanimate]
+      battlefield: [{card: Swamp, tapped: true}]
+      exile: []
+    p1:
+      battlefield: [{card: "Grafdigger's Cage"}]
+notes: >
+  Reanimate is cast from hand, so the Cage's casting clause does not apply, and Griselbrand in a graveyard is a legal
+  target (the Cage does not stop targeting). On resolution the put-onto-battlefield part is impossible, Griselbrand
+  stays in the graveyard, and the unconditional life loss still happens: 20 - 8 = 12 (Griselbrand's mana value is 8).
+  A wrong engine refuses the cast, makes the spell fizzle (no life loss), or lets Griselbrand enter.

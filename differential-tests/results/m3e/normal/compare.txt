@@ -1,0 +1,8 @@
+positions 13265  identical-action-sets 13265  action-diffs 0  injection-mismatch 0  forge-nonempty-stack 0  forge-errors 0
+suppressed by known divergences: {'kd-0005': 3, 'kd-0002': 1}
+
+action differences by (side, kind|card):
+
+injection mismatches (first 15 distinct):
+
+forge errors:

@@ -1,0 +1,55 @@
+--- /home/claude/rust-engine/crates/mtg-debug/src/noninterference.rs	2026-10-01 14:47:51.004106345 +0000
++++ crates/mtg-debug/src/noninterference.rs	2026-10-01 18:19:50.217057238 +0000
+@@ -58,7 +58,7 @@
+     // The worlds must actually differ somewhere hidden, otherwise the test proves nothing; this is
+     // checked in aggregate by the caller via `hidden_differs`.
+     let mut trace: Vec<String> = Vec::new();
+-    let fail = |step: u64, what: String, trace: &[String]| NiFail { seed, step, what: format!("{what}\n--- last actions:\n{}", trace[trace.len().saturating_sub(8)..].join("\n")) };
++    let fail = |step: u64, what: String, trace: &[String]| NiFail { seed, step, what: format!("{what}\n--- last actions:\n{}", trace[trace.len().saturating_sub(24)..].join("\n")) };
+     let lib0 = g.observe(a).me.library_count;
+     let mut step = 0u64;
+     loop {
+@@ -66,9 +66,24 @@
+             return Ok(step);
+         }
+         let (o1, o2) = (g.observe(a), g2.observe(a));
++        if std::env::var_os("REVIEW_STOP_ON_OWN_SHUFFLE").is_some() && o1.events.iter().any(|e| matches!(e, mtg_view::ViewEvent::Shuffled { me: true })) {
++            return Ok(step);
++        }
++        if std::env::var_os("REVIEW_STOP_ON_OWN_SHUFFLE").is_some() {
++            let nm = |v: &[mtg_view::ViewCard]| v.iter().map(|c| c.name.clone()).collect::<Vec<_>>();
++            if nm(&o1.opp.revealed_hand) != nm(&o2.opp.revealed_hand) || nm(&o1.me.library_known_top) != nm(&o2.me.library_known_top) || nm(&o1.me.library_known_bottom) != nm(&o2.me.library_known_bottom) || nm(&o1.opp.library_known_top) != nm(&o2.opp.library_known_top) || nm(&o1.opp.library_known_bottom) != nm(&o2.opp.library_known_bottom) {
++                return Ok(step); // the observer legitimately learned something different (reveal / look)
++            }
++        }
+         if cfg.own_library && o1.me.library_count != lib0 {
+             return Ok(step); // the observer learned a drawn card: legitimately different worlds now
+         }
++        if std::env::var_os("REVIEW_STOP_ON_OWN_SHUFFLE").is_some() && o1.events != o2.events {
++            let reveals = |evs: &[mtg_view::ViewEvent]| evs.iter().any(|e| matches!(e, mtg_view::ViewEvent::Moved { vid_old, from, .. } if *vid_old == mtg_core::ids::ViewId::NONE && matches!(from, mtg_core::types::ZoneKind::Library | mtg_core::types::ZoneKind::Hand)));
++            if reveals(&o1.events) || reveals(&o2.events) {
++                return Ok(step); // a hidden card was publicly revealed (mill, exile from library, discard): legitimate divergence
++            }
++        }
+         if o1.events != o2.events {
+             // A card that was hidden from the observer being revealed (discard, mill) differs
+             // legitimately between the worlds. Anything else in the event stream is a leak.
+@@ -93,7 +108,7 @@
+             let (t1, t2) = (format!("{o1:#?}"), format!("{o2:#?}"));
+             let (l1, l2): (Vec<&str>, Vec<&str>) = (t1.lines().collect(), t2.lines().collect());
+             let i = l1.iter().zip(l2.iter()).position(|(a, b)| a != b).unwrap_or(l1.len().min(l2.len()));
+-            let lo = i.saturating_sub(40);
++            let lo = i.saturating_sub(if std::env::var_os("REVIEW_SHORT").is_some() { 12 } else { 40 });
+             return Err(fail(step, format!("observation differs at line {i}:\n--- world 1\n{}\n--- world 2\n{}", l1[lo..(i + 6).min(l1.len())].join("\n"), l2[lo..(i + 6).min(l2.len())].join("\n")), &trace));
+         }
+         if o1.view_hash != o2.view_hash {
+@@ -142,6 +157,9 @@
+                 return Ok(step);
+             }
+             let pick = common[h64(&(seed, step)) as usize % common.len()];
++            if std::env::var_os("REVIEW_VERBOSE").is_some() {
++                trace.push(format!("   opp d1 labels {:?}\n   opp d2 labels {:?}", d1.options.iter().map(|x| x.label.clone()).collect::<Vec<_>>(), d2.options.iter().map(|x| x.label.clone()).collect::<Vec<_>>()));
++            }
+             trace.push(format!("step {step}: opponent picks {:?} ({:?})", pick.label, d1.kind));
+             let i2 = d2.options.iter().find(|y| y.label == pick.label).unwrap().idx as usize;
+             g.apply(p1.0, pick.idx as usize).unwrap();

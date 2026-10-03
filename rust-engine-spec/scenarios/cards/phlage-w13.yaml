@@ -1,0 +1,86 @@
+id: phlage-hard-cast-sacrificed-damage-trigger-still-resolves
+title: A hard-cast Phlage is sacrificed by its own trigger, and its damage trigger still deals 3 and gains 3 life
+area: card
+cards: ["Phlage, Titan of Fire's Fury", Mountain, Plains, Island]
+tags: [phlage, etb-trigger, order-triggers, last-known-information, sacrifice]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Phlage, Titan of Fire's Fury", text: "When Phlage enters, sacrifice it unless it escaped.", verified: true}
+  - {kind: oracle, card: "Phlage, Titan of Fire's Fury", text: "Whenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "If an ability states that an object does something, it’s the object as it exists—or as it most recently existed—that does it, not the ability.", verified: true}
+  - {kind: cr, ref: "702.138b", text: "A spell or permanent “escaped” if that spell or the spell that became that permanent as it resolved was cast from a graveyard with an escape ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Phlage, Titan of Fire's Fury @ph"]
+    battlefield: ["Mountain @m", "Plains @pl", "Island @i"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ph", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: order_triggers, answer: [{source: "@ph", text_contains: "deals 3 damage"}, {source: "@ph", text_contains: "sacrifice"}]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack:
+        - {kind: triggered, source: "@ph", text_contains: "deals 3 damage"}
+        - {kind: triggered, source: "@ph", text_contains: "sacrifice"}
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - check:
+      p0: {graveyard: ["Phlage, Titan of Fire's Fury"]}
+      stack: [{kind: triggered, source: "@ph", text_contains: "deals 3 damage"}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      graveyard: ["Phlage, Titan of Fire's Fury"]
+      battlefield: [{card: Mountain, tapped: true}, {card: Plains, tapped: true}, {card: Island, tapped: true}]
+    p1:
+      life: 17
+notes: >
+  Phlage was cast from hand, so it did not escape and its first trigger sacrifices it. Both enter triggers are p0's and
+  differ, so p0 orders them; here the damage trigger goes on the stack first (resolves last). The sacrifice resolves,
+  then the damage trigger resolves with Phlage in the graveyard: Phlage as it last existed deals the 3 damage (608.2h)
+  and p0 gains 3. Either order gives this final state. A wrong engine cancels the damage trigger when its source is
+  gone, or never sacrifices a hard-cast Phlage.
+---
+id: phlage-escape-needs-five-other-cards
+title: Phlage cannot escape with only four other cards in the graveyard
+area: card
+cards: ["Phlage, Titan of Fire's Fury", Mountain, Plains, Lightning Bolt, Ponder, Island, Brainstorm]
+tags: [phlage, escape, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Phlage, Titan of Fire's Fury", text: "Escape—{R}{R}{W}{W}, Exile five other cards from your graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mountain @m1", "Mountain @m2", "Plains @pl1", "Plains @pl2"]
+    graveyard: ["Phlage, Titan of Fire's Fury @ph", "Lightning Bolt @g1", "Ponder @g2", "Island @g3", "Brainstorm @g4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ph", alt_cost: {escape: {exile: ["@g1", "@g2", "@g3", "@g4"]}}, pay: auto}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@ph"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Phlage, Titan of Fire's Fury", Lightning Bolt, Ponder, Island, Brainstorm]
+      exile: []
+notes: >
+  Four other cards cannot pay "Exile five other cards", and Phlage itself does not count. Paired with
+  a sibling scenario.

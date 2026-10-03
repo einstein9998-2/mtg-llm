@@ -1,0 +1,147 @@
+# UR Cutter vs Alurentell. Part C: Tomb of Annihilation, Atraxa, Omniscience free casts, Acererak attack.
+
+=== acererak-tomb-completed-stays
+title: Acererak with Aluren through Tomb of Annihilation: Trapped Entry -> Veils of Fear -> Sandfall Cell -> Cradle of the Death God; after completion Acererak stays on the battlefield
+ref: Acererak Oracle ("if you haven't completed Tomb of Annihilation"); CR 701.49, 309.7; Tomb room text
+state:
+  humanhand=Acererak the Archlich
+  humanbattlefield=Aluren
+script:
+  p1: cast Acererak the Archlich ~free
+  p1: pick Tomb of Annihilation
+  p1: wait-empty
+  p1: cast Acererak the Archlich ~free
+  p1: pick Veils of Fear
+  p1: pick no
+  p1: wait-empty
+  p1: cast Acererak the Archlich ~free
+  p1: wait-empty
+  p1: cast Acererak the Archlich ~free
+  p1: wait-empty
+  p1: cast Acererak the Archlich ~free
+  p1: wait-empty
+expect:
+  zone p1 battlefield has "Acererak the Archlich"
+  zone p1 battlefield has "The Atropal"
+
+=== acererak-attack-zombie-unless-sacrifice
+title: Acererak attacks: the opponent makes a 2/2 Zombie for you unless they sacrifice a creature
+ref: Acererak Oracle
+state:
+  humanbattlefield=Acererak the Archlich
+  aibattlefield=Goblin Bombardment
+script:
+  p1: at COMBAT_BEGIN
+  p1: attack Acererak the Archlich
+  p1: at MAIN2
+expect:
+  zone p1 battlefield has "Zombie Token"
+  life p2 == 15
+
+=== atraxa-reveal-ten-one-of-each-type
+title: Atraxa: reveal ten, put one card of each type into hand (creature, land, artifact, enchantment, instant, sorcery), rest on the bottom
+ref: Atraxa, Grand Unifier Oracle
+state:
+  humanhand=Atraxa, Grand Unifier
+  humanmanapool=G W U B C C C
+  humanlibrary=Island;Brainstorm;Stock Up;Lotus Petal;Aluren;Acererak the Archlich;Ancient Tomb;Force of Will;Ponder;Mishra's Bauble;Boseiju, Who Endures;Show and Tell
+script:
+  p1: cast Atraxa, Grand Unifier
+expect:
+  zone p1 hand size == 6
+  zone p1 library size == 6
+
+=== atraxa-reveal-ten-library-shorter
+title: Atraxa with fewer than ten cards in library reveals all of them
+ref: Atraxa, Grand Unifier Oracle
+state:
+  humanhand=Atraxa, Grand Unifier
+  humanmanapool=G W U B C C C
+  humanlibrary=Brainstorm;Stock Up;Island
+script:
+  p1: cast Atraxa, Grand Unifier
+expect:
+  zone p1 hand size == 3
+  zone p1 library size == 0
+
+=== atraxa-keywords
+title: Atraxa: flying, vigilance, deathtouch, lifelink combat (blocks and gains life from damage dealt)
+ref: Atraxa Oracle; CR 702.15 (lifelink), 702.2 (deathtouch)
+state:
+  humanbattlefield=Atraxa, Grand Unifier
+  aibattlefield=Murktide Regent
+  aihand=Lightning Bolt
+  activeplayer=p2
+  activephase=MAIN1
+script:
+  p2: at COMBAT_BEGIN
+  p2: attack Murktide Regent
+  p1: block Atraxa, Grand Unifier blocks Murktide Regent
+  p2: at p2:MAIN2
+expect:
+  zone p2 graveyard has "Murktide Regent"
+  life p1 == 27
+  zone p1 battlefield has "Atraxa, Grand Unifier"
+
+=== omniscience-free-cast-from-hand
+title: Omniscience: Atraxa cast from hand without paying its mana cost; no mana spent
+ref: Omniscience Oracle
+state:
+  humanhand=Atraxa, Grand Unifier
+  humanbattlefield=Omniscience
+script:
+  p1: cast Atraxa, Grand Unifier ~free
+expect:
+  zone p1 battlefield has "Atraxa, Grand Unifier"
+  life p1 == 20
+
+=== omniscience-free-force-of-will-no-pitch
+title: Omniscience: Force of Will cast for free from hand counters a spell with no life paid and no card exiled
+ref: Omniscience Oracle
+state:
+  humanbattlefield=Omniscience
+  humanhand=Force of Will;Brainstorm
+  aihand=Lightning Bolt
+  aibattlefield=Mountain
+  activeplayer=p2
+script:
+  p2: cast Lightning Bolt -> p1
+  p2: pass
+  p1: when-stack Lightning Bolt
+  p1: cast Force of Will ~free -> Lightning Bolt
+expect:
+  life p1 == 20
+  zone p1 hand has "Brainstorm"
+  zone p1 exile size == 0
+  zone p2 graveyard has "Lightning Bolt"
+
+=== omniscience-not-instant-speed-for-creatures
+title: Omniscience does not grant flash: Atraxa cannot be cast for free on the opponent's turn
+ref: Omniscience Oracle; CR 307.1 / 601.3 (creatures are sorcery speed)
+state:
+  activeplayer=p2
+  activephase=UPKEEP
+  humanbattlefield=Omniscience
+  humanhand=Atraxa, Grand Unifier
+script:
+  p1: at p2:UPKEEP
+  p1: try cast Atraxa, Grand Unifier ~free
+expect:
+  zone p1 hand has "Atraxa, Grand Unifier"
+
+=== omniscience-and-aluren-both
+title: With Omniscience and Aluren, a creature spell (MV 3) can be cast free at instant speed (Aluren) while Atraxa (MV 7) only at sorcery speed (Omniscience)
+ref: Omniscience, Aluren Oracle
+state:
+  activeplayer=p2
+  activephase=UPKEEP
+  humanbattlefield=Omniscience;Aluren
+  humanhand=Atraxa, Grand Unifier;Acererak the Archlich
+script:
+  p1: at p2:UPKEEP
+  p1: try cast Atraxa, Grand Unifier ~free
+  p1: cast Acererak the Archlich ~free
+  p1: pick Lost Mine of Phandelver
+expect:
+  zone p1 hand has "Atraxa, Grand Unifier"
+  spells p1 == 1

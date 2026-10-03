@@ -1,0 +1,287 @@
+id: first-strike-on-both-sides-deals-damage-simultaneously-in-the-first-step
+title: Amped Raptor (first strike) blocked by White Orchid Phantom (first strike) - both deal damage in the first-strike step and both die
+area: core
+cards: [Amped Raptor, White Orchid Phantom]
+tags: [combat, first-strike, combat-damage-steps, simultaneous-damage, sba]
+derived_from: cr
+source:
+  - {kind: oracle, card: Amped Raptor, text: "First strike", verified: true}
+  - {kind: oracle, card: White Orchid Phantom, text: "Flying, first strike", verified: true}
+  - {kind: cr, ref: "510.4", text: "After that step, instead of proceeding to the end of combat step, the phase gets a second combat damage step.", verified: true}
+  - {kind: cr, ref: "510.2", text: "Second, all combat damage that’s been assigned is dealt simultaneously.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Amped Raptor @raptor"]
+    library_pad: 10
+  p1:
+    battlefield: ["White Orchid Phantom @wop"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@raptor", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@wop", attacker: "@raptor"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [], graveyard: [Amped Raptor]}
+      p1: {battlefield: [], graveyard: [White Orchid Phantom]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, graveyard: [Amped Raptor]}
+    p1: {life: 20, graveyard: [White Orchid Phantom]}
+notes: >
+  Both creatures have first strike, so both assign and deal their damage in the first combat damage step,
+  simultaneously (510.2): Raptor (2/1) takes 2, Phantom (2/2) takes 2, both destroyed by SBA. The phase still gets a
+  second combat damage step (510.4, unconditional), in which no creature remains. Wrong engines: the attacker's first
+  strike resolved before the blocker's (only the Phantom dies), or no second step.
+---
+id: first-strike-and-regular-attackers-deal-damage-in-two-steps
+title: Unblocked Ocelot Pride (first strike, lifelink) and Dragon's Rage Channeler deal their damage in two separate steps
+area: core
+cards: [Ocelot Pride, "Dragon's Rage Channeler"]
+tags: [combat, first-strike, combat-damage-steps, lifelink, unblocked]
+derived_from: cr
+source:
+  - {kind: oracle, card: Ocelot Pride, text: "First strike, lifelink", verified: true}
+  - {kind: cr, ref: "510.4", text: "If at least one attacking or blocking creature has first strike (see rule 702.7) or double strike (see rule 702.4) as the combat damage step begins, the only creatures that assign combat damage in that step are those with first strike or double strike.", verified: true}
+  - {kind: cr, ref: "510.4", text: "The only creatures that assign combat damage in that step are the remaining attackers and blockers that had neither first strike nor double strike as the first combat damage step began", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Ocelot Pride @oc", "Dragon's Rage Channeler @drc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@oc", target: {player: p1}}, {creature: "@drc", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      pending: {actor: p0, kind: priority}
+      p0: {life: 21}
+      p1: {life: 19}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 21}
+    p1: {life: 18}
+notes: >
+  p1 has no creatures, so no block declaration is raised (the second pair of passes is the declare blockers step).
+  First-strike step: only Ocelot Pride deals damage, 1 to p1 (19) with lifelink (p0 21). Regular step: only DRC deals
+  damage (Ocelot already dealt its damage and has no double strike), p1 18. DRC has no delirium (empty graveyards), so
+  it is a 1/1. Wrong engines: all damage in one step (p1 18 at the first check), or Ocelot dealing damage in both steps
+  (p1 17, p0 22).
+---
+id: first-striker-deals-no-second-damage-and-surviving-blocker-strikes-back
+title: Amped Raptor (2/1 first strike) blocked by Street Wraith (3/4) deals 2 first, then Street Wraith kills it in the regular step
+area: core
+cards: [Amped Raptor, Street Wraith]
+tags: [combat, first-strike, combat-damage-steps, damage-persists, sba]
+derived_from: cr
+source:
+  - {kind: oracle, card: Amped Raptor, text: "First strike", verified: true}
+  - {kind: cr, ref: "510.4", text: "The only creatures that assign combat damage in that step are the remaining attackers and blockers that had neither first strike nor double strike as the first combat damage step began", verified: true}
+  - {kind: cr, ref: "702.7c", text: "Removing first strike from a creature after it has already dealt combat damage in the first combat damage step won’t allow it to also assign combat damage in the second combat damage step (unless the creature has double strike).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Amped Raptor @raptor"]
+    library_pad: 10
+  p1:
+    battlefield: ["Street Wraith @sw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@raptor", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@sw", attacker: "@raptor"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      p0: {battlefield: [{card: Amped Raptor, damage: 0}]}
+      p1: {battlefield: [{card: Street Wraith, damage: 2}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, battlefield: [], graveyard: [Amped Raptor]}
+    p1: {life: 20, battlefield: [{card: Street Wraith, damage: 2}]}
+notes: >
+  First-strike step: the Raptor assigns 2 to the 3/4 Wraith, which survives with 2 damage marked. Regular step: only
+  creatures without first strike assign damage (510.4), so the Wraith deals 3 to the Raptor (toughness 1, destroyed)
+  and the Raptor does not deal damage a second time: the Wraith ends with 2 damage, not 4. Damage stays marked until
+  cleanup. Wrong engines: the Raptor striking twice (Wraith dies), or the Wraith not striking back.
+---
+id: no-first-strike-in-combat-means-no-first-strike-damage-step
+title: With no first strike or double strike creature in combat, the game goes straight from declare blockers to a single combat damage step
+area: core
+cards: ["Dragon's Rage Channeler"]
+tags: [combat, first-strike, combat-damage-steps, turn-structure]
+derived_from: cr
+source:
+  - {kind: cr, ref: "510.4", text: "If at least one attacking or blocking creature has first strike (see rule 702.7) or double strike (see rule 702.4) as the combat damage step begins, the only creatures that assign combat damage in that step are those with first strike or double strike.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@drc", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {life: 19}
+notes: >
+  Only DRC (no first strike) is in combat, so the extra first-strike damage step of 510.4 does not exist: after the
+  declare attackers and declare blockers passes, the next priority is in the combat damage step with the damage
+  already dealt (p1 19). The negative side of the first-strike scenarios above: a wrong engine that always creates a
+  first-strike step stops in first_strike_damage.
+---
+id: creature-flashed-in-during-first-strike-step-deals-no-combat-damage
+title: A creature cast with flash during the first-strike damage step is not attacking and deals no damage in the regular step
+area: core
+cards: [Ocelot Pride, Containment Priest, Plains]
+tags: [combat, first-strike, combat-damage-steps, flash, not-attacking]
+derived_from: cr
+source:
+  - {kind: oracle, card: Containment Priest, text: "Flash", verified: true}
+  - {kind: cr, ref: "510.4", text: "The only creatures that assign combat damage in that step are the remaining attackers and blockers that had neither first strike nor double strike as the first combat damage step began", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Containment Priest @cp"]
+    battlefield: ["Ocelot Pride @oc", "Plains @w1", "Plains @w2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@oc", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      pending: {actor: p0, kind: priority}
+      p1: {life: 19}
+  - p0: {t: cast, card: "@cp", pay: {tap: ["@w1", "@w2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      p0: {battlefield_contains: [{card: Containment Priest, tapped: false, sick: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 21}
+    p1: {life: 19}
+notes: >
+  Containment Priest enters during the first-strike damage step but it was never declared as an attacker, so it is
+  not an attacking creature and assigns no combat damage in the second step (510.4 names "remaining attackers and
+  blockers"). p1 takes only Ocelot's 1 (19); p0 gained 1 from lifelink (21). Wrong engine: every untapped creature of
+  the active player deals damage in the regular step (p1 17).
+---
+id: mana-empties-between-the-two-combat-damage-steps
+title: Mana added during the first-strike damage step is lost when that step ends and cannot pay for Lightning Bolt in the regular damage step
+area: core
+cards: [Ocelot Pride, Mountain, Lightning Bolt]
+tags: [mana-pool, mana-empties, combat-damage-steps, first-strike, turn-structure]
+derived_from: cr
+source:
+  - {kind: cr, ref: "106.4", text: "Each player’s mana pool empties at the end of each step and phase, and the player is said to lose this mana.", verified: true}
+  - {kind: cr, ref: "405.6c", text: "If a player had priority before a mana ability was activated, that player gets priority after it resolves.", verified: true}
+  - {kind: cr, ref: "510.4", text: "After that step, instead of proceeding to the end of combat step, the phase gets a second combat damage step.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Ocelot Pride @oc", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@oc", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@m1", ability: 0}
+  - check:
+      phase: first_strike_damage
+      pending: {actor: p0, kind: priority}
+      p0: {mana_pool: {R: 1}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: combat_damage
+      pending: {actor: p0, kind: priority}
+      p0: {mana_pool: {}}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}]}}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Lightning Bolt], mana_pool: {}, battlefield_contains: [{card: Mountain, tapped: true}]}
+    p1: {life: 19}
+notes: >
+  The first-strike damage step and the regular combat damage step are separate steps, so the {R} p0 floated in the
+  first one empties when it ends (106.4). In the regular step p0 has no mana and no untapped land, so Bolt is not
+  castable. The mana ability does not use the stack and p0 keeps priority (405.6c). Wrong engine: the pool survives
+  across combat damage steps (one "combat damage" phase).

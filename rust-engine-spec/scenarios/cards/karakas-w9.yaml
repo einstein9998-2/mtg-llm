@@ -1,0 +1,78 @@
+id: karakas-bounces-legendary-creature-not-nonlegendary
+title: Karakas returns an opponent's legendary creature to hand and cannot target a nonlegendary creature
+area: card
+cards: [Karakas, Griselbrand, Flickerwisp]
+tags: [karakas, bounce, legendary, targeting, activated-ability, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Karakas, text: "{T}: Return target legendary creature to its owner's hand.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Karakas @kar"]
+    library_pad: 10
+  p1:
+    battlefield: ["Griselbrand @gris", "Flickerwisp @wisp"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@kar", ability: 1, targets: ["@wisp"]}}
+  - p0: {t: activate, source: "@kar", ability: 1, targets: ["@gris"]}
+  - check:
+      stack: [{kind: activated, source: "@kar", controller: p0, targets: ["@gris"]}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [{card: Karakas, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Karakas, tapped: true}]
+    p1:
+      hand: [Griselbrand]
+      battlefield: [{card: Flickerwisp}]
+      graveyard: []
+notes: >
+  Ability index 1 is the bounce ability (index 0 is {T}: Add {W}). Griselbrand is a Legendary Creature; Flickerwisp is
+  not legendary and must not be a legal target. The bounce returns the card to its owner's hand (p1).
+---
+id: karakas-legend-rule-keeps-chosen-copy
+title: Playing a second Karakas makes its controller keep one Karakas (legend rule); the chosen untapped one stays
+area: card
+cards: [Karakas]
+tags: [karakas, legend-rule, state-based-actions, land-drop]
+derived_from: cr
+source:
+  - {kind: oracle, card: Karakas, text: "{T}: Add {W}.", verified: true}
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners’ graveyards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 0
+    hand: ["Karakas @k2"]
+    battlefield: [{card: Karakas, as: k1, tapped: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@k2"}
+  - p0: {decision: legend_rule, keep: "@k2"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      hand: []
+      battlefield: [{card: Karakas, tapped: false}]
+      graveyard: [Karakas]
+notes: >
+  Karakas is a Legendary Land. After the land play, state-based actions are checked before p0 receives priority and
+  p0 chooses which Karakas to keep. Keeping the new, untapped one sends the tapped one to the graveyard. A wrong engine
+  forgets the legend rule for lands, picks the copy itself, or keeps the older one.

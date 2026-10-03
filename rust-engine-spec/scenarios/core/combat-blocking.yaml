@@ -1,0 +1,257 @@
+id: flying-attacker-blockable-only-by-flying-or-reach
+title: A flying attacker cannot be blocked by a creature without flying or reach
+area: core
+cards: [Faerie Macabre, "Spider-Woman, Stunning Savior", Containment Priest]
+tags: [combat, flying, declare-blockers, mask-validity, evasion]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.9b", text: "A creature with flying can’t be blocked except by creatures with flying and/or reach. A creature with flying can block a creature with or without flying.", verified: true}
+  - {kind: cr, ref: "509.1a", text: "The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.", verified: true}
+  - {kind: oracle, card: "Faerie Macabre", text: "Flying", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Faerie Macabre @fm"]
+    library_pad: 10
+  p1:
+    battlefield: ["Spider-Woman, Stunning Savior @sw", "Containment Priest @priest"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@fm", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p1: {decision: declare_blockers, blocks: [{blocker: "@priest", attacker: "@fm"}]}}
+  - p1:
+      decision: declare_blockers
+      blocks: []
+      expect_options: {include: ["@sw"], exclude: ["@priest"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p1:
+      life: 18
+      battlefield: [{card: "Spider-Woman, Stunning Savior", damage: 0}, {card: "Containment Priest", damage: 0}]
+    p0:
+      battlefield: [{card: Faerie Macabre, tapped: true, damage: 0}]
+notes: >
+  Faerie Macabre (flying) attacks. The non-flying Containment Priest cannot block it, so a block assignment naming it is not
+  in the legal set, while the flying Spider-Woman is offered as a possible blocker (and the declare_blockers decision is
+  therefore raised). p1 declines to block and takes 2. A wrong engine lets a ground creature block a flyer.
+---
+id: summoning-sick-creature-can-block-and-stays-untapped
+title: A creature with summoning sickness can block, and blocking does not tap it
+area: core
+cards: ["Goblin Token", Containment Priest]
+tags: [combat, summoning-sickness, declare-blockers, no-tap-to-block]
+derived_from: cr
+source:
+  - {kind: cr, ref: "509.1a", text: "The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Containment Priest, as: priest, sick: true}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@gob", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@priest", attacker: "@gob"}], expect_options: {include: ["@priest"]}}
+  - check:
+      phase: declare_blockers
+      priority: p0
+      p1: {battlefield: [{card: Containment Priest, tapped: false}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    p0: {battlefield: [], graveyard: []}
+    p1:
+      life: 20
+      battlefield: [{card: Containment Priest, tapped: false, damage: 1}]
+notes: >
+  p1's Containment Priest came under p1's control this turn (sick: true; for instance flashed in earlier in p0's turn).
+  Summoning sickness (302.6) restricts attacking and tap-symbol abilities only, so the Priest is offered as a blocker, and
+  blocking does not tap it (509.1a lists no tap). Priest takes 1 damage and survives, the Goblin takes 2 and dies.
+---
+id: blocker-blocks-only-one-attacker-other-attacker-unblocked
+title: One blocker blocks one attacker; the other attacker is unblocked and damages the player
+area: core
+cards: ["Goblin Token", "Skeleton Token", "Zombie Token"]
+tags: [combat, declare-blockers, one-blocker-one-attacker, unblocked, combat-damage, mask-validity]
+derived_from: cr
+source:
+  - {kind: cr, ref: "509.1a", text: "The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.", verified: true}
+  - {kind: cr, ref: "510.1b", text: "An unblocked creature assigns its combat damage to the player, planeswalker, or battle it’s attacking.", verified: true}
+  - {kind: cr, ref: "510.1c", text: "A blocked creature assigns its combat damage to the creatures blocking it. If no creatures are currently blocking it (if, for example, they were destroyed or removed from combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its combat damage to that creature. If two or more creatures are blocking it, it assigns its combat damage to those creatures divided as its controller chooses among them.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: Goblin Token, as: gob}, {token: Skeleton Token, as: skel}]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Zombie Token, as: zomb}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks:
+        - {creature: "@gob", target: {player: p1}}
+        - {creature: "@skel", target: {player: p1}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal:
+      p1:
+        decision: declare_blockers
+        blocks: [{blocker: "@zomb", attacker: "@gob"}, {blocker: "@zomb", attacker: "@skel"}]
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@zomb", attacker: "@gob"}], expect_options: {include: ["@zomb"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p0:
+      graveyard: []
+      battlefield: [{token: Skeleton Token, tapped: true}]
+    p1:
+      life: 19
+      battlefield: [{token: Zombie Token, damage: 1, tapped: false}]
+notes: >
+  509.1a: for each chosen blocker the defending player chooses ONE creature for it to block. No card in this pool lets a
+  creature block more than one attacker, so a declaration with the same Zombie blocking two attackers is not in the legal
+  set. The Zombie blocks the Goblin only: the Goblin dies and the Zombie takes 1. The Skeleton is unblocked and deals 1 to
+  p1 (20 to 19). The brief's wording "two attackers blocked by one creature" cannot occur under this CR without an effect
+  granting extra blocks; this scenario pins the legality instead.
+---
+id: flash-blocker-cast-in-declare-attackers-step-can-block
+title: A creature with flash cast after attackers are declared can block that combat
+area: core
+cards: ["Goblin Token", Containment Priest, Plains, Island]
+tags: [combat, flash, priority, declare-attackers, declare-blockers, stack]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Containment Priest", text: "Flash", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority. A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+  - {kind: cr, ref: "509.1a", text: "The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+  p1:
+    hand: ["Containment Priest @priest"]
+    battlefield: ["Plains @pl", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@gob", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@priest", pay: auto}
+  - check: {phase: declare_attackers, priority: p1, stack: [{kind: spell, card: "@priest", controller: p1}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {phase: declare_attackers, priority: p0, stack: [], p1: {battlefield_contains: [{card: Containment Priest, tapped: false}]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@priest", attacker: "@gob"}], expect_options: {include: ["@priest"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p0: {battlefield: [], graveyard: []}
+    p1:
+      life: 20
+      hand: []
+      battlefield:
+        - {card: Containment Priest, tapped: false, damage: 1}
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  After attackers are declared p0 holds priority first and passes; p1 then casts the flash creature (117.1a) and receives
+  priority again (117.3c). When both pass the spell resolves and the active player gets priority (117.3b). The Priest is untapped
+  and able to block (a creature cast this turn can block: summoning sickness only limits attacking). It blocks the Goblin, takes
+  1 damage and kills it. The flashed creature never needs to be on the battlefield when attackers are declared.
+---
+id: spider-woman-opposing-flash-creature-enters-tapped-cannot-block
+title: With Spider-Woman on the battlefield the opponent's flashed-in creature enters tapped and cannot block
+area: core
+cards: ["Spider-Woman, Stunning Savior", "Goblin Token", Containment Priest, "Skeleton Token", Plains, Island]
+tags: [combat, flash, enters-tapped, declare-blockers, spider-woman, tapped]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Artifacts and creatures your opponents control enter tapped.", verified: true}
+  - {kind: oracle, card: "Containment Priest", text: "Flash", verified: true}
+  - {kind: cr, ref: "509.1a", text: "The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Spider-Woman, Stunning Savior @sw", {token: Goblin Token, as: gob}]
+    library_pad: 10
+  p1:
+    hand: ["Containment Priest @priest"]
+    battlefield: ["Plains @pl", "Island @isl", {token: Skeleton Token, as: skel}]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@gob", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@priest", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [], priority: p0, p1: {battlefield_contains: [{card: Containment Priest, tapped: true}]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p1: {decision: declare_blockers, blocks: [{blocker: "@priest", attacker: "@gob"}]}}
+  - p1: {decision: declare_blockers, blocks: [], expect_options: {include: ["@skel"], exclude: ["@priest"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    p1:
+      life: 19
+      battlefield:
+        - {card: Containment Priest, tapped: true}
+        - {token: Skeleton Token, tapped: false}
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: true}
+    p0:
+      battlefield:
+        - {card: "Spider-Woman, Stunning Savior", tapped: false}
+        - {token: Goblin Token, tapped: true}
+notes: >
+  Spider-Woman says artifacts and creatures her controller's opponents control enter tapped. The Priest is cast (so
+  Containment Priest's own exile replacement does not apply) and enters tapped; a tapped creature cannot block (509.1a).
+  The untapped Skeleton token already on the battlefield is the legal blocker (it makes the declare_blockers decision
+  appear) and declines; the Goblin's 1 damage goes through. A wrong engine lets the Priest enter untapped and block.

@@ -1,0 +1,136 @@
+id: erode-destroys-creature-controller-searches-basic-tapped-w11
+title: Erode destroys the target creature and its controller may search for a basic land, which enters tapped; a nonbasic Plains is not offered
+area: card
+cards: [Erode, Plains, Tundra, Island, "Phelia, Exuberant Shepherd"]
+tags: [erode, destroy, may-search, basic-land, enters-tapped, opponent-decides]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Erode, text: "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.8a", text: "To destroy a permanent, move it from the battlefield to its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "305.4", text: "Effects may also allow players to \"put\" lands onto the battlefield. This isn't the same as \"playing a land\"", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Erode @erode"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @phelia", "Island @isl"]
+    library: ["Tundra @tun", "Plains @lp"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@erode", targets: ["@isl"]}}
+  - p0: {t: cast, card: "@erode", targets: ["@phelia"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: yes_no, purpose: may_search, answer: true}
+  - p1:
+      decision: search
+      found: "@lp"
+      expect_options: {include: ["@lp"], exclude: ["@tun"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Erode], battlefield: [{card: Plains, tapped: true}]}
+    p1:
+      graveyard: ["Phelia, Exuberant Shepherd"]
+      battlefield:
+        - {card: Island, tapped: false}
+        - {card: Plains, tapped: true}
+      library_count: 11
+      lands_played: 0
+notes: >
+  The destroyed creature's controller (p1), not Erode's caster, makes the search decision. Tundra has the Plains type
+  but is not basic, so it is not offered; the basic Plains (and the basic Island pad cards) are. The land enters tapped
+  and is not a land play. Library 12 -> 11, then shuffled (random: any; only counts asserted). A land is not a legal
+  target. Bugs caught: the caster searching, a nonbasic dual offered, the land entering untapped.
+---
+id: erode-target-gone-no-search
+title: If Erode's target leaves before resolution, Erode does not resolve and no search is offered
+area: card
+cards: [Erode, Swords to Plowshares, Plains, "Phelia, Exuberant Shepherd"]
+tags: [erode, fizzle, illegal-target, may-search, swords-to-plowshares]
+derived_from: cr
+source:
+  - {kind: oracle, card: Erode, text: "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Erode @erode"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Phelia, Exuberant Shepherd @phelia", "Plains @ppl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@erode", targets: ["@phelia"]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@phelia"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p1: {life: 22, exile: ["Phelia, Exuberant Shepherd"]}
+      stack: [{kind: spell, card: "@erode", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Erode]}
+    p1:
+      life: 22
+      graveyard: [Swords to Plowshares]
+      battlefield: [{card: Plains, tapped: true}]
+      library_count: 10
+notes: >
+  p1 exiles their own Phelia in response (gaining 2). Erode's only target is gone, so Erode does not resolve: the search
+  is never offered (no yes_no step), the library keeps 10 cards. The script would fail if the engine raised the may-search
+  prompt. Bug caught: the land-search half executed on a fizzled Erode.
+---
+id: erode-own-creature-caster-searches
+title: Erode on the caster's own creature lets the caster, as that creature's controller, search for a basic land
+area: card
+cards: [Erode, Plains, Island, "Phelia, Exuberant Shepherd"]
+tags: [erode, own-creature, may-search, basic-land, enters-tapped]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Erode, text: "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Erode @erode"]
+    battlefield: ["Plains @pl", "Phelia, Exuberant Shepherd @phelia"]
+    library: ["Island @li"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@erode", targets: ["@phelia"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: may_search, answer: true}
+  - p0: {decision: search, found: "@li"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Erode, "Phelia, Exuberant Shepherd"]
+      battlefield: [{card: Plains, tapped: true}, {card: Island, tapped: true}]
+      library_count: 10
+      lands_played: 0
+notes: >
+  "Its controller" is the destroyed creature's controller, here the caster. The basic Island enters tapped and is not a
+  land play. Pair of the opponent-side scenario: a wrong engine that always asks the target's opponent or always the
+  caster fails one of the two.

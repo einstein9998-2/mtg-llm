@@ -1,0 +1,281 @@
+id: hi-mask-fow-pitch-options-blue-cards-only
+title: Force of Will's alternative cost is offered once per other blue card in hand and never for nonblue cards or itself
+area: hidden-info
+cards: [Force of Will, "Atraxa, Grand Unifier", Aluren, Lotus Petal, Acererak the Archlich, Ponder, Volcanic Island, Tropical Island]
+tags: [hidden-info, mask-validity, alternative-cost, color, legal-actions]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+  - {kind: cr, ref: "202.2b", text: "Objects with no colored mana symbols in their mana costs are colorless.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+  - {kind: cr, ref: "118.3", text: "A player can't pay a cost without having the necessary resources to pay it fully.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority. A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ponder @pd"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Force of Will @fow2", "Atraxa, Grand Unifier @atx", "Aluren @alu", "Lotus Petal @lp", "Acererak the Archlich @ace"]
+    battlefield: ["Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pd", pay: auto}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@pd", controller: p0}]
+    pending: {actor: p1, kind: priority}
+    legal:
+      p1:
+        include:
+          - {t: pass}
+          - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@atx", pay_life: 1}}
+          - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@fow2", pay_life: 1}}
+        exclude:
+          - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@fow", pay_life: 1}}
+          - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@alu", pay_life: 1}}
+          - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@lp", pay_life: 1}}
+          - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@ace", pay_life: 1}}
+          - {t: cast, card: "@fow", alt_cost: null}
+          - {t: cast, card: "@alu"}
+          - {t: cast, card: "@atx"}
+          - {t: cast, card: "@lp"}
+          - {t: cast, card: "@ace"}
+  - at: after_script
+    observer: p0
+    obs:
+      opp: {hand_count: 6, revealed_hand: []}
+      option_labels_exclude_names: [Force of Will, "Atraxa, Grand Unifier", Aluren, Lotus Petal, Acererak the Archlich]
+notes: >
+  Atraxa ({3}{G}{W}{U}{B}) is blue among other colors (202.2c); a second Force of Will is blue; Aluren is green only,
+  Acererak black only, Lotus Petal colorless (202.2b). The Force of Will being cast is already on the stack when costs are
+  paid (601.2a), so it cannot exile itself. Hardcasting needs {3}{U}{U} and p1 has one land, so it is not offered (118.3).
+  Aluren, Atraxa, Lotus Petal and Acererak are noninstant and lack flash, so on p0's turn with a spell on the stack none of
+  them is castable (117.1a). p0's own observation must not show any of p1's hand. "alt_cost: null" means "cast paying the
+  mana cost" (SCHEMA addenda). The mirror-image actions (casting @fow2 pitching @fow or @atx) are equally legal but
+  lead to the same canonical state as the listed ones, so they are not required in `include` (review: an engine may
+  collapse interchangeable identical-card options).
+---
+id: hi-mask-omniscience-free-force-of-will-on-opponents-turn
+title: With Omniscience, Force of Will is castable free on the opponent's turn but a sorcery-speed card is not
+area: hidden-info
+cards: [Force of Will, Aluren, Omniscience, Lightning Bolt, Volcanic Island, Tropical Island]
+tags: [hidden-info, mask-validity, omniscience, free-cast, timing, legal-actions]
+derived_from: cr
+source:
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority. A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it's being cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Aluren @alu"]
+    battlefield: ["Omniscience @omni", "Tropical Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    pending: {actor: p1, kind: priority}
+    legal:
+      p1:
+        include:
+          - {t: pass}
+          - {t: cast, card: "@fow", alt_cost: {free: omniscience}}
+        exclude:
+          - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@alu", pay_life: 1}}
+          - {t: cast, card: "@alu"}
+notes: >
+  Omniscience removes the mana cost but not timing restrictions: Force of Will is an instant, so it is castable for free in
+  response to Bolt; Aluren is an enchantment and p1 is not in its own main phase with an empty stack. Aluren is green, so
+  it cannot pay Force of Will's alternative cost.
+---
+id: hi-mask-own-options-independent-of-opponent-hand
+title: A player's offered options are identical whatever the opponent holds
+area: hidden-info
+cards: [Daze, Volcanic Island, Thundering Falls, Stock Up, Force of Will, "Atraxa, Grand Unifier", Aluren, Island, Tropical Island, Hedge Maze]
+tags: [hidden-info, mask-validity, non-interference, paired-world]
+derived_from: cr
+source:
+  - {kind: cr, ref: "402.3", text: "A player can't look at the cards in another player's hand but may count those cards at any time.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Daze @daze"]
+    battlefield: ["Volcanic Island @volc", {card: Thundering Falls, as: tf, tapped: true}]
+    library_pad: 10
+  p1:
+    hand: ["Stock Up @su", "Force of Will @h1", "Atraxa, Grand Unifier @h2"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+world_b:
+  p1: {hand: ["Stock Up @su", "Aluren @h1", "Island @h2"]}
+assert_streams_identical: {observer: p0}
+script:
+  - p1: {t: cast, card: "@su", pay: auto}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+    legal:
+      p0:
+        include:
+          - {t: pass}
+          - {t: cast, card: "@daze", alt_cost: {return_island: "@volc"}}
+          - {t: cast, card: "@daze", alt_cost: {return_island: "@tf"}}
+        exclude:
+          - {t: cast, card: "@daze", alt_cost: null}
+notes: >
+  The worlds differ only in p1's two unrevealed hand cards. p0's observation and its option list at this priority decision
+  (pass, Daze returning either Island, mana abilities) must be byte-identical. Daze's mana cost {1}{U} is not payable with
+  one untapped land, so the hardcast is excluded in both worlds. A wrong engine sizes or orders p0's options, or assigns
+  view ids, using p1's hand.
+---
+id: hi-mask-responder-options-independent-of-caster-hand
+title: The responding player's options depend only on its own hand, not on the active player's hidden cards
+area: hidden-info
+cards: [Force of Will, Brainstorm, Ponder, Lightning Bolt, Daze, Murktide Regent, Volcanic Island, Island, Tropical Island]
+tags: [hidden-info, mask-validity, non-interference, paired-world, legal-actions]
+derived_from: cr
+source:
+  - {kind: cr, ref: "402.3", text: "A player can't look at the cards in another player's hand but may count those cards at any time.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ponder @pd", "Lightning Bolt @h1", "Daze @h2"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Island"]
+    library_pad: 10
+world_b:
+  p0: {hand: ["Ponder @pd", "Murktide Regent @h1", "Island @h2"]}
+assert_streams_identical: {observer: p1}
+script:
+  - p0: {t: cast, card: "@pd", pay: auto}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    pending: {actor: p1, kind: priority}
+    legal:
+      p1:
+        include:
+          - {t: pass}
+          - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}}
+          - {t: cast, card: "@bs"}
+        exclude:
+          - {t: cast, card: "@fow", alt_cost: null}
+notes: >
+  p1 may pitch Brainstorm to Force of Will or cast Brainstorm with its Island. The worlds differ only in p0's two unrevealed
+  hand cards, so p1's stream, including this option list, must be byte-identical.
+---
+id: hi-mask-show-and-tell-options-chooser-eligible-cards-only
+title: The Show and Tell choice offers each of the chooser's artifact, creature, enchantment and land cards plus nothing
+area: hidden-info
+cards: [Show and Tell, Omniscience, Force of Will, Murktide Regent, "Mishra's Bauble", Cori-Steel Cutter, Volcanic Island, Lightning Bolt, Island, Tropical Island, Hedge Maze]
+tags: [hidden-info, show-and-tell, mask-validity, simultaneous-secret-choice]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "101.4a", text: "If an effect has each player choose a card in a hidden zone, such as their hand or library, those cards may remain face down as they're chosen.", verified: true}
+  - {kind: cr, ref: "301.5b", text: "Equipment spells are cast like other artifact spells. Equipment enter the battlefield like other artifacts. They don't enter the battlefield attached to a creature.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mk", "Mishra's Bauble @bb", "Cori-Steel Cutter @cut", "Volcanic Island @hv", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Show and Tell @st", "Omniscience @omni", "Force of Will @fow"]
+    battlefield: ["Island", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@st", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: p1-picked
+    p1: {decision: simultaneous_secret_choice, answer: "@omni"}
+  - p0:
+      decision: simultaneous_secret_choice
+      answer: "@cut"
+      expect_options: {include: ["@mk", "@bb", "@cut", "@hv", null], exclude: ["@bolt"], count: 5}
+expect:
+  - at: p1-picked
+    observer: p0
+    obs:
+      option_labels_exclude_names: [Omniscience, Force of Will]
+      events_text_exclude: [Omniscience, Force of Will]
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Murktide Regent, "Mishra's Bauble", Volcanic Island, Lightning Bolt]
+      battlefield: [{card: Cori-Steel Cutter, controller: p0}]
+      lands_played: 0
+    p1: {battlefield_contains: [{card: Omniscience}], hand: [Force of Will]}
+notes: >
+  p0's mask: Murktide (creature), Bauble and Cutter (artifacts), Volcanic Island (land) and "nothing"; Bolt is an instant.
+  Nothing of p1's appears in p0's options or events before the cards enter. Cutter enters unattached (301.5b); its Flurry
+  trigger needs a cast, so nothing triggers.
+---
+id: hi-mask-force-of-negation-free-only-on-opponents-turn
+title: Force of Negation's alternative cost is not offered on its controller's own turn
+area: hidden-info
+cards: [Force of Negation, Stock Up, Lightning Bolt, Volcanic Island, Island]
+tags: [hidden-info, mask-validity, alternative-cost, not-your-turn, legal-actions]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "Partial payments are not allowed. Unpayable costs can't be paid.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Volcanic Island"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Stock Up @su"]
+    battlefield: ["Island", "Island"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bolt", controller: p0}]
+    pending: {actor: p1, kind: priority}
+    phase: main1
+    legal:
+      p1:
+        include: [{t: pass}]
+        exclude:
+          - {t: cast, card: "@fon"}
+          - {t: cast, card: "@su"}
+notes: >
+  It is p1's own turn, so the exile alternative is unavailable, and two Islands cannot pay {1}{U}{U}; no Force of Negation
+  cast is offered (Bolt is a noncreature spell, so a target exists; the cost is the only obstacle). Stock Up is a sorcery
+  and the stack is not empty. p1 passing with an empty stack in main1 gives p0 priority, where p0 casts Bolt (117.3d).

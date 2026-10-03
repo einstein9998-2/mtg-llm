@@ -1,0 +1,15 @@
+{
+"policy":"plain","stops":"default","seatA_deck":"dnt.dck","seatB_deck(ForgeAI)":"jund75.dck",
+"games":10,"seatA_wins":3,"forgeAI_wins":7,"draws":0,"seatA_games_on_play":0,"seatA_wins_on_play":0,"wall_ms":21696,
+"prompts":0,"prompt_chars":0,"prompt_tokens_est":0,"prompts_per_game":0.0,
+"asked_by_kind":{},
+"chars_by_kind":{},"chars_if_every_prompt_carried_full_state":{},
+"menu_enumeration_ms_avg":0.0,"menu_calls":0,"prompt_render_ms_avg":0.0,
+"forced_no_prompt":{},
+"auto_pass_by_rule":{},
+"delegated_to_forge_ai":{},
+"problems":{},
+"leak_checks":0,"leak_failures":0,
+"mirror_ai_priority_pick_on_menu":0,"mirror_ai_priority_pick_missing":0,
+"problem_samples":[]
+}

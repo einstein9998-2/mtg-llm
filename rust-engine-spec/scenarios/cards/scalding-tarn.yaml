@@ -1,0 +1,101 @@
+id: scalding-tarn-fetch-mountain-and-use-it-immediately
+title: Scalding Tarn finds a Mountain (or any card with the Island or Mountain type), the new land is untapped and can pay for Lightning Bolt in the same turn
+area: card
+cards: [Scalding Tarn, Island, Mountain, Plains, Swamp, Lightning Bolt]
+tags: [fetchland, search, land-types, mana-ability, no-summoning-sickness-for-lands]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Scalding Tarn, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "602.5a", text: "A creature's activated ability with the tap symbol ({T}) or the untap symbol ({Q}) in its activation cost can't be activated unless the creature has been under its controller's control since the start of their most recent turn.", verified: true, note: "applies to creatures only; lands are not affected"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Scalding Tarn @tarn"]
+    library: ["Island @isl", "Mountain @mtn", "Plains @pl", "Swamp @sw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, purpose: fetch, found: "@mtn", expect_options: {include: ["@isl", "@mtn"], exclude: ["@pl", "@sw"]}}
+  - p0: {t: activate, source: "@mtn", ability: 0}
+  - check:
+      p0: {mana_pool: {R: 1}, battlefield: [{card: Mountain, tapped: true}]}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      mana_pool: {}
+      lands_played: 0
+      battlefield: [{card: Mountain, tapped: true}]
+      graveyard: [Scalding Tarn, Lightning Bolt]
+    p1: {life: 17}
+notes: >
+  A land put onto the battlefield by an effect has no summoning sickness (that rule applies to creatures only, 602.5a) and its mana ability
+  works at once. Plains and Swamp are not Island or Mountain cards and must be absent from the offered options. Life: 20 - 1 (Tarn) = 19 for p0;
+  Bolt takes p1 to 17. The decision keyword for the search is `search` with found: alias.
+---
+id: scalding-tarn-fetches-thundering-falls-tapped-with-surveil
+title: Scalding Tarn fetches Thundering Falls (an Island Mountain card) which enters tapped and surveils after the shuffle
+area: card
+cards: [Scalding Tarn, Thundering Falls, Island, Lightning Bolt, Ponder]
+tags: [fetchland, search, enters-tapped, surveil, etb-trigger, shuffle, scripted-random]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Scalding Tarn, text: "Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Thundering Falls, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Thundering Falls, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+random:
+  - {kind: shuffle, player: p0, result: [Lightning Bolt, Ponder, Island]}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Scalding Tarn @tarn"]
+    library: ["Island @isl", "Thundering Falls @falls", "Lightning Bolt @bolt", "Ponder @pond"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tarn", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, purpose: fetch, found: "@falls"}
+  - check:
+      stack: [{kind: triggered, source: "@falls", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        life: 19
+        library_top: [Lightning Bolt, Ponder, Island]
+        battlefield: [{card: Thundering Falls, tapped: true}]
+  - expect_illegal: {p0: {t: activate, source: "@falls", ability: 0}}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: ["@bolt"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Scalding Tarn, Lightning Bolt]
+      library_top: [Ponder, Island]
+      library_count: 2
+      battlefield: [{card: Thundering Falls, tapped: true}]
+notes: >
+  Order of events: search, put the land onto the battlefield (it enters tapped), then the shuffle (scripted to Lightning Bolt, Ponder, Island),
+  and only then does the enters trigger go on the stack (603.3), so the surveil looks at the top card of the SHUFFLED library: Lightning Bolt.
+  A wrong engine would surveil before the shuffle (and so look at the pre-shuffle top card, the Island) or have the land enter untapped.
+  The mid-script check pins the trigger on the stack and the tapped state; a tapped land cannot use its mana ability (expect_illegal).
+  The random queue holds exactly one shuffle; a second shuffle would fail the scenario.

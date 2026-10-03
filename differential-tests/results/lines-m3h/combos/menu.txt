@@ -1,0 +1,2 @@
+windows with menu differences 1319; differing keys 2282; suppressed {'kd-0002': 2179, 'kd-0007': 100, 'kd-0003': 2}; unexplained 1
+    1 FORGE_ONLY play|Graveyard|Boggart Trawler|                         seat0 ['aluren-on-bf']  e.g. scn:combos.scn:aluren-chain-02:l2 w7

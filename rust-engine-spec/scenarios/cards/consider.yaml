@@ -1,0 +1,73 @@
+id: consider-surveil-to-graveyard-then-draw-the-next-card
+title: Consider surveils the top card into the graveyard and then draws the card below it
+area: card
+cards: [Consider, Griselbrand, Ponder, Island]
+tags: [consider, surveil, draw, sequencing]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Consider, text: "Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nDraw a card.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Consider @c"]
+    battlefield: ["Island @i"]
+    library: ["Griselbrand @g", "Ponder @p"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@c", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: ["@g"], on_top_order: []}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Griselbrand, Consider]
+      library_count: 10
+notes: >
+  The surveil comes first, so the draw takes the card under the binned one. A Reanimator use: Griselbrand reaches the
+  graveyard. Wrong engines: draw first, or draw the binned card.
+---
+id: consider-surveil-keep-on-top-then-draw-it
+title: Consider keeping the top card draws that same card
+area: card
+cards: [Consider, Griselbrand, Ponder, Island]
+tags: [consider, surveil, draw]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Consider, text: "Draw a card.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Consider @c"]
+    battlefield: ["Island @i"]
+    library: ["Griselbrand @g", "Ponder @p"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@c", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@g"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Griselbrand]
+      graveyard: [Consider]
+      library_count: 11
+      library_top: [Ponder]
+notes: >
+  Keeping the card on top means the draw takes it. Pairs with the binning scenario above.

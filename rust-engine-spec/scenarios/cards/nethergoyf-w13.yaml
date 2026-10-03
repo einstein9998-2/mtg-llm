@@ -1,0 +1,70 @@
+id: nethergoyf-escape-not-offered-with-three-other-types
+title: Nethergoyf cannot escape when the other cards in the graveyard have only three card types, however many cards there are
+area: card
+cards: [Nethergoyf, Lightning Bolt, Ponder, Island, Swamp]
+tags: [nethergoyf, escape, collective-cost, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Nethergoyf, text: "Escape—{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    graveyard: ["Nethergoyf @ng", "Lightning Bolt @gb1", "Lightning Bolt @gb2", "Ponder @gp", "Island @gi"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ng", alt_cost: {escape: {exile: ["@gb1", "@gb2", "@gp", "@gi"]}}, pay: auto}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@ng"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Nethergoyf, Lightning Bolt, Lightning Bolt, Ponder, Island]
+      exile: []
+notes: >
+  Four other cards but only three types among them (instant, sorcery, land). Nethergoyf's own creature type does not
+  help because the cost says "other cards". No escape action may be offered. Paired with
+  a sibling scenario.
+---
+id: nethergoyf-escaped-enters-under-containment-priest
+title: An escaped Nethergoyf was cast, so the opponent's Containment Priest does not exile it
+area: card
+cards: [Nethergoyf, "Overlord of the Balemurk", Lightning Bolt, Ponder, Island, Swamp, Containment Priest]
+tags: [nethergoyf, escape, containment-priest, cast-from-graveyard, replacement-effect, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Containment Priest, text: "If a nontoken creature would enter and it wasn't cast, exile it instead.", verified: true}
+  - {kind: oracle, card: Nethergoyf, text: "Escape—{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them.", verified: true}
+  - {kind: cr, ref: "702.138a", text: "“Escape [cost]” means “You may cast this card from your graveyard by paying [cost] rather than paying its mana cost.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    graveyard: ["Nethergoyf @ng", "Overlord of the Balemurk @ov", "Lightning Bolt @gb", "Ponder @gp", "Island @gi"]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ng", alt_cost: {escape: {exile: ["@ov", "@gb", "@gp"]}}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Nethergoyf, controller: p0, pt: [1, 2]}]
+      exile: ["Overlord of the Balemurk", Lightning Bolt, Ponder]
+      graveyard: [Island]
+notes: >
+  The Priest cares whether the creature was cast, not where from. Casting from the graveyard with escape is casting,
+  so Nethergoyf enters. A wrong engine equates "from the graveyard" with "reanimated" and exiles it.

@@ -1,0 +1,269 @@
+id: mu-bowmasters-warped-riddler-empty-hand-two-triggers-kill-phelia
+title: UWx warps Quantum Riddler with no other cards in hand; its enter trigger draws two cards, Bowmasters triggers twice and the two pings kill Phelia
+area: matchup
+cards: [Quantum Riddler, Orcish Bowmasters, "Phelia, Exuberant Shepherd", Ponder, Stifle, Tundra, Underground Sea]
+tags: [matchup, dimir-vs-uwx, quantum-riddler, bowmasters, replacement-effect, draw-trigger, damage-accumulates, state-based-actions, amass]
+derived_from: cr
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "As long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "121.2", text: "Cards may only be drawn one at a time. If a player is instructed to draw multiple cards, that player performs that many individual card draws.", verified: true}
+  - {kind: cr, ref: "614.6", text: "If an event is replaced, it never happens. A modified event occurs instead, which may in turn trigger abilities.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+  - {kind: cr, ref: "701.47a", text: "If you don’t control an Army creature, create a 0/0 black [subtype] Army creature token. Choose an Army creature you control. Put N +1/+1 counters on that creature.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Quantum Riddler @qr"]
+    battlefield: ["Tundra @t1", "Tundra @t2", "Phelia, Exuberant Shepherd @ph"]
+    library: ["Ponder @c1", "Stifle @c2"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@qr", alt_cost: {warp: true}, pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [{kind: triggered, source: "@qr", controller: p1}], p1: {hand: []}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@ph"}
+  - p0: {decision: choose_target, slot: 0, answer: "@ph"}
+  - check:
+      stack:
+        - {kind: triggered, source: "@bow", controller: p0, targets: ["@ph"]}
+        - {kind: triggered, source: "@bow", controller: p0, targets: ["@ph"]}
+      pending: {actor: p1, kind: priority}
+      p1: {hand: [Ponder, Stifle], library_count: 10}
+  - resolve_top: true
+  - check:
+      p1: {battlefield_contains: [{card: "Phelia, Exuberant Shepherd", damage: 1}]}
+      p0: {battlefield_contains: [{token: Orc Army Token, counters: {"+1/+1": 1}, pt: [1, 1]}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 20
+      graveyard: ["Phelia, Exuberant Shepherd"]
+      hand: [Ponder, Stifle]
+      battlefield: [{card: Tundra, tapped: true}, {card: Tundra, tapped: true}, {card: Quantum Riddler, sick: true}]
+    p0:
+      battlefield:
+        - {card: Orcish Bowmasters}
+        - {card: Underground Sea}
+        - {token: Orc Army Token, controller: p0, counters: {"+1/+1": 2}, pt: [2, 2]}
+notes: >
+  With an empty hand, Riddler's own enter trigger draws two cards instead of one (replacement, 614.6), performed as two
+  individual draws (121.2) in p1's main phase: two Bowmasters triggers. Both target Phelia (2/2). The first deals 1
+  (Phelia survives with 1 damage) and creates the Army; the second deals the lethal second point and adds a counter.
+  Bugs caught: one trigger for a replaced draw, damage not accumulating, Phelia dying early.
+---
+id: mu-bowmasters-uwx-draw-step-then-brainstorm-three-triggers
+title: Without Riddler, UWx's draw-step draw does not trigger Bowmasters but its Brainstorm in the same draw step triggers it three times
+area: matchup
+cards: [Orcish Bowmasters, Brainstorm, Ponder, Stifle, Swords to Plowshares, Force of Will, Tundra, Underground Sea]
+tags: [matchup, dimir-vs-uwx, bowmasters, draw-step, brainstorm, draw-trigger, exception-first-draw]
+derived_from: cr
+source:
+  - {kind: oracle, card: Orcish Bowmasters, text: "whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "504.1", text: "First, the active player draws a card. This turn-based action doesn't use the stack.", verified: true}
+  - {kind: cr, ref: "121.2", text: "Cards may only be drawn one at a time. If a player is instructed to draw multiple cards, that player performs that many individual card draws.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: upkeep
+  p0:
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Tundra @t1"]
+    library: ["Ponder @c1", "Stifle @c2", "Swords to Plowshares @c3", "Force of Will @c4"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {phase: draw, stack: [], pending: {actor: p1, kind: priority}, p1: {hand: [Brainstorm, Ponder]}}
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: put_back, answer: ["@c1", "@c2"]}
+  - p1: {decision: order_cards, purpose: put_back, answer: ["@c1", "@c2"]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      phase: draw
+      stack:
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+      pending: {actor: p1, kind: priority}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: draw
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 17
+      hand: [Swords to Plowshares, Force of Will]
+      library_top: [Ponder, Stifle]
+      graveyard: [Brainstorm]
+    p0:
+      battlefield_contains: [{token: Orc Army Token, controller: p0, counters: {"+1/+1": 3}, pt: [3, 3]}]
+notes: >
+  The draw-step draw (Ponder) is the first card p1 draws in this draw step: no trigger, and p1 gets priority in the
+  draw step with an empty stack. Brainstorm, cast in the same draw step, draws three more; none of them is the first of
+  the step, so three triggers (17 life, Army 3/3). Brainstorm puts back the Ponder and Stifle, top Ponder. Bugs caught:
+  the exception applied to "the first draw of a spell", the draw-step draw triggering, or all draws in the draw step
+  excepted.
+---
+id: mu-bowmasters-riddler-brainstorm-four-triggers
+title: With Riddler out and one other card in hand, UWx's Brainstorm draws four cards and Bowmasters triggers four times
+area: matchup
+cards: [Quantum Riddler, Orcish Bowmasters, Brainstorm, Swords to Plowshares, Ponder, Stifle, Force of Will, Prismatic Ending, Consign to Memory, Tundra, Underground Sea]
+tags: [matchup, dimir-vs-uwx, quantum-riddler, bowmasters, brainstorm, replacement-effect, draw-trigger, multiple-triggers]
+derived_from: cr
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "As long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "121.2a", text: "An instruction to draw multiple cards can be modified by replacement effects that refer to the number of cards drawn. This modification occurs before considering any of the individual card draws.", verified: true}
+  - {kind: cr, ref: "121.2", text: "Cards may only be drawn one at a time. If a player is instructed to draw multiple cards, that player performs that many individual card draws.", verified: true}
+  - {kind: cr, ref: "614.5", text: "A replacement effect doesn't invoke itself repeatedly; it gets only one opportunity to affect an event or any modified events that may replace that event.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Swords to Plowshares @h1"]
+    battlefield: ["Quantum Riddler @qr", "Tundra @t1"]
+    library: ["Ponder @c1", "Stifle @c2", "Force of Will @c3", "Prismatic Ending @c4", "Consign to Memory @c5"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1:
+      decision: choose_cards
+      purpose: put_back
+      answer: ["@c1", "@c2"]
+      expect_options: {include: ["@h1", "@c1", "@c2", "@c3", "@c4"], exclude: ["@c5"], count: 5}
+  - p1: {decision: order_cards, purpose: put_back, answer: ["@c2", "@c1"]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack:
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+      pending: {actor: p1, kind: priority}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 16
+      hand: [Swords to Plowshares, Force of Will, Prismatic Ending]
+      library_top: [Stifle, Ponder, Consign to Memory]
+      library_count: 13
+      graveyard: [Brainstorm]
+    p0:
+      battlefield_contains: [{token: Orc Army Token, controller: p0, counters: {"+1/+1": 4}, pt: [4, 4]}]
+notes: >
+  While Brainstorm resolves p1 holds one card (Swords), so "draw three" becomes "draw four" before any individual draw
+  (121.2a), once only (614.5). Four individual draws, four Bowmasters triggers (p1 20 -> 16, Army 4/4). The put-back
+  choice is over the five cards in hand (Swords plus the four drawn), not the fifth library card. Library 15 - 4 + 2 =
+  13. Bugs caught: three triggers (counting the instruction, not the cards), six draws (bonus per card), Bowmasters
+  ignoring replacement-added draws.
+---
+id: mu-bowmasters-only-opponent-draws-trigger-both-brainstorm
+title: Dimir Brainstorms with its own Bowmasters out (no trigger); UWx answers with its own Brainstorm and those three draws do trigger Bowmasters
+area: matchup
+cards: [Orcish Bowmasters, Brainstorm, Ponder, Daze, Thoughtseize, Swords to Plowshares, Stifle, Force of Will, Underground Sea, Tundra]
+tags: [matchup, dimir-vs-uwx, bowmasters, brainstorm, opponent-only, draw-trigger, negative, stack-lifo]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Orcish Bowmasters, text: "whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "603.3a", text: "A triggered ability is controlled by the player who controlled its source at the time it triggered, unless it's a delayed triggered ability.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs0"]
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1"]
+    library: ["Ponder @a0", "Daze @b0", "Thoughtseize @c0"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs1"]
+    battlefield: ["Tundra @t1"]
+    library: ["Swords to Plowshares @a1", "Stifle @b1", "Force of Will @c1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs0", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bs1", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: put_back, answer: ["@a1", "@b1"]}
+  - p1: {decision: order_cards, purpose: put_back, answer: ["@a1", "@b1"]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack:
+        - {kind: spell, card: "@bs0", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - check: {stack: [{kind: spell, card: "@bs0", controller: p0}], p1: {life: 17}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@a0", "@b0"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@a0", "@b0"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Thoughtseize]
+      library_top: [Ponder, Daze]
+      graveyard: [Brainstorm]
+      battlefield_contains: [{token: Orc Army Token, controller: p0, counters: {"+1/+1": 3}, pt: [3, 3]}]
+    p1:
+      life: 17
+      hand: [Force of Will]
+      library_top: [Swords to Plowshares, Stifle]
+      graveyard: [Brainstorm]
+notes: >
+  p1's Brainstorm, cast in response, resolves first: three opponent draws, three triggers that p0 controls and targets
+  (603.3a). On p0's turn p0 is the active player and gets priority after each resolution (117.3b). p0's own Brainstorm
+  then resolves: p0's draws are not an opponent's, so no trigger and the stack is empty after the put-back. Bugs caught:
+  Bowmasters triggering on its controller's draws, triggers controlled by the drawing player.

@@ -1,0 +1,263 @@
+id: mu-swords-nethergoyf-life-equals-own-graveyard-types
+title: UWx's Swords to Plowshares exiles a 3/4 Nethergoyf and Dimir gains 3; the creature card in UWx's graveyard does not count
+area: matchup
+cards: [Swords to Plowshares, Nethergoyf, Polluted Delta, Brainstorm, Thoughtseize, "Phelia, Exuberant Shepherd", Tundra, Underground Sea]
+tags: [matchup, dimir-vs-uwx, swords-to-plowshares, nethergoyf, characteristic-defining, life-gain, last-known-information]
+derived_from: cr
+source:
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "If the effect requires information from a specific object, including the source of the ability itself, the effect uses the current information of that object if it’s in the public zone it was expected to be in; if it’s no longer in that zone, or if the effect has moved it from a public zone to a hidden zone, the effect uses the object’s last known information.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Nethergoyf @ng", "Underground Sea @us1"]
+    graveyard: ["Polluted Delta @g1", "Brainstorm @g2", "Thoughtseize @g3"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Tundra @t1"]
+    graveyard: ["Phelia, Exuberant Shepherd @g4"]
+    library_pad: 10
+script:
+  - check: {p0: {battlefield_contains: [{card: Nethergoyf, pt: [3, 4]}]}}
+  - p1: {t: cast, card: "@stp", targets: ["@ng"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 23
+      exile: [Nethergoyf]
+      battlefield: [{card: Underground Sea}]
+      graveyard: [Polluted Delta, Brainstorm, Thoughtseize]
+    p1:
+      life: 20
+      graveyard: ["Phelia, Exuberant Shepherd", Swords to Plowshares]
+notes: >
+  Nethergoyf counts land, instant and sorcery in p0's graveyard: 3/4 (Phelia, a creature card, is in p1's graveyard and
+  does not count). Swords exiles it and its controller p0 gains life equal to its power, using last known information
+  (3). Bugs caught: counting both graveyards (4 life), using the exiled card's printed */1+* (0 life), giving the life
+  to the caster.
+---
+id: mu-swords-barrowgoyf-swords-itself-not-yet-in-graveyard
+title: Swords to Plowshares on Barrowgoyf gives life equal to its power while Swords is still on the stack, so Swords' own instant type does not count
+area: matchup
+cards: [Swords to Plowshares, Barrowgoyf, Polluted Delta, Ponder, Tundra, Underground Sea]
+tags: [matchup, dimir-vs-uwx, swords-to-plowshares, barrowgoyf, characteristic-defining, life-gain, resolution-order]
+derived_from: cr
+source:
+  - {kind: oracle, card: Barrowgoyf, text: "Barrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "the effect uses the object’s last known information", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Barrowgoyf @bg", "Underground Sea @us1"]
+    graveyard: ["Polluted Delta @g1"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Tundra @t1"]
+    graveyard: ["Ponder @g2"]
+    library_pad: 10
+script:
+  - check: {p0: {battlefield_contains: [{card: Barrowgoyf, pt: [2, 3]}]}}
+  - p1: {t: cast, card: "@stp", targets: ["@bg"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {life: 22, exile: [Barrowgoyf]}
+    p1: {life: 20, graveyard: [Ponder, Swords to Plowshares]}
+notes: >
+  Barrowgoyf counts land (p0's Delta) and sorcery (p1's Ponder): 2/3. Swords goes to the graveyard only as the final
+  part of its own resolution (608.2n), after the exile and life gain, so the instant type is never counted for the
+  life: p0 gains 2, not 3. Bugs caught: putting Swords into the graveyard before applying its effect, or counting the
+  spell on the stack.
+---
+id: mu-prismatic-ending-x2-two-colors-misses-barrowgoyf
+title: Prismatic Ending with X=2 paid with white and blue (two colors) does not exile Barrowgoyf (mana value 3)
+area: matchup
+cards: [Prismatic Ending, Barrowgoyf, Tundra, Underground Sea]
+tags: [matchup, dimir-vs-uwx, prismatic-ending, converge, mana-value, barrowgoyf, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: oracle, card: Tundra, text: "({T}: Add {W} or {U}.)", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Barrowgoyf @bg", "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Tundra @t1", "Tundra @t2", "Tundra @t3"]
+    library_pad: 10
+script:
+  - p1: {t: activate, source: "@t1", ability: 0, choose_color: W}
+  - p1: {t: activate, source: "@t2", ability: 0, choose_color: U}
+  - p1: {t: activate, source: "@t3", ability: 0, choose_color: W}
+  - p1: {t: cast, card: "@pe", x: 2, targets: ["@bg"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {exile: [], battlefield_contains: [{card: Barrowgoyf, pt: [1, 2]}]}
+    p1: {graveyard: [Prismatic Ending], mana_pool: {}}
+notes: >
+  Barrowgoyf's mana cost {2}{B} gives mana value 3; two colors spent, so the condition fails and nothing is exiled
+  (Barrowgoyf is a legal target, so the spell resolves and does nothing). After Ending hits p1's graveyard Barrowgoyf
+  counts a sorcery: 1/2. Pair: the next scenario spends three colors. Bug caught: counting the three mana instead of
+  the two colors.
+---
+id: mu-prismatic-ending-x2-three-colors-exiles-barrowgoyf
+title: Prismatic Ending with X=2 paid with white, blue and red (Tundra, Tundra, Volcanic Island) exiles Barrowgoyf
+area: matchup
+cards: [Prismatic Ending, Barrowgoyf, Tundra, Volcanic Island, Underground Sea]
+tags: [matchup, dimir-vs-uwx, prismatic-ending, converge, mana-value, barrowgoyf, dual-lands]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: oracle, card: Volcanic Island, text: "({T}: Add {U} or {R}.)", verified: true}
+  - {kind: oracle, card: Tundra, text: "({T}: Add {W} or {U}.)", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Barrowgoyf @bg", "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Tundra @t1", "Tundra @t2", "Volcanic Island @v1"]
+    library_pad: 10
+script:
+  - p1: {t: activate, source: "@t1", ability: 0, choose_color: W}
+  - p1: {t: activate, source: "@t2", ability: 0, choose_color: U}
+  - p1: {t: activate, source: "@v1", ability: 0, choose_color: R}
+  - p1: {t: cast, card: "@pe", x: 2, targets: ["@bg"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {exile: [Barrowgoyf], battlefield: [{card: Underground Sea}]}
+    p1: {graveyard: [Prismatic Ending], mana_pool: {}}
+notes: >
+  Three colors of mana spent (W, U, R) against mana value 3: exiled. The colors are fixed when each dual land is tapped.
+  Pair of the previous scenario.
+---
+id: mu-wrath-of-the-skies-x1-kills-goyf-bauble-army-not-bowmasters
+title: UWx's Wrath of the Skies with X=1 and one energy paid destroys Nethergoyf, Mishra's Bauble and the Orc Army token but not Bowmasters or Phelia
+area: matchup
+cards: [Wrath of the Skies, Orcish Bowmasters, Nethergoyf, "Mishra's Bauble", "Phelia, Exuberant Shepherd", Tundra, Volcanic Island, Underground Sea, Swamp]
+tags: [matchup, dimir-vs-uwx, wrath-of-the-skies, energy, mana-value, token-mana-value-zero, flash, bowmasters, amass]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wrath of the Skies, text: "You get X {E} (energy counters), then you may pay any amount of {E}. Destroy each artifact, creature, and enchantment with mana value less than or equal to the amount of {E} paid this way.", verified: true}
+  - {kind: cr, ref: "202.3a", text: "The mana value of an object with no mana cost is 0", verified: true}
+  - {kind: cr, ref: "701.47a", text: "If you don’t control an Army creature, create a 0/0 black [subtype] Army creature token.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Orcish Bowmasters @bow"]
+    battlefield: ["Nethergoyf @ng", "Mishra's Bauble @bb", "Underground Sea @us1", "Swamp @sw1"]
+    library_pad: 10
+  p1:
+    hand: ["Wrath of the Skies @wr"]
+    battlefield: ["Tundra @t1", "Tundra @t2", "Volcanic Island @v1", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bow", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - resolve_top: true
+  - check: {phase: main1, stack: [], pending: {actor: p1, kind: priority}, p1: {life: 19}}
+  - p1: {t: cast, card: "@wr", x: 1, pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_number, purpose: pay_energy, answer: 1}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Nethergoyf, "Mishra's Bauble"]
+      battlefield:
+        - {card: Orcish Bowmasters}
+        - {card: Underground Sea, tapped: true}
+        - {card: Swamp, tapped: true}
+    p1:
+      energy: 0
+      life: 19
+      graveyard: [Wrath of the Skies]
+      battlefield_contains: [{card: "Phelia, Exuberant Shepherd"}]
+notes: >
+  p1 passes in its own main phase; p0 flashes in Bowmasters (enter trigger at p1, Army created). Back in p1's main
+  phase with an empty stack, p1 casts Wrath with X=1 (three lands), gets 1 energy and chooses to pay 1 (0 or 1 is a
+  real choice). Destroyed: Nethergoyf (mana value 1), Mishra's Bauble (mana value 0) and the Orc Army token (no mana
+  cost, mana value 0); survivors: Bowmasters and Phelia (mana value 2). The token ceases to exist, so p0's graveyard
+  holds only the two cards. Bugs caught: tokens treated as having no mana value (never destroyed), energy not spent,
+  noncreature artifacts spared.
+---
+id: mu-erode-nethergoyf-dimir-chooses-to-fetch-basic
+title: UWx's Erode destroys Nethergoyf; Dimir, its controller, may search for a basic land, which enters tapped
+area: matchup
+cards: [Erode, Nethergoyf, Underground Sea, Swamp, Tundra]
+tags: [matchup, dimir-vs-uwx, erode, opponent-decision, may-search, enters-tapped, shuffle]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Erode, text: "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn’t required to find some or all of those cards even if they’re present in that zone.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Nethergoyf @ng", "Underground Sea @us1"]
+    library: ["Swamp @sw"]
+    library_pad: 10
+  p1:
+    hand: ["Erode @er"]
+    battlefield: ["Tundra @t1"]
+    library_pad: 10
+random: any
+script:
+  - p1: {t: cast, card: "@er", targets: ["@ng"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: may_search, answer: true}
+  - p0: {decision: search, found: "@sw", expect_options: {include: ["@sw"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Nethergoyf]
+      battlefield: [{card: Underground Sea, tapped: false}, {card: Swamp, tapped: true}]
+      library_count: 10
+    p1: {graveyard: [Erode], battlefield: [{card: Tundra, tapped: true}]}
+notes: >
+  The destroyed creature's controller (p0, not Erode's caster) makes the may-search decision and the search; the Swamp
+  enters tapped. Library 11 -> 10. Bugs caught: asking the caster, the land entering untapped.

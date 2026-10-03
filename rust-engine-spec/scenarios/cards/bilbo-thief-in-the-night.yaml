@@ -1,0 +1,110 @@
+id: bilbo-reduces-nethergoyf-escape-cost-by-one
+title: With Bilbo, Nethergoyf's escape costs {1}{B} and is castable with two lands
+area: card
+cards: ["Bilbo, Thief in the Night", Nethergoyf, Swamp, Island, Brainstorm, Ponder, "Mishra's Bauble"]
+tags: [bilbo, cost-reduction, escape, cast-from-graveyard, alternative-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Bilbo, Thief in the Night", text: "Spells you cast from anywhere other than your hand cost {1} less to cast.", verified: true}
+  - {kind: oracle, card: Nethergoyf, text: "Escape—{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "118.7a", text: "Effects that reduce a cost by an amount of generic mana affect only the generic mana component of that cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Bilbo, Thief in the Night @bilbo", "Swamp @s1", "Island @i1"]
+    graveyard: ["Nethergoyf @goyf", "Island @gi", "Brainstorm @gb", "Ponder @gp", "Mishra's Bauble @gm"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@goyf", alt_cost: {escape: {exile: ["@gi", "@gb", "@gp", "@gm"]}}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: []
+      exile: [Island, Brainstorm, Ponder, "Mishra's Bauble"]
+      battlefield:
+        - {card: "Bilbo, Thief in the Night"}
+        - {card: Nethergoyf, pt: [0, 1]}
+        - {card: Swamp, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  Escape casts Nethergoyf from the graveyard, so Bilbo's reduction applies to the escape cost (118.9d): {2}{B} becomes
+  {1}{B}, which the two lands pay. Afterwards p0's graveyard is empty and Nethergoyf is 0/1. Without the reduction the cast
+  would be impossible with two lands.
+---
+id: bilbo-attack-trigger-casts-sorcery-from-graveyard-for-less-and-exiles-it
+title: Bilbo's attack trigger casts Flow State from the graveyard for {U}; it resolves and is exiled instead of going to the graveyard
+area: card
+cards: ["Bilbo, Thief in the Night", Flow State, Nethergoyf, Island, Ponder, Brainstorm, Swamp]
+tags: [bilbo, attack-trigger, cast-during-resolution, cast-from-graveyard, cost-reduction, replacement-effect, flow-state]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Bilbo, Thief in the Night", text: "Whenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead.", verified: true}
+  - {kind: oracle, card: "Bilbo, Thief in the Night", text: "Spells you cast from anywhere other than your hand cost {1} less to cast.", verified: true}
+  - {kind: cr, ref: "608.2g", text: "If an effect specifically instructs or allows a player to cast a spell during resolution, they do so by following the steps in rules 601.2a–i, except no player receives priority after it's cast. That spell becomes the topmost object on the stack, and the currently resolving spell or ability continues to resolve, which may include casting other spells this way.", verified: true}
+  - {kind: oracle, card: Flow State, text: "Look at the top three cards of your library. Put one of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+  - {kind: cr, ref: "117.1", text: "Unless a spell or ability is instructing a player to take an action, which player can take actions at any given time is determined by a system of priority.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Bilbo, Thief in the Night @bilbo", "Island @i1"]
+    graveyard: ["Flow State @fs", "Nethergoyf @gg"]
+    library: ["Ponder @l1", "Brainstorm @l2", "Swamp @l3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@bilbo", target: {player: p1}}]}
+  - check:
+      phase: declare_attackers
+      stack: [{kind: triggered, source: "@bilbo", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: cast_from_graveyard, answer: ["@fs"], expect_options: {include: ["@fs"], exclude: ["@gg"]}}
+  - check:
+      stack: [{kind: spell, card: "@fs", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Nethergoyf], battlefield_contains: [{card: Island, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: to_hand, answer: ["@l1"]}
+  - p0: {decision: order_cards, purpose: bottom, answer: ["@l2", "@l3"]}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Nethergoyf]
+      exile: [Flow State]
+      library_bottom: [Brainstorm, Swamp]
+      library_count: 12
+      battlefield:
+        - {card: "Bilbo, Thief in the Night", tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  The attack trigger resolves in the declare attackers step. Its "may cast" lets p0 cast Flow State (a sorcery) during
+  the resolution; timing restrictions for sorceries apply to casting with priority, not to casting during resolution
+  (608.2g). Nethergoyf is a creature card and is not offered. Bilbo's reduction applies because the spell is cast from the
+  graveyard: {1}{U} becomes {U}, paid by the one Island (118.7a: generic only). No player gets priority right after the cast;
+  the trigger finishes, then the active player p0 gets priority with Flow State on the stack. On resolution p0's graveyard
+  holds only a creature card, so one card goes to hand and two go to the bottom in the chosen order (answer is top first,
+  so Swamp is bottom-most). Flow State would go to the graveyard and is exiled instead. The "may cast" is one choose_cards with
+  purpose cast_from_graveyard (SCHEMA addenda; an empty answer would decline), payment automatic. Sorcery timing
+  (117.1a, 307.1) is part of the priority system, which 117.1 says does not govern actions a resolving ability
+  instructs; Bilbo's effect allows the cast (601.3) and 608.2g says how it is done during resolution.

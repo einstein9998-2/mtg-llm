@@ -1,0 +1,229 @@
+id: stifle-cannot-target-show-and-tell-but-can-target-archon-enters-trigger
+title: Stifle cannot target the Show and Tell spell, but after it resolves Stifle counters the Archon of Cruelty's enters trigger it set up
+area: core
+cards: [Stifle, Show and Tell, Archon of Cruelty, Island]
+tags: [stifle, show-and-tell, archon-of-cruelty, etb-trigger, targeting, counter-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability. (Mana abilities can't be targeted.)", verified: true}
+  - {kind: oracle, card: Archon of Cruelty, text: "Whenever this creature enters or attacks, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Archon of Cruelty @arch"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @st", "Island @ph"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@st", targets: ["@snt"]}}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@arch"}
+  - p1: {decision: simultaneous_secret_choice, answer: null}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack: [{kind: triggered, source: "@arch", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@st", targets: [{trigger_of: "@arch", nth: 0}], pay: {tap: ["@pi"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand_count: 0
+      library_count: 10
+      graveyard: [Show and Tell]
+      battlefield_contains: [{card: Archon of Cruelty, sick: true}]
+    p1:
+      life: 20
+      hand: [Island]
+      graveyard: [Stifle]
+notes: >
+  Stifle targets only activated or triggered abilities, so the Show and Tell spell is not a legal target and the cast
+  is not offered. p1 holds a land card so that p1's Show and Tell choice is a real decision (p1 declines). The Archon
+  enters, its trigger targets p1 as it goes on the stack, and p1 Stifles it: no sacrifice, no discard, no life change
+  for either player and no draw for p0 (library stays 10). The Archon stays on the battlefield. Wrong engines: offering
+  Stifle against a spell, or Stifle only removing part of the trigger (e.g. the draw or the life gain still happening).
+---
+id: stifle-on-flusterstorm-storm-trigger-means-no-copies
+title: Stifle counters Flusterstorm's storm trigger, so no copy is made and the Bolt caster pays {1} only once
+area: core
+cards: [Stifle, Flusterstorm, Lightning Bolt, Mountain, Island]
+tags: [stifle, storm, flusterstorm, triggered-ability, copies, counter-war]
+derived_from: cr
+source:
+  - {kind: oracle, card: Flusterstorm, text: "Counter target instant or sorcery spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "Storm is a triggered ability that functions on the stack. “Storm” means “When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Stifle @st"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Island @i1"]
+    library_pad: 10
+  p1:
+    hand: ["Flusterstorm @flu"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@flu", targets: ["@bolt"], pay: {tap: ["@j1"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@flu", controller: p1}
+        - {kind: triggered, source: "@flu", controller: p1}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@st", targets: [{trigger_of: "@flu", nth: 0}], pay: {tap: ["@i1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@flu", controller: p1}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_flusterstorm, answer: true}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt, Stifle]
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Island, tapped: true}
+    p1:
+      life: 17
+      graveyard: [Flusterstorm]
+notes: >
+  Storm is a cast trigger that goes on the stack above Flusterstorm (702.40a); with Bolt cast before it, it would make
+  one copy. Stifle counters the trigger, so no copy is ever created. Only the original Flusterstorm resolves; p0 pays
+  {1} with the last Mountain and Bolt resolves (p1 20 -> 17). A copy would have demanded a second {1} that p0 cannot
+  pay. Wrong engines: storm as a static "on cast" copy that cannot be responded to, or copies made at cast time.
+---
+id: stifle-on-karakas-bounce-keeps-griselbrand-on-the-battlefield
+title: Stifle counters Karakas's bounce ability aimed at Griselbrand; Karakas stays tapped and Griselbrand stays
+area: core
+cards: [Stifle, Karakas, Griselbrand, Island]
+tags: [stifle, karakas, activated-ability, legendary, respond, counter-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Karakas, text: "{T}: Return target legendary creature to its owner's hand.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stifle @st"]
+    battlefield: ["Griselbrand @g", "Island @i1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Karakas @kar"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@kar", ability: 1, targets: ["@g"]}
+  - check:
+      stack: [{kind: activated, source: "@kar", controller: p1}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@st", targets: [{ability_of: "@kar", nth: 0}], pay: {tap: ["@i1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Stifle]
+      battlefield:
+        - {card: Griselbrand, tapped: false}
+        - {card: Island, tapped: true}
+    p1:
+      battlefield: [{card: Karakas, tapped: true}]
+notes: >
+  p0 passes in main1 with an empty stack, so p1 gets priority and activates Karakas's second ability (index 1; index 0
+  is the mana ability) targeting Griselbrand; tapping is a cost, so Karakas stays tapped. p0 Stifles the ability; it is
+  removed from the stack without resolving and Griselbrand stays. Stifle resolving leaves the stack empty, the active
+  player p0 receives priority (117.3b) and the game is still in main1 (the step ends only when both pass on an empty
+  stack). Wrong engines: the step advancing after Stifle, or Karakas untapping.
+---
+id: stifle-on-kaito-plus-one-keeps-the-loyalty-and-uses-up-the-loyalty-activation
+title: Stifle on Kaito's +1 gives no emblem, but the loyalty counter added as the cost stays and Kaito cannot activate another loyalty ability that turn
+area: core
+cards: [Stifle, "Kaito, Bane of Nightmares", Island]
+tags: [stifle, kaito, loyalty-ability, costs, once-per-turn, counter-ability, layers]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Kaito, Bane of Nightmares", text: "+1: You get an emblem with \"Ninjas you control get +1/+1.\"", verified: true}
+  - {kind: oracle, card: "Kaito, Bane of Nightmares", text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has hexproof.", verified: true}
+  - {kind: cr, ref: "606.4", text: "The cost to activate a loyalty ability of a permanent is to put on or remove from that permanent a certain number of loyalty counters, as shown by the loyalty symbol in the ability’s cost.", verified: true}
+  - {kind: cr, ref: "606.3", text: "but only if no player has previously activated a loyalty ability of that permanent that turn.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Kaito, Bane of Nightmares", as: kaito, counters: {loyalty: 3}, sick: false}]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @st"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@kaito", ability: 1}
+  - check:
+      stack: [{kind: activated, source: "@kaito", controller: p0}]
+      p0: {battlefield: [{card: "Kaito, Bane of Nightmares", counters: {loyalty: 4}, pt: [3, 4]}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@st", targets: [{ability_of: "@kaito", nth: 0}], pay: {tap: ["@j1"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - expect_illegal: {p0: {t: activate, source: "@kaito", ability: 2}}
+  - expect_illegal: {p0: {t: activate, source: "@kaito", ability: 1}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: "Kaito, Bane of Nightmares", counters: {loyalty: 4}, pt: [3, 4], subtypes: [Ninja]}]
+    p1: {graveyard: [Stifle]}
+notes: >
+  The +1 is a cost (606.4), paid on activation: loyalty 3 -> 4 before p1 can respond, and it stays after the ability is
+  countered. No emblem is created, so Kaito (a 3/4 Ninja creature on p0's turn) stays 3/4 instead of 4/5. A loyalty
+  ability of Kaito was activated this turn, so neither the 0 (index 2) nor the +1 can be activated again (606.3) even
+  though the stack is empty in p0's main phase. Ability indexes: ninjutsu 0, +1 is 1, 0 is 2 (matches the existing
+  Kaito scenarios). Wrong engines: refunding the loyalty, creating the emblem anyway, or resetting the per-turn
+  loyalty activation when the ability is countered.

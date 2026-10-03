@@ -1,0 +1,80 @@
+id: polluted-delta-finds-island-or-swamp-types-not-mountain
+title: Polluted Delta finds an Island or Swamp card (a basic Swamp is legal even for a blue-red deck), not a Mountain or Plains
+area: card
+cards: [Polluted Delta, Swamp, Island, Mountain, Volcanic Island, Plains]
+tags: [fetchland, search, land-types, thinning]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Polluted Delta @delta"]
+    library: ["Mountain @mtn", "Swamp @sw", "Island @isl", "Volcanic Island @volc", "Plains @pl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@delta", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, purpose: fetch, found: "@sw", expect_options: {include: ["@sw", "@isl", "@volc"], exclude: ["@mtn", "@pl"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Polluted Delta]
+      battlefield: [{card: Swamp, tapped: false}]
+      library_count: 14
+notes: >
+  Nothing restricts the choice to lands the deck can use: a Swamp is a legal find, and so are Island and Volcanic Island (it has the Island subtype).
+  Mountain and Plains must not be offered. Library 5 listed + 10 pad = 15, minus one = 14.
+---
+id: polluted-delta-countered-by-stifle-still-costs-life-and-land
+title: Stifle on the Polluted Delta ability leaves the land sacrificed and life paid but nothing is fetched and the library is not shuffled
+area: card
+cards: [Polluted Delta, Stifle, Island]
+tags: [fetchland, stifle, countering-abilities, costs-are-not-refunded, shuffle, scripted-random]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Polluted Delta, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "602.2b", text: "The remainder of the process for activating an ability is identical to the process for casting a spell listed in rules 601.2b–i.", verified: true}
+random: []
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Polluted Delta @delta"]
+    library: ["Island @isl"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@delta", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@delta", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      battlefield: []
+      graveyard: [Polluted Delta]
+      library_count: 11
+    p1: {graveyard: [Stifle], hand: []}
+notes: >
+  The tap, the 1 life and the sacrifice are costs, paid at activation; countering the ability afterwards does not refund them (602.2b: activation
+  follows the casting procedure). The ability never resolves, so no search happens and, importantly, no shuffle: random is an EMPTY queue, so an
+  engine that shuffles anyway consumes an event the queue does not cover and fails. Stifle targets the ability on the stack, not the land (which is
+  already in the graveyard).

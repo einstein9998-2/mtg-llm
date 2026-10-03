@@ -1,0 +1,4 @@
+#!/bin/sh
+# usage: library_odds [options]   (see README.md)
+D="$(cd "$(dirname "$0")/.." && pwd)"
+PYTHONPATH="$D" exec python3 -m mtgtools library_odds "$@"

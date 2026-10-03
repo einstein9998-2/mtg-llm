@@ -1,0 +1,86 @@
+id: misty-rainforest-is-not-an-island-for-daze-but-can-be-cracked-at-instant-speed
+title: A Misty Rainforest is not an Island, so Daze cannot return it, while its own fetch ability stays available at instant speed
+area: card
+cards: [Misty Rainforest, Daze, Lightning Bolt, Mountain]
+tags: [fetchland, daze, alternative-cost, land-types, instant-speed, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Misty Rainforest, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  priority: p1
+  p0:
+    hand: ["Daze @daze"]
+    battlefield: ["Misty Rainforest @misty"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@daze", alt_cost: {return_island: "@misty"}, targets: ["@bolt"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bolt", controller: p1}]
+    pending: {actor: p0, kind: priority}
+    legal:
+      p0:
+        include: [{t: pass}, {t: activate, source: "@misty", ability: 0}]
+        exclude: [{t: cast, card: "@daze"}]
+    p0: {hand: [Daze], battlefield: [{card: Misty Rainforest, tapped: false}], life: 20}
+notes: >
+  Misty Rainforest has no basic land types (its type line in oracle.json is just "Land"), so it is not an Island and Daze's alternative cost cannot be paid with it. p0 has no
+  mana, so Daze is not castable at all (no cast action offered). The fetch ability, however, is an activated ability of a land: it is legal at
+  instant speed with a spell on the stack, which is why activate stays in the legal set.
+---
+id: misty-rainforest-fetches-hedge-maze-keep-surveil-card
+title: Misty Rainforest fetches Hedge Maze (Forest Island), which enters tapped and surveils the shuffled library; the player may keep the card on top
+area: card
+cards: [Misty Rainforest, Hedge Maze, Island, Ponder]
+tags: [fetchland, search, enters-tapped, surveil, etb-trigger, shuffle, scripted-random]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Misty Rainforest, text: "Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "This land enters tapped.", verified: true}
+  - {kind: oracle, card: Hedge Maze, text: "When this land enters, surveil 1.", verified: true}
+  - {kind: cr, ref: "701.25a", text: "To \"surveil N\" means to look at the top N cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.", verified: true}
+random:
+  - {kind: shuffle, player: p0, result: [Ponder, Island]}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Misty Rainforest @misty"]
+    library: ["Hedge Maze @maze", "Island @isl", "Ponder @pond"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@misty", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, purpose: fetch, found: "@maze"}
+  - check:
+      stack: [{kind: triggered, source: "@maze"}]
+      p0: {library_top: [Ponder, Island], battlefield: [{card: Hedge Maze, tapped: true}]}
+  - resolve_top: true
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@pond"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Misty Rainforest]
+      library_top: [Ponder, Island]
+      library_count: 2
+      battlefield: [{card: Hedge Maze, tapped: true}]
+notes: >
+  Same shape as the Scalding Tarn / Thundering Falls scenario, but the player keeps the surveilled card on top (to_graveyard empty), so the graveyard
+  holds only the sacrificed fetchland. Hedge Maze has the Forest and Island subtypes, so it matches "Forest or Island card". Surveil happens after the
+  shuffle (scripted result Ponder, Island), so the card seen is Ponder.

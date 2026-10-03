@@ -1,0 +1,862 @@
+# Boros Aggro (p1) vs BW Death and Taxes (p2): ETB triggers, replacement effects, evoke/impending, Aether Vial, Spider-Woman, Voice of Victory, Phlage.
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see ../README.md.
+
+=== spider-woman-opponent-creature-enters-tapped
+title: With Spider-Woman out, an opponent's creature (Phelia, flashed in) enters tapped
+ref: Spider-Woman, Stunning Savior Oracle (Venom Blast)
+state:
+  humanbattlefield=Spider-Woman, Stunning Savior
+  aihand=Phelia, Exuberant Shepherd
+  aibattlefield=Plains;Plains
+script:
+  p1: pass
+  p2: cast Phelia, Exuberant Shepherd
+  p2: pass
+  p1: pass
+expect:
+  tapped p2 "Phelia, Exuberant Shepherd"
+
+=== spider-woman-opponent-artifact-enters-tapped
+title: With Spider-Woman out, an opponent's artifact (Aether Vial) enters tapped
+ref: Spider-Woman, Stunning Savior Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Spider-Woman, Stunning Savior
+  aihand=Aether Vial
+  aibattlefield=Plains
+script:
+  p2: cast Aether Vial
+  p2: pass
+  p1: pass
+expect:
+  tapped p2 "Aether Vial"
+
+=== spider-woman-own-creature-untapped
+title: Spider-Woman only taps opponents' creatures: the controller's own creature enters untapped
+ref: Spider-Woman, Stunning Savior Oracle
+state:
+  humanhand=Ocelot Pride
+  humanbattlefield=Spider-Woman, Stunning Savior;Plains
+script:
+  p1: cast Ocelot Pride
+  p1: pass
+  p2: pass
+expect:
+  untapped p1 "Ocelot Pride"
+
+=== spider-woman-aether-vial-creature-enters-tapped
+title: A creature put onto the battlefield with Aether Vial still enters tapped under Spider-Woman
+ref: Spider-Woman, Stunning Savior Oracle; Aether Vial Oracle
+state:
+  humanbattlefield=Spider-Woman, Stunning Savior
+  aihand=Phelia, Exuberant Shepherd
+  aibattlefield=Aether Vial|Counters:CHARGE=2
+script:
+  p2: activate Aether Vial
+  p2: pick Phelia, Exuberant Shepherd
+  p2: pass
+  p1: pass
+expect:
+  controls p2 "Phelia, Exuberant Shepherd"
+  tapped p2 "Phelia, Exuberant Shepherd"
+
+=== aether-vial-cannot-be-countered
+title: A creature put onto the battlefield with Aether Vial uses no stack and cannot be countered
+ref: Aether Vial Oracle; CR 603.3 (ability resolves, creature is never cast)
+state:
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  aihand=Phelia, Exuberant Shepherd
+  aibattlefield=Aether Vial|Counters:CHARGE=2
+script:
+  p2: activate Aether Vial
+  p2: pick Phelia, Exuberant Shepherd
+  p2: pass
+  p1: pass
+expect:
+  controls p2 "Phelia, Exuberant Shepherd"
+  spells p2 == 0
+
+=== aether-vial-wrong-mana-value
+title: Aether Vial with two charge counters offers a mana value 2 creature but not a mana value 3 one
+ref: Aether Vial Oracle
+state:
+  aihand=Skyclave Apparition;Phelia, Exuberant Shepherd
+  aibattlefield=Aether Vial|Counters:CHARGE=2
+script:
+  p2: activate Aether Vial
+  p2: pick !Skyclave Apparition
+  p2: pass
+  p1: pass
+expect:
+  not controls p2 "Skyclave Apparition"
+  controls p2 "Phelia, Exuberant Shepherd"
+
+=== phlage-etb-sacrificed-unless-escaped
+title: Phlage cast from hand deals 3 damage, gains 3 life, then is sacrificed
+ref: Phlage, Titan of Fire's Fury Oracle
+state:
+  humanhand=Phlage, Titan of Fire's Fury
+  humanbattlefield=Mountain;Plains;Plains
+script:
+  p1: cast Phlage, Titan of Fire's Fury
+  p1: pass
+  p2: pass
+  p1: pick p2
+expect:
+  life p2 == 17
+  life p1 == 23
+  zone p1 graveyard has "Phlage, Titan of Fire's Fury"
+  not controls p1 "Phlage, Titan of Fire's Fury"
+
+=== phlage-escape-stays
+title: Phlage cast with escape (exile five other cards) stays on the battlefield
+ref: Phlage, Titan of Fire's Fury Oracle; CR 702.138
+state:
+  humanbattlefield=Mountain;Mountain;Plains;Plains
+  humangraveyard=Phlage, Titan of Fire's Fury;Island;Island;Island;Island;Island
+script:
+  p1: cast Phlage, Titan of Fire's Fury ~escape
+  p1: pick Island;Island;Island;Island;Island
+  p1: pass
+  p2: pass
+  p1: pick p2
+expect:
+  controls p1 "Phlage, Titan of Fire's Fury"
+  life p2 == 17
+  life p1 == 23
+
+=== phlage-escape-needs-five-other-cards
+title: Phlage cannot escape with only four other cards in the graveyard
+ref: Phlage, Titan of Fire's Fury Oracle
+state:
+  humanbattlefield=Mountain;Mountain;Plains;Plains
+  humangraveyard=Phlage, Titan of Fire's Fury;Island;Island;Island;Island
+script:
+  p1: try cast Phlage, Titan of Fire's Fury ~escape
+  p1: pass
+expect:
+  zone p1 graveyard has "Phlage, Titan of Fire's Fury"
+  not controls p1 "Phlage, Titan of Fire's Fury"
+
+=== goblin-bombardment-sacrifice-damage
+title: Goblin Bombardment sacrifices a creature as a cost and deals 1 damage to any target
+ref: Goblin Bombardment Oracle
+state:
+  humanbattlefield=Goblin Bombardment;Ocelot Pride
+script:
+  p1: activate Goblin Bombardment -> p2
+  p1: pick Ocelot Pride
+  p1: pass
+  p2: pass
+expect:
+  life p2 == 19
+  zone p1 graveyard has "Ocelot Pride"
+
+=== goblin-bombardment-in-response-to-removal
+title: Sacrificing a creature to Bombardment in response to Swords means no lifegain from Swords
+ref: Goblin Bombardment Oracle; Swords to Plowshares Oracle (no exile, no life)
+state:
+  humanbattlefield=Goblin Bombardment;Ocelot Pride
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aihand=Swords to Plowshares
+  aibattlefield=Plains
+script:
+  p2: cast Swords to Plowshares -> Ocelot Pride
+  p2: pass
+  p1: when-stack Swords to Plowshares
+  p1: activate Goblin Bombardment -> p2
+  p1: pick Ocelot Pride
+  p1: pass
+  p2: pass
+expect:
+  life p1 == 20
+  life p2 == 19
+  zone p1 graveyard has "Ocelot Pride"
+
+=== voice-of-victory-blocks-opponent-spells-on-my-turn
+title: Voice of Victory stops the opponent casting spells during its controller's turn (Solitude evoke is refused)
+ref: Voice of Victory Oracle
+state:
+  humanbattlefield=Voice of Victory
+  aihand=Solitude;Skyclave Apparition
+  aibattlefield=Plains;Plains;Plains;Plains;Plains
+script:
+  p2: try cast Solitude
+  p2: pass
+  p1: pass
+expect:
+  controls p1 "Voice of Victory"
+  zone p2 hand has "Solitude"
+
+=== voice-of-victory-allows-spells-on-opponents-turn
+title: Voice of Victory does not stop the opponent casting spells during the opponent's own turn
+ref: Voice of Victory Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Voice of Victory
+  aihand=Skyclave Apparition
+  aibattlefield=Plains;Plains;Plains
+script:
+  p2: cast Skyclave Apparition
+  p2: pass
+  p1: pass
+  p2: pick Voice of Victory
+expect:
+  controls p2 "Skyclave Apparition"
+  zone p1 exile has "Voice of Victory"
+
+=== voice-of-victory-mobilize
+title: Voice of Victory attacks with two tapped and attacking 1/1 Warrior tokens that are sacrificed at end step
+ref: Voice of Victory Oracle; CR 702.181
+state:
+  humanbattlefield=Voice of Victory
+script:
+  p1: at COMBAT_BEGIN
+  p1: attack Voice of Victory -> p2
+  p1: at COMBAT_DAMAGE
+  p1: check controls p1 "Warrior Token"
+  p1: at END_OF_TURN
+  p1: pass
+  p2: pass
+expect:
+  life p2 == 17
+  not controls p1 "Warrior Token"
+
+=== ocelot-pride-end-step-cat
+title: Ocelot Pride makes a 1/1 Cat at your end step if you gained life this turn
+ref: Ocelot Pride Oracle
+state:
+  humanbattlefield=Ocelot Pride
+  humanhand=Lightning Bolt
+  turn=3
+script:
+  p1: at END_OF_TURN
+  p1: pass
+  p2: pass
+expect:
+  not controls p1 "Cat Token"
+
+=== ocelot-pride-with-lifegain
+title: Ocelot Pride creates a Cat at end step after lifegain (Phlage's 3 life)
+ref: Ocelot Pride Oracle
+state:
+  humanbattlefield=Ocelot Pride;Mountain;Plains;Plains
+  humanhand=Phlage, Titan of Fire's Fury
+script:
+  p1: cast Phlage, Titan of Fire's Fury
+  p1: pass
+  p2: pass
+  p1: pick p2
+  p1: at END_OF_TURN
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Cat Token"
+
+=== ocelot-pride-city-blessing-copies-tokens
+title: With the city's blessing Ocelot Pride copies each token that entered this turn (Guide of Souls gives the lifegain, Ajani makes a token)
+ref: Ocelot Pride Oracle; CR 702.131 (ascend)
+state:
+  humanbattlefield=Ocelot Pride;Guide of Souls;Plains;Plains;Plains;Plains;Plains;Plains;Plains;Plains
+  humanhand=Ajani, Nacatl Pariah
+  turn=3
+script:
+  p1: cast Ajani, Nacatl Pariah
+  p1: pass
+  p2: pass
+  p1: at END_OF_TURN
+  p1: pass
+  p2: pass
+expect:
+  zone p1 battlefield count "Cat Warrior Token" == 2
+  zone p1 battlefield count "Cat Token" == 2
+
+=== ajani-etb-token
+title: Ajani, Nacatl Pariah makes a 2/1 Cat Warrior token when it enters
+ref: Ajani, Nacatl Pariah Oracle
+state:
+  humanhand=Ajani, Nacatl Pariah
+  humanbattlefield=Plains;Plains
+script:
+  p1: cast Ajani, Nacatl Pariah
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Cat Warrior Token"
+  pt p1 "Cat Warrior Token" 2/1
+
+=== ajani-flips-when-cat-dies
+title: Ajani transforms into a planeswalker when another Cat you control dies
+ref: Ajani, Nacatl Pariah Oracle
+state:
+  humanhand=Ajani, Nacatl Pariah
+  humanbattlefield=Goblin Bombardment;Plains;Plains
+script:
+  p1: cast Ajani, Nacatl Pariah
+  p1: pass
+  p2: pass
+  p1: wait-empty
+  p1: activate Goblin Bombardment -> p2
+  p1: pick Cat Warrior Token
+  p1: pass
+  p2: pass
+  p1: pick yes
+expect:
+  controls p1 "Ajani, Nacatl Avenger"
+
+=== sand-scout-fetches-desert
+title: Sand Scout fetches a Desert (Lazotep Quarry) tapped when an opponent controls more lands
+ref: Sand Scout Oracle
+state:
+  humanhand=Sand Scout
+  humanbattlefield=Plains;Plains
+  humanlibrary=Lazotep Quarry;Island;Island
+  aibattlefield=Plains;Plains;Plains
+script:
+  p1: cast Sand Scout
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Lazotep Quarry"
+  tapped p1 "Lazotep Quarry"
+
+=== sand-scout-no-fetch-when-not-behind
+title: Sand Scout does not fetch when the opponent does not control more lands
+ref: Sand Scout Oracle (intervening if)
+state:
+  humanhand=Sand Scout
+  humanbattlefield=Plains;Plains
+  humanlibrary=Lazotep Quarry;Island;Island
+  aibattlefield=Plains;Plains
+script:
+  p1: cast Sand Scout
+  p1: pass
+  p2: pass
+expect:
+  not controls p1 "Lazotep Quarry"
+
+=== sand-scout-wasteland-makes-token
+title: Sand Scout makes a Sand Warrior when a land card goes to your graveyard (sacrificed Wasteland)
+ref: Sand Scout Oracle
+state:
+  humanbattlefield=Sand Scout;Wasteland
+  aibattlefield=Tundra
+script:
+  p1: activate Wasteland ~Destroy -> Tundra
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Sand Warrior Token"
+  zone p2 graveyard has "Tundra"
+
+=== sand-scout-triggers-once-per-turn
+title: Sand Scout's token trigger happens only once each turn even if two lands hit the graveyard
+ref: Sand Scout Oracle
+state:
+  humanbattlefield=Sand Scout;Wasteland;Wasteland
+  aibattlefield=Tundra;Scrubland
+script:
+  p1: activate Wasteland ~Destroy -> Tundra
+  p1: pass
+  p2: pass
+  p1: activate Wasteland ~Destroy -> Scrubland
+  p1: pass
+  p2: pass
+expect:
+  zone p1 battlefield count "Sand Warrior Token" == 1
+
+=== guide-of-souls-lifegain-and-energy
+title: Guide of Souls gains 1 life and an energy counter when another creature enters
+ref: Guide of Souls Oracle
+state:
+  humanbattlefield=Guide of Souls;Plains;Plains
+  humanhand=Ocelot Pride
+script:
+  p1: cast Ocelot Pride
+  p1: pass
+  p2: pass
+expect:
+  life p1 == 21
+  log has "energy"
+
+=== amped-raptor-free-spell-from-top
+title: Amped Raptor cast from hand exiles from the top until a nonland and may cast it paying energy equal to its mana value
+ref: Amped Raptor Oracle
+state:
+  humanhand=Amped Raptor
+  humanbattlefield=Mountain;Mountain
+  humanlibrary=Island;Lightning Bolt;Island;Island
+script:
+  p1: cast Amped Raptor
+  p1: pass
+  p2: pass
+  p1: pick Lightning Bolt
+  p1: pick p2
+expect:
+  life p2 == 17
+  zone p1 exile has "Island"
+  zone p1 graveyard has "Lightning Bolt"
+
+=== karakas-bounces-legendary
+title: Karakas returns a legendary creature (Samwise) to its owner's hand
+ref: Karakas Oracle
+state:
+  humanbattlefield=Karakas
+  aibattlefield=Samwise the Stouthearted
+script:
+  p1: activate Karakas ~Return -> Samwise the Stouthearted
+  p1: pass
+  p2: pass
+expect:
+  zone p2 hand has "Samwise the Stouthearted"
+
+=== karakas-cannot-bounce-nonlegendary
+title: Karakas cannot target a nonlegendary creature (Ocelot Pride)
+ref: Karakas Oracle
+state:
+  humanbattlefield=Karakas
+  aibattlefield=Ocelot Pride
+script:
+  p1: try activate Karakas ~Return -> Ocelot Pride
+  p1: pass
+expect:
+  controls p2 "Ocelot Pride"
+  untapped p1 "Karakas"
+
+=== elegant-parlor-enters-tapped
+title: Elegant Parlor enters tapped and surveils 1
+ref: Elegant Parlor Oracle
+state:
+  humanhand=Elegant Parlor
+  humanlibrary=Island;Plains;Plains
+script:
+  p1: play Elegant Parlor
+  p1: pick Island
+  p1: pass
+  p2: pass
+expect:
+  tapped p1 "Elegant Parlor"
+  zone p1 graveyard has "Island"
+
+=== solitude-etb-exile-and-lifegain
+title: Solitude cast normally exiles a creature, whose controller gains life equal to its power, and stays on the battlefield with lifelink
+ref: Solitude Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Ocelot Pride
+  aihand=Solitude
+  aibattlefield=Plains;Plains;Plains;Plains;Plains
+script:
+  p2: cast Solitude
+  p2: pass
+  p1: pass
+  p2: pick Ocelot Pride
+expect:
+  zone p1 exile has "Ocelot Pride"
+  life p1 == 21
+  controls p2 "Solitude"
+
+=== solitude-evoke-exiles-and-sacrifices
+title: Evoked Solitude exiles a white card from hand, its ETB exiles a creature, and it is sacrificed
+ref: Solitude Oracle; CR 702.74 (evoke)
+state:
+  humanbattlefield=Ocelot Pride
+  aihand=Solitude;Swords to Plowshares
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+script:
+  p2: cast Solitude ~Evoke
+  p2: pick Swords to Plowshares
+  p2: pass
+  p1: pass
+  p2: pick Ocelot Pride
+expect:
+  zone p1 exile has "Ocelot Pride"
+  zone p2 exile has "Swords to Plowshares"
+  zone p2 graveyard has "Solitude"
+  not controls p2 "Solitude"
+
+=== solitude-evoke-needs-other-white-card
+title: Solitude's evoke cost cannot exile Solitude itself and needs another white card
+ref: Solitude Oracle
+state:
+  humanbattlefield=Ocelot Pride
+  aihand=Solitude;Lightning Bolt
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+script:
+  p2: try cast Solitude ~Evoke
+  p2: pass
+expect:
+  zone p2 hand has "Solitude"
+
+=== skyclave-apparition-exiles-and-leaves-illusion
+title: Skyclave Apparition exiles a mana value 3 permanent; when it leaves, the owner gets a 3/3 Illusion token
+ref: Skyclave Apparition Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Ocelot Pride;Goblin Bombardment
+  aihand=Skyclave Apparition
+  aibattlefield=Plains;Plains;Plains
+script:
+  p2: cast Skyclave Apparition
+  p2: pass
+  p1: pass
+  p2: pick Goblin Bombardment
+expect:
+  zone p1 exile has "Goblin Bombardment"
+
+=== skyclave-apparition-mana-value-cap
+title: Skyclave Apparition cannot exile a permanent with mana value 5 or more
+ref: Skyclave Apparition Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Omniscience
+  aihand=Skyclave Apparition
+  aibattlefield=Plains;Plains;Plains
+script:
+  p2: cast Skyclave Apparition
+  p2: pass
+  p1: pass
+  p2: pick !Omniscience
+expect:
+  controls p1 "Omniscience"
+
+=== skyclave-apparition-leaves-gives-token
+title: When Skyclave Apparition dies, the exiled card's owner creates an X/X Illusion where X is its mana value
+ref: Skyclave Apparition Oracle
+state:
+  humanbattlefield=Goblin Bombardment
+  humanhand=Lightning Bolt
+  humanbattlefield=Mountain
+  aibattlefield=Skyclave Apparition
+script:
+  p1: cast Lightning Bolt -> Skyclave Apparition
+  p1: pass
+  p2: pass
+expect:
+  zone p2 graveyard has "Skyclave Apparition"
+
+=== flickerwisp-returns-at-end-step
+title: Flickerwisp exiles another target permanent, which returns at the beginning of the next end step
+ref: Flickerwisp Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Plains|Tapped
+  aihand=Flickerwisp
+  aibattlefield=Plains;Plains;Plains
+script:
+  p2: cast Flickerwisp
+  p2: pass
+  p1: pass
+  p2: pick Plains@p1
+  p2: at END_OF_TURN
+  p2: pass
+  p1: pass
+expect:
+  controls p1 "Plains"
+  untapped p1 "Plains"
+
+=== flickerwisp-exiled-token-gone
+title: A token (Orc Army) exiled by Flickerwisp ceases to exist and does not return
+ref: Flickerwisp Oracle; CR 111.7
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aihand=Flickerwisp;Orcish Bowmasters
+  aibattlefield=Plains;Plains;Plains;Swamp;Swamp
+script:
+  p2: cast Orcish Bowmasters
+  p2: pass
+  p1: pass
+  p2: pick p1
+  p2: wait-empty
+  p2: cast Flickerwisp
+  p2: pass
+  p1: pass
+  p2: pick Orc Army Token
+  p2: at END_OF_TURN
+  p2: pass
+  p1: pass
+expect:
+  not controls p2 "Orc Army Token"
+
+=== flickerwisp-on-skyclave-returns-card
+title: Flickering Skyclave Apparition's exiled card: the old exile does not return; the Apparition's leave trigger gives an Illusion
+ref: Skyclave Apparition Oracle; Flickerwisp Oracle (rulings: the card exiled by the first ETB is not returned, X/X token created)
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Goblin Bombardment
+  aihand=Flickerwisp
+  aibattlefield=Skyclave Apparition|Exiled;Plains;Plains;Plains
+script:
+  p2: cast Flickerwisp
+  p2: pass
+  p1: pass
+  p2: pick Skyclave Apparition
+expect:
+  controls p2 "Flickerwisp"
+
+=== cloak-and-dagger-exiles-nonland-until-leaves
+title: Cloak and Dagger exiles a nonland card from the opponent's hand until it leaves the battlefield
+ref: Cloak and Dagger, Entwined Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanhand=Lightning Bolt;Mountain
+  aihand=Cloak and Dagger, Entwined
+  aibattlefield=Plains;Swamp;Plains
+script:
+  p2: cast Cloak and Dagger, Entwined
+  p2: pass
+  p1: pass
+  p2: pick p1
+  p2: pick p2
+  p2: pick Lightning Bolt
+expect:
+  zone p1 exile has "Lightning Bolt"
+  zone p1 hand has "Mountain"
+
+=== cloak-and-dagger-returns-card-when-removed
+title: When Cloak and Dagger leaves the battlefield the exiled card returns to its owner's hand
+ref: Cloak and Dagger, Entwined Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanhand=Lightning Bolt;Swords to Plowshares
+  humanbattlefield=Plains
+  aihand=Cloak and Dagger, Entwined
+  aibattlefield=Plains;Swamp;Plains
+script:
+  p2: cast Cloak and Dagger, Entwined
+  p2: pass
+  p1: pass
+  p2: pick p1
+  p2: pick p2
+  p2: pick Lightning Bolt
+  p2: pass
+  p1: wait-empty
+  p1: cast Swords to Plowshares -> Cloak and Dagger, Entwined
+  p1: pass
+  p2: pass
+expect:
+  zone p1 hand has "Lightning Bolt"
+  zone p1 exile lacks "Lightning Bolt"
+
+=== overlord-impending-is-not-a-creature
+title: Overlord of the Balemurk cast for its impending cost enters as a non-creature with five time counters
+ref: Overlord of the Balemurk Oracle; CR 702.176 (impending)
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aihand=Overlord of the Balemurk
+  aibattlefield=Swamp;Swamp
+script:
+  p2: cast Overlord of the Balemurk ~impending
+  p2: pass
+  p1: pass
+expect:
+  controls p2 "Overlord of the Balemurk"
+  notcreature p2 "Overlord of the Balemurk"
+  counters p2 "Overlord of the Balemurk" TIME == 5
+
+=== overlord-etb-mills-four-and-returns-creature
+title: Overlord of the Balemurk mills four and may return a creature card (not an Avatar) to hand
+ref: Overlord of the Balemurk Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aihand=Overlord of the Balemurk
+  aibattlefield=Swamp;Swamp
+  ailibrary=Phelia, Exuberant Shepherd;Island;Island;Island;Island;Island
+script:
+  p2: cast Overlord of the Balemurk ~impending
+  p2: pass
+  p1: pass
+  p2: pick Phelia, Exuberant Shepherd
+expect:
+  zone p2 hand has "Phelia, Exuberant Shepherd"
+  zone p2 graveyard size == 3
+
+=== overlord-time-counter-removed-end-step
+title: Impending Overlord loses a time counter at the beginning of its controller's end step
+ref: Overlord of the Balemurk Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aihand=Overlord of the Balemurk
+  aibattlefield=Swamp;Swamp
+script:
+  p2: cast Overlord of the Balemurk ~impending
+  p2: pass
+  p1: pass
+  p2: at END_OF_TURN
+  p2: pass
+  p1: pass
+expect:
+  counters p2 "Overlord of the Balemurk" TIME == 4
+
+=== samwise-returns-permanent-that-died-this-turn
+title: Samwise returns a permanent card put into your graveyard from the battlefield this turn, then the Ring tempts you
+ref: Samwise the Stouthearted Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Mountain
+  humanhand=Lightning Bolt
+  aihand=Samwise the Stouthearted
+  aibattlefield=Phelia, Exuberant Shepherd;Plains;Plains
+script:
+  p2: pass
+  p1: cast Lightning Bolt -> Phelia, Exuberant Shepherd
+  p1: pass
+  p2: pass
+  p2: cast Samwise the Stouthearted
+  p2: pass
+  p1: pass
+  p2: pick Phelia, Exuberant Shepherd
+expect:
+  zone p2 hand has "Phelia, Exuberant Shepherd"
+  log has "Ring"
+
+=== samwise-ignores-cards-not-from-battlefield
+title: Samwise cannot return a card that went to the graveyard from hand (discarded) this turn
+ref: Samwise the Stouthearted Oracle ("put there from the battlefield this turn")
+state:
+  humanhand=Thoughtseize
+  humanbattlefield=Swamp
+  aihand=Samwise the Stouthearted;Phelia, Exuberant Shepherd
+  aibattlefield=Plains;Plains
+script:
+  p1: cast Thoughtseize -> p2
+  p1: pass
+  p2: pass
+  p1: pick Phelia, Exuberant Shepherd
+  p1: pass
+  p2: cast Samwise the Stouthearted
+  p2: pass
+  p1: pass
+  p2: pick !Phelia, Exuberant Shepherd
+expect:
+  zone p2 graveyard has "Phelia, Exuberant Shepherd"
+
+=== white-orchid-phantom-destroys-nonbasic
+title: White Orchid Phantom destroys a nonbasic land; the land's controller may fetch a basic tapped
+ref: White Orchid Phantom Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Plateau
+  humanlibrary=Plains;Mountain;Mountain
+  aihand=White Orchid Phantom
+  aibattlefield=Plains;Plains
+script:
+  p2: cast White Orchid Phantom
+  p2: pass
+  p1: pass
+  p2: pick Plateau
+  p1: pick Plains
+expect:
+  zone p1 graveyard has "Plateau"
+  controls p1 "Plains"
+  tapped p1 "Plains"
+
+=== white-orchid-phantom-cannot-target-basic
+title: White Orchid Phantom cannot target a basic land
+ref: White Orchid Phantom Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Plains
+  aihand=White Orchid Phantom
+  aibattlefield=Plains;Plains
+script:
+  p2: cast White Orchid Phantom
+  p2: pass
+  p1: pass
+  p2: pick !Plains
+expect:
+  controls p1 "Plains"
+
+=== recruiter-of-the-guard-finds-toughness-two
+title: Recruiter of the Guard searches for a creature with toughness 2 or less and puts it into hand
+ref: Recruiter of the Guard Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aihand=Recruiter of the Guard
+  aibattlefield=Plains;Plains;Plains
+  ailibrary=Overlord of the Balemurk;Phelia, Exuberant Shepherd;Island;Island
+script:
+  p2: cast Recruiter of the Guard
+  p2: pass
+  p1: pass
+  p2: pick !Overlord of the Balemurk
+expect:
+  zone p2 hand has "Phelia, Exuberant Shepherd"
+
+=== witch-enchanter-destroys-artifact
+title: Witch Enchanter destroys target artifact an opponent controls
+ref: Witch Enchanter Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Mishra's Bauble
+  aihand=Witch Enchanter
+  aibattlefield=Plains;Plains;Plains;Plains
+script:
+  p2: cast Witch Enchanter
+  p2: pass
+  p1: pass
+  p2: pick Mishra's Bauble
+expect:
+  zone p1 graveyard has "Mishra's Bauble"
+
+=== boggart-trawler-exiles-graveyard
+title: Boggart Trawler's ETB exiles target player's graveyard
+ref: Boggart Trawler Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humangraveyard=Lightning Bolt;Island;Phlage, Titan of Fire's Fury
+  aihand=Boggart Trawler
+  aibattlefield=Swamp;Swamp;Swamp
+script:
+  p2: cast Boggart Trawler
+  p2: pass
+  p1: pass
+  p2: pick p1
+expect:
+  zone p1 graveyard size == 0
+  zone p1 exile size == 3

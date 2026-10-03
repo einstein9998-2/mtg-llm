@@ -1,0 +1,6 @@
+# Recorded reviews of layered-effect pairs flagged by `depsscan` (doc 01 section 10.4).
+# Format: <Card A> | <Card B> | <layer> | <verdict and reason>   (cards in alphabetical order)
+# A pair listed here is judged independent under timestamp-only evaluation (layers stage 1).
+# Review 2026-10-01 (implementer; a second reader should confirm before the core freeze).
+Kaito, Bane of Nightmares | Magus of the Moon | L4 | independent: Kaito's type change applies only to Kaito, a planeswalker that is never a land, and Magus applies only to nonbasic lands; neither changes whether the other applies. Breaks only if a pool card could make Kaito a land or make a land a Kaito.
+Magus of the Moon | Overlord of the Balemurk | L4 | independent: Overlord's "isn't a creature while it has time counters" applies only to itself, never a land; Magus's affected set (nonbasic lands) and result (Mountain, no abilities) are the same in either order.

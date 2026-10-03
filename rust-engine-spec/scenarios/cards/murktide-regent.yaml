@@ -1,0 +1,176 @@
+id: murktide-delve-all-five-counters-for-instants-and-sorceries-only
+title: Murktide Regent delving five cards enters with one counter per instant and sorcery card exiled with it (3 of 5 here), as a 6/6 flyer
+area: card
+cards: [Murktide Regent, Island, Lightning Bolt, Brainstorm, Ponder, Dragon's Rage Channeler]
+tags: [murktide, delve, counters, card-types, additional-cost-vs-delve]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Murktide Regent, text: "Delve (Each card you exile from your graveyard while casting this spell pays for {1}.)", verified: true}
+  - {kind: oracle, card: Murktide Regent, text: "This creature enters with a +1/+1 counter on it for each instant and sorcery card exiled with it.", verified: true}
+  - {kind: cr, ref: "702.66a", text: "Delve is a static ability that functions while the spell with delve is on the stack. \"Delve\" means \"For each generic mana in this spell's total cost, you may exile a card from your graveyard rather than pay that mana.\"", verified: true}
+  - {kind: cr, ref: "702.66b", text: "The delve ability isn't an additional or alternative cost and applies only after the total cost of the spell with delve is determined.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mur"]
+    battlefield: ["Island @i1", "Island @i2"]
+    graveyard: ["Lightning Bolt @g1", "Brainstorm @g2", "Ponder @g3", "Island @g4", "Dragon's Rage Channeler @g5"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mur", delve: ["@g1", "@g2", "@g3", "@g4", "@g5"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@mur", controller: p0}]
+      p0:
+        graveyard: []
+        exile: [Lightning Bolt, Brainstorm, Ponder, Island, Dragon's Rage Channeler]
+        battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: []
+      exile: [Lightning Bolt, Brainstorm, Ponder, Island, Dragon's Rage Channeler]
+      battlefield:
+        - {card: Murktide Regent, counters: {"+1/+1": 3}, pt: [6, 6], keywords: [flying], types: [Creature]}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  Total cost {5}{U}{U}: five exiled cards pay all of {5}, the two Islands pay {U}{U}. Of the five exiled cards, Lightning Bolt and Brainstorm are instants
+  and Ponder is a sorcery (3 counters); the Island and the Dragon's Rage Channeler give nothing. Base 3/3 plus 3 counters is 6/6. A wrong engine counts
+  every exiled card (8/8) or only counts after the spell resolves from the graveyard.
+---
+id: murktide-no-counter-when-creature-card-leaves-graveyard
+title: Exiling a creature card from p0's graveyard does not trigger Murktide Regent
+area: card
+cards: [Murktide Regent, Dragon's Rage Channeler, Island, Surgical Extraction, Swamp]
+tags: [murktide, leaves-graveyard, card-types, surgical-extraction, negative-case, phyrexian-mana]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Murktide Regent, text: "Whenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on this creature.", verified: true}
+  - {kind: oracle, card: Surgical Extraction, text: "({B/P} can be paid with either {B} or 2 life.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Murktide Regent @mur"]
+    graveyard: ["Dragon's Rage Channeler @gd", "Island @gi"]
+    library_pad: 10
+  p1:
+    hand: ["Surgical Extraction @surg"]
+    battlefield: ["Swamp @sw"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@surg", phyrexian: [mana], targets: ["@gd"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: search, purpose: surgical_extraction, found: ["@gd"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Murktide Regent, counters: {}, pt: [3, 3]}]
+      graveyard: [Island]
+      exile: [Dragon's Rage Channeler]
+    p1: {life: 20, graveyard: [Surgical Extraction], battlefield: [{card: Swamp, tapped: true}]}
+notes: >
+  The exiled card is a creature card, not an instant or sorcery, so Murktide does not trigger (stack stays empty and the creature is still 3/3). p1
+  paid {B/P} with Swamp mana, so life stays 20. The counters: {} descriptor means no +1/+1 counters.
+---
+id: murktide-delve-can-switch-off-own-dragons-rage-channeler-delirium
+title: Delving away the graveyard while casting Murktide Regent immediately ends Dragon's Rage Channeler's delirium
+area: card
+cards: [Murktide Regent, Dragon's Rage Channeler, Lightning Bolt, Ponder, Mishra's Bauble, Island]
+tags: [murktide, drc, delirium, delve, interaction, card-types]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: oracle, card: Murktide Regent, text: "Delve (Each card you exile from your graveyard while casting this spell pays for {1}.)", verified: true}
+  - {kind: cr, ref: "702.66a", text: "Delve is a static ability that functions while the spell with delve is on the stack. \"Delve\" means \"For each generic mana in this spell's total cost, you may exile a card from your graveyard rather than pay that mana.\"", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mur"]
+    battlefield: ["Dragon's Rage Channeler @drc", "Island @i1", "Island @i2", "Island @i3"]
+    graveyard: ["Lightning Bolt @g1", "Ponder @g2", "Mishra's Bauble @g3", "Island @g4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: Dragon's Rage Channeler, pt: [3, 3], keywords: [flying]}]}
+  - p0: {t: cast, card: "@mur", delve: ["@g1", "@g2", "@g3", "@g4"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@mur"}]
+      p0:
+        graveyard: []
+        battlefield_contains: [{card: Dragon's Rage Channeler, pt: [1, 1], keywords_exclude: [flying]}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: [Lightning Bolt, Ponder, Mishra's Bauble, Island]
+      graveyard: []
+      battlefield:
+        - {card: Dragon's Rage Channeler, pt: [1, 1]}
+        - {card: Murktide Regent, counters: {"+1/+1": 2}, pt: [5, 5]}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  Before the cast the graveyard has instant, sorcery, artifact and land (delirium: DRC is a 3/3 flyer). Exiling all four cards as part of casting
+  empties the graveyard, so the very next state check shows DRC as a 1/1 without flying. Murktide is a creature spell, so DRC does not surveil.
+  Remaining cost after delving four is {1}{U}{U}: all three Islands tap. Counters: Lightning Bolt and Ponder give 2, so 5/5.
+---
+id: murktide-countered-by-daze-delved-cards-stay-exiled
+title: A Daze-countered Murktide Regent goes to the graveyard but the cards exiled for delve stay exiled
+area: card
+cards: [Murktide Regent, Daze, Island, Lightning Bolt, Brainstorm, Ponder, Dragon's Rage Channeler]
+tags: [murktide, delve, daze, counter-unless-pay, costs-are-not-refunded, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "702.66b", text: "The delve ability isn't an additional or alternative cost and applies only after the total cost of the spell with delve is determined.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @mur"]
+    battlefield: ["Island @i1", "Island @i2"]
+    graveyard: ["Lightning Bolt @g1", "Brainstorm @g2", "Ponder @g3", "Island @g4", "Dragon's Rage Channeler @g5"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mur", delve: ["@g1", "@g2", "@g3", "@g4", "@g5"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@mur"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Murktide Regent]
+      exile: [Lightning Bolt, Brainstorm, Ponder, Island, Dragon's Rage Channeler]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1: {hand: [Island], graveyard: [Daze]}
+notes: >
+  Delve exiled five cards as a cost while casting and both Islands paid {U}{U}, leaving p0 with no untapped mana: Daze's payment is impossible, so
+  there is no prompt and Murktide is countered. Exiled cards do not return. Murktide itself lands in the graveyard.

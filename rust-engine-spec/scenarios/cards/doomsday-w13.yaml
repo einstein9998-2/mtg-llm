@@ -1,0 +1,47 @@
+id: doomsday-pile-from-library-and-graveyard-chosen-then-ordered
+title: Doomsday takes five cards from library and graveyard, exiles the rest of both, stacks the five in the chosen order and halves life rounded up
+area: card
+cards: [Doomsday, Swamp, "Thassa's Oracle", Brainstorm, Ponder, Island, Lightning Bolt, Dark Ritual, Force of Will, Consider]
+tags: [doomsday, search, choose-cards, order-cards, library-order, life-loss, rounding]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Doomsday, text: "Search your library and graveyard for five cards and exile the rest. Put the chosen cards on top of your library in any order. You lose half your life, rounded up.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it’s a hidden zone) and find a card that matches the given description.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 15
+    hand: ["Doomsday @dd"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    graveyard: ["Consider @cs", "Swamp @gs"]
+    library: ["Thassa's Oracle @to", "Brainstorm @bs", "Ponder @po", "Island @i1", "Island @i2", "Lightning Bolt @lb", "Dark Ritual @dr", "Force of Will @fw"]
+  p1:
+    library_pad: 10
+random: []
+script:
+  - p0: {t: cast, card: "@dd", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: doomsday_pile, answer: ["@to", "@bs", "@po", "@cs", "@lb"], expect_options: {include: ["@to", "@bs", "@po", "@i1", "@i2", "@lb", "@dr", "@fw", "@cs", "@gs"]}}
+  - p0: {decision: order_cards, purpose: doomsday_order, answer: ["@po", "@bs", "@lb", "@cs", "@to"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 7
+      library_count: 5
+      library_top: [Ponder, Brainstorm, Lightning Bolt, Consider, "Thassa's Oracle"]
+      graveyard: [Doomsday]
+      exile: [Island, Island, Dark Ritual, Force of Will, Swamp]
+      hand: []
+      battlefield: [{card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}]
+notes: >
+  The five cards may come from both zones (Consider is taken from the graveyard). Everything else in the library and
+  graveyard is exiled; Doomsday itself is on the stack while resolving and goes to the graveyard afterwards, so it is
+  the only card left there. The pile is one unordered pick of five (the Forge harness picks one at a time; the runner
+  adapter owns the shape), then an explicit order decision, answer top first. Life 15, half is 7.5, rounded up to 8:
+  15 - 8 = 7. No shuffle happens (random: []). A wrong engine shuffles, leaves the rest of the graveyard, ignores
+  graveyard cards, or rounds down.

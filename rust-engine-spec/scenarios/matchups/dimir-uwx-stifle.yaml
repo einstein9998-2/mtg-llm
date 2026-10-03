@@ -1,0 +1,217 @@
+id: mu-uwx-stifle-bowmasters-enter-trigger-draw-triggers-still-work
+title: UWx Stifles Bowmasters' enter trigger (no ping, no Army), then its own Brainstorm draws three cards and each draw triggers the same Bowmasters
+area: matchup
+cards: [Stifle, Orcish Bowmasters, Brainstorm, Ponder, Force of Will, Swords to Plowshares, Tundra, Volcanic Island, Underground Sea, Swamp]
+tags: [matchup, dimir-vs-uwx, stifle, bowmasters, etb-trigger, draw-trigger, counter-ability, flash, amass, multiple-triggers]
+derived_from: cr
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "121.2", text: "Cards may only be drawn one at a time. If a player is instructed to draw multiple cards, that player performs that many individual card draws.", verified: true}
+  - {kind: cr, ref: "603.2c", text: "An ability triggers only once each time its trigger event occurs. However, it can trigger repeatedly if one event contains multiple occurrences.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+  - {kind: cr, ref: "701.47a", text: "If you don’t control an Army creature, create a 0/0 black [subtype] Army creature token. Choose an Army creature you control. Put N +1/+1 counters on that creature.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Orcish Bowmasters @bow"]
+    battlefield: ["Underground Sea @us1", "Swamp @sw1"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Stifle @st"]
+    battlefield: ["Tundra @t1", "Volcanic Island @v1"]
+    library: ["Ponder @a", "Force of Will @b", "Swords to Plowshares @c"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bs", pay: {tap: ["@t1"]}}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bow", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack: [{kind: spell, card: "@bs", controller: p1}, {kind: triggered, source: "@bow", controller: p0}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: cast, card: "@st", targets: [{trigger_of: "@bow"}], pay: {tap: ["@v1"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bs", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p1: {life: 20}
+      p0: {battlefield: [{card: Orcish Bowmasters}, {card: Underground Sea, tapped: true}, {card: Swamp, tapped: true}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: put_back, answer: ["@a", "@c"]}
+  - p1: {decision: order_cards, purpose: put_back, answer: ["@a", "@c"]}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack:
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+      pending: {actor: p1, kind: priority}
+      p1: {hand: [Force of Will], graveyard: [Brainstorm, Stifle]}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 17
+      hand: [Force of Will]
+      library_top: [Ponder, Swords to Plowshares]
+      graveyard: [Brainstorm, Stifle]
+    p0:
+      battlefield:
+        - {card: Orcish Bowmasters, pt: [1, 1]}
+        - {card: Underground Sea, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {token: Orc Army Token, controller: p0, counters: {"+1/+1": 3}, pt: [3, 3]}
+notes: >
+  Stifle counters only the enter trigger: no damage and no amass, so after it p0 still has no Army. The Bowmasters'
+  other ability is unaffected. Brainstorm makes p1 draw three cards one at a time (121.2), each a separate draw outside
+  p1's draw step, so Bowmasters triggers three times; the triggers wait until Brainstorm finishes (put-back first), then
+  p0 targets each as it goes on the stack. The three triggers are identical (same source, same text), so by the design
+  convention in core apnap-and-trigger-ordering no order_triggers decision is raised; all three target p1 so the order
+  cannot matter. The first resolution creates the Army with one counter, the next two add counters (one Army, no real
+  choice). p1 20 -> 17, Army 3/3. Bugs caught: Stifle "turning off" the creature, one trigger for a three-card draw,
+  amass happening on the countered trigger.
+---
+id: mu-uwx-stifle-own-warp-exile-trigger-riddler-stays
+title: UWx warps Quantum Riddler and Stifles its own warp exile trigger at the end step; Riddler stays on the battlefield into the next turn
+area: matchup
+cards: [Quantum Riddler, Stifle, Ponder, Swords to Plowshares, Tundra, Volcanic Island, Underground Sea]
+tags: [matchup, dimir-vs-uwx, stifle, warp, delayed-trigger, end-step, counter-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "Warp {1}{U}", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "702.185a", text: "If this spell’s warp cost was paid, exile the permanent this spell becomes at the beginning of the next end step.", verified: true}
+  - {kind: cr, ref: "603.7b", text: "A delayed triggered ability will trigger only once—the next time its trigger event occurs—unless it has a stated duration, such as “this turn.”", verified: true}
+  - {kind: cr, ref: "603.7d", text: "The controller of that delayed triggered ability is the player who controlled that spell as it resolved.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Quantum Riddler @qr", "Stifle @st", "Ponder @pd"]
+    battlefield: ["Tundra @t1", "Tundra @t2", "Volcanic Island @v1"]
+    library: ["Swords to Plowshares @c1"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@qr", alt_cost: {warp: true}, pay: {tap: ["@t1", "@t2"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [{kind: triggered, source: "@qr", controller: p1}], pending: {actor: p1, kind: priority}}
+  - resolve_top: true
+  - check: {stack: [], p1: {hand: [Stifle, Ponder, Swords to Plowshares]}}
+  - advance: {to: end, of: p1}
+  - check:
+      stack: [{kind: triggered, controller: p1, text_contains: "exile"}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: cast, card: "@st", targets: [{trigger_of: "@qr", text_contains: "exile"}], pay: {tap: ["@v1"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      phase: end
+      p1: {exile: [], battlefield_contains: [{card: Quantum Riddler}]}
+  - advance: {to: upkeep, of: p0}
+expect:
+  - at: after_script
+    turn: 7
+    active: p0
+    phase: upkeep
+    stack: []
+    p1:
+      exile: []
+      graveyard: [Stifle]
+      battlefield_contains: [{card: Quantum Riddler, pt: [4, 6]}]
+      hand: [Ponder, Swords to Plowshares]
+notes: >
+  The warp delayed trigger is created as Riddler enters and triggers at the beginning of p1's end step; p1 controls it
+  (603.7d). p1 Stifles it: Riddler is never exiled. The delayed trigger triggers only once (603.7b), so nothing exiles
+  Riddler later; it is still on the battlefield in p0's upkeep. The enters trigger drew one card (two other cards in
+  hand, so no Riddler bonus). FORMAT CAVEAT: Stifle names the trigger as {trigger_of: "@qr", text_contains: "exile"};
+  the CR does not fix the source of a warp delayed trigger (SCHEMA addenda), so the runner must resolve this reference
+  to "the triggered ability on the stack whose text contains exile" whatever source the engine assigns; the stack
+  assertion itself does not name a source. Bugs caught: exiling Riddler anyway, the warp trigger re-triggering next
+  turn, the trigger not targetable.
+---
+id: mu-uwx-stifle-one-of-two-bowmasters-triggers-from-riddler-draw
+title: Riddler's enter trigger with one card in hand draws two cards, triggering Bowmasters twice; UWx Stifles one trigger and takes only 1 damage
+area: matchup
+cards: [Quantum Riddler, Stifle, Orcish Bowmasters, Ponder, Brainstorm, Tundra, Volcanic Island, Underground Sea]
+tags: [matchup, dimir-vs-uwx, quantum-riddler, bowmasters, replacement-effect, draw-trigger, stifle, multiple-triggers]
+derived_from: cr
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "As long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.", verified: true}
+  - {kind: oracle, card: Quantum Riddler, text: "When this creature enters, draw a card.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "121.2", text: "Cards may only be drawn one at a time. If a player is instructed to draw multiple cards, that player performs that many individual card draws.", verified: true}
+  - {kind: cr, ref: "614.6", text: "If an event is replaced, it never happens. A modified event occurs instead, which may in turn trigger abilities.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Orcish Bowmasters @bow", "Underground Sea @us1"]
+    library_pad: 10
+  p1:
+    hand: ["Quantum Riddler @qr", "Stifle @st"]
+    battlefield: ["Tundra @t1", "Tundra @t2", "Volcanic Island @v1"]
+    library: ["Ponder @c1", "Brainstorm @c2"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@qr", alt_cost: {warp: true}, pay: {tap: ["@t1", "@t2"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [{kind: triggered, source: "@qr", controller: p1}], p1: {hand: [Stifle]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack:
+        - {kind: triggered, source: "@bow", controller: p0}
+        - {kind: triggered, source: "@bow", controller: p0}
+      pending: {actor: p1, kind: priority}
+      p1: {hand: [Stifle, Ponder, Brainstorm], library_count: 10}
+  - p1: {t: cast, card: "@st", targets: [{trigger_of: "@bow", nth: 0}], pay: {tap: ["@v1"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check: {stack: [{kind: triggered, source: "@bow", controller: p0}], pending: {actor: p1, kind: priority}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      life: 19
+      hand: [Ponder, Brainstorm]
+      graveyard: [Stifle]
+      battlefield_contains: [{card: Quantum Riddler}]
+    p0:
+      battlefield:
+        - {card: Orcish Bowmasters}
+        - {card: Underground Sea}
+        - {token: Orc Army Token, controller: p0, counters: {"+1/+1": 1}, pt: [1, 1]}
+notes: >
+  After warping Riddler p1 holds one card (Stifle), so the enter trigger's "draw a card" becomes "draw two" (Riddler is
+  on the battlefield when its trigger resolves). The two cards are drawn one at a time (121.2) in p1's main phase, so
+  Bowmasters triggers twice; p0 targets p1 with both. Stifle counters the top one; the other deals 1 and creates the
+  Army. Library 12 -> 10. Bugs caught: the Riddler bonus draw not counted as a draw for Bowmasters (only one trigger),
+  Stifle countering both identical triggers, the bonus applied twice.

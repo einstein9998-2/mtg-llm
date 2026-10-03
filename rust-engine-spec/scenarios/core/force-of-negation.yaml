@@ -1,0 +1,132 @@
+id: force-of-negation-alt-cost-exiles-countered-spell
+title: "Force of Negation cast for free on the opponent's turn counters Lightning Bolt and exiles it instead of putting it into the graveyard"
+area: core
+cards: [Lightning Bolt, Mountain, Force of Negation, Ponder]
+tags: [force-of-negation, alternative-cost, counterspell, replacement-of-destination, exile-instead]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "In some cases, later text on the card may modify the meaning of earlier text (for example, “Destroy target creature. It can’t be regenerated” or “Counter target spell. If that spell is countered this way, put it on top of its owner’s library instead of into its owner’s graveyard.”)", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Ponder @pond"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@pond"}, targets: ["@bolt"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@fon", controller: p1, targets: ["@bolt"]}
+      p1: {life: 20, hand: [], exile: [Ponder]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [], exile: [Lightning Bolt], hand: [], battlefield: [{card: Mountain, tapped: true}]}
+    p1: {life: 20, graveyard: [Force of Negation], exile: [Ponder], hand: []}
+notes: >
+  It is p0's turn, so p1 may cast Force of Negation by exiling a blue card (Ponder) instead of paying {1}{U}{U}; no life
+  is paid (unlike Force of Will). Lightning Bolt is a noncreature spell, a legal target. It is countered, and the
+  second sentence redirects its destination: it goes to its owner's exile, not the graveyard, so p0's graveyard stays
+  empty. A wrong engine puts it in the graveyard (the ordinary 701.6a destination) or charges 1 life.
+---
+id: force-of-negation-alt-cost-not-offered-on-own-turn
+title: "Force of Negation's free cast is not offered on its controller's own turn; the {1}{U}{U} hard cast still works"
+area: core
+cards: [Lightning Bolt, Mountain, Force of Negation, Ponder, Island]
+tags: [force-of-negation, alternative-cost, turn-condition, mask-validity, exile-instead]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "601.2e", text: "The game checks to see if the proposed spell can legally be cast.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Ponder @pond"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@pond"}, targets: ["@bolt"]}}
+  - p1: {t: cast, card: "@fon", targets: ["@bolt"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@fon", controller: p1, targets: ["@bolt"]}
+      p1:
+        hand: [Ponder]
+        exile: []
+        battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {graveyard: [], exile: [Lightning Bolt]}
+    p1: {life: 20, graveyard: [Force of Negation], hand: [Ponder], exile: []}
+notes: >
+  On turn 4 p1 is the active player. p1 passes priority in the empty main phase, p0 casts Lightning Bolt at p1 (instant),
+  and now p1 holds priority on their own turn: the alternative cost ("if it's not your turn") is not available, so the
+  exile-a-blue-card cast is illegal. Paying {1}{U}{U} with three Islands works and the Bolt is exiled. Ponder stays in
+  hand. After the Bolt leaves, the active player (p1) gets priority.
+---
+id: force-of-negation-alt-cost-needs-a-blue-card
+title: "Force of Negation's free cast needs a blue card in hand; a nonblue card and the spell itself do not qualify"
+area: core
+cards: [Lightning Bolt, Mountain, Force of Negation]
+tags: [force-of-negation, alternative-cost, mask-validity, color]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt0"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Lightning Bolt @bolt1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt0", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bolt1"}, targets: ["@bolt0"]}}
+  - expect_illegal: {p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@fon"}, targets: ["@bolt0"]}}
+  - check:
+      legal: {p1: {exclude: [{t: cast, card: "@fon"}]}}
+expect:
+  - at: after_script
+    stack:
+      - {kind: spell, card: "@bolt0", controller: p0}
+    pending: {actor: p1, kind: priority}
+    p1: {hand: [Force of Negation, Lightning Bolt], exile: [], life: 20}
+notes: >
+  It is p0's turn, so the alternative cost is available in principle, but p1's only other card is a red Lightning Bolt
+  and Force of Negation cannot exile itself (it is on the stack, not in hand, once casting begins). With no lands either, no
+  form of the spell is offered. A wrong engine that does not check the color of the exiled card would offer the free cast.

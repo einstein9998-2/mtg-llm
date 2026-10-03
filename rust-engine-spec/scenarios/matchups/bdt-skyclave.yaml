@@ -1,0 +1,141 @@
+id: mu-bdt-skyclave-exiles-six-power-phlage-mana-value-3-illusion-3-3
+title: Skyclave Apparition can exile a 6/6 escaped Phlage (mana value 3, not power); when Skyclave leaves, Boros gets a 3/3 Illusion and Phlage stays exiled
+area: matchup
+cards: [Skyclave Apparition, "Phlage, Titan of Fire's Fury", "Cat Token (Ocelot Pride)", "Illusion Token (Skyclave Apparition)", Swords to Plowshares, Plains]
+tags: [matchup, boros-vs-dt, skyclave-apparition, mana-value, phlage, leaves-battlefield-trigger, token, targeting]
+derived_from: cr
+source:
+  - {kind: oracle, card: Skyclave Apparition, text: "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.", verified: true}
+  - {kind: oracle, card: Skyclave Apparition, text: "When this creature leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "603.10a", text: "Some zone-change triggers look back in time. These are leaves-the-battlefield abilities", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Phlage, Titan of Fire's Fury @ph", "Plains @w0", {token: "Cat Token (Ocelot Pride)", as: cat}]
+    library_pad: 10
+  p1:
+    hand: ["Skyclave Apparition @sky"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@sky", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_target, slot: 0, answer: "@ph", expect_options: {include: ["@ph"], exclude: ["@cat", "@w0", "@sky", "@w1"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p0: {exile: ["Phlage, Titan of Fire's Fury"]}
+      stack: []
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@stp", targets: ["@sky"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@sky", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p1: {life: 22, exile: [Skyclave Apparition]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      exile: ["Phlage, Titan of Fire's Fury"]
+      graveyard: [Swords to Plowshares]
+      battlefield:
+        - {card: Plains, tapped: true}
+        - {token: "Cat Token (Ocelot Pride)"}
+        - {token: "Illusion Token (Skyclave Apparition)", controller: p0, pt: [3, 3], colors: [U], sick: true}
+    p1:
+      life: 22
+      exile: [Skyclave Apparition]
+      battlefield:
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  The cutoff is mana value, not power: Phlage's {1}{R}{W} is 3, so the 6/6 is a legal target. The Cat is a token and the
+  Plains a land, so neither is offered; Skyclave cannot target itself or p1's lands ("you don't control"). After p0's
+  Swords exiles Skyclave (p1 gains its power 2), the leaves trigger (controlled by p1, Skyclave's controller) makes the
+  exiled card's owner p0 create a 3/3 blue Illusion. Phlage is not returned. Setup Phlage escaped earlier. A wrong engine
+  compares power to 4, returns Phlage, or gives the Illusion to p1.
+---
+id: mu-bdt-bombardment-fizzles-skyclave-etb-then-no-illusion
+title: Boros sacrifices Skyclave's target to Goblin Bombardment; the enters trigger exiles nothing, and when Bombardment kills Skyclave no Illusion is created
+area: matchup
+cards: [Skyclave Apparition, Goblin Bombardment, Ocelot Pride, Guide of Souls, Plains]
+tags: [matchup, boros-vs-dt, skyclave-apparition, goblin-bombardment, fizzle, leaves-battlefield-trigger, damage-accumulates]
+derived_from: cr
+source:
+  - {kind: oracle, card: Skyclave Apparition, text: "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.", verified: true}
+  - {kind: oracle, card: Skyclave Apparition, text: "When this creature leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.", verified: true}
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Goblin Bombardment @bomb", "Ocelot Pride @oc", "Guide of Souls @guide"]
+    library_pad: 10
+  p1:
+    hand: ["Skyclave Apparition @sky"]
+    battlefield: ["Plains @w1", "Plains @w2", "Plains @w3"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@sky", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_target, slot: 0, answer: "@oc", expect_options: {include: ["@oc", "@guide", "@bomb"]}}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@oc"], targets: ["@sky"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p1: {battlefield_contains: [{card: Skyclave Apparition, damage: 1}]}
+      stack: [{kind: triggered, source: "@sky", controller: p1, targets: ["@oc"]}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      p0: {exile: [], graveyard: [Ocelot Pride]}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@guide"], targets: ["@sky"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@sky", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p1: {graveyard: [Skyclave Apparition]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      exile: []
+      graveyard: [Ocelot Pride, Guide of Souls]
+      battlefield: [{card: Goblin Bombardment}]
+    p1:
+      graveyard: [Skyclave Apparition]
+      battlefield:
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+notes: >
+  The enters trigger targets Ocelot; p0 sacrifices Ocelot to Bombardment (1 damage to the 2/2 Skyclave). The trigger's
+  only target is gone, so it does not resolve and nothing is exiled. Later, in the same main phase, a second ping
+  (sacrificing Guide) brings Skyclave's marked damage to 2 and it is destroyed (704.5g). Its leaves trigger still
+  triggers, but there is no exiled card, so nobody creates a token: neither battlefield gains an Illusion. A wrong
+  engine creates a 0/0 or 1/1 Illusion from the fizzled target, or clears the first point of damage early.

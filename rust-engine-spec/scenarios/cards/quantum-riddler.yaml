@@ -1,0 +1,346 @@
+id: quantum-riddler-etb-with-empty-hand-draws-two
+title: Quantum Riddler's enters trigger draws two cards when its controller has no other cards in hand
+area: card
+cards: [Quantum Riddler, Island, Ponder, Brainstorm, Lightning Bolt]
+tags: [quantum-riddler, etb-trigger, replacement-effect, draw]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "When this creature enters, draw a card.", verified: true}
+  - {kind: oracle, card: Quantum Riddler, text: "As long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.", verified: true}
+  - {kind: cr, ref: "614.1a", text: "Effects that use the word “instead” are replacement effects.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Quantum Riddler @qr"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library: ["Ponder @c1", "Brainstorm @c2", "Lightning Bolt @c3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@qr", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@qr", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand_count: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder, Brainstorm]
+      library_top: [Lightning Bolt]
+      library_count: 11
+      battlefield_contains: [{card: Quantum Riddler, pt: [4, 6], keywords: [flying]}]
+notes: >
+  Riddler is on the battlefield when its own trigger resolves, so its replacement applies. p0 has zero cards in hand
+  (one or fewer), so "draw a card" becomes "draw two". Library 13 -> 11. Bugs caught: the replacement ignored for the
+  Riddler's own trigger, the replacement only active from the next turn, drawing three.
+---
+id: quantum-riddler-draw-step-with-one-card-draws-two
+title: With Quantum Riddler and one card in hand, the draw step draws two cards
+area: card
+cards: [Quantum Riddler, Island, Ponder, Brainstorm, Lightning Bolt]
+tags: [quantum-riddler, replacement-effect, draw-step, turn-based-action]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "As long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: upkeep
+  p0:
+    hand: ["Island @h1"]
+    battlefield: ["Quantum Riddler @qr", "Island @i1"]
+    library: ["Ponder @c1", "Brainstorm @c2", "Lightning Bolt @c3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: main1, of: p0}
+expect:
+  - at: after_script
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Ponder, Brainstorm]
+      library_top: [Lightning Bolt]
+      library_count: 11
+notes: >
+  The turn-based draw is a draw like any other, so the replacement applies to it. Bug caught: the replacement wired only
+  to spell and ability draws.
+---
+id: quantum-riddler-brainstorm-draws-four-not-six
+title: With Quantum Riddler and an empty hand, Brainstorm draws four cards (three plus one, applied once), then puts two back
+area: card
+cards: [Quantum Riddler, Brainstorm, Island, Ponder, Lightning Bolt, Daze, Force of Will, Stifle]
+tags: [quantum-riddler, brainstorm, replacement-effect, multiple-draws]
+derived_from: cr
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "As long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "121.2a", text: "An instruction to draw multiple cards can be modified by replacement effects that refer to the number of cards drawn. This modification occurs before considering any of the individual card draws.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Quantum Riddler @qr", "Island @i1"]
+    library: ["Ponder @c1", "Lightning Bolt @c2", "Daze @c3", "Force of Will @c4", "Stifle @c5"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_cards
+      purpose: put_back
+      answer: ["@c1", "@c2"]
+      expect_options: {include: ["@c1", "@c2", "@c3", "@c4"], exclude: ["@c5"], count: 4}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@c2", "@c1"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Daze, Force of Will]
+      library_top: [Lightning Bolt, Ponder, Stifle]
+      library_count: 13
+      graveyard: [Brainstorm]
+notes: >
+  While Brainstorm is on the stack p0's hand is empty, so the instruction "draw three cards" becomes "draw four" before
+  any individual draw happens (121.2a): four cards are drawn, not three, and not six (an engine that applied the +1 to
+  each individual draw while the hand was small would draw more). Two go back, leaving two in hand. Library 15 - 4 + 2
+  = 13. The put-back choice is over exactly the four drawn cards.
+---
+id: quantum-riddler-does-not-affect-opponent-draws
+title: Quantum Riddler's replacement affects only its controller; the opponent with an empty hand draws one card in their draw step
+area: card
+cards: [Quantum Riddler, Island]
+tags: [quantum-riddler, replacement-effect, draw-step, controller-only, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "As long as you have one or fewer cards in hand, if you would draw one or more cards, you draw that many cards plus one instead.", verified: true}
+setup:
+  turn: 6
+  active: p1
+  phase: upkeep
+  p0:
+    battlefield: ["Quantum Riddler @qr", "Island @i1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - advance: {to: main1, of: p1}
+expect:
+  - at: after_script
+    phase: main1
+    pending: {actor: p1, kind: priority}
+    p1: {hand_count: 1, library_count: 9}
+    p0: {hand_count: 0, library_count: 10}
+notes: >
+  "you" in Riddler's text is its controller (p0). p1 has no cards in hand but draws exactly one. Bug caught: the
+  replacement applied to every player.
+---
+id: quantum-riddler-warp-cast-draws-then-exiled-at-end-step
+title: Quantum Riddler cast for its warp cost enters, its enters trigger draws, and it is exiled at the beginning of the end step
+area: card
+cards: [Quantum Riddler, Island, Ponder]
+tags: [quantum-riddler, warp, alternative-cost, delayed-trigger, end-step, exile]
+derived_from: cr
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "Warp {1}{U}", verified: true}
+  - {kind: oracle, card: Quantum Riddler, text: "When this creature enters, draw a card.", verified: true}
+  - {kind: cr, ref: "702.185a", text: "“Warp [cost]” means “You may cast this card from your hand by paying [cost] rather than its mana cost” and “If this spell’s warp cost was paid, exile the permanent this spell becomes at the beginning of the next end step. Its owner may cast this card after the current turn has ended for as long as it remains exiled.”", verified: true}
+  - {kind: cr, ref: "608.3g", text: "that delayed triggered ability is created as that permanent is put onto the battlefield", verified: true}
+  - {kind: cr, ref: "603.7d", text: "If a spell creates a delayed triggered ability, the source of that delayed triggered ability is that spell. The controller of that delayed triggered ability is the player who controlled that spell as it resolved.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Quantum Riddler @qr", "Island @h1", "Island @h2"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library: ["Ponder @c1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@qr", alt_cost: {warp: true}, pay: auto}
+  - check:
+      p0: {battlefield_contains: [{card: Island, tapped: false}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {hand: [Island, Island, Ponder], battlefield_contains: [{card: Quantum Riddler, sick: true}]}
+  - advance: {to: end, of: p0}
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "exile"}]
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: [Quantum Riddler]
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: false}
+      hand: [Island, Island, Ponder]
+notes: >
+  Warp {1}{U} is an alternative cost (two of the three Islands tap; one stays untapped, which shows the full {3}{U}{U} was
+  not paid). The enters trigger draws one card (two cards in hand, so no extra draw). The summoning-sick Riddler cannot
+  attack, so advance passes combat without a decision. At the beginning of p0's end step the warp delayed trigger exiles
+  it. Bugs caught: warp charged at full cost, no end-step exile, Riddler going to the graveyard instead of exile, the
+  exile happening at cleanup or next turn.
+---
+id: quantum-riddler-warped-card-cast-from-exile-later-turn-for-mana-cost
+title: A warped Quantum Riddler can be cast from exile on its owner's next turn for its mana cost (not for warp) and then stays
+area: card
+cards: [Quantum Riddler, Island, Ponder]
+tags: [quantum-riddler, warp, cast-from-exile, alternative-cost, delayed-trigger]
+derived_from: cr
+source:
+  - {kind: oracle, card: Quantum Riddler, text: "Warp {1}{U}", verified: true}
+  - {kind: cr, ref: "702.185a", text: "“Warp [cost]” means “You may cast this card from your hand by paying [cost] rather than its mana cost” and “If this spell’s warp cost was paid, exile the permanent this spell becomes at the beginning of the next end step. Its owner may cast this card after the current turn has ended for as long as it remains exiled.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Quantum Riddler @qr", "Island @h1", "Island @h2"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library: ["Ponder @c1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@qr", alt_cost: {warp: true}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+  - resolve_top: true
+  - check:
+      p0: {exile: [Quantum Riddler], hand_count: 3}
+  - advance: {to: main1, of: p0}
+  - check:
+      turn: 5
+      p0: {hand_count: 4, exile: [Quantum Riddler]}
+  - expect_illegal: {p0: {t: cast, card: "@qr", alt_cost: {warp: true}}}
+  - p0: {t: cast, card: "@qr", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+expect:
+  - at: after_script
+    turn: 5
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: []
+      hand_count: 5
+      battlefield_contains: [{card: Quantum Riddler, tapped: false}]
+notes: >
+  Turn 3: warp cast (2 of 5 Islands), draw one (hand 3), exiled at the end step. The turn passes to p1 (turn 4) and back
+  to p0 (turn 5); p0 draws in the draw step (hand 4; Riddler is not on the battlefield, so one card). The warp permission
+  is "cast this card from your hand", so warp is not offered from exile; the mana cost {3}{U}{U} is. Cast that way, the
+  warp delayed trigger is not created, its enters trigger draws one (hand 4 -> 5, more than one card so no extra), and
+  at turn 5's end step nothing exiles it. Bugs caught: warp offered from exile, a warped card unable to be cast later,
+  the second cast still treated as warped. The casting permission "after the current turn has ended" is not probed on
+  turn 3 because sorcery timing would also forbid it at the end step.
+---
+id: quantum-riddler-warped-flickered-by-phelia-stays
+title: A warped Quantum Riddler exiled and returned by Phelia is a new object; the warp exile trigger does nothing to it and it stays on the battlefield
+area: card
+cards: [Quantum Riddler, "Phelia, Exuberant Shepherd", Island]
+tags: [quantum-riddler, warp, phelia, new-object, delayed-trigger, order-triggers]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Phelia, Exuberant Shepherd", text: "At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.", verified: true}
+  - {kind: oracle, card: Quantum Riddler, text: "When this creature enters, draw a card.", verified: true}
+  - {kind: cr, ref: "603.7c", text: "However, if that object is no longer in the zone it’s expected to be in at the time the delayed triggered ability resolves, the ability won’t affect it. (Note that if that object left that zone and then returned, it’s a new object and thus won’t be affected. See rule 400.7.)", verified: true}
+  - {kind: cr, ref: "702.185a", text: "exile the permanent this spell becomes at the beginning of the next end step", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Quantum Riddler @qr", "Island @h1", "Island @h2"]
+    battlefield: ["Phelia, Exuberant Shepherd @phelia", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@qr", alt_cost: {warp: true}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - resolve_top: true
+  - check: {p0: {hand_count: 3}}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@phelia", target: {player: p1}}], expect_options: {exclude: ["@qr"]}}
+  - p0: {decision: choose_target, slot: 0, answer: "@qr"}
+  - resolve_top: true
+  - check: {p0: {exile: [Quantum Riddler]}}
+  - advance: {to: main2, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: order_triggers
+      answer:
+        - {text_contains: "exile"}
+        - {source: "@phelia", text_contains: "return"}
+  - check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "exile"}
+        - {kind: triggered, source: "@phelia", controller: p0, text_contains: "return"}
+  - resolve_top: true
+  - check:
+      stack:
+        - {kind: triggered, controller: p0, text_contains: "exile"}
+        - {kind: triggered, source: "@qr", controller: p0, text_contains: "draw"}
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: []
+      hand_count: 4
+      battlefield_contains:
+        - {card: Quantum Riddler, sick: true}
+        - {card: "Phelia, Exuberant Shepherd", counters: {"+1/+1": 1}, pt: [3, 3]}
+    p1: {life: 18}
+notes: >
+  Riddler is warped in main 1 (enters trigger: one draw, hand 3). Phelia attacks (the sick Riddler cannot) and exiles it.
+  The script passes explicitly out of main 2 because the ordering decision is raised before anyone gets priority in the
+  end step (an advance would fail on it). At the end step two delayed triggers trigger: the warp exile (created when the warped Riddler entered) and Phelia's
+  return; p0 orders them, here with Phelia's on top. Phelia's resolves first: Riddler returns under its owner's control
+  (counter on Phelia) as a new object and its enters trigger goes on the stack above the warp trigger; it draws one
+  (hand 4). The warp trigger then resolves and does nothing, because the permanent it refers to left the battlefield and
+  the Riddler now there is a new object (603.7c). Bugs caught: exiling the returned Riddler (warp state carried across the
+  flicker), the warp trigger vanishing so no ordering is offered, no counter on Phelia. The warp trigger is identified by its
+  text only: the CR does not fix the source of a delayed trigger created by warp's static ability (SCHEMA addenda), so
+  no scenario asserts it; its controller is p0 (603.7d: the player who controlled the spell as it resolved).

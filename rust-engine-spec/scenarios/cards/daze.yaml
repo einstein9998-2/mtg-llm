@@ -1,0 +1,165 @@
+id: daze-hard-cast-with-mana-and-victim-declines-to-pay
+title: Daze cast for {1}{U} (no Island returned) counters the spell when its controller declines to pay even though payment was possible
+area: card
+cards: [Daze, Brainstorm, Island]
+tags: [daze, counter-unless-pay, hard-cast, yes-no-decision]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, \"[Do something] unless [a player does something else].\" This means the same thing as \"[A player may do something else]. If [that player] doesn't, [do something].\"", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", targets: ["@bs"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false, expect_options: {include: [true, false]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Brainstorm]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: false}]
+    p1:
+      graveyard: [Daze]
+      hand: []
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  The "unless pays" choice belongs to the spell's controller (p0), not to the Daze caster. With an untapped Island available the prompt is offered with
+  both options; answering no counters Brainstorm. Because Daze was hard cast, p1's Islands stay on the battlefield (both tapped) and nothing returns to hand.
+  A wrong engine auto-pays, or auto-declines, or lets p1 answer.
+---
+id: daze-may-return-volcanic-island-because-it-is-an-island
+title: Daze's alternative cost accepts a tapped Volcanic Island (it has the Island subtype); the returned land goes to hand
+area: card
+cards: [Daze, Volcanic Island, Lightning Bolt, Mountain]
+tags: [daze, alternative-cost, land-types, dual-land, cost-before-resolution]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Volcanic Island, text: "({T}: Add {U} or {R}.)", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text, or applied to it from another effect, that its controller may pay rather than paying the spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield:
+      - {card: Volcanic Island, as: volc, tapped: true}
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@volc"}, targets: ["@bolt"]}
+  - check:
+      stack: [{kind: spell, card: "@bolt"}, {kind: spell, card: "@daze", controller: p1}]
+      p1: {hand: [Volcanic Island], battlefield: []}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt], life: 20}
+    p1: {hand: [Volcanic Island], graveyard: [Daze], life: 20}
+notes: >
+  The return is a cost, so Volcanic Island is already in p1's hand while Daze is on the stack (mid-script check). p0's Mountain was tapped for Bolt so
+  the {1} cannot be paid: no prompt, Bolt is countered and p1 takes no damage. A wrong engine accepts only cards named Island.
+---
+id: daze-alt-cost-rejects-wasteland-fetchland-and-mountain
+title: Wasteland, Misty Rainforest and Mountain are not Islands, so Daze cannot be cast for free with only them and cannot be hard cast without blue mana
+area: card
+cards: [Daze, Wasteland, Misty Rainforest, Mountain, Lightning Bolt]
+tags: [daze, alternative-cost, land-types, mask-validity, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Wasteland @w", "Misty Rainforest @misty", "Mountain @mtn"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@w"}, targets: ["@bolt"]}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@misty"}, targets: ["@bolt"]}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@mtn"}, targets: ["@bolt"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bolt"}]
+    pending: {actor: p1, kind: priority}
+    legal:
+      p1:
+        include: [{t: pass}]
+        exclude: [{t: cast, card: "@daze"}]
+    p1: {hand: [Daze], battlefield: [{card: Wasteland}, {card: Misty Rainforest}, {card: Mountain}]}
+notes: >
+  p1 has three untapped nonbasic/non-Island lands: none is an Island, and between them they cannot make {U} (Wasteland makes {C}, Mountain {R}, Misty
+  makes nothing), so the hard cast {1}{U} is impossible too. Daze is not offered at all. Each probe leaves the state unchanged.
+---
+id: daze-with-defense-grid-three-islands-pay-the-tax-by-tapping-the-returned-island-too
+title: With three Islands Daze via its alternative cost plus Defense Grid's {3} is castable only by tapping all three Islands and returning one of them
+area: card
+cards: [Daze, Defense Grid, Lightning Bolt, Mountain, Island]
+tags: [daze, alternative-cost, cost-increase, defense-grid, mana-payment, tapped-island-returned]
+derived_from: cr
+source:
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  priority: p1
+  p0:
+    hand: ["Daze @daze"]
+    battlefield: ["Defense Grid @grid", "Island @j1", "Island @j2", "Island @j3"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Mountain @m4"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@bolt"], pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bolt"}, {kind: spell, card: "@daze", targets: ["@bolt"]}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      battlefield: [{card: Defense Grid}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  The {3} added by Defense Grid needs three mana, and p0 has exactly three Islands. Mana abilities may be activated while paying costs, so one Island is tapped for
+  mana and then returned to hand as Daze's alternative cost: the other two end tapped, and the returned Island is in hand (so the end state is the same whichever
+  Island the engine returns). Control of the Grid and the turn make the tax apply under either reading of "its controller". The script stops with Daze on the stack
+  because whether p1 can pay Daze's {1} depends on whether p1's own Bolt was taxed. A wrong engine either demands four lands or ignores the tax.

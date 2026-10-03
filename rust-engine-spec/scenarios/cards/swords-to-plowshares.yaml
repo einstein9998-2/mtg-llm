@@ -1,0 +1,127 @@
+id: stp-exiles-creature-controller-gains-power-with-counters
+title: Swords to Plowshares exiles a Murktide Regent with two +1/+1 counters and its controller gains 5, its current power
+area: card
+cards: [Swords to Plowshares, Plains, Murktide Regent]
+tags: [swords-to-plowshares, exile, life-gain, derived-power, counters]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "If the effect requires information from a specific object, including the source of the ability itself, the effect uses the current information of that object if it's in the public zone it was expected to be in; if it's no longer in that zone, or if the effect has moved it from a public zone to a hidden zone, the effect uses the object's last known information.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Murktide Regent, as: murk, counters: {"+1/+1": 2}}]
+    library_pad: 10
+script:
+  - check:
+      p1: {battlefield: [{card: Murktide Regent, pt: [5, 5]}]}
+  - p0: {t: cast, card: "@stp", targets: ["@murk"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Swords to Plowshares]
+      battlefield: [{card: Plains, tapped: true}]
+    p1:
+      life: 25
+      battlefield: []
+      exile: [Murktide Regent]
+      graveyard: []
+notes: >
+  The life gain goes to the creature's controller (p1), not to the caster, and equals the creature's power as it last
+  existed on the battlefield: printed 3 plus two +1/+1 counters = 5 (608.2h, last known information, because the effect
+  moved it to exile). A wrong engine uses the printed power (gain 3), reads the power after the counters fell off in
+  exile, gives the life to the caster, or puts the creature into the graveyard instead of exile.
+---
+id: stp-targets-only-creatures
+title: Swords to Plowshares cannot target a player, a land or a noncreature artifact, only a creature
+area: card
+cards: [Swords to Plowshares, Plains, Plateau, "Mishra's Bauble", "Dragon's Rage Channeler"]
+tags: [swords-to-plowshares, targeting, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "The player announces their choice of an appropriate object or player for each target the spell requires.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Plateau @plat", "Mishra's Bauble @bauble", "Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@stp", targets: [{player: p1}]}}
+  - expect_illegal: {p0: {t: cast, card: "@stp", targets: ["@plat"]}}
+  - expect_illegal: {p0: {t: cast, card: "@stp", targets: ["@bauble"]}}
+  - p0: {t: cast, card: "@stp", targets: ["@drc"], pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@stp", controller: p0, targets: ["@drc"]}]
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [], battlefield: [{card: Plains, tapped: true}]}
+notes: >
+  "Target creature" admits only creatures on the battlefield. The three probes must be absent from the legal set; the
+  final cast on a creature is the positive control in the same scenario, so an engine that offers nothing also fails.
+  After casting, p0 holds priority again (117.3c).
+---
+id: stp-instant-speed-exiles-attacker-on-opponents-turn
+title: Swords to Plowshares cast in the declare attackers step on the opponent's turn exiles the attacker and its controller gains 3
+area: card
+cards: [Swords to Plowshares, Plains, Murktide Regent]
+tags: [swords-to-plowshares, instant-timing, combat, exile, life-gain]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority.", verified: true}
+  - {kind: cr, ref: "117.3b", text: "The active player receives priority after a spell or ability (other than a mana ability) resolves.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: begin_combat
+  p0:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @murk"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@murk", target: {player: p0}}]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@stp", targets: ["@murk"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Swords to Plowshares]
+    p1:
+      life: 23
+      battlefield: []
+      exile: [Murktide Regent]
+notes: >
+  p1 is the active player. After attackers are declared p1 gets priority first and passes; p0 casts Swords as an
+  instant. After it resolves the active player (p1) gets priority. The 3/3 Murktide (no counters) gives p1 3 life.
+  A wrong engine refuses an instant on the opponent's turn or gives priority to the caster after resolution.

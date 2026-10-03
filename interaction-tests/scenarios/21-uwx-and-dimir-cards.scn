@@ -1,0 +1,350 @@
+# UWx Control (p2) and Dimir Tempo (p1) individual cards: Murktide, Riddler, Tamiyo, Phelia, Prismatic Ending, Swords, Borrower, Flow State, Kaito.
+# Conventions: p1 = first seat, p2 = second seat, both scripted; see ../README.md.
+
+=== swords-exiles-and-gains-life
+title: Swords to Plowshares exiles the creature and its controller gains life equal to its power
+ref: Swords to Plowshares Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Moonshadow|Counters:M1M1=4
+  aihand=Swords to Plowshares
+  aibattlefield=Plains
+script:
+  p2: cast Swords to Plowshares -> Moonshadow
+  p2: pass
+  p1: pass
+expect:
+  zone p1 exile has "Moonshadow"
+  life p1 == 23
+
+=== prismatic-ending-converge-two-colors
+title: Prismatic Ending with X=2 paid with W and U (two colors) exiles a mana value 2 permanent
+ref: Prismatic Ending Oracle (converge, X is announced; colors of mana spent)
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Nethergoyf;Moonshadow
+  aihand=Prismatic Ending
+  aibattlefield=Plains;Island;Tundra
+script:
+  p2: cast Prismatic Ending x=2 -> Moonshadow
+  p2: pass
+  p1: pass
+expect:
+  zone p1 exile has "Moonshadow"
+
+=== prismatic-ending-single-color-cannot-hit-two
+title: Prismatic Ending paid with one color (all Plains) cannot exile a mana value 2 permanent
+ref: Prismatic Ending Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Phelia, Exuberant Shepherd
+  aihand=Prismatic Ending
+  aibattlefield=Plains;Plains
+script:
+  p2: cast Prismatic Ending x=2 -> Phelia, Exuberant Shepherd
+  p2: pass
+  p1: pass
+expect:
+  controls p1 "Phelia, Exuberant Shepherd"
+
+=== murktide-delve-exiles-and-counts-instants
+title: Murktide Regent delving away two instants and a land enters with two +1/+1 counters (only instants and sorceries count)
+ref: Murktide Regent Oracle; CR 702.66 (delve)
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aigraveyard=Brainstorm;Ponder;Island;Island;Island;Island
+  aibattlefield=Tundra;Tundra;Tundra
+  aihand=Murktide Regent
+script:
+  p2: cast Murktide Regent
+  p2: pass
+  p1: pass
+expect:
+  controls p2 "Murktide Regent"
+  counters p2 "Murktide Regent" P1P1 == 2
+  zone p2 exile has "Brainstorm"
+  zone p2 exile has "Ponder"
+
+=== quantum-riddler-warp-from-hand
+title: Quantum Riddler warp {1}{U}: cast from hand for the warp cost, it is exiled at the next end step and can be cast later from exile
+ref: Quantum Riddler Oracle; warp rules
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aibattlefield=Island;Island
+  aihand=Quantum Riddler
+  ailibrary=Island;Island;Island;Island
+script:
+  p2: cast Quantum Riddler ~warp
+  p2: pass
+  p1: pass
+  p2: at END_OF_TURN
+  p2: pass
+  p1: pass
+expect:
+  zone p2 exile has "Quantum Riddler"
+
+=== quantum-riddler-draws-extra-with-low-hand
+title: Quantum Riddler draws an extra card when you would draw and have one or fewer cards in hand (Brainstorm draws four)
+ref: Quantum Riddler Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aibattlefield=Quantum Riddler;Island
+  aihand=Brainstorm
+script:
+  p2: cast Brainstorm
+  p2: pass
+  p1: pass
+  p2: pick Island;Island
+expect:
+  draws p2 == 4
+
+=== tamiyo-flips-on-third-draw
+title: Tamiyo, Inquisitive Student flips on the controller's third draw of the turn (Brainstorm after a draw step)
+ref: Tamiyo Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=UPKEEP
+  aibattlefield=Tamiyo, Inquisitive Student;Island
+  aihand=Brainstorm
+script:
+  p2: at MAIN1
+  p2: cast Brainstorm
+  p2: pass
+  p1: pass
+  p2: pick Island;Island
+expect:
+  controls p2 "Tamiyo, Seasoned Scholar"
+
+=== phelia-attack-flickers-opponents-permanent
+title: Phelia exiles an opponent's permanent when attacking and it returns under its owner's control at end step with no counter for Phelia
+ref: Phelia Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aibattlefield=Phelia, Exuberant Shepherd
+  humanbattlefield=Moonshadow|Counters:M1M1=3
+script:
+  p2: at COMBAT_BEGIN
+  p2: attack Phelia, Exuberant Shepherd -> p1
+  p2: pick Moonshadow
+expect:
+  zone p1 exile has "Moonshadow"
+
+=== phelia-resets-counters-on-flickered-card
+title: A permanent exiled and returned by Phelia comes back as a new object (Moonshadow gets its six -1/-1 counters again)
+ref: Phelia Oracle; CR 400.7
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aibattlefield=Phelia, Exuberant Shepherd
+  humanbattlefield=Moonshadow|Counters:M1M1=1
+script:
+  p2: at COMBAT_BEGIN
+  p2: attack Phelia, Exuberant Shepherd -> p1
+  p2: pick Moonshadow
+  p2: at END_OF_TURN
+  p2: pass
+  p1: pass
+expect:
+  counters p1 "Moonshadow" M1M1 == 6
+  counters p2 "Phelia, Exuberant Shepherd" P1P1 == 0
+
+=== brazen-borrower-petty-theft
+title: Petty Theft returns target nonland permanent an opponent controls to its owner's hand
+ref: Brazen Borrower Oracle
+state:
+  humanhand=Brazen Borrower
+  humanbattlefield=Island;Island
+  aibattlefield=Phelia, Exuberant Shepherd
+script:
+  p1: cast Brazen Borrower ~Return target -> Phelia, Exuberant Shepherd
+  p1: pass
+  p2: pass
+expect:
+  zone p2 hand has "Phelia, Exuberant Shepherd"
+  zone p1 exile has "Brazen Borrower"
+
+=== brazen-borrower-cast-from-exile-after-adventure
+title: After Petty Theft resolves the Borrower is exiled on an adventure and can be cast as a creature
+ref: Brazen Borrower Oracle; CR 715.4
+state:
+  humanhand=Brazen Borrower
+  humanbattlefield=Island;Island;Island;Island;Island
+  aibattlefield=Phelia, Exuberant Shepherd
+script:
+  p1: cast Brazen Borrower ~Return target -> Phelia, Exuberant Shepherd
+  p1: pass
+  p2: pass
+  p1: cast Brazen Borrower
+  p1: pass
+  p2: pass
+expect:
+  controls p1 "Brazen Borrower"
+
+=== flow-state-takes-one
+title: Flow State with no instant and sorcery pair in the graveyard puts one of the top three into hand
+ref: Flow State Oracle
+state:
+  humanhand=Flow State
+  humanbattlefield=Island;Island
+  humanlibrary=Brainstorm;Ponder;Island;Island;Island;Island
+script:
+  p1: cast Flow State
+  p1: pass
+  p2: pass
+  p1: pick Brainstorm
+expect:
+  zone p1 hand has "Brainstorm"
+  zone p1 hand size == 1
+
+=== flow-state-takes-two-with-instant-and-sorcery
+title: Flow State takes two cards when an instant and a sorcery are in your graveyard
+ref: Flow State Oracle
+state:
+  humanhand=Flow State
+  humanbattlefield=Island;Island
+  humangraveyard=Brainstorm;Lightning Bolt
+  humanlibrary=Brainstorm;Ponder;Island;Island;Island;Island
+script:
+  p1: cast Flow State
+  p1: pass
+  p2: pass
+  p1: pick Brainstorm;Ponder
+expect:
+  zone p1 hand size == 2
+  zone p1 hand has "Ponder"
+
+=== kaito-ninjutsu-returns-attacker
+title: Kaito's ninjutsu returns an unblocked attacker to hand and puts Kaito onto the battlefield attacking
+ref: Kaito, Bane of Nightmares Oracle; CR 702.49
+state:
+  humanhand=Kaito, Bane of Nightmares
+  humanbattlefield=Moonshadow|Counters:M1M1=6;Island;Swamp;Island
+script:
+  p1: at COMBAT_DECLARE_ATTACKERS
+  p1: attack Moonshadow -> p2
+  p1: at COMBAT_DECLARE_BLOCKERS
+  p1: activate Kaito, Bane of Nightmares ~Ninjutsu
+  p1: pass
+expect:
+  controls p1 "Kaito, Bane of Nightmares"
+  zone p1 hand has "Moonshadow"
+
+=== kaito-is-creature-on-own-turn-only
+title: Kaito is a 3/4 hexproof Ninja creature only during his controller's turn
+ref: Kaito, Bane of Nightmares Oracle
+state:
+  turn=3
+  activeplayer=human
+  activephase=MAIN1
+  humanbattlefield=Kaito, Bane of Nightmares|Counters:LOYALTY=4
+script:
+  p1: check creature p1 "Kaito, Bane of Nightmares"
+  p1: pass
+expect:
+  creature p1 "Kaito, Bane of Nightmares"
+  pt p1 "Kaito, Bane of Nightmares" 3/4
+
+=== kaito-not-creature-on-opponents-turn
+title: Kaito is not a creature on the opponent's turn
+ref: Kaito, Bane of Nightmares Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  humanbattlefield=Kaito, Bane of Nightmares|Counters:LOYALTY=4
+script:
+  p2: pass
+expect:
+  notcreature p1 "Kaito, Bane of Nightmares"
+
+=== wasteland-destroys-nonbasic
+title: Wasteland destroys a nonbasic land but cannot target a basic
+ref: Wasteland Oracle
+state:
+  humanbattlefield=Wasteland
+  aibattlefield=Tundra;Island
+script:
+  p1: activate Wasteland ~Destroy -> Tundra
+  p1: pass
+  p2: pass
+expect:
+  zone p2 graveyard has "Tundra"
+  zone p1 graveyard has "Wasteland"
+
+=== wasteland-cannot-target-basic
+title: Wasteland cannot target a basic land
+ref: Wasteland Oracle
+state:
+  humanbattlefield=Wasteland
+  aibattlefield=Island
+script:
+  p1: try activate Wasteland ~Destroy -> Island
+  p1: pass
+expect:
+  controls p1 "Wasteland"
+  controls p2 "Island"
+
+=== snow-covered-basic-is-basic
+title: Wasteland cannot target a Snow-Covered Island (it is a basic land)
+ref: Wasteland Oracle; CR 205.4 (supertype basic)
+state:
+  humanbattlefield=Wasteland
+  aibattlefield=Snow-Covered Island
+script:
+  p1: try activate Wasteland ~Destroy -> Snow-Covered Island
+  p1: pass
+expect:
+  controls p1 "Wasteland"
+  controls p2 "Snow-Covered Island"
+
+=== force-of-will-vs-stifle-on-own-spell-no-interaction
+title: Stifle cannot target a spell (only abilities)
+ref: Stifle Oracle
+state:
+  humanhand=Brainstorm
+  humanbattlefield=Island
+  aihand=Stifle
+  aibattlefield=Island
+script:
+  p1: cast Brainstorm
+  p1: pass
+  p2: when-stack Brainstorm
+  p2: try cast Stifle -> Brainstorm
+expect:
+  zone p2 hand has "Stifle"
+  trace has "CASTFAIL"
+
+=== phelia-own-permanent-gets-counter
+title: Phelia flickering the controller's own permanent puts a +1/+1 counter on Phelia (it returns under her controller's control)
+ref: Phelia Oracle
+state:
+  turn=2
+  activeplayer=ai
+  activephase=MAIN1
+  aibattlefield=Phelia, Exuberant Shepherd;Tamiyo, Inquisitive Student
+script:
+  p2: at COMBAT_BEGIN
+  p2: attack Phelia, Exuberant Shepherd -> p1
+  p2: pick Tamiyo, Inquisitive Student
+  p2: at END_OF_TURN
+  p2: pass
+  p1: pass
+expect:
+  counters p2 "Phelia, Exuberant Shepherd" P1P1 == 1
+  controls p2 "Tamiyo, Inquisitive Student"

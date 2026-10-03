@@ -1,0 +1,107 @@
+id: haste-from-cori-steel-cutter-lets-a-summoning-sick-creature-attack
+title: Equipping Cori-Steel Cutter gives haste, so the equipped sick creature may attack while an unequipped sick creature may not
+area: core
+cards: [Dragon's Rage Channeler, Cori-Steel Cutter, Mountain, Island]
+tags: [summoning-sickness, haste, equip, cori-steel-cutter, attack, declare-attackers]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equip {1}{R}", verified: true}
+  - {kind: cr, ref: "508.1a", text: "The active player chooses which creatures that they control, if any, will attack. The chosen creatures must be untapped, they can't also be battles, and each one must either have haste or have been controlled by the active player continuously since the turn began.", verified: true}
+  - {kind: cr, ref: "702.6a", text: "Equip is an activated ability of Equipment cards. \"Equip [cost]\" means \"[Cost]: Attach this permanent to target creature you control. Activate only as a sorcery.\"", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature can't attack unless it has been under its controller's control continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "507.2", text: "Second, the active player gets priority.", verified: true, note: "beginning of combat step; retrieved by reviewer"}
+  - {kind: cr, ref: "508.1", text: "First, the active player declares attackers. This turn-based action doesn't use the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: Dragon's Rage Channeler, as: armed, sick: true}
+      - {card: Dragon's Rage Channeler, as: unarmed, sick: true}
+      - {card: Cori-Steel Cutter, as: cutter}
+      - {card: Mountain, as: m}
+      - {card: Island, as: isl}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@cutter", ability: 0, targets: ["@armed"], pay: auto}
+  - label: equip-on-stack
+    check:
+      stack: [{kind: activated, source: "@cutter", controller: p0}]
+      priority: p0
+      p0:
+        battlefield_contains:
+          - {card: Dragon's Rage Channeler, alias: armed, pt: [1, 1], keywords_exclude: [haste]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: equip-resolved
+    check:
+      stack: []
+      priority: p0
+      p0:
+        battlefield_contains:
+          - {card: Dragon's Rage Channeler, alias: armed, pt: [2, 2]}
+          - {card: Cori-Steel Cutter, alias: cutter, attached_to: "@armed"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check: {phase: begin_combat, priority: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@armed", target: {player: p1}}], expect_options: {include: ["@armed"], exclude: ["@unarmed"]}}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    active: p0
+    p0:
+      battlefield_contains:
+        - {card: Dragon's Rage Channeler, alias: armed, tapped: true, pt: [2, 2]}
+        - {card: Dragon's Rage Channeler, alias: unarmed, tapped: false, pt: [1, 1]}
+notes: >
+  Both channelers entered this turn (sick: true). Equip {1}{R} (the equipment's only activated ability, index 0) is
+  paid with the Mountain and the Island, uses the stack, and resolves when both players pass; after that the equipped
+  creature is a 2/2 with haste (and trample), so it is a legal attacker despite being summoning sick, while the
+  unequipped creature remains illegal to declare. A wrong engine would ignore haste from an Equipment, apply the bonus
+  only after the creature has been under control since the turn began, or let both creatures attack. Flurry does not
+  trigger (no spell was cast this turn).
+---
+id: lands-and-artifacts-can-tap-the-turn-they-enter
+title: "Summoning sickness restricts only creatures, so a land played this turn and a Lotus Petal that entered this turn can both be tapped"
+area: core
+cards: [Island, Lotus Petal]
+tags: [summoning-sickness, mana-ability, lotus-petal, land-drop, tap-ability]
+derived_from: cr
+source:
+  - {kind: cr, ref: "302.6", text: "A creature's activated ability with the tap symbol or the untap symbol in its activation cost can't be activated unless the creature has been under its controller's control continuously since their most recent turn began.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "305.1", text: "A player who has priority may play a land card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Island @isl"]
+    battlefield:
+      - {card: Lotus Petal, as: petal, sick: true}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@isl"}
+  - p0: {t: activate, source: "@isl", ability: 0}
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    priority: p0
+    p0:
+      mana_pool: {U: 1, R: 1}
+      lands_played: 1
+      graveyard: [Lotus Petal]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  Rule 302.6 speaks only about creatures. The Island entered this turn and the Petal is flagged as having come under
+  p0's control this turn, yet both {T} abilities can be activated at once: the pool holds {U}{R}. A wrong engine
+  would apply summoning sickness to every permanent with a tap symbol.

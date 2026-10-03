@@ -1,0 +1,15 @@
+{
+"policy":"hybrid","stops":"default","seatA_deck":"dnt.dck","seatB_deck(ForgeAI)":"jund75.dck",
+"games":30,"seatA_wins":3,"forgeAI_wins":27,"draws":0,"seatA_games_on_play":0,"seatA_wins_on_play":0,"wall_ms":54074,
+"prompts":1757,"prompt_chars":963068,"prompt_tokens_est":267519,"prompts_per_game":58.6,
+"asked_by_kind":{"Attack":64,"Block":27,"BottomCards":43,"ChooseCards":43,"ChooseName":1,"ChooseOption":5,"Mode":10,"Mulligan":73,"OrderTriggers":9,"Priority":1275,"Target":56,"YesNo":151},
+"chars_by_kind":{"Attack":11257,"Block":23366,"BottomCards":8364,"ChooseCards":18862,"ChooseName":1047,"ChooseOption":1450,"Mode":1654,"Mulligan":13463,"OrderTriggers":8427,"Priority":775225,"Target":10535,"YesNo":89418},"chars_if_every_prompt_carried_full_state":{"Attack":47978,"Block":23289,"BottomCards":40526,"ChooseCards":33608,"ChooseName":1695,"ChooseOption":4628,"Mode":9204,"Mulligan":61611,"OrderTriggers":8203,"Priority":1078689,"Target":48256,"YesNo":110913},
+"menu_enumeration_ms_avg":0.67,"menu_calls":5797,"prompt_render_ms_avg":0.1,
+"forced_no_prompt":{"ChooseCards":63,"Priority":2718,"Target":21},
+"auto_pass_by_rule":{"stack:only-own-items":233,"stop-rule:my:COMBAT_BEGIN":142,"stop-rule:my:COMBAT_DAMAGE":14,"stop-rule:my:COMBAT_DECLARE_ATTACKERS":137,"stop-rule:my:COMBAT_END":136,"stop-rule:my:COMBAT_FIRST_STRIKE_DAMAGE":3,"stop-rule:my:DRAW":145,"stop-rule:my:END_OF_TURN":139,"stop-rule:my:UPKEEP":142,"stop-rule:opp:COMBAT_BEGIN":117,"stop-rule:opp:COMBAT_DAMAGE":49,"stop-rule:opp:COMBAT_END":97,"stop-rule:opp:COMBAT_FIRST_STRIKE_DAMAGE":1,"stop-rule:opp:DRAW":118,"stop-rule:opp:MAIN1":117,"stop-rule:opp:MAIN2":97,"stop-rule:opp:UPKEEP":117},
+"delegated_to_forge_ai":{"assignCombatDamage":36,"chooseCardsPile":4,"chooseCounterType":41,"chooseNumber":6,"chooseSingleReplacementEffect":1,"chooseSpellAbilityToPlay":1275,"orderMoveToZoneList":6,"payManaCost":889,"playSpellAbilityNoStack":91},
+"problems":{},
+"leak_checks":1757,"leak_failures":0,
+"mirror_ai_priority_pick_on_menu":1275,"mirror_ai_priority_pick_missing":0,
+"problem_samples":[]
+}

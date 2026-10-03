@@ -1,0 +1,132 @@
+id: murktide-delve-cannot-pay-colored-mana
+title: "Delve pays only generic mana: Murktide Regent cannot be cast with one blue source however many cards are exiled"
+area: core
+cards: [Murktide Regent, Island, Lightning Bolt, Brainstorm, Ponder, Preordain, Mountain]
+tags: [delve, murktide-regent, generic-mana-only, mask-validity, mana-payment]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.66a", text: "Delve is a static ability that functions while the spell with delve is on the stack. \"Delve\" means \"For each generic mana in this spell's total cost, you may exile a card from your graveyard rather than pay that mana.\"", verified: true}
+  - {kind: oracle, card: Murktide Regent, text: "Delve (Each card you exile from your graveyard while casting this spell pays for {1}.)", verified: true}
+  - {kind: cr, ref: "702.66b", text: "The delve ability isn't an additional or alternative cost and applies only after the total cost of the spell with delve is determined.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @murk"]
+    battlefield: ["Island @u1", {card: Island, as: u2, tapped: true}]
+    graveyard: ["Lightning Bolt @g1", "Brainstorm @g2", "Ponder @g3", "Preordain @g4", "Mountain @g5", "Mountain @g6", "Lightning Bolt @g7"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@murk", delve: ["@g1", "@g2", "@g3", "@g4", "@g5"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@murk", delve: ["@g1", "@g2", "@g3", "@g4", "@g5", "@g6", "@g7"], pay: auto}}
+  - check:
+      legal: {p0: {exclude: [{t: cast, card: "@murk"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Murktide Regent]
+      graveyard: [Lightning Bolt, Brainstorm, Ponder, Preordain, Mountain, Mountain, Lightning Bolt]
+      exile: []
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: true}]
+notes: >
+  Murktide Regent costs {5}{U}{U}. Delve exiles cards "for each generic mana in the total cost" (702.66a), which is
+  five at most, and never pays {U}. With one untapped Island (the other is tapped) only one {U} can be produced, so the
+  cast is impossible even with seven cards available to delve. A wrong engine that lets delve pay colored mana would
+  allow casting Murktide for one Island and a full graveyard. Nothing changes: the graveyard keeps all seven cards.
+---
+id: murktide-delve-exile-is-not-refunded-when-countered
+title: "Cards exiled to delve stay exiled when Murktide Regent is countered; the countered Murktide goes to the graveyard"
+area: core
+cards: [Murktide Regent, Island, Lightning Bolt, Brainstorm, Ponder, Preordain, Force of Will]
+tags: [delve, murktide-regent, counterspell, no-refund, force-of-will, graveyard]
+derived_from: cr
+source:
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn’t get a “refund” of any costs that were paid.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "702.66a", text: "\"Delve\" means \"For each generic mana in this spell's total cost, you may exile a card from your graveyard rather than pay that mana.\"", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Murktide Regent @murk"]
+    battlefield: ["Island @u1", "Island @u2"]
+    graveyard: ["Lightning Bolt @g1", "Brainstorm @g2", "Ponder @g3", "Preordain @g4", "Island @g5"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Ponder @pond"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@murk", delve: ["@g1", "@g2", "@g3", "@g4", "@g5"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pond", pay_life: 1}, targets: ["@murk"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Murktide Regent]
+      exile: [Lightning Bolt, Brainstorm, Ponder, Preordain, Island]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1: {life: 19, graveyard: [Force of Will], exile: [Ponder], hand: []}
+notes: >
+  The five delved cards were exiled while casting, as payment of the generic mana (702.66a). Countering the spell gives
+  no refund (701.6b): the five cards remain exiled and the two Islands remain tapped. The graveyard now holds only the
+  countered Murktide Regent. A wrong engine could return the delved cards or fail to exile them until resolution.
+---
+id: murktide-counter-when-own-instant-leaves-graveyard
+title: "Murktide Regent gets a +1/+1 counter when an instant card leaves its controller's graveyard"
+area: core
+cards: [Murktide Regent, Brainstorm, Faerie Macabre]
+tags: [murktide-regent, triggered-ability, graveyard, zone-change, faerie-macabre, activated-from-hand]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Murktide Regent, text: "Whenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on this creature.", verified: true}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Faerie Macabre @fm"]
+    battlefield: [{card: Murktide Regent, as: murk, counters: {}}]
+    graveyard: ["Brainstorm @g1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@g1"]}
+  - check:
+      stack: [{kind: activated, source: "@fm"}]
+      p0: {graveyard: [Brainstorm, Faerie Macabre], hand: []}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@murk", controller: p0}]
+      p0: {graveyard: [Faerie Macabre], exile: [Brainstorm]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Faerie Macabre]
+      exile: [Brainstorm]
+      battlefield: [{card: Murktide Regent, counters: {"+1/+1": 1}}]
+notes: >
+  Discarding Faerie Macabre is the cost: the Faerie (a creature card) goes to the graveyard, which does not trigger
+  Murktide. When the ability resolves it exiles Brainstorm, an instant card leaving p0's graveyard, so Murktide
+  triggers; the trigger goes on the stack before p0 next receives priority (603.3) and resolves for one counter. The
+  `counters: {}` in setup means the Murktide starts with no counters.

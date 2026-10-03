@@ -1,0 +1,125 @@
+id: pyroclasm-own-channeler-survives-by-becoming-a-delirium-3-3-as-pyroclasm-hits-the-graveyard
+title: Pyroclasm's own graveyard entry supplies the fourth card type, so a damaged Dragon's Rage Channeler becomes 3/3 before state-based actions and survives
+area: card
+cards: [Pyroclasm, Dragon's Rage Channeler, Island, Mishra's Bauble, Lightning Bolt, Mountain]
+tags: [pyroclasm, drc, delirium, state-based-actions, resolution-order, card-types, surveil]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyroclasm, text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: cr, ref: "704.4", text: "Unlike triggered abilities, state-based actions pay no attention to what happens during the resolution of a spell or ability.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, \"Timing and Priority\"), the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroclasm @pyro"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Dragon's Rage Channeler @drc"]
+    graveyard: ["Island", "Mishra's Bauble", "Lightning Bolt"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@pyro"}, {kind: triggered, source: "@drc"}]
+      p0: {battlefield_contains: [{card: Dragon's Rage Channeler, alias: drc, pt: [1, 1], keywords_exclude: [flying]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@top"]}
+  - check:
+      stack: [{kind: spell, card: "@pyro"}]
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Island, Mishra's Bauble, Lightning Bolt]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Island, Mishra's Bauble, Lightning Bolt, Pyroclasm]
+      battlefield_contains: [{card: Dragon's Rage Channeler, alias: drc, pt: [3, 3], damage: 2, keywords: [flying]}]
+notes: >
+  The graveyard starts with land, artifact and instant (three types). Keeping the surveilled card on top leaves it at three. Pyroclasm deals 2 damage to the
+  1/1 channeler during its resolution, but state-based actions are not checked mid-resolution (704.4); the final step of resolution puts Pyroclasm (a sorcery) into
+  the graveyard, giving the fourth type, so by the next state-based-action check the channeler is a 3/3 with 2 damage and survives. A wrong engine destroys it
+  immediately when the damage is dealt. The channeler is not killed, and its pt is [3,3] with flying.
+---
+id: pyroclasm-kills-own-channeler-when-delirium-is-one-type-short
+title: With only two other card types in the graveyard, Pyroclasm's own card makes three types, so the damaged Dragon's Rage Channeler dies
+area: card
+cards: [Pyroclasm, Dragon's Rage Channeler, Island, Lightning Bolt, Mountain]
+tags: [pyroclasm, drc, delirium, negative-case, card-types, resolution-order]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyroclasm, text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+  - {kind: oracle, card: Dragon's Rage Channeler, text: "Delirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroclasm @pyro"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Dragon's Rage Channeler @drc"]
+    graveyard: ["Island", "Lightning Bolt"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@top"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Island, Lightning Bolt, Pyroclasm, Dragon's Rage Channeler]
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+notes: >
+  Land, instant and (after resolution) sorcery make only three types, so there is no delirium and the 1/1 channeler dies to the 2 damage; it then goes to the graveyard
+  (creature type, irrelevant afterwards). Control case for the previous scenario. A wrong engine always counts the resolving spell as already in the graveyard
+  before dealing damage, or grants delirium from the creature's own death.
+---
+id: pyroclasm-kills-an-equipped-monk-and-leaves-the-equipment
+title: Pyroclasm kills an equipped 2/2 Monk token, and Cori-Steel Cutter stays on the battlefield unattached
+area: card
+cards: [Pyroclasm, Cori-Steel Cutter, Monk Token, Mountain]
+tags: [pyroclasm, equipment, token, state-based-actions, unattach, cori-steel-cutter]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyroclasm, text: "Pyroclasm deals 2 damage to each creature.", verified: true}
+  - {kind: cr, ref: "701.3d", text: "If an Aura, Equipment, or Fortification that was attached to an object or player ceases to be attached to it, that counts as “becoming unattached [from that object or player]”; this includes if that Aura, Equipment, or Fortification leaves the battlefield, the object leaves the zone it was in, or that player leaves the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroclasm @pyro"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Monk Token, as: monk}, {card: Cori-Steel Cutter, as: cut, attached_to: "@monk"}]
+    library_pad: 10
+script:
+  - check:
+      p1: {battlefield_contains: [{token: Monk Token, alias: monk, pt: [2, 2]}]}
+  - p0: {t: cast, card: "@pyro", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Pyroclasm]}
+    p1: {graveyard: [], battlefield: [{card: Cori-Steel Cutter, attached_to: null}]}
+notes: >
+  The equipped Monk is a 2/2 (+1/+1 from the Cutter), so 2 damage kills it. The token vanishes; the Cutter stays on the battlefield, no longer attached.
+  p1 casts no spell, so no prowess trigger helps the Monk. A wrong engine sends the equipment to the graveyard with the creature.

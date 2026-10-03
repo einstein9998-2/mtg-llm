@@ -1,0 +1,115 @@
+id: prismari-charm-mode-two-hits-two-different-targets-for-one-damage-each
+title: Prismari Charm mode 2 deals 1 damage to each of two different targets, a creature and a player
+area: card
+cards: [Prismari Charm, Dragon's Rage Channeler, Island, Mountain]
+tags: [prismari-charm, damage, two-targets, modal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismari Charm, text: "Prismari Charm deals 1 damage to each of one or two targets.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [2], targets: ["@drc", {player: p1}], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@charm", modes: [2], targets: ["@drc", {player: p1}]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm], life: 20}
+    p1: {life: 19, graveyard: [Dragon's Rage Channeler], battlefield: []}
+notes: >
+  Each of the two targets is dealt 1 damage: the 1/1 channeler dies and p1 goes from 20 to 19. A wrong engine deals the damage to only the first target,
+  or divides one damage between them.
+---
+id: prismari-charm-mode-three-bounces-a-nonland-permanent-but-not-a-land
+title: Prismari Charm mode 3 returns a nonland permanent to its owner's hand and cannot target a land
+area: card
+cards: [Prismari Charm, Murktide Regent, Island, Mountain, Volcanic Island]
+tags: [prismari-charm, bounce, targeting, nonland, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismari Charm, text: "Return target nonland permanent to its owner's hand.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Island @i1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Murktide Regent @mur", "Volcanic Island @vi"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [3], targets: ["@vi"], pay: auto}}
+  - p0: {t: cast, card: "@charm", modes: [3], targets: ["@mur"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm]}
+    p1: {hand: [Murktide Regent], battlefield: [{card: Volcanic Island}]}
+notes: >
+  Volcanic Island is a land and therefore not a legal target of the third mode; the probe changes nothing. The Murktide Regent is returned to its owner's
+  hand. A wrong engine allows land targets or destroys instead of returning.
+---
+id: prismari-charm-mode-two-resolves-for-the-remaining-target-when-one-target-is-gone
+title: Prismari Charm mode 2 still hits its other target when one of its two targets was killed in response
+area: card
+cards: [Prismari Charm, Lightning Bolt, Dragon's Rage Channeler, Island, Mountain]
+tags: [prismari-charm, lightning-bolt, partial-fizzle, target-legality, stack, response]
+derived_from: cr
+source:
+  - {kind: oracle, card: Prismari Charm, text: "Prismari Charm deals 1 damage to each of one or two targets.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "Illegal targets, if any, won't be affected by parts of a resolving spell's effect for which they're illegal. Other parts of the effect for which those targets are not illegal may still affect them.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm", "Lightning Bolt @bolt"]
+    battlefield: ["Island @i1", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [2], targets: ["@drc", {player: p1}], pay: auto}
+  - p0: {t: cast, card: "@bolt", targets: ["@drc"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@charm"}, {kind: spell, card: "@bolt"}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@charm"}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Dragon's Rage Channeler], life: 20}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt, Prismari Charm]}
+    p1: {life: 19, graveyard: [Dragon's Rage Channeler]}
+notes: >
+  Bolt (cast last) resolves first and kills the channeler. When the Charm then resolves, one of its two targets is illegal but the player target is still
+  legal, so the Charm resolves normally for the remaining target (608.2b: it only fizzles if all targets are illegal): p1 goes to 19. A wrong engine counters
+  the whole Charm because one target is gone.

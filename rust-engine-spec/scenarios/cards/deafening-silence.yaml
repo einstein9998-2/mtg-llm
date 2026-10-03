@@ -1,0 +1,127 @@
+id: silence-second-noncreature-spell-not-castable-creature-still-is
+title: Under Deafening Silence, after one noncreature spell a player cannot cast a second one that turn, but can still cast a creature
+area: card
+cards: [Deafening Silence, Plateau, Lightning Bolt, Swords to Plowshares, Ocelot Pride, Containment Priest]
+tags: [deafening-silence, casting-restriction, spell-count, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Swords to Plowshares @stp", "Ocelot Pride @oc"]
+    battlefield: ["Deafening Silence @ds", "Plateau @l1", "Plateau @l2", "Plateau @l3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Containment Priest @cp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@l1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@stp", targets: ["@cp"]}}
+  - p0: {t: cast, card: "@oc", pay: {tap: ["@l2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Swords to Plowshares]
+      graveyard: [Lightning Bolt]
+      battlefield_contains: [{card: Ocelot Pride, sick: true}, {card: Plateau, tapped: false}]
+    p1:
+      life: 17
+      battlefield: [{card: Containment Priest}]
+notes: >
+  Bolt is p0's one noncreature spell this turn. Swords is then illegal even though p0 has an untapped Plateau; Ocelot
+  Pride is a creature spell and is unaffected. Deafening Silence restricts its own controller too ("each player").
+---
+id: silence-creature-first-then-one-noncreature-allowed
+title: Under Deafening Silence, casting a creature spell does not use up the one noncreature spell
+area: card
+cards: [Deafening Silence, Plateau, Lightning Bolt, Ocelot Pride]
+tags: [deafening-silence, spell-count, creature-spell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @oc", "Lightning Bolt @bolt"]
+    battlefield: ["Deafening Silence @ds", "Plateau @l1", "Plateau @l2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@oc", pay: {tap: ["@l1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@l2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt]
+    p1:
+      life: 17
+notes: >
+  Positive control for the restriction: a creature spell first, then the single allowed noncreature spell. A wrong
+  engine counts all spells.
+---
+id: silence-limit-is-per-player
+title: Under Deafening Silence each player has their own one-noncreature-spell allowance; the opponent can respond once but not twice
+area: card
+cards: [Deafening Silence, Plateau, Lightning Bolt, Swords to Plowshares, Ocelot Pride]
+tags: [deafening-silence, spell-count, per-player, priority, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Deafening Silence, text: "Each player can't cast more than one noncreature spell each turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt0"]
+    battlefield: ["Deafening Silence @ds", "Plateau @a1", "Ocelot Pride @oc"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt1", "Swords to Plowshares @stp1"]
+    battlefield: ["Plateau @b1", "Plateau @b2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt0", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt1", targets: [{player: p0}], pay: {tap: ["@b1"]}}
+  - expect_illegal: {p1: {t: cast, card: "@stp1", targets: ["@oc"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      graveyard: [Lightning Bolt]
+      battlefield_contains: [{card: Ocelot Pride}]
+    p1:
+      life: 17
+      hand: [Swords to Plowshares]
+      graveyard: [Lightning Bolt]
+notes: >
+  p0's Bolt does not use up p1's allowance: p1 may cast one noncreature spell (Bolt) in response. After that p1 holds
+  priority again (117.3c) and a second noncreature spell (Swords on p0's Ocelot Pride, payable with p1's untapped
+  Plateau) is illegal. p1's Bolt resolves first (p0 17), then p0's (p1 17). A wrong engine shares one count between
+  the players or counts only the active player's spells.

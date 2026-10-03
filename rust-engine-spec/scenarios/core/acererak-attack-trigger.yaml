@@ -1,0 +1,80 @@
+id: acererak-attack-trigger-opponent-sacrifices-creature-no-zombie
+title: "Acererak's attack trigger: the opponent chooses to sacrifice a creature, so no Zombie is created"
+area: core
+cards: [Acererak the Archlich, Zombie Token, Goblin Token]
+tags: [acererak, triggers, attack-trigger, opponent-choice, sacrifice, combat]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "Whenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice.", verified: true}
+  - {kind: cr, ref: "508.1m", text: "Any abilities that trigger on attackers being declared trigger.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Acererak the Archlich @ace"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@ace", target: {player: p1}}]}
+  - check:
+      stack:
+        - {kind: triggered, source: "@ace", controller: p0}
+  - resolve_top: true
+  - p1: {decision: yes_no, purpose: sacrifice_creature_to_stop_zombie, answer: true}
+  - p1: {decision: choose_cards, purpose: sacrifice, answer: ["@gob"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {battlefield: [], graveyard: []}
+    p0:
+      battlefield: [{card: Acererak the Archlich, tapped: true}]
+notes: >
+  The opponent, not Acererak's controller, decides whether to sacrifice ("that player sacrifices a creature of their
+  choice"). p1 has the Goblin token and pays; so p0 gets no Zombie. The token ceases to exist after being sacrificed, so p1's
+  graveyard is empty. The decision decomposition (a yes/no followed by a choice among creatures, one candidate here) follows
+  design doc 02 section 2.2; scenario mode presents both prompts even though the creature choice has one candidate.
+---
+id: acererak-attack-trigger-opponent-declines-zombie-created
+title: "Acererak's attack trigger: the opponent declines to sacrifice, keeps their creature, and p0 creates the Zombie"
+area: core
+cards: [Acererak the Archlich, Zombie Token, Goblin Token]
+tags: [acererak, triggers, attack-trigger, opponent-choice, token, combat]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Acererak the Archlich, text: "Whenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Acererak the Archlich @ace"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@ace", target: {player: p1}}]}
+  - resolve_top: true
+  - p1: {decision: yes_no, purpose: sacrifice_creature_to_stop_zombie, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p1: {battlefield: [{token: Goblin Token}]}
+    p0:
+      battlefield:
+        - {card: Acererak the Archlich, tapped: true}
+        - {token: Zombie Token, pt: [2, 2]}
+notes: >
+  Declining the sacrifice means the "unless" clause did not happen, so p0 creates the Zombie. The Goblin stays. A wrong engine
+  would let p0 (the attacker's controller) decide, or create the Zombie regardless of the sacrifice.

@@ -1,0 +1,18 @@
+{'complete': 4173, 'game_over': 6, 'unaligned': 36, 'forge_play_failed': 20, 'history_artifact': 8, 'diverged': 2}
+   14  unaligned  payment    the engines paid a cost from different lands (or a damage source differs): later windows are not comparable   e.g. rnd:alurentell-dimir-tempo-s700240-d92
+    3  unaligned  follow     leftover: payCostToPreventEffect true   e.g. rnd:bw-death-and-taxes-alurentell-s700322-d60
+    3  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Scrubland{}|T", "Witch-Blessed    e.g. rnd:bw-death-and-taxes-alurentell-s700938-d43
+    2  unaligned  follow     unmatched: ChooseReplicate: no logged number (None)   e.g. rnd:uwx-control-boros-aggro-s700351-d757
+    2  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Scrubland{}|T", "Shadowy Backst   e.g. rnd:bw-death-and-taxes-ur-cutter-s700698-d181
+    2  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Scrubland{}|T", "done"]   e.g. rnd:bw-death-and-taxes-boros-aggro-s700834-d47
+    2  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Phelia, Exuberant Shepherd{}",    e.g. rnd:boros-aggro-bw-death-and-taxes-s700841-d583
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Murktide Regent{PNPN=N}", "Ampe   e.g. rnd:ur-cutter-boros-aggro-s700246-d239
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Recruiter of the Guard{}", "Whi   e.g. rnd:bw-death-and-taxes-doomsday-s700514-d224
+    1  diverged   window     priority: rust seat N stack N, forge seat N stack N   e.g. rnd:doomsday-alurentell-s700812-d36
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Shadowy Backstreet{}|T", "done"   e.g. rnd:bw-death-and-taxes-uwx-control-s700874-d139
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Dragon's Rage Channeler{}|T", "   e.g. rnd:ur-cutter-boros-aggro-s700974-d318
+    1  diverged   state      human bf: rust [Island^L;Kaito, Bane of Nightmares|Counters:LOYALTY=N;Nethergoyf;Polluted Delta^L;Swamp^L;Unde   e.g. rnd:dimir-tempo-boros-aggro-s700995-d511
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Recruiter of the Guard{}", "don   e.g. rnd:alurentell-bw-death-and-taxes-s701016-d158
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Prismatic Vista{}", "done"]   e.g. rnd:dimir-tempo-bw-death-and-taxes-s701843-d106
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Witch-Blessed Meadow{}|T", "don   e.g. rnd:bw-death-and-taxes-boros-aggro-s701954-d121
+    1  unaligned  follow     unmatched: ChooseTarget { slot: N }: no logged trigger/ability targets among ["Scrubland{}", "Shadowy Backstre   e.g. rnd:bw-death-and-taxes-uwx-control-s702050-d256

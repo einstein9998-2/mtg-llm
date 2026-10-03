@@ -1,0 +1,27 @@
+# Finding E7 (lockstep lines, random games boros-aggro vs bw/ur, seeds 700162 and 701366): new engine bug, open on m3h.
+# Ajani, Nacatl Pariah: "Whenever one or more other Cats you control die, you may exile Ajani, then return him transformed."
+# In the engine the trigger goes on the stack when a permanent that is not a Cat is sacrificed as a cost (Wasteland, a fetchland), and a yes
+# flips Ajani into Ajani, Nacatl Avenger without any Cat dying. Forge puts only the activated ability on the stack. Found as a stack-size
+# mismatch (rust 3, forge 2) after Wasteland was activated; confirmed here on the engine alone.
+# (Not checked: whether permanents that die by destruction or damage trigger it. The cases below are the two cost-sacrifices seen.)
+=== wasteland-sacrifice-does-not-trigger-ajani
+title: Sacrificing Wasteland as a cost does not trigger Ajani, Nacatl Pariah (no Cat died); only the ability is on the stack
+ref: Ajani, Nacatl Pariah Oracle
+state:
+  humanbattlefield=Wasteland;Ajani, Nacatl Pariah
+  aibattlefield=Boggart Bog
+script:
+  p1: activate Wasteland -> Boggart Bog
+  p1: check stack size == 1
+expect:
+  controls p1 "Ajani, Nacatl Pariah"
+
+=== fetchland-crack-does-not-trigger-ajani
+title: Cracking a fetchland does not trigger Ajani, Nacatl Pariah
+ref: Ajani, Nacatl Pariah Oracle
+state:
+  humanbattlefield=Ajani, Nacatl Pariah;Arid Mesa
+  humanlibrary=Plateau;Island
+script:
+  p1: activate Arid Mesa
+  p1: check stack size == 1

@@ -1,0 +1,73 @@
+id: volcanic-island-one-mana-of-one-color
+title: Volcanic Island adds one mana, either U or R, not both; the single tap pays for Lightning Bolt and nothing else
+area: card
+cards: [Volcanic Island, Lightning Bolt, Brainstorm, Island, Mountain]
+tags: [dual-land, mana-ability, land-types, nonbasic]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Volcanic Island, text: "({T}: Add {U} or {R}.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Brainstorm @bs"]
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@volc", ability: 0, choose_color: R}
+  - check:
+      p0: {mana_pool: {R: 1}}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - expect_illegal: {p0: {t: cast, card: "@bs", pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      mana_pool: {}
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Volcanic Island, tapped: true, types: [Land], subtypes: [Island, Mountain]}]
+    p1: {life: 17}
+notes: >
+  The land makes ONE mana of the chosen color. After it is spent on Lightning Bolt the pool is empty and the land is tapped, so Brainstorm
+  ({U}) cannot be cast (expect_illegal: nothing left to pay with). The derived subtypes Island and Mountain are asserted on the permanent.
+---
+id: volcanic-island-mana-empties-at-end-of-phase
+title: Mana from Volcanic Island stays through priority passes in the phase and empties when main phase 1 ends
+area: card
+cards: [Volcanic Island]
+tags: [dual-land, mana-ability, mana-pool, phase-end]
+derived_from: cr
+source:
+  - {kind: cr, ref: "500.5", text: "As a step or phase ends, if there are effects that last until the end of that step or phase, those effects expire. Then any unspent mana left in a player's mana pool empties.", verified: true}
+  - {kind: oracle, card: Volcanic Island, text: "({T}: Add {U} or {R}.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@volc", ability: 0, choose_color: U}
+  - check:
+      p0: {mana_pool: {U: 1}}
+      phase: main1
+  - advance: {to: begin_combat, of: p0}
+expect:
+  - at: after_script
+    phase: begin_combat
+    active: p0
+    stack: []
+    p0: {mana_pool: {}, battlefield: [{card: Volcanic Island, tapped: true}]}
+notes: >
+  Unused mana does not carry over to the next step or phase (500.5). The land stays tapped, so the mana is simply lost. The advance step performs
+  explicit passes by both players with an empty stack; no decisions arise on the way.
