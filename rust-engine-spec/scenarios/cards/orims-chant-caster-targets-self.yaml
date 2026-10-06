@@ -1,0 +1,56 @@
+id: orims-chant-caster-can-target-itself-and-then-cannot-cast
+title: "Orim's Chant may target its own caster: afterwards the caster cannot cast Lightning Bolt while the opponent still can"
+area: card
+cards: ["Orim's Chant", Plains, Mountain, Lightning Bolt]
+tags: [orims-chant, casting-restriction, target-self, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orim's Chant @chant", "Lightning Bolt @b0"]
+    battlefield: ["Plains @pl", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @b1"]
+    battlefield: ["Mountain @m1"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@chant", targets: [{player: p0}]}, {t: cast, card: "@chant", targets: [{player: p1}]}]}}
+  - p0: {t: cast, card: "@chant", targets: [{player: p0}], pay: {tap: ["@pl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - expect_illegal: {p0: {t: cast, card: "@b0", targets: [{player: p1}], pay: {tap: ["@mtn"]}}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@b0"}]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@b1", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      hand: [Lightning Bolt]
+      graveyard: ["Orim's Chant"]
+      battlefield: [{card: Plains, tapped: true}, {card: Mountain, tapped: false}]
+    p1:
+      life: 20
+      hand: []
+      graveyard: [Lightning Bolt]
+      spells_cast_this_turn: 1
+notes: >
+  "Target player" is any player, including the caster. After Chant resolves on p0, p0's Bolt is not offered although an
+  untapped Mountain is available, while p1's Bolt is (p1 Bolts p0 to 17). Wrong engines: restrict the opponent
+  regardless of the target, restrict both players, or forbid the self-target.

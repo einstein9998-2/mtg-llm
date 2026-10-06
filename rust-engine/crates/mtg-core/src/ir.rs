@@ -810,6 +810,10 @@ pub enum PlayerFx {
     SpellsUncounterable,
     /// The player and their permanents have hexproof from the given colors.
     HexproofFrom(Colors),
+    /// The player can't cast spells (Orim's Chant).
+    CantCast,
+    /// Creatures the player controls can't attack (Orim's Chant, kicked: applied to each player).
+    CreaturesCantAttack,
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]

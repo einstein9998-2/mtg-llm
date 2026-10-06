@@ -1045,6 +1045,13 @@
    "oracle_text": "When Ajani enters, create a 2/1 white Cat Warrior creature token.\nWhenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.",
    "source": "RECALLED from memory (the card search returns no face text for this multi-face card); unverified. Scenarios quoting it are verified:false.",
    "pt": "3/2"
+  },
+  "Orim's Chant": {
+   "name": "Orim's Chant",
+   "mana_cost": "{W}",
+   "type_line": "Instant",
+   "oracle_text": "Kicker {W} (You may pay an additional {W} as you cast this spell.)\nTarget player can't cast spells this turn. If this spell was kicked, creatures can't attack this turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
   }
  },
  "tokens": {

@@ -1,0 +1,59 @@
+id: orims-chant-countered-has-no-effect
+title: "A countered Orim's Chant never resolves, so the opponent who countered it can still cast Lightning Bolt the same turn"
+area: card
+cards: ["Orim's Chant", Plains, Force of Will, Brainstorm, Lightning Bolt, Mountain]
+tags: [orims-chant, counterspell, force-of-will, no-effect, casting-restriction, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@chant", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@chant"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: ["Orim's Chant"]}
+      p1: {life: 19, graveyard: [Force of Will], exile: [Brainstorm]}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@bolt", targets: [{player: p0}]}]}}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      graveyard: ["Orim's Chant"]
+    p1:
+      life: 19
+      hand: []
+      graveyard: [Force of Will, Lightning Bolt]
+      exile: [Brainstorm]
+      spells_cast_this_turn: 2
+notes: >
+  Force of Will (pitching Brainstorm, 1 life) counters Chant. A countered spell does not resolve and none of its effects
+  occur (701.6a), so p1's casting is unrestricted: Bolt is offered in the same main phase and resolves (p0 at 17, p1
+  at 19 from the pitch cost). Wrong engines apply the restriction when Chant is cast rather than when it resolves.
+  The "fizzled" case (all targets illegal on resolution, 608.2b) cannot be built: the only target is a player, and a
+  player cannot become an illegal target in this two-player pool.

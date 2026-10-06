@@ -67,6 +67,11 @@ impl<'a> Cx<'a> {
     /// With `x = Some(n)` the spell is already on the stack with X announced: only the rules that
     /// look at its mana value (which now includes X) can still forbid it.
     pub(crate) fn cast_restricted_x(&mut self, seat: Seat, spell: ObjRef, x: Option<u8>) -> bool {
+        // "Target player can't cast spells this turn" (Orim's Chant). It applies at announcement
+        // only: a spell already on the stack (`x` is `Some`) was legally cast.
+        if x.is_none() && self.s.player_fx.iter().any(|f| f.player == seat && f.fx == PlayerFx::CantCast) {
+            return true;
+        }
         if !self.db.has_restrict {
             return false;
         }

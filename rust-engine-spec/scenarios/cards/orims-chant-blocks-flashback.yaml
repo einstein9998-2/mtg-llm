@@ -1,0 +1,65 @@
+id: orims-chant-blocks-flashback-and-hand-cast-in-own-turn
+title: "Orim's Chant cast in the opponent's upkeep stops flashback from the graveyard (mana and sacrifice flashback) and the hand copy in that player's own main phase"
+area: card
+cards: ["Orim's Chant", Plains, Cabal Therapy, Faithless Looting, Ocelot Pride, Swamp, Mountain, Island]
+tags: [orims-chant, casting-restriction, flashback, cast-from-graveyard, own-turn, alternative-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "702.34a", text: "“Flashback [cost]” means “You may cast this card from your graveyard if the resulting spell is an instant or sorcery spell by paying [cost] rather than paying its mana cost”", verified: true}
+  - {kind: cr, ref: "117.3a", text: "The active player receives priority at the beginning of most steps and phases, after any turn-based actions (such as drawing a card during the draw step; see rule 703) have been dealt with", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: upkeep
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Cabal Therapy @ct_hand"]
+    battlefield: ["Swamp @sw", "Mountain @m1", "Mountain @m2", "Mountain @m3", "Ocelot Pride @op"]
+    graveyard: ["Cabal Therapy @ct_gy", "Faithless Looting @fl_gy"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@chant", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      turn: 4
+      phase: upkeep
+  - advance: {to: main1, of: p1}
+  - expect_illegal: {p1: {t: cast, card: "@ct_gy", alt_cost: {flashback: {sacrifice: "@op"}}, targets: [{player: p0}]}}
+  - expect_illegal: {p1: {t: cast, card: "@fl_gy", alt_cost: {flashback: true}, pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@ct_hand", targets: [{player: p0}], pay: auto}}
+  - check:
+      legal:
+        p1:
+          include: [{t: pass}]
+          exclude: [{t: cast, card: "@ct_gy"}, {t: cast, card: "@fl_gy"}, {t: cast, card: "@ct_hand"}]
+expect:
+  - at: after_script
+    turn: 4
+    phase: main1
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {graveyard: ["Orim's Chant"]}
+    p1:
+      life: 20
+      hand: [Cabal Therapy, Island]
+      graveyard: [Cabal Therapy, Faithless Looting]
+      exile: []
+      spells_cast_this_turn: 0
+      battlefield_contains: [{card: Ocelot Pride}, {card: Swamp, tapped: false}, {card: Mountain, tapped: false}]
+notes: >
+  p0 casts Chant in p1's upkeep (p1 passes first as the active player, then p0 has priority). By p1's main phase 1
+  (the draw step added an Island to p1's hand) p1 has priority with an empty stack, untapped Swamp and Mountains and a
+  creature to sacrifice, yet may not cast: Cabal Therapy from hand, Faithless Looting by flashback {2}{R}, or Cabal
+  Therapy by flashback (sacrifice a creature, no mana). Flashback is an alternative cost way of casting (702.34a), so it
+  is still casting. Nothing is exiled, no creature is sacrificed. The sorcery-speed timing is legal in main phase 1 with an
+  empty stack (see cabal-therapy.yaml for the positive control), so the exclusion is due to Chant only.

@@ -1,0 +1,63 @@
+id: orims-chant-blocks-aluren-free-cast-while-the-caster-can-still-use-aluren
+title: "Aluren's free creature cast is still a cast: after Orim's Chant the targeted player cannot flash in a creature, but the Chant caster can"
+area: card
+cards: ["Orim's Chant", Plains, Aluren, Ocelot Pride]
+tags: [orims-chant, casting-restriction, aluren, free-cast, alternative-cost, flash, caster-unaffected, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orim's Chant @chant", "Ocelot Pride @op0"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Ocelot Pride @op1"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@chant", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      stack: [{kind: spell, card: "@chant", controller: p0}]
+      legal: {p1: {include: [{t: cast, card: "@op1", alt_cost: {free: aluren}}]}}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - p0: {t: cast, card: "@op0", alt_cost: {free: aluren}}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      stack: [{kind: spell, card: "@op0", controller: p0}]
+  - expect_illegal: {p1: {t: cast, card: "@op1", alt_cost: {free: aluren}}}
+  - check:
+      legal: {p1: {include: [{t: pass}], exclude: [{t: cast, card: "@op1"}]}}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: ["Orim's Chant"]
+      spells_cast_this_turn: 2
+      battlefield_contains: [{card: Ocelot Pride, controller: p0}]
+    p1:
+      hand: [Ocelot Pride]
+      battlefield: [{card: Aluren}]
+      spells_cast_this_turn: 0
+notes: >
+  Aluren lets any player cast creature spells with mana value 3 or less without paying their mana costs and as though
+  they had flash. That is a permission to cast, so the restriction applies to it exactly as to any other cast (601.3,
+  101.2). Control: while Chant is on the stack p1's free Ocelot Pride cast is offered (flash from Aluren). After Chant
+  resolves, p1 is not offered it even while p0's free-cast Ocelot is on the stack, and p0's free cast was allowed.
+  A wrong engine checks the prohibition only when mana is paid, and a free cast pays none. Also not a Lavinia trap:
+  no Lavinia is on the battlefield.

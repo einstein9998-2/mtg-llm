@@ -7,25 +7,23 @@ _Prepared 2026-10-01 for Brady to edit. Banlist as of 2026-08-10. Forge master a
 | # | Deck | Type | Meta evidence | Source list | Forge-AI-unsupported cards in main |
 |---|------|------|---------------|-------------|------|
 | 1 | UR Cutter (Murktide / Cori-Steel Cutter tempo) | Tempo (non-combo) | UR Tempo 4% on mtgtop8 2-month and 5.6% on AetherHub; Izzet Delver 4.2% on MTGGoldfish | [hejljud, 4th, MTGO League, 2026-09-22](https://mtgtop8.com/event?e=91149&d=892306&f=LE) | Mishra's Bauble (4) |
-| 2 | Alurentell (Aluren + Show and Tell + Omniscience) | Combo (Aluren / cheat big permanents) | Aluren 4% on mtgtop8 2-month (all recent Aluren lists are this hybrid); Aluren 3.9% on MTGGoldfish | Brady's personal list, 2026-10-06 (was Freqing, 1st, MTGO League, 2026-09-27) | City of Traitors (1) |
+| 2 | Alurentell (Aluren + Show and Tell + Omniscience) | Combo (Aluren / cheat big permanents) | Aluren 4% on mtgtop8 2-month (all recent Aluren lists are this hybrid); Aluren 3.9% on MTGGoldfish | [Freqing, 1st, MTGO League, 2026-09-27](https://mtgtop8.com/event?e=91342&d=893755&f=LE) | City of Traitors (1) |
 | 3 | Boros Aggro (Energy) | Aggro (non-combo) | Boros Energy #3 on MTGGoldfish (6.3%); Ocelot Aggro 9.7% on MTGO tier list; Boros Aggro 6% on mtgtop8 2-month | [Fenrir18, 13th, MTGO Challenge 32, 2026-09-27 (65 players)](https://mtgtop8.com/event?e=91385&d=894044&f=LE) | Goblin Bombardment (3) |
 | 4 | BW Death and Taxes | Midrange / taxes (non-combo) | Death and Taxes (Yorion) BW #4 on MTGGoldfish (5.3%); BW D&T 3.4% AetherHub; D&T 4% mtgtop8 2-month | [Federodi, 5th-8th, 1 Tappa Tigullio League 2026/27, 2026-09-27 (23 players)](https://mtgtop8.com/event?e=91360&d=893865&f=LE) | none |
 | 5 | Dimir Tempo | Tempo (non-combo) | #1 on MTGGoldfish (10.3%), MTGO tier list (10.1%), AetherHub (7.5%), mtgtop8 2-month (11%) | [_GhostWalking_, 14th, MTGO Challenge 32, 2026-09-27 (65 players)](https://mtgtop8.com/event?e=91385&d=894054&f=LE) | Nethergoyf (4), Mishra's Bauble (3) |
-| 6 | UW Phelia (Phelia / Riddler / Stifle; formerly "UWx Control", file stem `uwx-control`) | Control-tempo (non-combo) | UWx Control 9% on mtgtop8 2-month (#2); Uwx Phelia #3 on AetherHub (6.25%); Azorius Tempo 2.2% on MTGGoldfish | [HJ_Kaiser, 5th-8th, MTGO Challenge 32, 2026-09-27 (65 players)](https://mtgtop8.com/event?e=91385&d=894042&f=LE) | Prismatic Ending (2), Stifle (4) |
+| 6 | UWx Control (Phelia / Riddler / Stifle) | Control-tempo (non-combo) | UWx Control 9% on mtgtop8 2-month (#2); Uwx Phelia #3 on AetherHub (6.25%); Azorius Tempo 2.2% on MTGGoldfish | [HJ_Kaiser, 5th-8th, MTGO Challenge 32, 2026-09-27 (65 players)](https://mtgtop8.com/event?e=91385&d=894042&f=LE) | Prismatic Ending (2), Stifle (4) |
 | 7 | Doomsday | Combo (pile / Oracle) | #5 on MTGGoldfish (5.1%); 6.5% and best win rate (65.8%) on MTGO tier list; 4% mtgtop8 2-month | [thescuba96, 2nd, MTGO Challenge 32, 2026-09-27 (65 players)](https://mtgtop8.com/event?e=91385&d=894043&f=LE) | Doomsday (4), Edge of Autumn (2), Lion's Eye Diamond (1) |
 | 8 | Reanimator | Combo (graveyard) | Reanimator 4% on mtgtop8 2-month; Rakdos Reanimator 3.1% on MTGGoldfish; 4.1% on MTGO tier list | [pacoelflaco, 2nd, MTGO Challenge 32, 2026-09-26](https://mtgtop8.com/event?e=91314&d=893501&f=LE) | Cabal Therapy (1), Faithless Looting (4), Unmask (4) |
-| 9 | Storm (Beseech Storm), added 2026-10-06 | Combo (LED / Wish storm) | Storm 3% on mtgtop8 2-month; 14 distinct Storm-family entries on mtgtop8 between 2026-09-22 and 2026-10-04, 9 of them this Beseech Storm variant (2 were TES) | Brady's own 75 (2026-10-06); main identical to [Otazz, 9th, MTGO Challenge 32, 2026-10-02 (53 players)](https://mtgtop8.com/event?e=91634&d=895876&f=LE) | not checked yet |
-| 10 | Colorless Tron (Karn / Ugin / Tezzeret / The One Ring + Trinisphere), added 2026-10-06 | Prison-ramp (colorless Tron lands) | Not a meta pick: Brady's own list, added as an Alurentell opponent | Brady's personal list, 2026-10-06 (not a tournament list) | not checked (Forge does not pilot it); 27 of its 32 distinct cards are missing from the Rust engine, see `tron-engine-gap.md` |
 
 **Pool:** 144 unique non-basic cards, 45 of them shared by two or more decks. That is below your 200 to 300 estimate. Each list is one real tournament list, not an average, so it reflects one pilot's choices; tune them if you want a more typical build.
 
-**Spread:** five non-combo decks (aggro, taxes-midrange, two tempo decks, tempo-control) and three combo decks (Alurentell, Doomsday, Reanimator). There is no pure draw-go control deck: the UW Phelia list is a tempo-control deck built on Phelia, Quantum Riddler, Tamiyo and Stifle, which is what UW Phelia currently means in Legacy. Storm (Beseech Storm) was added as a ninth deck on 2026-10-06 at Brady's request, as an Alurentell opponent, using his own 75; it needs new engine cards, see `storm-engine-gap.md`. A TES list is kept in `storm-tes-alt.txt`. Colorless Tron was added as a tenth deck on 2026-10-06, also at Brady's request as an Alurentell opponent, using his own 75 (checked card by card; see `tron-engine-gap.md` for the engine gap). The 144-card pool count above predates decks 9 and 10: Tron adds 27 unique non-basic cards the engine lacks and shares 5 with the pool (Ancient Tomb, Karakas, Boseiju, Disruptor Flute, Grafdigger's Cage).
+**Spread:** five non-combo decks (aggro, taxes-midrange, two tempo decks, tempo-control) and three combo decks (Alurentell, Doomsday, Reanimator). There is no pure draw-go control deck: the UWx Control list is a tempo-control deck built on Phelia, Quantum Riddler, Tamiyo and Stifle, which is what UWx Control currently means in Legacy. Storm is 3% on mtgtop8, so it is out for now.
 
 ## Matchups
 
 1. **UR Cutter vs Alurentell (your pick).** Do not let the Forge AI pilot Alurentell: it has no logic for the Aluren or Show and Tell combo, so a Forge-AI Alurentell would mostly sit there and flatter any win rate. For a Forge baseline, put the AI on the UR Cutter side and have our player pilot Alurentell.
 2. **Boros Aggro vs BW Death and Taxes.** The cleanest pipeline test for the Forge-AI milestone: both are creature-combat decks with little stack interaction, BW D&T has no AI-unsupported card in its main deck, and Boros has one (Goblin Bombardment).
-3. **Dimir Tempo vs UW Phelia.** The stack and priority stress test (Force of Will, Daze, Stifle, Brainstorm, Bowmasters). Nethergoyf, Mishra's Bauble, Stifle and Prismatic Ending are the AI-unsupported cards in play.
+3. **Dimir Tempo vs UWx Control.** The stack and priority stress test (Force of Will, Daze, Stifle, Brainstorm, Bowmasters). Nethergoyf, Mishra's Bauble, Stifle and Prismatic Ending are the AI-unsupported cards in play.
 
 The other combo decks, Doomsday and Reanimator, are for our players to pilot against the non-combo decks, not for the Forge AI.
 
@@ -63,13 +61,13 @@ No card in any main deck or sideboard is on the Legacy banlist (Wizards' list as
 **Risks specific to this set:**
 - **Aluren is "any player" and lets either player cast creatures with mana value 3 or less for free at instant speed.** Forge's script extends the permission to several zones with a flag meant to avoid granting new zone permissions; worth a scripted test.
 - **Acererak ventures into a dungeon.** The action API has to expose dungeon room choices.
-- **Stifle (UW Phelia) targets triggered and activated abilities.** The legal-action enumerator has to expose triggers on the stack as targets.
+- **Stifle (UWx Control) targets triggered and activated abilities.** The legal-action enumerator has to expose triggers on the stack as targets.
 - **Newer and Universes Beyond cards** (Spider-Woman, Raph & Mikey, Bilbo, Samwise, Kaito, Cloak and Dagger) are the least battle-tested scripts. Most are one-of or two-of cards, but they are a good place to look for rules bugs.
 - **Forge has a headless `sim` mode** (`forge-gui-desktop/.../view/SimulateMatch.java`) for the Phase 1 runner; JDK 21 is installed here. Games per second not measured.
 
 ## Not included, in case you want to swap
 
-Eldrazi Aggro (#2 on MTGGoldfish), Tron and Karn Forge, Artifacts Blue (won MTGO Challenge 32 on 2026-09-27), Lands, Sewer-Cam Combo, Hogaak. I did not pull lists for them. Artifacts Blue and Lands are the two I would look at first for a colorless or prison-style deck.
+Eldrazi Aggro (#2 on MTGGoldfish), Tron and Karn Forge, Artifacts Blue (won MTGO Challenge 32 on 2026-09-27), Lands, Sewer-Cam Combo, Hogaak, Storm. I did not pull lists for them. Artifacts Blue and Lands are the two I would look at first for a colorless or prison-style deck.
 
 ## Decklists
 
@@ -113,19 +111,20 @@ Sideboard (15)
 
 ### 2. Alurentell (Aluren + Show and Tell + Omniscience)
 
-Source: Brady's personal list, 2026-10-06 (not a tournament list; replaces the Freqing 1st-place list of 2026-09-27, kept in `superseded-v3/`). The engine needs Orim's Chant for the sideboard (RFC 0005); Savannah was already in the pool.
+Source: [Freqing, 1st, MTGO League, 2026-09-27](https://mtgtop8.com/event?e=91342&d=893755&f=LE)
 
 ```
 Main (60)
 4 Ancient Tomb
 1 Boseiju, Who Endures
 1 City of Traitors
-3 Flooded Strand
+1 Flooded Strand
+1 Forest
 2 Hedge Maze
-1 Island
+2 Island
 4 Misty Rainforest
-1 Savannah
-1 Tundra
+1 Polluted Delta
+1 Prismatic Vista
 2 Tropical Island
 4 Acererak the Archlich
 4 Atraxa, Grand Unifier
@@ -140,12 +139,14 @@ Main (60)
 2 Omniscience
 
 Sideboard (15)
-4 Carpet of Flowers
-1 Force of Negation
+1 Boseiju, Who Endures
+3 Carpet of Flowers
 2 Consign to Memory
+2 Defense Grid
+1 Dismember
+1 Disruptor Flute
 2 Faerie Macabre
-2 Orim's Chant
-2 Prismatic Ending
+1 Force of Negation
 2 Veil of Summer
 ```
 
@@ -275,7 +276,7 @@ Sideboard (15)
 1 Snuff Out
 ```
 
-### 6. UW Phelia (Phelia / Riddler / Stifle; file stem `uwx-control`)
+### 6. UWx Control (Phelia / Riddler / Stifle)
 
 Source: [HJ_Kaiser, 5th-8th, MTGO Challenge 32, 2026-09-27 (65 players)](https://mtgtop8.com/event?e=91385&d=894042&f=LE)
 
@@ -397,91 +398,4 @@ Sideboard (15)
 4 Show and Tell
 4 Stronghold Gambit
 2 Surgical Extraction
-```
-
-### 9. Storm (Beseech Storm)
-
-Source: Brady's own list, 2026-10-06; main matches [Otazz, 9th, MTGO Challenge 32, 2026-10-02](https://mtgtop8.com/event?e=91634&d=895876&f=LE) and yonthan910, 1st, MTGO League, 2026-09-23. Only the sideboard differs (Veil of Summer instead of Carpet of Flowers). Not yet in the Rust engine (see `storm-engine-gap.md`).
-
-```
-Main (60)
-1 Badlands
-1 Bloodstained Mire
-1 Raucous Theater
-1 Scalding Tarn
-1 Taiga
-1 Underground Sea
-4 Urza's Saga
-2 Verdant Catacombs
-4 Hexing Squelcher
-1 Runehorn Hellkite
-3 Beseech the Mirror
-4 Burning Wish
-4 Dark Ritual
-3 Echo of Eons
-1 Gaea's Will
-4 Gamble
-1 Tendrils of Agony
-2 Veil of Summer
-4 Chrome Mox
-4 Giant's Boulder
-4 Lion's Eye Diamond
-4 Lotus Petal
-4 Mox Opal
-1 Song of Creation
-
-Sideboard (15)
-1 Beseech the Mirror
-4 Boomerang Basics
-2 Boseiju, Who Endures
-1 Echo of Eons
-1 Empty the Warrens
-1 Haywire Mite
-1 Peer into the Abyss
-1 Thoughtseize
-1 Tendrils of Agony
-2 Veil of Summer
-```
-
-### 10. Colorless Tron
-
-Source: Brady's own list, 2026-10-06 (not a tournament list). Mostly not in the Rust engine yet (see `tron-engine-gap.md`).
-
-```
-Main (60)
-4 Ancient Tomb
-1 Karakas
-2 Boseiju, Who Endures
-4 Planar Nexus
-4 Urza's Saga
-4 Urza's Tower
-4 Urza's Workshop
-4 Karn, the Great Creator
-4 Ugin, Eye of the Storms
-4 Tezzeret, Cruel Captain
-4 The One Ring
-4 Trinisphere
-4 Kozilek's Command
-4 Grim Monolith
-2 Manifold Key
-1 Voltaic Key
-2 Mishra's Research Desk
-1 Pithing Needle
-1 Disruptor Flute
-1 Portable Hole
-1 Expedition Map
-
-Sideboard (15)
-1 Portable Hole
-1 Tormod's Crypt
-1 Grafdigger's Cage
-1 Eldrazi Confluence
-1 Liquimetal Coating
-1 Torpor Orb
-3 Warping Wail
-1 Ensnaring Bridge
-2 Argentum Masticore
-1 Mycosynth Lattice
-1 Extinguisher Battleship
-1 Summon: Bahamut
 ```
