@@ -139,6 +139,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
   var db = null;
   var saving = {};   // id -> {busy, again}
   var timers = {};
+  var cardKeys = {};
   var localRev = {};  // id -> number of local edits; a snapshot older than this is stale
   function bump(id) { localRev[id] = Math.max(localRev[id] || 0, (answers[id] && answers[id].rev) || 0) + 1; }
 
@@ -172,13 +173,48 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       cardsEl.innerHTML = '<div class="empty">No positions loaded. When Claude adds a batch it appears here.</div>';
       return;
     }
-    // Keep typed notes and scroll position while re-rendering.
-    var active = document.activeElement, activeId = active && active.id, selStart = active && active.selectionStart;
-    cardsEl.innerHTML = positions.map(cardHtml).join('');
-    if (activeId) { var el = document.getElementById(activeId); if (el) { el.focus(); try { el.setSelectionRange(selStart, selStart); } catch (e) {} } }
+    // Update card by card: a card is rebuilt only when what it shows changes. Typing never rebuilds
+    // anything, so the note box keeps its cursor and scroll position.
+    var orderKey = positions.map(function (p) { return p.id; }).join('|');
+    if (cardsEl.dataset.order !== orderKey) {
+      cardsEl.innerHTML = positions.map(function (p, i) { return cardHtml(p, i, false); }).join('');
+      cardsEl.dataset.order = orderKey;
+      cardKeys = {};
+      positions.forEach(function (p, i) { cardKeys[p.id] = cardHtml(p, i, true); });
+      return;
+    }
+    positions.forEach(function (p, i) {
+      var key = cardHtml(p, i, true);
+      var el = document.getElementById('card-' + p.id);
+      var a = answers[p.id] || {};
+      if (el && cardKeys[p.id] === key) {
+        var ta = document.getElementById('note-' + p.id);
+        if (ta && ta !== document.activeElement && ta.value !== (a.note || '')) ta.value = a.note || '';
+        return;
+      }
+      var ae = document.activeElement;
+      var focusId = ae && el && el.contains(ae) ? ae.id : '';
+      var ss = focusId ? ae.selectionStart : 0, se = focusId ? ae.selectionEnd : 0, st = focusId ? ae.scrollTop : 0;
+      var logOpen = el && el.querySelector('details.log') && el.querySelector('details.log').open;
+      var holder = document.createElement('div');
+      holder.innerHTML = cardHtml(p, i, false);
+      var fresh = holder.firstElementChild;
+      if (logOpen && fresh.querySelector('details.log')) fresh.querySelector('details.log').open = true;
+      if (el) {
+        var tOld = document.getElementById('note-' + p.id);
+        var tNew = fresh.querySelector('textarea');
+        if (tOld && tNew && tOld === ae) tNew.value = tOld.value;
+        el.replaceWith(fresh);
+      } else { cardsEl.appendChild(fresh); }
+      cardKeys[p.id] = key;
+      if (focusId) {
+        var f = document.getElementById(focusId);
+        if (f) { f.focus(); try { f.setSelectionRange(ss, se); f.scrollTop = st; } catch (e) {} }
+      }
+    });
   }
 
-  function cardHtml(p, idx) {
+  function cardHtml(p, idx, forKey) {
     var v = p.view, a = answers[p.id] || {};
     var answered = a.pick != null;
     var lifeLine = '<div class="life"><span class="you">You <b>' + v.my_life + '</b> life · library ' + v.my_lib + '</span>' + landNote(p, v) + '<span class="opp">Opponent <b>' + v.opp_life + '</b> life · ' + v.opp_hand + ' cards in hand · library ' + v.opp_lib + '</span></div>';
@@ -211,7 +247,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     var f = a.flags || {};
     function flag(k, t) { return '<button class="flag" data-flag="' + esc(p.id) + ':' + k + '" aria-pressed="' + (!!f[k]) + '">' + t + '</button>'; }
     return '<article class="card" id="card-' + esc(p.id) + '">' +
-      '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : (v.whose === 'your' ? 'Your' : 'Opponent\'s') + ' turn ' + Math.ceil((+v.turn) / 2) + ', ' + esc(v.step) + (p.on_play === true ? ' (you are on the play)' : p.on_play === false ? ' (you are on the draw)' : '')) + '</span><span class="meta">' + esc(p.category) + '</span></div>' +
+      '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : (v.whose === 'your' ? 'Your' : 'Opponent\'s') + ' turn ' + Math.ceil((+v.turn) / 2) + ', ' + esc(v.step) + (p.on_play === true ? ' (you are on the play)' : p.on_play === false ? ' (you are on the draw)' : '')) + '</span><span class="meta">batch ' + esc(p.batch || 1) + ' · ' + esc(p.category) + '</span></div>' +
       lifeLine +
       '<div class="board"><div>' +
         zone('Your hand', v.hand, 'hand') + (v.lib_top && v.lib_top.length ? zone('Known top of your library (top first)', v.lib_top, 'known') : '') + (v.lib_bottom && v.lib_bottom.length ? zone('Known bottom of your library', v.lib_bottom, 'known') : '') + zone('Your battlefield', v.my_bf) + gy('Your graveyard', v.my_gy) +
@@ -220,7 +256,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       '</div></div>' + extra + stack + log +
       '<div class="q">' + esc(p.question) + '</div><div class="opts">' + opts + '</div>' + reveal +
       '<div class="extras"><div class="flags">' + flag('either', 'Either is fine') + flag('cant_tell', "Can't tell from this view") + flag('rule', 'Make this a rule') + '</div>' +
-      '<textarea id="note-' + esc(p.id) + '" data-note="' + esc(p.id) + '" placeholder="Why? (optional, one line is plenty)">' + esc(a.note || '') + '</textarea>' +
+      '<textarea id="note-' + esc(p.id) + '" data-note="' + esc(p.id) + '" placeholder="Why? (optional, one line is plenty)">' + (forKey ? '' : esc(a.note || '')) + '</textarea>' +
       '<div class="status" id="st-' + esc(p.id) + '"></div></div>' +
       '</article>';
   }
