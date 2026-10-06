@@ -1,0 +1,19 @@
+# Alurentell vs Storm (Brady's own Storm 75, being added by thread "Add a Legacy Storm deck").
+# PENDING: the deck stem below (`storm`) is a guess; move this into sideboard-plans/alurentell.txt once
+# the Storm deck exists and `bo3 --check` accepts it. This is NOT the Doomsday plan (that is a separate
+# draft in sideboard-plans/alurentell.txt, vs doomsday).
+vs storm
+# [Brady, baseline] Consign hits the Tendrils storm trigger and their colorless pieces (LED, Moxen);
+# Ending hits Squelcher and the Moxen; Omniscience over Atraxa because you want to win the turn you
+# Show, not hand them a free Squelcher and pass; one Acererak is enough when they barely interact.
+# A second Veil works against Tendrils, but they can play around it with Song of Creation and Veil may
+# have to be cast early because of Echo of Eons. Hard rule: never below 3 Acererak.
+-2 Veil of Summer
+-2 Stock Up
+-1 Island
+-1 Atraxa, Grand Unifier
+-1 Acererak the Archlich
++2 Consign to Memory
++2 Orim's Chant
++2 Prismatic Ending
++1 Force of Negation

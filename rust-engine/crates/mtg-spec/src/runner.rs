@@ -874,6 +874,19 @@ impl Runner {
     }
 
     pub(crate) fn alt_way_for(&self, card: ObjRef, a: &J) -> R<u8> {
+        // `kicked: true|false` (Orim's Chant, RFC 0005): the pool models kicker as the alternative
+        // way with key "kicked", so a kicked cast is that way and an unkicked cast is the normal one.
+        match a.get("kicked").and_then(|x| x.as_bool()) {
+            Some(false) => return Ok(0),
+            Some(true) => {
+                let def = self.db.def(self.st().def_of(card));
+                return match def.abilities.iter().filter_map(|x| if let AbilityDef::Alt(a) = x { Some(a) } else { None }).position(|ab| ab.key == "kicked") {
+                    Some(i) => Ok(i as u8 + 1),
+                    None => unsupported!("kicked cast of {}", def.name),
+                };
+            }
+            None => {}
+        }
         let alt = match a.get("alt_cost") {
             None | Some(J::Null) => return Ok(0),
             Some(x) => x,

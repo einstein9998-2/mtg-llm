@@ -67,15 +67,15 @@ fn board_rejects_bad_plans() {
     let (db, names, decks, _) = load();
     let a = &decks[names.iter().position(|n| n == "alurentell").unwrap()];
     let id = |n: &str| db.id(n).unwrap();
-    let plan = |out: &[&str], inn: &[&str]| Plan { out: out.iter().map(|n| id(n)).collect(), inn: inn.iter().map(|n| id(n)).collect() };
+    let plan = |out: &[&str], inn: &[&str]| Plan { out: out.iter().map(|n| id(n)).collect(), inn: inn.iter().map(|n| id(n)).collect(), oversize: false };
     // Not one for one.
     assert!(board(&db, a, &plan(&["Stock Up"], &[])).is_err());
     // The card to take out is not in the main deck.
-    assert!(board(&db, a, &plan(&["Lightning Bolt"], &["Dismember"])).is_err());
+    assert!(board(&db, a, &plan(&["Lightning Bolt"], &["Prismatic Ending"])).is_err());
     // The card to bring in is not in the sideboard.
     assert!(board(&db, a, &plan(&["Stock Up"], &["Lightning Bolt"])).is_err());
-    // Only one Dismember in the sideboard.
-    assert!(board(&db, a, &plan(&["Stock Up", "Stock Up"], &["Dismember", "Dismember"])).is_err());
+    // Only one Force of Negation in the sideboard.
+    assert!(board(&db, a, &plan(&["Stock Up", "Stock Up"], &["Force of Negation", "Force of Negation"])).is_err());
     // Both sideboard Veils in: four in the main deck, still four copies in all.
     assert!(board(&db, a, &plan(&["Stock Up", "Stock Up"], &["Veil of Summer", "Veil of Summer"])).is_ok());
     // A plan file with an unknown card is rejected at load time.
@@ -145,7 +145,7 @@ fn match_structure_first_player_and_boarding() {
     let mut seen_three = false;
     for seed in 0..40u64 {
         let cfg = MatchConfig { seed, first: Seat((seed % 2) as u8), max_decisions: 20000, ..MatchConfig::default() };
-        let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], Some(&book), &cfg, &mut RandFac).unwrap();
+        let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
         assert!(r.games.len() >= 2 && r.games.len() <= 5);
         assert_eq!(r.wins[0] as usize, r.games.iter().filter(|g| g.winner == Some(Seat(0))).count());
         assert!(r.wins[0] <= 2 && r.wins[1] <= 2);
@@ -165,10 +165,10 @@ fn match_structure_first_player_and_boarding() {
     assert!(seen_three, "no match went to three games in 40 tries");
     // --board a: only seat 0 boards; a pair without a plan never boards.
     let cfg = MatchConfig { board: [true, false], seed: 5, max_decisions: 20000, ..MatchConfig::default() };
-    let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], Some(&book), &cfg, &mut RandFac).unwrap();
+    let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
     assert!(r.games.iter().skip(1).all(|g| g.boarded == [true, false]));
     let (d, e) = (names.iter().position(|n| n == "dimir-tempo").unwrap(), names.iter().position(|n| n == "boros-aggro").unwrap());
-    let r = play_match(&db, ["dimir-tempo", "boros-aggro"], [&decks[d], &decks[e]], Some(&book), &MatchConfig { seed: 9, max_decisions: 20000, ..MatchConfig::default() }, &mut RandFac).unwrap();
+    let r = play_match(&db, ["dimir-tempo", "boros-aggro"], [&decks[d], &decks[e]], [Some(&book), Some(&book)], &MatchConfig { seed: 9, max_decisions: 20000, ..MatchConfig::default() }, &mut RandFac).unwrap();
     assert!(r.games.iter().all(|g| g.boarded == [false, false]), "no plan for this pair");
 }
 
@@ -181,7 +181,7 @@ fn forks_work_in_boarded_games_under_both_opponent_views() {
         let a = names.iter().position(|n| n == "alurentell").unwrap();
         let b = names.iter().position(|n| n == pair).unwrap();
         let cfg = MatchConfig::default();
-        let (boarded, flags) = game_decks(&db, ["alurentell", pair], [&decks[a], &decks[b]], Some(&book), &cfg, 1, Seat(0)).unwrap();
+        let (boarded, flags) = game_decks(&db, ["alurentell", pair], [&decks[a], &decks[b]], [Some(&book), Some(&book)], &cfg, 1, Seat(0)).unwrap();
         assert_eq!(flags, [true, true]);
         for seed in 0..6u64 {
             let mut g = mtg_view::Game::new(db.clone(), [&boarded[0], &boarded[1]], seed, mtg_core::state::GameConfig::default());
@@ -221,7 +221,7 @@ fn play_draw_sections_win_over_plain_and_star() {
     let (db, _, decks, _) = load();
     let dir = std::env::temp_dir().join(format!("mtg-match-pd-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
-    std::fs::write(dir.join("alurentell.txt"), "vs ur-cutter\n-1 Stock Up\n+1 Dismember\nvs ur-cutter on-draw\n-1 Ponder\n+1 Dismember\nvs *\n-1 Brainstorm\n+1 Dismember\n").unwrap();
+    std::fs::write(dir.join("alurentell.txt"), "vs ur-cutter\n-1 Stock Up\n+1 Prismatic Ending\nvs ur-cutter on-draw\n-1 Ponder\n+1 Dismember\nvs *\n-1 Brainstorm\n+1 Dismember\n").unwrap();
     let book = PlanBook::load_dir(&db, &dir).unwrap();
     std::fs::remove_dir_all(&dir).unwrap();
     let out = |p: Option<&Plan>| db.def(p.unwrap().out[0]).name.clone();
@@ -230,4 +230,26 @@ fn play_draw_sections_win_over_plain_and_star() {
     assert_eq!(out(book.plan_for("alurentell", "ur-cutter", None)), "Stock Up");
     assert_eq!(out(book.plan_for("alurentell", "doomsday", Some(false))), "Brainstorm");
     let _ = decks;
+}
+
+#[test]
+fn oversize_plans_and_separate_books() {
+    let (db, names, decks, _) = load();
+    let a = &decks[names.iter().position(|n| n == "alurentell").unwrap()];
+    let id = |n: &str| db.id(n).unwrap();
+    let mut p = Plan { out: vec![id("Stock Up")], inn: vec![id("Prismatic Ending"), id("Faerie Macabre")], oversize: false };
+    assert!(board(&db, a, &p).is_err(), "61 cards needs the directive");
+    p.oversize = true;
+    let d = board(&db, a, &p).unwrap();
+    assert_eq!((d.main.len(), d.side.len()), (61, 14));
+    // Two books: seat 0 boards, seat 1 has none.
+    let dir = std::env::temp_dir().join(format!("mtg-match-books-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("alurentell.txt"), "vs alurentell\n-1 Stock Up\n+1 Prismatic Ending\n").unwrap();
+    let book = PlanBook::load_dir(&db, &dir).unwrap();
+    std::fs::remove_dir_all(&dir).unwrap();
+    let (decks2, flags) = game_decks(&db, ["alurentell", "alurentell"], [a, a], [Some(&book), None], &MatchConfig::default(), 1, Seat(0)).unwrap();
+    assert_eq!(flags, [true, false]);
+    assert_eq!(decks2[0].main.len(), 60);
+    assert_ne!(decks2[0].main, decks2[1].main);
 }

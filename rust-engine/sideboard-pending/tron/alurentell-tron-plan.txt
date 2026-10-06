@@ -1,0 +1,16 @@
+# Alurentell vs Colorless Tron (Brady's own 75, being added by thread "Add Colorless Tron deck").
+# PENDING: the deck stem (`colorless-tron` here) is a guess; move this into sideboard-plans/alurentell.txt
+# once the deck exists and `bo3 --check` accepts it.
+# Their sideboard: Portable Hole, Tormod's Crypt, Grafdigger's Cage, Eldrazi Confluence, Liquimetal
+# Coating, Torpor Orb, 3 Warping Wail, Ensnaring Bridge, 2 Argentum Masticore, Mycosynth Lattice,
+# Extinguisher Battleship, Summon: Bahamut.
+vs colorless-tron
+# [Brady] The swaps are his, and: if they have Petrified Hamlet, cut a Misty Rainforest instead of the
+# Island. [My guess at the reasons, unreviewed] Veil has no blue or black spells to draw off; Consign
+# counters colorless spells; Force of Negation and Ending hit their artifacts and Trinisphere.
+-2 Veil of Summer
+-1 Island
+-2 Omniscience
++2 Consign to Memory
++1 Force of Negation
++2 Prismatic Ending

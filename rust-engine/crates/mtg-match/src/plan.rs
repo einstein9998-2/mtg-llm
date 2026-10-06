@@ -26,6 +26,9 @@ use std::path::Path;
 pub struct Plan {
     pub out: Vec<CardDefId>,
     pub inn: Vec<CardDefId>,
+    /// `!oversize` in the file: more cards may come in than go out (a 61-card main deck). For
+    /// experiments only; real constructed decks are 60.
+    pub oversize: bool,
 }
 
 /// All plans of a directory: own deck stem -> (opposing deck stem or `*`) -> plan.
@@ -100,6 +103,10 @@ fn parse_plans(db: &CardDb, text: &str) -> Result<BTreeMap<(String, Side), Plan>
             continue;
         }
         let err = |m: &str| format!("line {}: {m}: `{raw}`", ln + 1);
+        if l == "!oversize" {
+            out.get_mut(cur.as_ref().ok_or_else(|| err("directive before any `vs` line"))?).unwrap().oversize = true;
+            continue;
+        }
         if let Some(rest) = l.strip_prefix("vs ") {
             let mut words: Vec<&str> = rest.split_whitespace().collect();
             let side = match words.last().copied() {
@@ -150,7 +157,7 @@ fn take(list: &mut Vec<CardDefId>, id: CardDefId) -> bool {
 /// constructed rules (60 main cards, at most 15 sideboard cards, at most 4 copies of a non-basic).
 pub fn board(db: &CardDb, base: &DeckList, plan: &Plan) -> Result<DeckList, String> {
     let name = |id: CardDefId| db.def(id).name.clone();
-    if plan.out.len() != plan.inn.len() {
+    if plan.out.len() != plan.inn.len() && !(plan.oversize && plan.inn.len() > plan.out.len()) {
         return Err(format!("plan takes out {} cards and brings in {}", plan.out.len(), plan.inn.len()));
     }
     let mut d = base.clone();
@@ -170,7 +177,7 @@ pub fn board(db: &CardDb, base: &DeckList, plan: &Plan) -> Result<DeckList, Stri
     Ok(d)
 }
 
-/// 60+ main cards (the base deck's size is kept, so this only checks it did not change), at most
+/// 60+ main cards (the base deck's size is kept unless the plan is `!oversize`), at most
 /// 15 sideboard cards, at most four copies of a card across main and side unless it is basic.
 pub fn check_legal(db: &CardDb, d: &DeckList) -> Result<(), String> {
     if d.main.len() < 60 {

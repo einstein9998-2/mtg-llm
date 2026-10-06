@@ -84,3 +84,9 @@ Fixed: last-known-information filters now test subtypes, supertypes, keywords, m
 
 ## M3j: RFC 0003 (Ajani Avenger runaway loop, found by the first self-play run)
 Effect-loop index `u8` wrapped on lists over 255 objects (Cat tokens from Ocelot Pride copying), so Ajani Avenger's +2 never finished and the process died allocating events; combat attacker/blocker indices widened the same way. Added a 4M-instruction resolution cap (draw) and made Quarry auto-payment avoid the spell's own target. `ENGINE_CORE_VERSION` 5, `HASH_SCHEMA` 4, goldens re-recorded (action sequences unchanged). Tag `core-frozen-m5`. Regression: 300-Cat scenario (fails on the old code), Quarry own-target scenario. Stored game records and self-play dumps from before this must be regenerated.
+
+## M3k: RFC 0004 (token explosion cap and review follow-ups)
+Object cap 60,000 to 1,000 (draw); Ocelot Pride rules verified by scenario; four m5 review follow-ups applied. `ENGINE_CORE_VERSION` 6, `HASH_SCHEMA` 4, goldens re-recorded (only the header changed). Tag `core-frozen-m6`.
+
+## M3l: RFC 0005 (Orim's Chant, Brady's new Alurentell sideboard)
+New `PlayerFx::CantCast` and `PlayerFx::CreaturesCantAttack` (read in `restrict.rs` and `combat.rs`), `Cond::WasCast` now reads the stack entry for a spell still on the stack, kicker modelled as the Alt way "kicked" ({W}{W}; a free Chant cannot be kicked). Card data: Orim's Chant. No hash or layout change, goldens unchanged, `ENGINE_CORE_VERSION` unchanged. 18 scenarios written by a separate agent (`rust-engine-spec/scenarios/cards/orims-chant-*.yaml`); visible spec 824 of 824; workspace tests green; 3,000-game 8-deck fuzz and 13,500 boarded games clean. `decks/alurentell.txt` in this folder is still the old list: it changes together with new Alurentell sideboard plans (see `/mnt/project-files/rust-engine-orims-chant/README.md`).

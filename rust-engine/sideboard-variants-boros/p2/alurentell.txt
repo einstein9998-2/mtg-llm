@@ -1,0 +1,12 @@
+# Alurentell vs Boros variant p2: on the play b, on the draw base
+vs boros-aggro on-play
+-2 Veil of Summer
+-2 Aluren
++2 Prismatic Ending
++2 Orim's Chant
+vs boros-aggro on-draw
+-2 Veil of Summer
+-1 Stock Up
+-1 Aluren
++2 Prismatic Ending
++2 Orim's Chant

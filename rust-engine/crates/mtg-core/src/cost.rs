@@ -376,7 +376,10 @@ impl<'a> Cx<'a> {
             restricted = pay.restricted.iter().any(|&n| n > 0);
             // The spell or ability being paid for is on top of the stack with its targets chosen;
             // an automatic sacrifice must not take one of them.
-            let avoid: SmallVec<[ObjRef; 4]> = self.s.stack.last().map(|e| e.targets.iter().filter_map(|t| if let crate::decision::Target::Obj(r) = t { Some(*r) } else { None }).collect()).unwrap_or_default();
+            let mut avoid: SmallVec<[ObjRef; 4]> = self.s.stack.last().map(|e| e.targets.iter().filter_map(|t| if let crate::decision::Target::Obj(r) = t { Some(*r) } else { None }).collect()).unwrap_or_default();
+            // Nor a permanent the cost itself names (a chosen sacrifice or return) or the source.
+            avoid.extend(ctx.picks.iter().copied());
+            avoid.push(source);
             self.apply_payment(seat, &pay, &srcs, &avoid);
         }
         if plan.life > 0 {

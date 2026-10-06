@@ -41,7 +41,7 @@ pub mod turn;
 pub mod types;
 
 /// Bumped by any reviewed core change (doc 01 section 14.2). Stored in every game record.
-pub const ENGINE_CORE_VERSION: u32 = 5;
+pub const ENGINE_CORE_VERSION: u32 = 6;
 
 /// Bumped when the definition of the state hash changes (fields added, hashing order changed)
 /// without a rules change, so a stale record can be told from a corrupt one.

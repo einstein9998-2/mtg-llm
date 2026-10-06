@@ -1,43 +1,51 @@
-# Alurentell sideboard plans.
-# Sideboard (15): Boseiju, 3 Carpet of Flowers, 2 Consign to Memory, 2 Defense Grid, Dismember,
-# Disruptor Flute, 2 Faerie Macabre, Force of Negation, 2 Veil of Summer.
-# Common cuts: Stock Up is the slowest card (3 mana, sorcery), Omniscience is win-more when the
-# opponent can counter the Show and Tell it needs.
-
-vs ur-cutter
-# Islands (Volcanic x4, Island, fetches) make Carpet of Flowers ramp; Defense Grid taxes Daze and
-# Force of Will cast on my turn; Faerie Macabre is a free answer to Murktide's delve fuel.
--4 Stock Up
--2 Omniscience
-+3 Carpet of Flowers
-+2 Defense Grid
-+1 Faerie Macabre
+# Alurentell sideboard plans, for Brady's 75 of 2026-10-06 (decks/alurentell.txt).
+# Sideboard (15): 4 Carpet of Flowers, Force of Negation, 2 Consign to Memory, 2 Faerie Macabre,
+# 2 Orim's Chant, 2 Prismatic Ending, 2 Veil of Summer.
+#
+# [Brady] = locked by Brady in the project chat, 2026-10-06. [draft] = my adaptation, not reviewed.
 
 vs dimir-tempo
-# Underground Sea x4 and Island give Carpet mana. Everything they cast is blue or black, so the two
-# extra Veils both protect the combo (uncounterable, hexproof from Thoughtseize and Push) and
-# draw. Defense Grid against Daze, Force of Will and Bowmasters on my turn.
--4 Stock Up
+# [Brady] Veil is good because of Force of Will, Force of Negation and Daze, not because of any one
+# sideboard card. Prismatic Ending (always +2) answers their 1-mana 3/3.
+-4 Lotus Petal
+-4 Force of Will
 -2 Omniscience
--1 Ponder
-+3 Carpet of Flowers
-+2 Defense Grid
 +2 Veil of Summer
++4 Carpet of Flowers
++2 Orim's Chant
++2 Prismatic Ending
+
+vs ur-cutter
+# [Brady] Baseline. Their clock is faster, so the combo has to fit into one turn: keep 2 Force of
+# Will, cut Boseiju and one Aluren, no Petal (4 Stock Up stay: very good when Carpet is out and they
+# are threat-light but interaction-heavy). Variants are in sideboard-variants/.
+-2 Force of Will
+-2 Omniscience
+-1 Boseiju, Who Endures
+-1 Aluren
+-4 Lotus Petal
++2 Veil of Summer
++4 Carpet of Flowers
++2 Orim's Chant
++2 Prismatic Ending
 
 vs uwx-control
-# Tundra x3, Snow Island, Volcanic: Carpet is live. Stifle and Swords are their answers to
-# Acererak and Atraxa, Veil beats the counters and Grid taxes Stifle on my turn.
--4 Stock Up
+# [Brady] Similar to UR: they kill slower but their mana denial is stronger. Two Aluren out because
+# they have many Swords to Plowshares: go for Atraxa first and set up several Acereraks. Ponder and
+# City of Traitors stay (City's two-mana jump matters when they attack the mana). Prismatic Ending is
+# a little worse here, but it has to hit Tamiyo and Lavinia.
+-4 Lotus Petal
+-2 Force of Will
 -2 Omniscience
--1 Ponder
-+3 Carpet of Flowers
-+2 Defense Grid
+-2 Aluren
 +2 Veil of Summer
++4 Carpet of Flowers
++2 Orim's Chant
++2 Prismatic Ending
 
 vs doomsday
-# A race between two combos that both fight with Force of Will and Daze: Veil and Force of
-# Negation (hits Doomsday, Personal Tutor, Dark Ritual) in, slow cards out. Carpet: Underground Sea
-# x4, Snow-Covered Island.
+# [draft] A race between two combos that both fight with Force of Will and Daze: Veil and Force of
+# Negation in, slow cards out. Carpet: Underground Sea x4, Snow-Covered Island.
 -4 Stock Up
 -2 Omniscience
 +3 Carpet of Flowers
@@ -45,35 +53,47 @@ vs doomsday
 +1 Force of Negation
 
 vs reanimator
-# Show and Tell hands them Griselbrand, Archon or Koma for free, so cut two of the four. Faerie
-# Macabre (free, instant speed) is the best answer to Reanimate and Animate Dead; Veil stops
-# Thoughtseize and Unmask (hexproof from black) and draws; Force of Negation hits Reanimate,
-# Animate Dead and Shallow Grave.
--2 Show and Tell
--2 Stock Up
--1 Omniscience
-+2 Faerie Macabre
+# [Brady] Show and Tell is risky here because they have big things to put in (Griselbrand, Archon,
+# Koma), so three of four come out. One stays as the high-resource line: Show in Atraxa, Orim's
+# Chant so they cannot answer, win next turn; their discard makes high-resource games unreliable.
+# City of Traitors stays over the Island: two extra mana lets the combo go with one land fewer (one
+# more spell, combo or interaction). Faerie Macabre answers Reanimate and Animate Dead; Veil beats
+# Thoughtseize and Unmask and draws; Force of Negation covers their spells. Orim's Chant here is a
+# time walk cast on THEIR turn (upkeep, or in response to Dark Ritual): they are a non-blue combo
+# deck faster than you, unlike the blue interactive decks where Chant is for your own turn.
+-2 Omniscience
+-1 Stock Up
+-3 Show and Tell
+-1 Island
 +2 Veil of Summer
++2 Faerie Macabre
 +1 Force of Negation
++2 Orim's Chant
 
 vs boros-aggro
-# A creature race: no blue or black spells for Veil to blank, Stock Up is too slow. Dismember and
-# Disruptor Flute (name Swords to Plowshares) keep the Aluren / Acererak engine alive, Faerie
-# Macabre exiles Phlage (escape), Force of Negation counters Swords, Bombardment and Erode.
+# [Brady, tentative] Prismatic Ending is an easy +2 for Veil: it also answers their hate pieces
+# (Deafening Silence, Teeg, Containment Priest). Orim's Chant covers Swords to Plowshares, Pyroblast
+# and Flute. All 4 Force of Will and all 4 Petal stay: with 3 Pyroblast around Force and Chant are
+# wanted, and speed matters. No Carpet (no Islands) and no Consign (no colorless static prison).
+# Stock Up stays valuable but after a mulligan against Boros it should put 1 card back (play tip):
+# the game must be won the turn after it. Many variants in sideboard-variants-boros/.
 -2 Veil of Summer
--2 Stock Up
-+1 Dismember
-+1 Disruptor Flute
-+1 Faerie Macabre
-+1 Force of Negation
+-1 Stock Up
+-1 Aluren
++2 Prismatic Ending
++2 Orim's Chant
 
 vs alurentell
-# Mirror. Carpet is huge (Tropical Island x2, Hedge Maze x2 and Island x2 are all Islands), Consign
-# to Memory counters Acererak's and Atraxa's triggers, Force of Negation hits Show and Tell and
-# Aluren.
--4 Stock Up
--1 Omniscience
--1 Ponder
-+3 Carpet of Flowers
+# [Brady, baseline] Aluren and Show and Tell are symmetric: whoever blinks first loses, and whoever
+# resolves more Stock Ups usually wins. Ending does not matter against Aluren (with an Aluren in play
+# someone wins at instant speed in all but the most corner of cases). Same boarding in the white mirror.
+# Cutting City of Traitors is unsure: variants keep it, or play 61 cards (more data, but flawed).
+-1 City of Traitors
+-4 Lotus Petal
+-4 Show and Tell
+-2 Omniscience
++4 Carpet of Flowers
++2 Orim's Chant
++2 Veil of Summer
 +2 Consign to Memory
 +1 Force of Negation

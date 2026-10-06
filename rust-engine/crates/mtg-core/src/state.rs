@@ -410,9 +410,11 @@ impl std::fmt::Debug for State {
     }
 }
 
-/// Live objects (cards, tokens, abilities, spells) at which a game is declared a draw; the arena
-/// has 65,535 slots and the rest is headroom for the stack while the game winds down.
-pub const RUNAWAY_OBJECTS: usize = 60_000;
+/// Live objects (cards, tokens, abilities, spells) at which a game is declared a draw. Far beyond
+/// any real game (the decks never reach a few hundred), and low enough that the quadratic cost of
+/// refreshing derived state on a token explosion (Ocelot Pride copying under the city's blessing)
+/// stays small; the arena itself has 65,535 slots (RFC 0004, was 60,000).
+pub const RUNAWAY_OBJECTS: usize = 1_000;
 
 impl State {
     pub(crate) fn live_objects(&self) -> usize {

@@ -82,3 +82,25 @@ worth, and `--board b` the opponent's plan.
 | both | 58.2% | 803 of 1,477 (54.4%) |
 
 Reading: each plan moves its owner by 1 to 2 points in the expected direction (Alurentell +1.2 on games 2+, UR Cutter +2.4 for itself), but each row has about ±1.3 points of standard error on games 2+, so this is suggestive for UR Cutter's Pyroblast plan and not distinguishable from zero for Alurentell's. The net has never seen Carpet of Flowers, Defense Grid or Pyroblast in training, so these numbers underestimate what the plans are worth to a player who knows the cards. Treat them as a plumbing check, not a verdict on the plans.
+
+## Update 2026-10-06: Brady's Alurentell 75, plans and variants
+
+- Engine deck `decks/alurentell.txt` is now Brady's 75 (Tundra, Savannah, Orim's Chant in the
+  sideboard); RFC 0005 added Orim's Chant to the engine.
+- `sideboard-plans/alurentell.txt` has Brady's plans for Dimir Tempo, UR Cutter (baseline), UW Phelia
+  (`uwx-control`), Boros (tentative), Reanimator, and a mirror baseline; his reasons are in the
+  comments. Plans for Doomsday are still my draft. `sideboard-pending/` holds the Storm and Colorless
+  Tron plans until those decks are in the engine.
+- Plan files can differ on the play and on the draw (`vs ur-cutter on-play`), and `!oversize` allows a
+  61-card main deck for experiments. `bo3 --plans-b <dir>` gives deck B its own plans (mirror: a
+  variant against the baseline).
+- Variant sets for testing: `sideboard-variants/` (UR Cutter), `-boros`, `-mirror`, `-uwx`.
+  `tools/run_variants.sh <net> <matches> <iterations> <out dir> [threads]` plays them (set `VARIANTS=`,
+  `OPP=`, `PLANS_B=`), `bo3 --trace` writes every game, `sbtrace` replays each game and records when
+  each Alurentell card was drawn, cast or used, and `tools/sbvariants.py` writes the report (win rates
+  with 95% intervals, differences from the baseline, card evidence, example games).
+- `netremap <old snapshot.ron> <net.bin> <out.bin>` moves a trained net to a card database that gained
+  cards (Chant moved 60 card indices; an old net without it would read the wrong rows). New cards get
+  zero weights.
+- The nets were trained on the old Alurentell list. Per-deck-pair nets exist only for pairs that were
+  trained; a net that never saw a deck is no use for testing plans against it.

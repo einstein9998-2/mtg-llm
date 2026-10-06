@@ -1,0 +1,14 @@
+# Alurentell vs UWx variant base: Brady's plan
+vs uwx-control
+# [Brady] Similar to UR: they kill slower but their mana denial is stronger. Two Aluren out because
+# they have many Swords to Plowshares: go for Atraxa first and set up several Acereraks. Ponder and
+# City of Traitors stay (City's two-mana jump matters when they attack the mana). Prismatic Ending is
+# a little worse here, but it has to hit Tamiyo and Lavinia.
+-4 Lotus Petal
+-2 Force of Will
+-2 Omniscience
+-2 Aluren
++2 Veil of Summer
++4 Carpet of Flowers
++2 Orim's Chant
++2 Prismatic Ending

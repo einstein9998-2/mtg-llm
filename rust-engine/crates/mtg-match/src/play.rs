@@ -76,15 +76,16 @@ pub trait PlayerFactory {
 }
 
 /// The two decklists played in game `game_no` (0-based) and which seats actually boarded.
-pub fn game_decks(db: &CardDb, names: [&str; 2], base: [&DeckList; 2], book: Option<&PlanBook>, cfg: &MatchConfig, game_no: u32, first: Seat) -> Result<([DeckList; 2], [bool; 2]), String> {
+pub fn game_decks(db: &CardDb, names: [&str; 2], base: [&DeckList; 2], books: [Option<&PlanBook>; 2], cfg: &MatchConfig, game_no: u32, first: Seat) -> Result<([DeckList; 2], [bool; 2]), String> {
     let mut decks = [base[0].clone(), base[1].clone()];
     let mut boarded = [false; 2];
-    if game_no > 0 && book.is_some() {
+    if game_no > 0 {
         for s in 0..2 {
+            let Some(book) = books[s] else { continue };
             if !cfg.board[s] {
                 continue;
             }
-            if let Some(plan) = book.unwrap().plan_for(names[s], names[1 - s], Some(first.idx() == s)) {
+            if let Some(plan) = book.plan_for(names[s], names[1 - s], Some(first.idx() == s)) {
                 decks[s] = board(db, base[s], plan).map_err(|e| format!("{} vs {}: {e}", names[s], names[1 - s]))?;
                 boarded[s] = true;
             }
@@ -93,13 +94,14 @@ pub fn game_decks(db: &CardDb, names: [&str; 2], base: [&DeckList; 2], book: Opt
     Ok((decks, boarded))
 }
 
-/// Plays one match between `base[0]` (seat 0) and `base[1]` (seat 1).
-pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], book: Option<&PlanBook>, cfg: &MatchConfig, fac: &mut dyn PlayerFactory) -> Result<MatchResult, String> {
+/// Plays one match between `base[0]` (seat 0) and `base[1]` (seat 1). Each seat boards from its own
+/// plan book (the same book for both seats, or two books to play one plan against another).
+pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], books: [Option<&PlanBook>; 2], cfg: &MatchConfig, fac: &mut dyn PlayerFactory) -> Result<MatchResult, String> {
     let mut res = MatchResult { games: Vec::new(), wins: [0, 0] };
     let mut first = cfg.first;
     let mut game_no = 0u32;
     while res.wins[0] < 2 && res.wins[1] < 2 && game_no < cfg.max_games {
-        let (decks, boarded) = game_decks(db, names, base, book, cfg, game_no, first)?;
+        let (decks, boarded) = game_decks(db, names, base, books, cfg, game_no, first)?;
         // What each seat believes about the other's deck.
         let expected = |s: usize| -> Vec<CardDefId> {
             let opp = 1 - s;

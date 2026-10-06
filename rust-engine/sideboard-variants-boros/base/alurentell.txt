@@ -1,0 +1,7 @@
+# Alurentell vs Boros variant base: tentative baseline: -2 Veil -1 Stock Up -1 Aluren +2 Ending +2 Chant
+vs boros-aggro
+-2 Veil of Summer
+-1 Stock Up
+-1 Aluren
++2 Prismatic Ending
++2 Orim's Chant

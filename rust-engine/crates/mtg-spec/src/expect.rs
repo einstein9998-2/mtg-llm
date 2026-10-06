@@ -630,6 +630,7 @@ impl Runner {
             "cast" => {
                 let want = self.obj_alias(pat["card"].as_str().unwrap_or(""))?;
                 let way: Option<u8> = match pat.get("alt_cost") {
+                    None if pat.get("kicked").is_some() => Some(self.alt_way_for(want, pat)?),
                     None => None,
                     Some(J::Null) => Some(0),
                     Some(_) => Some(self.alt_way_for(want, pat)?),

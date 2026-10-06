@@ -1,0 +1,10 @@
+# Alurentell mirror variant s2: keep 2 Show and Tell: -2 S&T, 1 Consign in
+vs alurentell
+-1 City of Traitors
+-4 Lotus Petal
+-2 Show and Tell
+-2 Omniscience
++4 Carpet of Flowers
++2 Orim's Chant
++2 Veil of Summer
++1 Consign to Memory

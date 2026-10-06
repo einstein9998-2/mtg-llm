@@ -3,10 +3,11 @@
 # Extraction.
 
 vs alurentell
-# Pyroblast kills Atraxa and Omniscience (both blue) and counters Show and Tell, Brainstorm, Force
-# of Will. Alurentell has almost no creatures worth burning: Unholy Heat and one Bolt come out, and
-# the lone Prismari Charm. Null Rod stays out: it would turn off their own Bauble and Cutter equip.
+# [Brady] No Surgical Extraction, and 0 or 1 Unholy Heat after boarding: their plan is to kill as
+# fast as possible, and Pyroblast already kills Atraxa. Pyroblast kills Atraxa and Omniscience
+# (blue) and counters Show and Tell, Brainstorm, Force of Will, Stock Up.
+# [draft] The fourth cut (Preordain) is my guess; Brady has not said which card goes.
 -2 Unholy Heat
--1 Lightning Bolt
 -1 Prismari Charm
+-1 Preordain
 +4 Pyroblast

@@ -490,6 +490,19 @@
   (name: "Prismatic Ending", cost: "{X}{W}", types: "SORCERY", abilities: [
     Spell(targets: [(objects: (types_not: "LAND"))], effect: If(cond: Cmp(CmcOf(Target(0)), Le, ColorsSpent(This)), then: Exile(One(Target(0))))),
   ]),
+  // Kicker {W} is modelled as an alternative way to cast it for {W}{W} (RFC 0005): the pool has no
+  // other kicker card, and a kicked cast is only distinguishable from an unkicked one through the
+  // "was kicked" condition, which `WasCast` with the key answers.
+  (name: "Orim's Chant", cost: "{W}", types: "INSTANT", abilities: [
+    Alt(label: "kicked", key: "kicked", cost: [Mana("{W}{W}")]),
+    Spell(targets: [(players: Any)], effect: Seq([
+      PlayerFx(who: Target(0), fx: CantCast, until: EndOfTurn),
+      If(cond: WasCast(key: Some("kicked")), then: Seq([
+        PlayerFx(who: You, fx: CreaturesCantAttack, until: EndOfTurn),
+        PlayerFx(who: Opp, fx: CreaturesCantAttack, until: EndOfTurn),
+      ])),
+    ])),
+  ]),
   (name: "Skyclave Apparition", cost: "{1}{W}{W}", types: "CREATURE", subtypes: ["Kor", "Spirit"], pt: (2, 2), abilities: [
     Triggered(text: "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.", on: Enters(filter: (self_only: true)),
       targets: [(objects: (types_not: "LAND", token: Some(false), controller: Opp, cmc: (Le, 4)), optional: true)], effect: ExileLinked(One(Target(0)))),
