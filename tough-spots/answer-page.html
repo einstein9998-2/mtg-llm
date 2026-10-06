@@ -211,7 +211,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     var f = a.flags || {};
     function flag(k, t) { return '<button class="flag" data-flag="' + esc(p.id) + ':' + k + '" aria-pressed="' + (!!f[k]) + '">' + t + '</button>'; }
     return '<article class="card" id="card-' + esc(p.id) + '">' +
-      '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : 'Turn ' + esc(v.turn) + ', ' + esc(v.step) + ' (' + esc(v.whose) + ' turn)') + '</span><span class="meta">' + esc(p.category) + '</span></div>' +
+      '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : (v.whose === 'your' ? 'Your' : 'Opponent\'s') + ' turn ' + Math.ceil((+v.turn) / 2) + ', ' + esc(v.step) + (p.on_play === true ? ' (you are on the play)' : p.on_play === false ? ' (you are on the draw)' : '')) + '</span><span class="meta">' + esc(p.category) + '</span></div>' +
       lifeLine +
       '<div class="board"><div>' +
         zone('Your hand', v.hand, 'hand') + (v.lib_top && v.lib_top.length ? zone('Known top of your library (top first)', v.lib_top, 'known') : '') + (v.lib_bottom && v.lib_bottom.length ? zone('Known bottom of your library', v.lib_bottom, 'known') : '') + zone('Your battlefield', v.my_bf) + gy('Your graveyard', v.my_gy) +
