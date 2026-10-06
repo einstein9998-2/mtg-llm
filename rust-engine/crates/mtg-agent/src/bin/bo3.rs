@@ -1,7 +1,7 @@
 //! Best-of-three matches with sideboarding, both seats searched with determinized MCTS.
 //!
 //! Usage: bo3 <decks dir> <plans dir> <deck A> <deck B> [matches] [iterations]
-//!        [--net w.bin] [--rollout N] [--board both|a|b|none] [--opp-view plan|main]
+//!        [--net w.bin] [--opp net|rollout] [--rollout N] [--board both|a|b|none] [--opp-view plan|main]
 //!        [--threads T] [--seed S] [--csv out.csv] [--trace games.jsonl] [--plans-b <dir>] [--public <dir>]
 //! --plans-b gives deck B its own plan directory (a mirror with two different plans).
 //! --public gives the standard plan directory both seats are assumed to know (default: each seat's own
@@ -22,13 +22,15 @@ struct Fac {
     n_defs: usize,
     iters: u32,
     rollout: u32,
+    /// `--opp rollout`: deck B's seat plays plain rollout search instead of the net.
+    rollout_seat: Option<u8>,
 }
 
 impl PlayerFactory for Fac {
     fn make<'m>(&mut self, seat: Seat, _game_no: u32, model: &'m dyn BeliefModel, seed: u64) -> Box<dyn Policy + 'm> {
         let ev: Box<dyn Evaluator> = match &self.net {
-            Some(n) => Box::new(NetEvaluator::new(n.clone(), self.n_defs)),
-            None => Box::new(RolloutEvaluator::new(self.rollout, seed ^ seat.0 as u64)),
+            Some(n) if self.rollout_seat != Some(seat.0) => Box::new(NetEvaluator::new(n.clone(), self.n_defs)),
+            _ => Box::new(RolloutEvaluator::new(self.rollout, seed ^ seat.0 as u64)),
         };
         Box::new(MctsPolicy::new(model, ev, SearchConfig { iterations: self.iters, seed, ..SearchConfig::default() }))
     }
@@ -103,6 +105,7 @@ fn main() {
     };
     let net = flag("--net").map(|p| Arc::new(Net::load(std::path::Path::new(&p)).unwrap()));
     let n_defs = db.defs.len();
+    let rollout_seat = match flag("--opp").as_deref() { None | Some("net") => None, Some("rollout") => Some(1u8), Some(x) => panic!("--opp {x}") };
     let (na, nb) = (names[ia].clone(), names[ib].clone());
     let next = AtomicU64::new(0);
     let results: Mutex<Vec<(u64, MatchResult)>> = Mutex::new(Vec::new());
@@ -110,7 +113,7 @@ fn main() {
     std::thread::scope(|sc| {
         for _ in 0..threads {
             sc.spawn(|| {
-                let mut fac = Fac { net: net.clone(), n_defs, iters, rollout };
+                let mut fac = Fac { net: net.clone(), n_defs, iters, rollout, rollout_seat };
                 loop {
                     let i = next.fetch_add(1, Ordering::SeqCst);
                     if i >= matches {
