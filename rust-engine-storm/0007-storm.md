@@ -1,6 +1,6 @@
 # RFC 0007: Legacy Storm (Wish, Imprint, Sagas, suspend and the effects Tron shares)
 
-Status: implemented on a scratch copy of the live engine, NOT applied to `/mnt/project-files/rust-engine`; waiting for Brady's go-ahead and independent review
+Status: APPLIED to the live engine 2026-10-06 (Brady approved) as storm-on-tron.patch, after RFC 0008
 Author: Storm thread  Reviewers (two independent, one a rules reviewer): pending
 
 ## Problem
