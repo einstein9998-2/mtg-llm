@@ -1,6 +1,6 @@
 # RFC 0006: "Counter unless its controller pays" must not counter a spell that can't be countered
 
-Status: in review (patch NOT applied to the live engine; awaiting Brady's sign-off)
+Status: applied to the live engine 2026-10-06 at Brady's request; independent reviewers still pending
 Author: "Daze vs Veil of Summer" thread  Reviewers (two independent, one a rules reviewer): pending
 
 ## Problem
