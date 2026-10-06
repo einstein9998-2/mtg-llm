@@ -1,0 +1,294 @@
+<title>Alurentell Tough Spots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: a single column of position cards. Each card shows the board the bot saw, lettered options to pick from,
+   and (after you answer) what the bot chose and how sure it was. */
+:root {
+  --bg: #eef1f5;
+  --surface: #ffffff;
+  --surface-2: #f4f6f9;
+  --fg: #151b26;
+  --muted: #5b6678;
+  --line: #d6dce6;
+  --accent: #1f4fd8;
+  --accent-fg: #ffffff;
+  --accent-soft: #e2eafc;
+  --bot: #9a5b00;
+  --bot-soft: #fbefd5;
+  --good: #1b7a45;
+  --good-soft: #dcf2e4;
+  --opp: #8a2f3b;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f131b; --surface: #171c27; --surface-2: #1d2331; --fg: #e8ecf3; --muted: #98a3b7; --line: #2a3243;
+    --accent: #7ea1ff; --accent-fg: #0b1020; --accent-soft: #1f2c52; --bot: #f0b95a; --bot-soft: #382a10;
+    --good: #62d28f; --good-soft: #14301f; --opp: #f08a97; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f131b; --surface: #171c27; --surface-2: #1d2331; --fg: #e8ecf3; --muted: #98a3b7; --line: #2a3243;
+  --accent: #7ea1ff; --accent-fg: #0b1020; --accent-soft: #1f2c52; --bot: #f0b95a; --bot-soft: #382a10;
+  --good: #62d28f; --good-soft: #14301f; --opp: #f08a97; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 20px 64px; }
+main { max-width: 860px; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
+h1, h2 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+h1 { font-size: 28px; line-height: 1.15; }
+h2 { font-size: 19px; }
+.lede { color: var(--muted); max-width: 65ch; margin: 6px 0 0; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.progress { display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { font: inherit; font-family: var(--font-mono); font-size: 12px; padding: 4px 9px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 4px; cursor: pointer; }
+.tab[data-done="1"] { background: var(--good-soft); color: var(--good); border-color: transparent; }
+.tab:focus-visible, button:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.how { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; font-size: 14px; color: var(--muted); }
+.how b { color: var(--fg); font-weight: 600; }
+.empty { background: var(--surface); border: 1px dashed var(--line); padding: 28px 18px; text-align: center; color: var(--muted); border-radius: 6px; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; display: flex; flex-direction: column; scroll-margin-top: 12px; }
+.card-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
+.card-head .num { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+.card-head .when { font-weight: 500; }
+.card-head .meta { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.life { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px 0; font-family: var(--font-mono); font-size: 13px; }
+.life .you b { color: var(--accent); }
+.life .opp b { color: var(--opp); }
+.board { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; padding: 12px 16px; }
+.board > div { min-width: 0; }
+@media (max-width: 640px) { .board { grid-template-columns: 1fr; } }
+.zone { margin-bottom: 10px; }
+.zone .lab { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; font-size: 13px; line-height: 1.4; }
+.chip small { color: var(--muted); font-size: 11px; }
+.chip.tapped { opacity: .6; }
+.chip.hand { background: var(--accent-soft); border-color: transparent; font-weight: 500; }
+.gy { font-size: 12.5px; color: var(--muted); }
+.stack { background: var(--bot-soft); border-radius: 6px; padding: 8px 12px; margin: 0 16px; font-size: 13.5px; }
+.stack b { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--bot); margin-right: 8px; }
+details.log { margin: 10px 16px 0; font-size: 13px; color: var(--muted); }
+details.log summary { cursor: pointer; font-family: var(--font-mono); font-size: 12px; }
+details.log ol { margin: 6px 0 0; padding-left: 0; list-style: none; max-height: 220px; overflow: auto; border-left: 2px solid var(--line); padding-left: 10px; }
+details.log li { padding: 1px 0; }
+details.log li.turn { color: var(--fg); font-weight: 500; margin-top: 4px; }
+.q { padding: 14px 16px 6px; font-family: var(--font-display); font-weight: 600; font-size: 17px; }
+.opts { display: flex; flex-direction: column; gap: 6px; padding: 4px 16px 10px; }
+.opt { display: grid; grid-template-columns: 28px 1fr; align-items: center; gap: 10px; text-align: left; font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+.opt:hover { border-color: var(--accent); }
+.opt .ltr { font-family: var(--font-mono); font-weight: 500; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 4px; background: var(--surface-2); }
+.opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.opt[aria-pressed="true"] .ltr { background: var(--accent); color: var(--accent-fg); }
+.opt .body { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.opt .lbl { overflow-wrap: anywhere; }
+.opt .badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-family: var(--font-mono); font-size: 11px; padding: 1px 6px; border-radius: 3px; }
+.tag.bot { background: var(--bot-soft); color: var(--bot); }
+.tag.deep { background: var(--good-soft); color: var(--good); }
+.nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.nums span { display: flex; flex-direction: column; gap: 2px; }
+.meter { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--bot); }
+.extras { display: flex; flex-direction: column; gap: 10px; padding: 4px 16px 16px; }
+.flags { display: flex; flex-wrap: wrap; gap: 6px; }
+.flag { font: inherit; font-size: 13px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.flag[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+textarea { width: 100%; min-height: 64px; resize: vertical; font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.status { font-family: var(--font-mono); font-size: 12px; color: var(--muted); min-height: 1.4em; }
+.reveal { margin: 0 16px 14px; padding: 10px 12px; background: var(--bot-soft); border-radius: 6px; font-size: 14px; }
+.reveal b { color: var(--bot); }
+.reveal .agree { color: var(--good); font-weight: 600; }
+footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
+</style>
+
+<main>
+  <header>
+    <h1>Alurentell tough spots</h1>
+    <p class="lede">Positions where the bot was unsure: the search could not separate the top options, or the network and the search disagreed. Pick what you would play. The bot's choice and its numbers appear after you answer.</p>
+    <div class="progress"><span id="prog-text">loading</span><div class="bar"><i id="prog-bar"></i></div></div>
+    <nav class="tabs" id="tabs" aria-label="Positions"></nav>
+  </header>
+  <div class="how">
+    <b>How to answer.</b> Tap a letter. Optionally tick <b>Either is fine</b>, <b>Can't tell from this view</b> or <b>Make this a rule</b>, and add a line of why. Everything saves as you go and you can change an answer later. The bot saw exactly what is shown here (its hand and the public board), nothing about the opponent's hand.
+  </div>
+  <section id="cards" aria-live="polite"></section>
+  <footer>Positions come from engine-v5 self-play, Alurentell (net-guided search, 64 iterations) against UR Cutter played by the same net. Win % figures are search estimates from the bot's side and are noisy to a few points.</footer>
+</main>
+
+<script>
+(function () {
+  var cardsEl = document.getElementById('cards');
+  var tabsEl = document.getElementById('tabs');
+  var progText = document.getElementById('prog-text');
+  var progBar = document.getElementById('prog-bar');
+  var positions = [];
+  var answers = {};
+  var db = null;
+  var saving = {};   // id -> {busy, again}
+  var timers = {};
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function letter(i) { return String.fromCharCode(65 + i); }
+
+  function chip(text, cls) {
+    text = text.replace(/PlusOnex(\d+)/, '+1/+1 counters ×$1').replace(/MinusOnex(\d+)/, '-1/-1 counters ×$1');
+    var m = text.match(/^(.*?)((?: \(tapped\)| \(summoning sick\)| \[[^\]]*\]| <[^>]*>| \d+\/\d+| [A-Za-z]+x\d+| dmg \d+)*)$/);
+    var name = m ? m[1] : text, rest = m ? m[2].trim() : '';
+    var tapped = /\(tapped\)/.test(text);
+    return '<span class="chip ' + (cls || '') + (tapped ? ' tapped' : '') + '">' + esc(name) + (rest ? ' <small>' + esc(rest.replace(/\(tapped\)/, 'tapped')) + '</small>' : '') + '</span>';
+  }
+  function zone(label, items, cls) {
+    return '<div class="zone"><div class="lab">' + esc(label) + '</div><div class="chips">' +
+      (items && items.length ? items.map(function (t) { return chip(t, cls); }).join('') : '<span class="gy">none</span>') + '</div></div>';
+  }
+  function gy(label, items) {
+    return '<div class="zone"><div class="lab">' + esc(label) + '</div><div class="gy">' + (items && items.length ? esc(items.join(', ')) : 'empty') + '</div></div>';
+  }
+
+  function render() {
+    var done = positions.filter(function (p) { return answers[p.id] && answers[p.id].pick != null; }).length;
+    progText.textContent = positions.length ? done + ' of ' + positions.length + ' answered' : 'no positions yet';
+    progBar.style.width = positions.length ? (100 * done / positions.length) + '%' : '0';
+    tabsEl.innerHTML = positions.map(function (p, i) {
+      var a = answers[p.id];
+      return '<button class="tab" data-jump="' + esc(p.id) + '" data-done="' + (a && a.pick != null ? 1 : 0) + '">' + (i + 1) + '</button>';
+    }).join('');
+    if (!positions.length) {
+      cardsEl.innerHTML = '<div class="empty">No positions loaded. When Claude adds a batch it appears here.</div>';
+      return;
+    }
+    // Keep typed notes and scroll position while re-rendering.
+    var active = document.activeElement, activeId = active && active.id, selStart = active && active.selectionStart;
+    cardsEl.innerHTML = positions.map(cardHtml).join('');
+    if (activeId) { var el = document.getElementById(activeId); if (el) { el.focus(); try { el.setSelectionRange(selStart, selStart); } catch (e) {} } }
+  }
+
+  function cardHtml(p, idx) {
+    var v = p.view, a = answers[p.id] || {};
+    var answered = a.pick != null;
+    var lifeLine = '<div class="life"><span class="you">You <b>' + v.my_life + '</b> life · library ' + v.my_lib + '</span><span class="opp">Opponent <b>' + v.opp_life + '</b> life · ' + v.opp_hand + ' cards in hand · library ' + v.opp_lib + '</span></div>';
+    var stack = v.stack && v.stack.length ? '<div class="stack"><b>On the stack</b>' + esc(v.stack.join(' → ')) + '</div>' : '';
+    var log = '';
+    if (p.game_log && p.game_log.length > 3) {
+      log = '<details class="log"><summary>What happened this game (' + p.game_log.length + ' events)</summary><ol>' +
+        p.game_log.map(function (l) { return '<li class="' + (/^-- turn/.test(l) ? 'turn' : '') + '">' + esc(l.replace(/^-- |\s--$/g, '')) + '</li>'; }).join('') + '</ol></details>';
+    }
+    var opts = p.options.map(function (o, i) {
+      var chosen = a.pick === i;
+      var badges = '';
+      var nums = '';
+      if (answered) {
+        if (i === p.bot_choice) badges += '<span class="tag bot">bot played this</span>';
+        if (i === p.deep_best) badges += '<span class="tag deep">deeper search prefers this</span>';
+        nums = '<div class="nums"><span>net ' + o.net + '%<span class="meter"><i style="width:' + o.net + '%"></i></span></span><span>search ' + o.deep + '%<span class="meter"><i style="width:' + o.deep + '%"></i></span></span><span>est. win ' + (o.win == null ? 'n/a' : o.win + '%') + '</span></div>';
+      }
+      return '<button class="opt" data-pick="' + esc(p.id) + ':' + i + '" aria-pressed="' + chosen + '"><span class="ltr">' + letter(i) + '</span><span class="body"><span class="lbl">' + esc(o.label) + '</span>' + (badges ? '<span class="badges">' + badges + '</span>' : '') + nums + '</span></button>';
+    }).join('');
+    var reveal = '';
+    if (answered) {
+      var bot = letter(p.bot_choice) + '. ' + p.options[p.bot_choice].label;
+      var same = a.pick === p.bot_choice;
+      reveal = '<div class="reveal">' + (same ? '<span class="agree">You and the bot picked the same option.</span> ' : '') +
+        'Bot played <b>' + esc(bot) + '</b>' + (p.deep_best !== p.bot_choice ? '; a deeper search (800 iterations) prefers <b>' + esc(letter(p.deep_best) + '. ' + p.options[p.deep_best].label) + '</b>' : '') +
+        '. Position value for the bot about ' + p.win_est + '% to win.</div>';
+    }
+    var f = a.flags || {};
+    function flag(k, t) { return '<button class="flag" data-flag="' + esc(p.id) + ':' + k + '" aria-pressed="' + (!!f[k]) + '">' + t + '</button>'; }
+    return '<article class="card" id="card-' + esc(p.id) + '">' +
+      '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : 'Turn ' + esc(v.turn) + ', ' + esc(v.step) + ' (' + esc(v.whose) + ' turn)') + '</span><span class="meta">' + esc(p.category) + '</span></div>' +
+      lifeLine +
+      '<div class="board"><div>' +
+        zone('Your hand', v.hand, 'hand') + zone('Your battlefield', v.my_bf) + gy('Your graveyard', v.my_gy) +
+      '</div><div>' +
+        zone('Opponent battlefield', v.opp_bf) + gy('Opponent graveyard', v.opp_gy) + (v.opp_exile && v.opp_exile.length ? gy('Opponent exile', v.opp_exile) : '') +
+      '</div></div>' + stack + log +
+      '<div class="q">' + esc(p.question) + '</div><div class="opts">' + opts + '</div>' + reveal +
+      '<div class="extras"><div class="flags">' + flag('either', 'Either is fine') + flag('cant_tell', "Can't tell from this view") + flag('rule', 'Make this a rule') + '</div>' +
+      '<textarea id="note-' + esc(p.id) + '" data-note="' + esc(p.id) + '" placeholder="Why? (optional, one line is plenty)">' + esc(a.note || '') + '</textarea>' +
+      '<div class="status" id="st-' + esc(p.id) + '"></div></div>' +
+      '</article>';
+  }
+
+  function setStatus(id, t) { var el = document.getElementById('st-' + id); if (el) el.textContent = t; }
+
+  function save(id) {
+    if (!db) { setStatus(id, 'Not saved: open this page signed in to claude.ai.'); return; }
+    var s = saving[id] || (saving[id] = { busy: false, again: false });
+    if (s.busy) { s.again = true; return; }
+    s.busy = true;
+    var a = answers[id] || {};
+    var body = { pick: a.pick == null ? null : a.pick, pick_label: a.pick_label || '', flags: a.flags || {}, note: a.note || '', updated: new Date().toISOString() };
+    setStatus(id, 'saving…');
+    db.collection('answers').doc(id).set(body).then(function () {
+      setStatus(id, 'saved');
+    }).catch(function (e) {
+      setStatus(id, 'Could not save (' + (e && e.code || 'error') + ').');
+    }).then(function () {
+      s.busy = false;
+      if (s.again) { s.again = false; save(id); }
+    });
+  }
+
+  document.addEventListener('click', function (ev) {
+    var t = ev.target.closest('button');
+    if (!t) return;
+    if (t.dataset.jump) {
+      var el = document.getElementById('card-' + t.dataset.jump);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    if (t.dataset.pick) {
+      var parts = t.dataset.pick.split(':'), id = parts[0], i = +parts[1];
+      var p = positions.filter(function (x) { return x.id === id; })[0];
+      var a = answers[id] || (answers[id] = {});
+      a.pick = i; a.pick_label = p.options[i].label;
+      render(); save(id);
+    } else if (t.dataset.flag) {
+      var q = t.dataset.flag.split(':'), id2 = q[0], k = q[1];
+      var a2 = answers[id2] || (answers[id2] = {});
+      a2.flags = a2.flags || {};
+      a2.flags[k] = !a2.flags[k];
+      render(); save(id2);
+    }
+  });
+  document.addEventListener('input', function (ev) {
+    var t = ev.target;
+    if (!t.dataset || !t.dataset.note) return;
+    var id = t.dataset.note;
+    var a = answers[id] || (answers[id] = {});
+    a.note = t.value;
+    clearTimeout(timers[id]);
+    setStatus(id, 'typing…');
+    timers[id] = setTimeout(function () { delete timers[id]; save(id); }, 900);
+  });
+
+  render();
+
+  if (!window.claude || !window.claude.use) { progText.textContent = 'open in claude.ai to load positions'; return; }
+  window.claude.use('db').then(function (d) {
+    if (!d) { progText.textContent = 'sign in to claude.ai to load positions'; return; }
+    db = d;
+    d.collection('positions').orderBy('order').onSnapshot(function (snap) {
+      positions = snap.docs.map(function (x) { return x.data(); });
+      render();
+    }, function () { progText.textContent = 'could not load positions'; });
+    d.collection('answers').onSnapshot(function (snap) {
+      var next = {};
+      snap.docs.forEach(function (x) { next[x.id] = x.data(); });
+      // Do not clobber text being typed or an unsent edit.
+      Object.keys(answers).forEach(function (id) { if (saving[id] && (saving[id].busy || timers[id])) next[id] = answers[id]; });
+      answers = next;
+      render();
+    }, function () {});
+  });
+})();
+</script>
