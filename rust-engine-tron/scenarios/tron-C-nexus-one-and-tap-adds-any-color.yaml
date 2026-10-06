@@ -1,0 +1,33 @@
+id: tron-c-planar-nexus-one-tap-any-color-needs-other-mana
+title: Planar Nexus's {1},{T} ability adds one mana of any color, paying the {1} with another land
+area: card
+cards: [Planar Nexus, Mountain]
+tags: [planar-nexus, mana-ability, any-color, activation-cost, colored-mana]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Planar Nexus, text: "{1}, {T}: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "605.3a", text: "A player may activate an activated mana ability whenever they have priority, whenever they are casting a spell or activating an ability that requires a mana payment, or whenever a rule or effect asks for a mana payment, even if it’s in the middle of casting or resolving a spell or activating or resolving an ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [Planar Nexus @nx, Mountain @mtn]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@nx", ability: 1, choose_color: U, pay: {tap: ["@mtn"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {U: 1}
+      battlefield: [{card: Planar Nexus, tapped: true}, {card: Mountain, tapped: true}]
+notes: >
+  The {1} of the activation cost is paid by tapping the Mountain (its {R} is consumed by the cost, so it is not left in the
+  pool); the Nexus taps as the other part of the cost and adds {U}. Net effect: two lands become one colored mana. A wrong
+  engine leaves the Mountain's {R} floating, or does not tap the Mountain, or lets the ability work without paying {1}.
+  Ability index 1 is the {1},{T} ability (index 0 is {T}: Add {C}). A mana ability nested inside the cost payment of a mana ability: the schema runner
+  must accept `pay:` on an activation.

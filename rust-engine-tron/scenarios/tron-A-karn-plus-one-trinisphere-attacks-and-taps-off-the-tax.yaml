@@ -1,0 +1,54 @@
+id: tron-a-karn-plus-one-trinisphere-attacks-and-taps-off-the-tax
+title: "Karn's +1 makes Trinisphere a 3/3 creature; when it attacks it taps, so the tax switches off and Lightning Bolt costs just {R}"
+area: card
+cards: ["Karn, the Great Creator", Trinisphere, Lightning Bolt, Mountain]
+tags: [karn-the-great-creator, trinisphere, becomes-creature, attack-taps, untapped-condition, cost-increase, combat, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.", verified: true}
+  - {kind: oracle, card: Trinisphere, text: "As long as this artifact is untapped, each spell that would cost less than three mana to cast costs three mana to cast.", verified: true}
+  - {kind: cr, ref: "508.1f", text: "The active player taps the chosen creatures.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: [{card: "Karn, the Great Creator", as: karn, counters: {loyalty: 4}}, "Trinisphere @tri", "Mountain @mt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@mt"]}}}
+  - p0: {t: activate, source: "@karn", ability: 0, targets: ["@tri"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {battlefield_contains: [{card: Trinisphere, types: [Artifact, Creature], pt: [3, 3], tapped: false}]}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@mt"]}}}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@tri", target: {player: p1}}]}
+  - check:
+      phase: declare_attackers
+      p0: {battlefield_contains: [{card: Trinisphere, tapped: true, attacking: true}]}
+      legal: {p0: {include: [{t: cast, card: "@bolt"}]}}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@mt"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main2
+    stack: []
+    p0:
+      graveyard: [Lightning Bolt]
+    p1:
+      life: 14
+notes: >
+  Trinisphere has been under p0's control since the turn began, so as a creature it may attack. Attacking taps it (no
+  vigilance, 508.1f), so "as long as this artifact is untapped" is false and Bolt costs {R}: with one Mountain it is not
+  castable before the attack (Trinisphere untapped, even as a creature) and is castable in the declare attackers step.
+  Bolt (3) plus combat damage (3) leave p1 at 14. A wrong engine keeps the tax on a tapped attacker.

@@ -1,0 +1,37 @@
+id: tron-c-planar-nexus-has-every-nonbasic-land-type-and-taps-for-colorless
+title: Planar Nexus has every nonbasic land type (Urza's, Tower, Mine, Power-Plant, ...) and taps for {C}
+area: card
+cards: [Planar Nexus]
+tags: [planar-nexus, land-types, nonbasic, mana-ability, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Planar Nexus, text: "This land is every nonbasic land type.", verified: true}
+  - {kind: oracle, card: Planar Nexus, text: "{T}: Add {C}.", verified: true}
+  - {kind: cr, ref: "205.3i", text: "Of that list, Forest, Island, Mountain, Plains, and Swamp are the basic land types.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [Planar Nexus @nx]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0:
+        battlefield:
+          - {card: Planar Nexus, types: [Land], subtypes: [Cave, Desert, Gate, Lair, Locus, Mine, Power-Plant, Sphere, Tower, "Urza's"]}
+  - p0: {t: activate, source: "@nx", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 1}
+      battlefield: [{card: Planar Nexus, tapped: true, types: [Land]}]
+notes: >
+  The ten nonbasic land types named in the card's reminder text (Cave, Desert, Gate, Lair, Locus, Mine, Power-Plant,
+  Sphere, Tower, Urza's) are asserted; CR 205.3i also lists Planet and Town, which the Oracle reminder text omits and
+  which are deliberately not asserted. "Every nonbasic land type" does NOT include the five basic land types, so the
+  Nexus has no intrinsic mana ability from Plains/Island/etc.: tapping it for its {T}: Add {C} gives colorless only
+  (pool {C}). A wrong engine gives it the basic land types too (it would then also be offered {W}/{U}/{B}/{R}/{G}).

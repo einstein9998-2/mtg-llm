@@ -1,0 +1,47 @@
+id: tron-a-trinisphere-colored-symbol-still-required
+title: "Trinisphere does not replace the colored symbol: three Plains cannot cast Lightning Bolt, but two Plains and a Mountain can"
+area: card
+cards: [Trinisphere, Lightning Bolt, Plains, Mountain]
+tags: [trinisphere, cost-increase, colored-mana, mana-payment, legal-action-mask, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Trinisphere, text: "Additional mana in the cost may be paid with any color of mana or colorless mana.", verified: true}
+  - {kind: oracle, card: Trinisphere, text: "a spell that would cost {1}{B} to cast costs {2}{B} to cast instead", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Mountain @mt"]
+    battlefield: ["Plains @pl1", "Plains @pl2", "Plains @pl3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}}
+  - p0: {t: play_land, card: "@mt"}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt]
+      battlefield:
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: false}
+        - {card: Mountain, tapped: true}
+    p1:
+      life: 17
+notes: >
+  Three Plains are three mana but none is red, so Bolt ({2}{R} under Trinisphere) is not castable: the minimum cost
+  is a number of mana, the {R} requirement stays. After a Mountain is played the only payment taps the Mountain for
+  {R} and two of the three Plains for the generic part, leaving one Plains untapped (equivalent Plains payments give
+  the same canonical state). A wrong engine that turns the whole cost into {3} generic would accept the first cast.

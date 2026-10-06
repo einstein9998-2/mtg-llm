@@ -1,0 +1,42 @@
+id: tron-b-tormods-crypt-own-graveyard-also-exiles-itself
+title: "Targeting your own graveyard with Tormod's Crypt also exiles the Crypt itself, which was sacrificed as the cost"
+area: card
+cards: [Tormod's Crypt, Dark Ritual, Ponder]
+tags: [tormods-crypt, graveyard-hate, target-self, sacrifice-as-cost, only-target-graveyard, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Tormod's Crypt, text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Tormod's Crypt @crypt"]
+    graveyard: ["Dark Ritual"]
+    library_pad: 10
+  p1:
+    graveyard: [Ponder]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@crypt", ability: 0, targets: [{player: p0}]}
+  - label: on-stack
+    check:
+      stack: [{kind: activated, source: "@crypt", controller: p0}]
+      p0:
+        graveyard: ["Dark Ritual", "Tormod's Crypt"]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: []
+      exile: ["Dark Ritual", "Tormod's Crypt"]
+    p1:
+      graveyard: [Ponder]
+notes: >
+  "Target player's graveyard" may be your own. The Crypt went to the graveyard as a cost (701.21a) before the ability resolves, so
+  it is in the exiled graveyard along with Dark Ritual. p1's graveyard is unaffected. A wrong engine exiles only the cards that
+  were there at activation.

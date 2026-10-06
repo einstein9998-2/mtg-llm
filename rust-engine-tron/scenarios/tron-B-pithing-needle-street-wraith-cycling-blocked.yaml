@@ -1,0 +1,42 @@
+id: tron-b-pithing-needle-street-wraith-cycling-blocked
+title: "Pithing Needle naming Street Wraith stops cycling it from hand (a non-mana activated ability of a card in hand)"
+area: card
+cards: [Pithing Needle, Street Wraith, Island]
+tags: [pithing-needle, choose-name, street-wraith, cycling, activate-from-hand, negative, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pithing Needle, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: cr, ref: "702.29a", text: "Cycling is an activated ability that functions only while the card with cycling is in a player’s hand.", verified: true}
+  - {kind: ruling, card: Pithing Needle, date: "2012-07-01", text: "Pithing Needle stops activated abilities of cards in hidden zones that have the chosen name (for example channel and cycling), since the card is the source of the ability.", verified: false, note: "recalled, not retrieved; follows from the Oracle text but is not stated in the CR"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Pithing Needle @pn", "Street Wraith @sw"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - label: before-needle
+    check:
+      legal: {p0: {include: [{t: activate_from_hand, source: "@sw", ability: 0}]}}
+  - p0: {t: cast, card: "@pn", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: Street Wraith}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@sw", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Street Wraith]
+      library_count: 10
+notes: >
+  Cycling-Pay 2 life is the only activated ability of Street Wraith (swampwalk is static). Before the Needle it is offered
+  (control); after the Needle names Street Wraith it is not, and no life is paid. Same unverified-ruling caveat as the Boseiju
+  scenario. A wrong engine applies "sources with the chosen name" only to permanents.

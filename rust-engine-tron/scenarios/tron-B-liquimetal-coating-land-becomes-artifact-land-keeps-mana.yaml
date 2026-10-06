@@ -1,0 +1,47 @@
+id: tron-b-liquimetal-coating-land-becomes-artifact-land-keeps-mana
+title: "Liquimetal Coating makes an Island an artifact in addition to its other types: it is an Artifact Land Island and still taps for {U}"
+area: card
+cards: [Liquimetal Coating, Island]
+tags: [liquimetal-coating, type-change, in-addition, layers, artifact-land, mana-ability, tap-cost-only]
+derived_from: cr
+source:
+  - {kind: oracle, card: Liquimetal Coating, text: "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.", verified: true}
+  - {kind: cr, ref: "205.1b", text: "This rule applies to effects that use phrases such as “in addition to its other types”", verified: true}
+  - {kind: cr, ref: "613.1d", text: "Layer 4: Type-changing effects are applied.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Liquimetal Coating @coat", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@coat", ability: 0, targets: ["@isl"]}
+  - label: on-stack
+    check:
+      stack: [{kind: activated, source: "@coat", controller: p0}]
+      p0:
+        battlefield_contains: [{card: Liquimetal Coating, tapped: true}, {card: Island, types: [Land]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: coated
+    check:
+      stack: []
+      p0:
+        battlefield_contains: [{card: Island, types: [Artifact, Land], subtypes: [Island]}]
+  - p0: {t: activate, source: "@isl", ability: 0, choose_color: U}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {U: 1}
+      battlefield:
+        - {card: Liquimetal Coating, tapped: true}
+        - {card: Island, tapped: true, types: [Artifact, Land], subtypes: [Island]}
+notes: >
+  The Coating's only cost is {T}, so it can be activated with no other mana. "In addition to its other types" (205.1b) keeps
+  Land and the Island subtype: the card types are exactly {Artifact, Land}, and the Island still taps for {U} (its intrinsic
+  mana ability). A wrong engine replaces the types (losing Land and its mana ability).

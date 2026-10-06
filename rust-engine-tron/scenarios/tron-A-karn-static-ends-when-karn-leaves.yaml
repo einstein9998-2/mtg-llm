@@ -1,0 +1,47 @@
+id: tron-a-karn-static-ends-when-karn-leaves
+title: "When Lightning Bolt kills Karn (loyalty 3) the opponent's Lotus Petal can be activated again"
+area: card
+cards: ["Karn, the Great Creator", Lotus Petal, Lightning Bolt, Mountain]
+tags: [karn-the-great-creator, static-ability, planeswalker, state-based-action, damage-to-planeswalker, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Activated abilities of artifacts your opponents control can't be activated.", verified: true}
+  - {kind: cr, ref: "120.3c", text: "Damage dealt to a planeswalker causes that many loyalty counters to be removed from that planeswalker.", verified: true}
+  - {kind: cr, ref: "704.5i", text: "If a planeswalker has loyalty 0, it’s put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: [{card: "Karn, the Great Creator", as: karn, counters: {loyalty: 3}}]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Lotus Petal @lp", "Mountain @mt"]
+    library_pad: 10
+script:
+  - expect_illegal: {p1: {t: activate, source: "@lp", ability: 0, choose_color: R}}
+  - p1: {t: cast, card: "@bolt", targets: ["@karn"], pay: {tap: ["@mt"]}}
+  - expect_illegal: {p1: {t: activate, source: "@lp", ability: 0, choose_color: R}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: ["Karn, the Great Creator"], battlefield: []}
+  - p1: {t: activate, source: "@lp", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: []
+      graveyard: ["Karn, the Great Creator"]
+    p1:
+      graveyard: [Lightning Bolt, Lotus Petal]
+      mana_pool: {R: 1}
+      battlefield: [{card: Mountain, tapped: true}]
+notes: >
+  The static ability applies only while Karn is on the battlefield: with Bolt on the stack the Petal is still locked, once
+  Bolt removes all 3 loyalty and the state-based action puts Karn into the graveyard the Petal activates again. A wrong
+  engine keeps the lock after Karn is gone.

@@ -1,0 +1,52 @@
+id: tron-a-trinisphere-daze-return-island-plus-three-mana
+title: "Under Trinisphere, Daze cast by returning an Island also costs three mana; the tapped-out caster cannot pay {1} and the spell is countered"
+area: card
+cards: [Trinisphere, Daze, Voltaic Key, Plains, Island]
+tags: [trinisphere, daze, alternative-cost, return-island, cost-increase, mana-payment, counter-unless-pay, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Voltaic Key @key"]
+    battlefield: ["Trinisphere @tri", "Plains @pl1", "Plains @pl2", "Plains @pl3"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3", "Island @j4"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@key", pay: {tap: ["@pl1", "@pl2", "@pl3"]}}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@daze", alt_cost: {return_island: "@j4"}}]}}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j4"}, targets: ["@key"], pay: {tap: ["@j1", "@j2", "@j3"]}}
+  - check:
+      stack: [{kind: spell, card: "@key", controller: p0}, {kind: spell, card: "@daze", controller: p1, targets: ["@key"]}]
+      p1: {hand: [Island], spells_cast_this_turn: 1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Voltaic Key]
+      battlefield: [{card: Trinisphere}, {card: Plains, tapped: true}, {card: Plains, tapped: true}, {card: Plains, tapped: true}]
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  p1 returns the fourth Island (its alternative cost) and pays three mana from the other three Islands: Daze would cost
+  no mana, Trinisphere makes it three (118.9d). All three Islands tap and the returned Island is in hand. p0 is tapped
+  out (three Plains for Key's {3}), so Daze's "unless its controller pays {1}" gives p0 no real choice (no prompt,
+  same convention as the uncounterable-daze-veil-cannot-pay scenario) and Key is countered. A wrong engine lets Daze
+  stay free.

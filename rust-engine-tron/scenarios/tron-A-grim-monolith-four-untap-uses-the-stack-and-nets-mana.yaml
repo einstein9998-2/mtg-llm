@@ -1,0 +1,48 @@
+id: tron-a-grim-monolith-four-untap-uses-the-stack-and-nets-mana
+title: "Grim Monolith's {4} untap ability is not a mana ability: it goes on the stack, can be paid with the Monolith's own mana, and nets {C}{C}{C} minus {4}"
+area: card
+cards: [Grim Monolith, Island]
+tags: [grim-monolith, untap, activated-ability, stack, mana-payment, floating-mana, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Grim Monolith, text: "{T}: Add {C}{C}{C}.", verified: true}
+  - {kind: oracle, card: Grim Monolith, text: "{4}: Untap this artifact.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Grim Monolith @gm", "Island @is1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@gm", ability: 0}
+  - p0: {t: activate, source: "@gm", ability: 1, pay: auto}
+  - check:
+      stack: [{kind: activated, source: "@gm", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        mana_pool: {}
+        battlefield: [{card: Grim Monolith, tapped: true}, {card: Island, tapped: true}]
+  - expect_illegal: {p0: {t: activate, source: "@gm", ability: 0}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {battlefield_contains: [{card: Grim Monolith, tapped: false}]}
+  - p0: {t: activate, source: "@gm", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 3}
+      battlefield: [{card: Grim Monolith, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Tap for {C}{C}{C}, then pay the {4} untap with those three plus an Island. The untap ability adds no mana, so it is NOT
+  a mana ability: it uses the stack (the Monolith is still tapped while it waits, so the {T} ability is not offered) and
+  resolves only after both players pass. After it resolves the Monolith is untapped and taps again for {C}{C}{C}. Net
+  effect: one Island plus the Monolith's own mana buys another {C}{C}{C}. A wrong engine untaps immediately as a mana
+  ability, or refuses mana from the Monolith itself.

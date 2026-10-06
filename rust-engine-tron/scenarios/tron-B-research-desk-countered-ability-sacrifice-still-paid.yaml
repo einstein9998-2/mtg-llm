@@ -1,0 +1,50 @@
+id: tron-b-research-desk-countered-ability-sacrifice-still-paid
+title: If Stifle counters Mishra's Research Desk's ability, the Desk is already sacrificed and no card is exiled
+area: card
+cards: [Mishra's Research Desk, Stifle, Ponder, Island]
+tags: [mishras-research-desk, stifle, counter-ability, sacrifice-as-cost, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mishra's Research Desk, text: "{1}, {T}, Sacrifice this artifact: Exile the top two cards of your library.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Research Desk @desk", "Island @i1", "Island @i2"]
+    library: ["Ponder @pd", "Island @isl"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@desk", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@desk", nth: 0}], pay: auto}
+  - label: stifle-over-ability
+    check:
+      stack:
+        - {kind: activated, source: "@desk", controller: p0}
+        - {kind: spell, card: "@stifle", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Mishra's Research Desk"]
+      exile: []
+      library_top: [Ponder, Island]
+      library_count: 12
+      hand: []
+    p1:
+      graveyard: [Stifle]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  The cost (mana, tap and sacrifice) is paid on activation, so countering the ability leaves p0 without the Desk and without
+  any exiled cards: the top two cards are untouched and the Desk is in the graveyard. A wrong engine refunds the sacrifice or
+  exiles the cards anyway.

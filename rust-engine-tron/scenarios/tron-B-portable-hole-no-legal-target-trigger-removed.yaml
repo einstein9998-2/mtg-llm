@@ -1,0 +1,45 @@
+id: tron-b-portable-hole-no-legal-target-trigger-removed
+title: With no legal target Portable Hole still enters and its enters trigger is simply removed (nothing is exiled, no target is asked for)
+area: card
+cards: [Portable Hole, Carpet of Flowers, Flickerwisp, Aluren, Island, Plains]
+tags: [portable-hole, etb-trigger, no-legal-target, triggered-ability-removed, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Portable Hole, text: "exile target nonland permanent an opponent controls with mana value 2 or less", verified: true}
+  - {kind: cr, ref: "603.3d", text: "If a choice is required when the triggered ability goes on the stack but no legal choices can be made for it, or if a rule or a continuous effect otherwise makes the ability illegal, the ability is simply removed from the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Portable Hole @hole"]
+    battlefield: ["Plains @pl", "Carpet of Flowers @carpet"]
+    library_pad: 10
+  p1:
+    battlefield: ["Flickerwisp @wisp", "Aluren @alu", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hole", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Portable Hole}
+        - {card: Plains, tapped: true}
+        - {card: Carpet of Flowers}
+      exile: []
+    p1:
+      exile: []
+      battlefield:
+        - {card: Flickerwisp}
+        - {card: Aluren}
+        - {card: Island}
+notes: >
+  p1 controls only Flickerwisp (mana value 3), Aluren (4) and a land; p0's own Carpet of Flowers (mana value 1) is not an
+  opponent's permanent. So the trigger has no legal target, is removed from the stack when it would be put there (603.3d), no
+  choose_target decision is raised, and the Hole stays on the battlefield with nothing exiled. A wrong engine exiles its own
+  Carpet, asks for a target among illegal objects, or leaves a stuck trigger on the stack.

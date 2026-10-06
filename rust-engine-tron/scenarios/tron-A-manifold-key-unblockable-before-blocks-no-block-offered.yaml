@@ -1,0 +1,45 @@
+id: tron-a-manifold-key-unblockable-before-blocks-no-block-offered
+title: "Manifold Key's {3},{T} makes an attacker unblockable this turn, so the opponent's untapped creature has no legal block and the attacker connects"
+area: card
+cards: [Manifold Key, Ocelot Pride, "Phelia, Exuberant Shepherd", Island]
+tags: [manifold-key, cant-be-blocked, combat, evasion, lifelink, first-strike, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Manifold Key, text: "{3}, {T}: Target creature can't be blocked this turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Manifold Key @mk", "Ocelot Pride @op", "Island @is1", "Island @is2", "Island @is3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@mk", ability: 1, targets: ["@op"], pay: {tap: ["@is1", "@is2", "@is3"]}}
+  - check:
+      stack: [{kind: activated, source: "@mk", controller: p0, targets: ["@op"]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@op", target: {player: p1}}]}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main2
+    stack: []
+    p0:
+      life: 21
+      battlefield_contains: [{card: Ocelot Pride, tapped: true}, {card: Manifold Key, tapped: true}]
+    p1:
+      life: 19
+      battlefield: [{card: "Phelia, Exuberant Shepherd", damage: 0}]
+notes: >
+  Phelia is untapped and could block Ocelot Pride, but the attacker can't be blocked this turn, so no declare-blockers
+  decision is raised for p1 (a declaration with no legal blocker raises no decision; advance would fail otherwise).
+  First strike lifelink deals 1: p1 19, p0 21. A wrong engine ignores the effect or ends it at the end of combat step
+  of the activation.

@@ -1,0 +1,47 @@
+id: tron-b-ensnaring-bridge-stock-up-raises-hand-atraxa-legal
+title: "Ensnaring Bridge: casting Stock Up in main phase 1 takes the hand from six to seven, so Atraxa may then attack"
+area: card
+cards: [Ensnaring Bridge, "Atraxa, Grand Unifier", Stock Up, Lotus Petal, Brainstorm, Aluren, Island, Ponder]
+tags: [ensnaring-bridge, atraxa, stock-up, hand-size-change, declare-attackers, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ensnaring Bridge, text: "Creatures with power greater than the number of cards in your hand can't attack.", verified: true}
+  - {kind: oracle, card: Stock Up, text: "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stock Up @su", Island, Island, Island, Island, Island]
+    battlefield: ["Ensnaring Bridge @br", "Atraxa, Grand Unifier @atx", "Island @i1", "Island @i2", "Island @i3"]
+    library: ["Lotus Petal @lp", "Brainstorm @bs", "Aluren @al", "Island @is", "Ponder @pd"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@su", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: to_hand, answer: ["@lp", "@pd"]}
+  - p0: {decision: order_cards, purpose: bottom, answer: ["@al", "@bs", "@is"]}
+  - label: hand-seven
+    check:
+      stack: []
+      p0:
+        hand_count: 7
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@atx", target: {player: p1}}], expect_options: {include: ["@atx"]}}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    p0:
+      hand_count: 7
+      battlefield_contains: [{card: "Atraxa, Grand Unifier", attacking: true}]
+notes: >
+  p0 starts with six cards (Stock Up and five Islands). Casting Stock Up leaves five, then two cards are put into hand: seven.
+  At the declaration the Bridge compares Atraxa's power 7 with seven cards in hand: legal. The two passes in main phase 1 and
+  the two at the beginning of combat reach the declaration (no triggers on the way). A wrong engine caches the hand size or
+  counts it before the spell's cards arrive.

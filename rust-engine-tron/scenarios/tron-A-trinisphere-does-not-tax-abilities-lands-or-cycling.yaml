@@ -1,0 +1,54 @@
+id: tron-a-trinisphere-does-not-tax-abilities-lands-or-cycling
+title: "Trinisphere only taxes spells: Voltaic Key's {1} ability, Grim Monolith's mana ability, a land play and Street Wraith's cycling are unaffected"
+area: card
+cards: [Trinisphere, Voltaic Key, Grim Monolith, Street Wraith, Island, Plains]
+tags: [trinisphere, negative-case, activated-ability, special-action, cycling, voltaic-key, grim-monolith, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true}
+  - {kind: oracle, card: Street Wraith, text: "Cycling—Pay 2 life.", verified: true}
+  - {kind: cr, ref: "112.1", text: "A spell is a card on the stack.", verified: true}
+  - {kind: cr, ref: "116.2a", text: "Playing a land is a special action.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Plains @pl", "Street Wraith @sw"]
+    battlefield: ["Trinisphere @tri", "Voltaic Key @key", {card: Grim Monolith, as: gm, tapped: true}, "Island @is1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@key", ability: 0, targets: ["@gm"], pay: {tap: ["@is1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@gm", ability: 0}
+  - check:
+      p0: {mana_pool: {C: 3}}
+  - p0: {t: play_land, card: "@pl"}
+  - p0: {t: activate_from_hand, source: "@sw", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      lands_played: 1
+      spells_cast_this_turn: 0
+      hand: [Island]
+      graveyard: [Street Wraith]
+      mana_pool: {C: 3}
+      battlefield:
+        - {card: Trinisphere}
+        - {card: Voltaic Key, tapped: true}
+        - {card: Grim Monolith, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Plains, tapped: false}
+notes: >
+  Nothing here is a spell (112.1): Voltaic Key's activation costs its printed {1} (one Island taps), Monolith's mana
+  ability adds {C}{C}{C}, playing Plains is a special action (116.2a), and cycling Street Wraith costs 2 life, drawing the
+  padded Island. spells_cast_this_turn stays 0. A wrong engine applies the minimum to abilities or to cycling.

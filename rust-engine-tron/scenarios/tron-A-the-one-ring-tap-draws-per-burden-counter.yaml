@@ -1,0 +1,39 @@
+id: tron-a-the-one-ring-tap-draws-per-burden-counter
+title: "The One Ring's tap ability adds a burden counter first, then draws one card per burden counter (2 counters become 3, three cards)"
+area: card
+cards: [The One Ring, Island, Mountain, Plains, Swamp]
+tags: [the-one-ring, burden-counter, draw, activated-ability, ordering-within-resolution, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: The One Ring, text: "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: The One Ring, as: ring, counters: {burden: 2}}]
+    library: ["Island @c1", "Mountain @c2", "Plains @c3", "Swamp @c4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ring", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@ring", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [], battlefield: [{card: The One Ring, tapped: true, counters: {burden: 2}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Mountain, Plains]
+      library_top: [Swamp]
+      battlefield: [{card: The One Ring, tapped: true, counters: {burden: 3}}]
+notes: >
+  The cost is only {T}; the counter is put and the cards are drawn on resolution (the ability uses the stack). The
+  counter comes first, so with two burden counters the Ring ends at three and draws three cards: the top three of the
+  library (Island, Mountain, Plains), leaving Swamp on top. A wrong engine draws before adding the counter (two cards),
+  or draws one card.

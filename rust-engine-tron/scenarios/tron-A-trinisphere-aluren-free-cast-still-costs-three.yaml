@@ -1,0 +1,55 @@
+id: tron-a-trinisphere-aluren-free-cast-still-costs-three
+title: "Under Trinisphere, a creature cast through Aluren \"without paying its mana cost\" still costs three mana"
+area: card
+cards: [Trinisphere, Aluren, Ocelot Pride, Plains]
+tags: [trinisphere, aluren, free-cast, alternative-cost, cost-increase, legal-action-mask, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "118.9", text: "Alternative costs are usually phrased, “You may [action] rather than pay [this object’s] mana cost,” or “You may cast [this object] without paying its mana cost.”", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @op", "Plains @pl3"]
+    battlefield: ["Aluren @alu", "Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@op", alt_cost: {free: aluren}, pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@op", alt_cost: null, pay: auto}}
+  - p0: {t: play_land, card: "@pl3"}
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@op", alt_cost: {free: aluren}}]}}
+  - p0: {t: cast, card: "@op", alt_cost: {free: aluren}, pay: {tap: ["@pl1", "@pl2", "@pl3"]}}
+  - check:
+      stack: [{kind: spell, card: "@op", controller: p0}]
+      p0: {spells_cast_this_turn: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield:
+        - {card: Aluren}
+        - {card: Ocelot Pride, sick: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: true}
+    p1:
+      battlefield: [{card: Trinisphere}]
+notes: >
+  Ocelot Pride (mana value 1) is cast through Aluren's permission, which makes the cost zero; the mana component of the
+  total cost is nothing and Trinisphere raises any spell that "would cost less than three mana" to three (601.2f, 118.9d).
+  With two Plains neither the free cast nor the hard cast is offered. After a third Plains is played, the free cast is
+  offered and taps all three. A wrong engine treats "without paying its mana cost" as unpayable-for-free. This is a core
+  Alurentell line (Aluren plus Trinisphere on the other side).

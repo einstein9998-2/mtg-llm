@@ -1,0 +1,35 @@
+id: tron-c-kozileks-command-needs-two-colorless-mana-not-colored
+title: "Kozilek's Command's {C}{C} cannot be paid with Islands, Lotus Petal or a lone Urza's Tower"
+area: card
+cards: ["Kozilek's Command", Island, Lotus Petal, "Urza's Tower"]
+tags: [kozileks-command, colorless-mana-cost, mana-payment, legal-action-mask, negative-case, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Choose two —", verified: true}
+  - {kind: cr, ref: "107.4c", text: "The colorless mana symbol {C} is used to represent one colorless mana, and also to represent a cost that can be paid only with one colorless mana.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost. First, they pay all costs that don’t involve random elements or moving objects from the library to a public zone, in any order. Then they pay all remaining costs in any order. Partial payments are not allowed. Unpayable costs can’t be paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Island, Island, Island, Lotus Petal, "Urza's Tower @tw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 0, modes: [1, 2], targets: [{player: p0}, {player: p0}], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 3, modes: [1, 2], targets: [{player: p0}, {player: p0}], pay: auto}}
+  - check:
+      legal: {p0: {exclude: [{t: cast, card: "@kc"}]}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      hand: ["Kozilek's Command"]
+      spells_cast_this_turn: 0
+notes: >
+  p0 has plenty of mana (three Islands, a Petal for any one color, a Tower for {C}) but only ONE source of colorless mana:
+  the Tower alone adds a single {C} (no Mine or Power Plant). {C}{C} can only be paid with colorless mana, so even X = 0 is
+  not castable. A wrong engine treats {C} as generic and lets Islands pay it.

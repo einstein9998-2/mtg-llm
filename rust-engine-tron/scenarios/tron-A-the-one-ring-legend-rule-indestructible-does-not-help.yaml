@@ -1,0 +1,56 @@
+id: tron-a-the-one-ring-legend-rule-indestructible-does-not-help
+title: "A second cast of The One Ring triggers the legend rule: the player keeps one, the other goes to the graveyard despite indestructible, and the new Ring starts with no burden counters"
+area: card
+cards: [The One Ring, Island]
+tags: [the-one-ring, legend-rule, indestructible, burden-counter, enters-trigger, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: The One Ring, text: "Indestructible", verified: true}
+  - {kind: oracle, card: The One Ring, text: "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.", verified: true}
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners’ graveyards.", verified: true}
+  - {kind: cr, ref: "702.12b", text: "A permanent with indestructible can’t be destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["The One Ring @ring2"]
+    battlefield: [{card: The One Ring, as: ring1, counters: {burden: 2}}, "Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ring2", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: legend_rule, keep: "@ring2"}
+  - check:
+      stack: [{kind: triggered, source: "@ring2", controller: p0}]
+      p0:
+        graveyard: [The One Ring]
+        battlefield_contains: [{card: The One Ring}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@ring2", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand_count: 1
+      graveyard: [The One Ring]
+      battlefield:
+        - {card: The One Ring, tapped: true, counters: {burden: 1}}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  The legend rule (704.5j) puts the extra Ring into the graveyard: it is not "destroy", so indestructible does not save it.
+  p0 keeps the new Ring; the old Ring's two burden counters stay with the old object, so the new Ring starts at none:
+  activating it puts the first counter and draws exactly one card (a wrong engine that moved counters would draw three).
+  The new Ring (cast) also triggered; its trigger resolves (stack [] after the passes) and gives protection, which has no
+  effect in this scenario.

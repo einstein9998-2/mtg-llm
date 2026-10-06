@@ -1,0 +1,47 @@
+id: tron-c-kozileks-command-x2-two-spawn-scry-two-then-draw
+title: "Kozilek's Command with X = 2, modes 1 and 2: two Eldrazi Spawn, scry 2, then draw the card now on top"
+area: card
+cards: ["Kozilek's Command", Ancient Tomb, Mountain, Ponder, Brainstorm, Island, Eldrazi Spawn Token]
+tags: [kozileks-command, x-spell, scry, draw-after-scry, spawn-tokens, modal, ancient-tomb]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Target player scries X, then draws a card.", verified: true}
+  - {kind: cr, ref: "701.22a", text: "To “scry N” means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb, Mountain @m1, Mountain @m2]
+    library: [Ponder @l1, Brainstorm @l2, Island @l3]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@kc", x: 2, modes: [1, 2], targets: [{player: p0}, {player: p0}], pay: {tap: ["@tomb", "@m1", "@m2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: scry, to_bottom: ["@l1"], on_top_order: ["@l2"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      hand: [Brainstorm]
+      graveyard: ["Kozilek's Command"]
+      library_top: [Island]
+      library_bottom: [Ponder]
+      library_count: 12
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {token: Eldrazi Spawn Token, pt: [0, 1]}
+        - {token: Eldrazi Spawn Token, pt: [0, 1]}
+notes: >
+  Cost {2}{C}{C} = four mana: the Tomb pays {C}{C}, the Mountains pay the generic {2}. Scry 2 looks at Ponder and
+  Brainstorm; Ponder goes to the bottom, Brainstorm stays on top; THEN the draw takes Brainstorm (the order is the
+  card's: "scries X, then draws"). A wrong engine draws before scrying (would draw Ponder) or scries for the wrong amount.
+  Library: 13 cards, one drawn: 12; Island is now on top and Ponder at the bottom.

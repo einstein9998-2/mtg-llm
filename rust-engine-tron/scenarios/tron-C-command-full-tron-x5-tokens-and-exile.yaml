@@ -1,0 +1,55 @@
+id: tron-c-full-tron-casts-kozileks-command-for-five-tokens-and-exile
+title: "Full Tron (seven colorless mana) casts Kozilek's Command with X = 5: five Eldrazi Spawn for p0 and Faerie Macabre exiled"
+area: card
+cards: ["Kozilek's Command", "Urza's Tower", "Urza's Mine", "Urza's Power Plant", Faerie Macabre, Eldrazi Spawn Token]
+tags: [kozileks-command, x-spell, tron, spawn-tokens, exile, modal, mana-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Target player creates X 0/1 colorless Eldrazi Spawn creature tokens with \"Sacrifice this token: Add {C}.\"", verified: true}
+  - {kind: oracle, card: "Kozilek's Command", text: "Exile target creature with mana value X or less.", verified: true}
+  - {kind: cr, ref: "107.3a", text: "While a spell is on the stack, any X in its mana cost or in any alternative cost or additional cost it has equals the announced value.", verified: true}
+  - {kind: cr, ref: "202.3e", text: "When calculating the mana value of an object with an {X} in its mana cost, X is treated as 0 while the object is not on the stack, and X is treated as the number chosen for it while the object is on the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: ["Urza's Tower", "Urza's Mine", "Urza's Power Plant"]
+    library_pad: 10
+  p1:
+    battlefield: [Faerie Macabre @fm]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@kc", x: 5, modes: [1, 3], targets: [{player: p0}, "@fm"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@kc", controller: p0, x: 5, modes: [1, 3]}]
+      p0:
+        battlefield: [{card: "Urza's Tower", tapped: true}, {card: "Urza's Mine", tapped: true}, {card: "Urza's Power Plant", tapped: true}]
+        mana_pool: {}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Kozilek's Command"]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: "Urza's Tower", tapped: true}
+        - {card: "Urza's Mine", tapped: true}
+        - {card: "Urza's Power Plant", tapped: true}
+        - {token: Eldrazi Spawn Token, pt: [0, 1], types: [Creature], subtypes: [Eldrazi, Spawn], sick: true}
+        - {token: Eldrazi Spawn Token, pt: [0, 1], types: [Creature], subtypes: [Eldrazi, Spawn], sick: true}
+        - {token: Eldrazi Spawn Token, pt: [0, 1], types: [Creature], subtypes: [Eldrazi, Spawn], sick: true}
+        - {token: Eldrazi Spawn Token, pt: [0, 1], types: [Creature], subtypes: [Eldrazi, Spawn], sick: true}
+        - {token: Eldrazi Spawn Token, pt: [0, 1], types: [Creature], subtypes: [Eldrazi, Spawn], sick: true}
+    p1:
+      exile: [Faerie Macabre]
+      battlefield: []
+notes: >
+  Cost {X}{C}{C} with X = 5 is seven colorless mana: exactly what the three Tron lands make (3 + 2 + 2). The engine
+  must tap all three. Modes are listed in printed order (1 = tokens, 3 = exile) and targets in the order of the modes
+  (a player, then the creature). Faerie Macabre has mana value 3, at most X = 5. A wrong engine charges X wrongly
+  (X as 0 or 1), makes tokens for the wrong player or in the wrong number, or exiles to the graveyard.

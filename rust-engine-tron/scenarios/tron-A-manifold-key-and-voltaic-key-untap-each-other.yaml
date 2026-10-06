@@ -1,0 +1,37 @@
+id: tron-a-manifold-key-and-voltaic-key-untap-each-other
+title: "Voltaic Key can untap a tapped Manifold Key, which can then untap the tapped Voltaic Key"
+area: card
+cards: [Manifold Key, Voltaic Key, Island]
+tags: [manifold-key, voltaic-key, untap, tap-cost, activated-ability, targeting, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true}
+  - {kind: oracle, card: Manifold Key, text: "{1}, {T}: Untap another target artifact.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Voltaic Key @vk", {card: Manifold Key, as: mk, tapped: true}, "Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@mk", ability: 0, targets: ["@vk"], pay: {tap: ["@is1"]}}}
+  - p0: {t: activate, source: "@vk", ability: 0, targets: ["@mk"], pay: {tap: ["@is1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {battlefield_contains: [{card: Manifold Key, tapped: false}, {card: Voltaic Key, tapped: true}]}
+  - p0: {t: activate, source: "@mk", ability: 0, targets: ["@vk"], pay: {tap: ["@is2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Voltaic Key, tapped: false}, {card: Manifold Key, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  A tapped Manifold Key cannot activate (its cost has {T}); Voltaic Key untaps it; the Manifold Key then untaps the Voltaic
+  Key (a different artifact, so "another" is satisfied) and ends tapped. Two Islands pay the two {1}.

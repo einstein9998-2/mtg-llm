@@ -1,0 +1,47 @@
+id: tron-a-karn-static-opponent-artifact-abilities-cant-activate
+title: "Karn, the Great Creator stops the opponent's artifacts from activating any ability, mana abilities included, while the opponent's lands and Karn's controller's own artifacts still work"
+area: card
+cards: ["Karn, the Great Creator", Lotus Petal, Grim Monolith, Island]
+tags: [karn-the-great-creator, static-ability, cant-be-activated, mana-ability, artifact, opponent-permanents, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Activated abilities of artifacts your opponents control can't be activated.", verified: true, note: "Karn Oracle text supplied in the brief (Scryfall via Savecraft); entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "602.5", text: "A player can’t begin to activate an ability that’s prohibited from being activated.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Karn, the Great Creator", as: karn, counters: {loyalty: 5}}, "Lotus Petal @lp0"]
+    library_pad: 10
+  p1:
+    battlefield: ["Lotus Petal @lp1", "Grim Monolith @gm1", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@lp0", ability: 0, choose_color: G}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      p0: {mana_pool: {G: 1}}
+  - expect_illegal: {p1: {t: activate, source: "@lp1", ability: 0, choose_color: U}}
+  - expect_illegal: {p1: {t: activate, source: "@gm1", ability: 0}}
+  - check:
+      legal: {p1: {include: [{t: pass}, {t: activate, source: "@isl", ability: 0}], exclude: [{t: activate, source: "@lp1"}, {t: activate, source: "@gm1"}]}}
+  - p1: {t: activate, source: "@isl", ability: 0, choose_color: U}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Lotus Petal]
+      mana_pool: {G: 1}
+      battlefield: [{card: "Karn, the Great Creator"}]
+    p1:
+      mana_pool: {U: 1}
+      battlefield: [{card: Lotus Petal, tapped: false}, {card: Grim Monolith, tapped: false}, {card: Island, tapped: true}]
+notes: >
+  Mana abilities are activated abilities (605.1a), so Karn's static ability stops p1's Lotus Petal and Grim Monolith from
+  tapping for mana (602.5), even though they use no stack. p1's Island is not an artifact and works; p0's own Lotus Petal
+  (an artifact controlled by Karn's controller, not by an opponent) works. A wrong engine exempts mana abilities, or
+  also locks the controller's own artifacts. Karn's starting loyalty is irrelevant (5 set in setup).

@@ -1,0 +1,41 @@
+id: tron-c-full-tron-tower-three-mine-two-power-plant-two
+title: With Urza's Mine, Urza's Power Plant and Urza's Tower all in play the Tower adds {C}{C}{C}, the Mine {C}{C} and the Power Plant {C}{C} (seven in all)
+area: card
+cards: ["Urza's Tower", "Urza's Mine", "Urza's Power Plant"]
+tags: [urzas-tower, urzas-mine, urzas-power-plant, tron, mana-ability, replacement-effect]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Urza's Tower", text: "If you control an Urza's Mine and an Urza's Power-Plant, add {C}{C}{C} instead.", verified: true}
+  - {kind: oracle, card: "Urza's Mine", text: "If you control an Urza's Power-Plant and an Urza's Tower, add {C}{C} instead.", verified: true, note: "Urza's Mine text retrieved with Savecraft card_search; entry in oracle-additions-C.json"}
+  - {kind: oracle, card: "Urza's Power Plant", text: "If you control an Urza's Mine and an Urza's Tower, add {C}{C} instead.", verified: true, note: "Urza's Power Plant text retrieved with Savecraft card_search; entry in oracle-additions-C.json"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Tower @tw", "Urza's Mine @mine", "Urza's Power Plant @pp"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tw", ability: 0}
+  - check:
+      p0: {mana_pool: {C: 3}}
+  - p0: {t: activate, source: "@mine", ability: 0}
+  - check:
+      p0: {mana_pool: {C: 5}}
+  - p0: {t: activate, source: "@pp", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 7}
+      battlefield:
+        - {card: "Urza's Tower", tapped: true}
+        - {card: "Urza's Mine", tapped: true}
+        - {card: "Urza's Power Plant", tapped: true}
+notes: >
+  Tapping a land does not stop it counting as "controlled": the second and third lands still see all three Tron lands.
+  3 + 2 + 2 = 7 colorless mana, all in the pool as {C}. A wrong engine checks the condition against untapped lands only,
+  or against lands that have not yet been tapped for mana this turn.

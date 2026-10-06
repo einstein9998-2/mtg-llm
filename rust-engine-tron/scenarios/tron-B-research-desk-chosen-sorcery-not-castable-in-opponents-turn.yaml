@@ -1,0 +1,48 @@
+id: tron-b-research-desk-chosen-sorcery-not-castable-in-opponents-turn
+title: A sorcery chosen with Mishra's Research Desk during the opponent's end step is still only castable at sorcery timing, so Ponder is not offered
+area: card
+cards: [Mishra's Research Desk, Brainstorm, Ponder, Island]
+tags: [mishras-research-desk, instant-speed, play-from-exile, sorcery-timing, opponents-turn, negative, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mishra's Research Desk, text: "Until the end of your next turn, you may play that card.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  priority: p0
+  p0:
+    battlefield: ["Mishra's Research Desk @desk", "Island @i1", "Island @i2"]
+    library: ["Ponder @pd", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@desk", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: choose_one_to_play, answer: ["@pd"], expect_options: {include: ["@pd", "@bs"], count: 2}}
+  - p1: {t: pass}
+  - label: p0-has-priority
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@pd"}, {t: cast, card: "@bs"}]}}
+  - expect_illegal: {p0: {t: cast, card: "@pd"}}
+expect:
+  - at: after_script
+    turn: 4
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: [Ponder, Brainstorm]
+      graveyard: ["Mishra's Research Desk"]
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: true}]
+      spells_cast_this_turn: 0
+notes: >
+  The play permission does not change timing: Ponder is a sorcery, and it is p1's end step with p0 holding priority, so it can
+  only be cast in p0's own main phase with an empty stack (117.1a). The unchosen Brainstorm (an instant) is not castable
+  either, since it has no permission. One Island is untapped and would pay for either card. Nothing is asserted about the
+  permission lasting into p0's next turn (expiry is out of scope).

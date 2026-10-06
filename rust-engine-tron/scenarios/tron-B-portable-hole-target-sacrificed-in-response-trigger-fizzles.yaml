@@ -1,0 +1,50 @@
+id: tron-b-portable-hole-target-sacrificed-in-response-trigger-fizzles
+title: If the only target (Lotus Petal) is sacrificed in response, Portable Hole's trigger does nothing and the Hole stays
+area: card
+cards: [Portable Hole, Lotus Petal, Island, Plains]
+tags: [portable-hole, etb-trigger, fizzle, illegal-target, lotus-petal, response, alurentell-specific]
+derived_from: cr
+source:
+  - {kind: oracle, card: Portable Hole, text: "When this artifact enters, exile target nonland permanent an opponent controls with mana value 2 or less", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Portable Hole @hole"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Lotus Petal @petal", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hole", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@petal", expect_options: {include: ["@petal"], exclude: ["@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@petal", ability: 0, choose_color: W}
+  - label: petal-gone
+    check:
+      stack: [{kind: triggered, source: "@hole", controller: p0}]
+      p1:
+        graveyard: [Lotus Petal]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Portable Hole}, {card: Plains, tapped: true}]
+      exile: []
+    p1:
+      battlefield: [{card: Island}]
+      graveyard: [Lotus Petal]
+      exile: []
+notes: >
+  Lotus Petal is the only legal target (the Island is a land). p1 answers by sacrificing it for mana (a mana ability, no
+  stack). The trigger's only target is gone, so on resolution it does not resolve (608.2b). Nothing is exiled and the Hole
+  stays. Lotus Petal is in the graveyard (sacrificed, not exiled). The mana in p1's pool is not asserted.

@@ -1,0 +1,33 @@
+id: tron-c-urzas-workshop-with-two-artifacts-only-basic-mana
+title: With only two artifacts (the opponent's three do not count) Urza's Workshop adds one {C} and its Metalcraft mana ability cannot be activated
+area: card
+cards: ["Urza's Workshop", Lotus Petal, "Mishra's Bauble", Aether Vial, Null Rod, "Lion's Eye Diamond"]
+tags: [urzas-workshop, tron, metalcraft, activation-restriction, negative-case, opponents-artifacts]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Urza's Workshop", text: "{T}: Add {C}.", verified: true}
+  - {kind: oracle, card: "Urza's Workshop", text: "Metalcraft — {T}: Add {C} for each Urza's land you control. Activate only if you control three or more artifacts.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Workshop @ws", Lotus Petal, "Mishra's Bauble"]
+    library_pad: 10
+  p1:
+    battlefield: [Aether Vial, Null Rod, "Lion's Eye Diamond"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@ws", ability: 1}}
+  - p0: {t: activate, source: "@ws", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 1}
+      battlefield_contains: [{card: "Urza's Workshop", tapped: true}]
+notes: >
+  Ability indexes follow Oracle order: 0 = {T}: Add {C}, 1 = Metalcraft. The engine models the two as one ability
+  (brief); the adapter should map both to it. p0 controls two artifacts; p1's three artifacts (Aether Vial, Null Rod, LED)
+  do not count for p0 ("you control"), so metalcraft is off and the basic ability gives {C}. Null Rod does not affect
+  Workshop (a land, not an artifact). A wrong engine counts all artifacts on the battlefield.

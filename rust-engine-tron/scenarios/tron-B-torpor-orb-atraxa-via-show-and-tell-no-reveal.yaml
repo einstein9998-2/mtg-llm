@@ -1,0 +1,43 @@
+id: tron-b-torpor-orb-atraxa-via-show-and-tell-no-reveal
+title: Torpor Orb stops Atraxa's enters trigger when Show and Tell puts her onto the battlefield, so nothing is revealed and no card is drawn
+area: card
+cards: [Torpor Orb, Show and Tell, "Atraxa, Grand Unifier", Island]
+tags: [torpor-orb, atraxa, show-and-tell, etb-trigger, trigger-suppressed, negative, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Torpor Orb, text: "Creatures entering don't cause abilities to trigger.", verified: true}
+  - {kind: oracle, card: "Atraxa, Grand Unifier", text: "When Atraxa enters, reveal the top ten cards of your library.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Torpor Orb @orb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@atx"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      library_count: 10
+      graveyard: [Show and Tell]
+      battlefield_contains: [{card: "Atraxa, Grand Unifier", types: [Creature], sick: true}, {card: Torpor Orb}]
+    p1:
+      library_count: 10
+      hand: []
+notes: >
+  p1 has no card in hand, so Show and Tell gives p1 no choice and no decision is raised for p1 (SCHEMA addenda). p0 puts Atraxa
+  onto the battlefield (not a cast). Her enters trigger would reveal ten cards and put up to one per card type into p0's hand;
+  under Torpor Orb (p0's own) it never triggers, so the stack is empty, p0's hand stays empty and the library keeps 10 cards.
+  A wrong engine suppresses only cast creatures, only the opponent's creatures, or lets put-onto-the-battlefield bypass the Orb.

@@ -1,0 +1,38 @@
+id: tron-b-expedition-map-no-land-in-library-still-shuffles
+title: "Expedition Map with no land card in the library finds nothing but still shuffles"
+area: card
+cards: [Expedition Map, Lightning Bolt, Brainstorm, Ponder, Island]
+tags: [expedition-map, search, fail-to-find, shuffle, sacrifice-as-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Expedition Map, text: "Search your library for a land card, reveal it, put it into your hand, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn’t required to find some or all of those cards even if they’re present in that zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Expedition Map @map", "Island @i1", "Island @i2"]
+    library: ["Lightning Bolt", "Brainstorm", "Ponder"]
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Ponder, Brainstorm, Lightning Bolt]}
+script:
+  - p0: {t: activate, source: "@map", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: null}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Expedition Map]
+      library_count: 3
+      library_top: [Ponder, Brainstorm, Lightning Bolt]
+notes: >
+  The library holds only spells. The search decision is still raised (SCHEMA addenda: a search is raised even when nothing legal
+  can be found) and is answered with found: null; the shuffle after the search still happens (the scripted outcome reverses the
+  order and is asserted). A wrong engine skips the shuffle when nothing was found.

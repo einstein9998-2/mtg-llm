@@ -1,0 +1,49 @@
+id: tron-c-kozileks-command-exile-up-to-x-cards-from-both-graveyards
+title: "Kozilek's Command mode 4 with X = 3: up to three cards, from any graveyards (a fourth is not allowed); with two chosen the third stays"
+area: card
+cards: ["Kozilek's Command", Ancient Tomb, Mountain, Ponder, Lightning Bolt, Brainstorm, Island, Eldrazi Spawn Token]
+tags: [kozileks-command, x-spell, up-to-x-targets, graveyard-hate, modal, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Exile up to X target cards from graveyards.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "If the spell has a variable number of targets, the player announces how many targets they will choose before they announce those targets.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb, Mountain @m1, Mountain @m2, Mountain @m3]
+    graveyard: [Ponder @g0]
+    library_pad: 10
+  p1:
+    graveyard: [Lightning Bolt @g1, Brainstorm @g2, Island @g3]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 3, modes: [1, 4], targets: [{player: p0}, "@g0", "@g1", "@g2", "@g3"], pay: auto}}
+  - p0: {t: cast, card: "@kc", x: 3, modes: [1, 4], targets: [{player: p0}, "@g0", "@g1"], pay: {tap: ["@tomb", "@m1", "@m2", "@m3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      graveyard: ["Kozilek's Command"]
+      exile: [Ponder]
+      battlefield:
+        - {card: Ancient Tomb}
+        - {card: Mountain}
+        - {card: Mountain}
+        - {card: Mountain}
+        - {token: Eldrazi Spawn Token}
+        - {token: Eldrazi Spawn Token}
+        - {token: Eldrazi Spawn Token}
+    p1:
+      exile: [Lightning Bolt]
+      graveyard: [Brainstorm, Island]
+notes: >
+  Four cards sit in graveyards (one in p0's, three in p1's); X = 3 allows at most three targets, so the four-target cast
+  is illegal. "Up to" lets p0 choose two (Ponder from its own graveyard, Lightning Bolt from the opponent's), and
+  those two are exiled; Brainstorm and Island stay. The resolving Command is not in a graveyard until it finishes
+  resolving, so it is not a candidate. A wrong engine confines the cards to one graveyard, ignores the X limit, or
+  exiles all of them.

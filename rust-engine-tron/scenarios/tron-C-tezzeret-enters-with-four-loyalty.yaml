@@ -1,0 +1,33 @@
+id: tron-c-tezzeret-cruel-captain-enters-with-four-loyalty
+title: "Tezzeret, Cruel Captain enters with 4 loyalty counters and does not trigger itself (it is not an artifact)"
+area: card
+cards: ["Tezzeret, Cruel Captain", Island]
+tags: [tezzeret, planeswalker, starting-loyalty, enters-with-counters, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.", verified: true, note: "Printed loyalty 4 is given by the engine owner's brief (confirmed); it is not in the Oracle text."}
+  - {kind: cr, ref: "306.5b", text: "A planeswalker has the intrinsic ability “This permanent enters with a number of loyalty counters on it equal to its printed loyalty number.” This ability creates a replacement effect (see rule 614.1c).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Tezzeret, Cruel Captain @tz"]
+    battlefield: [Island, Island, Island]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@tz", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      spells_cast_this_turn: 1
+      battlefield_contains: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 4}, types: [Planeswalker], supertypes: [Legendary]}]
+notes: >
+  Printed loyalty 4 (brief). The planeswalker is itself colorless but not an artifact, so its own ETB does not fire
+  its trigger: loyalty stays 4, the stack is empty. A wrong engine adds one loyalty for itself or enters with the wrong number.

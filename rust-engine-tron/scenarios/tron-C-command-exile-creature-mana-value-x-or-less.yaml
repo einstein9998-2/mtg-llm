@@ -1,0 +1,49 @@
+id: tron-c-kozileks-command-exile-creature-checks-mana-value-against-x
+title: "Kozilek's Command mode 3: X = 2 cannot target Acererak (mana value 3) or Atraxa; X = 3 exiles Acererak and Atraxa stays out of reach"
+area: card
+cards: ["Kozilek's Command", Ancient Tomb, Mountain, Acererak the Archlich, "Atraxa, Grand Unifier", "Phelia, Exuberant Shepherd", Eldrazi Spawn Token]
+tags: [kozileks-command, x-spell, mana-value, targeting, exile, mask-validity, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Exile target creature with mana value X or less.", verified: true}
+  - {kind: cr, ref: "202.3e", text: "When calculating the mana value of an object with an {X} in its mana cost, X is treated as 0 while the object is not on the stack, and X is treated as the number chosen for it while the object is on the stack.", verified: true}
+  - {kind: cr, ref: "700.2a", text: "The controller of a modal spell or activated ability chooses the mode(s) as part of casting that spell or activating that ability. If one of the modes would be illegal (due to an inability to choose legal targets, for example), that mode can’t be chosen.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb, Mountain @m1, Mountain @m2, Mountain @m3]
+    library_pad: 10
+  p1:
+    battlefield: ["Acererak the Archlich @ace", "Atraxa, Grand Unifier @atx", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 2, modes: [1, 3], targets: [{player: p0}, "@ace"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 3, modes: [1, 3], targets: [{player: p0}, "@atx"], pay: auto}}
+  - p0: {t: cast, card: "@kc", x: 3, modes: [1, 3], targets: [{player: p0}, "@ace"], pay: {tap: ["@tomb", "@m1", "@m2", "@m3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 18
+      graveyard: ["Kozilek's Command"]
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {token: Eldrazi Spawn Token}
+        - {token: Eldrazi Spawn Token}
+        - {token: Eldrazi Spawn Token}
+    p1:
+      exile: [Acererak the Archlich]
+      battlefield: [{card: "Atraxa, Grand Unifier"}, {card: "Phelia, Exuberant Shepherd"}]
+notes: >
+  Acererak ({2}{B}) has mana value 3, Atraxa ({3}{G}{W}{U}{B}) 7, Phelia ({1}{W}) 2. With X = 2 Acererak is not a legal
+  target (3 is not 2 or less); with X = 3 Atraxa is still not legal. The cast is only legal for a creature whose mana
+  value is at most the announced X. Cost for X = 3 is {3}{C}{C}: the Tomb (2 damage to p0) plus three Mountains. Resolution: three Spawn for p0 and
+  Acererak exiled (he never returns to hand). A wrong engine compares power/toughness or the printed X as 0.

@@ -1,0 +1,38 @@
+id: tron-c-kozileks-command-must-choose-exactly-two-different-modes
+title: "Kozilek's Command: one mode, three modes, or the same mode twice is not offered; two different modes are"
+area: card
+cards: ["Kozilek's Command", Ancient Tomb, Mountain, Ocelot Pride]
+tags: [kozileks-command, modal, choose-two, same-mode-twice, legal-action-mask, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Choose two —", verified: true}
+  - {kind: cr, ref: "700.2d", text: "If a player is allowed to choose more than one mode for a modal spell or ability, that player normally can’t choose the same mode more than once.", verified: true}
+  - {kind: cr, ref: "700.2", text: "A spell or ability is modal if it has two or more options in a bulleted list preceded by instructions for a player to choose a number of those options, such as “Choose one —.” Each of those options is a mode.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb, Mountain @m1]
+    library_pad: 10
+  p1:
+    battlefield: [Ocelot Pride @cat]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 1, modes: [1], targets: [{player: p0}], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 1, modes: [1, 2, 3], targets: [{player: p0}, {player: p0}, "@cat"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 1, modes: [1, 1], targets: [{player: p0}, {player: p0}], pay: auto}}
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@kc", x: 1, modes: [1, 2]}, {t: cast, card: "@kc", x: 1, modes: [1, 3]}, {t: cast, card: "@kc", x: 1, modes: [2, 3]}]}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      hand: ["Kozilek's Command"]
+      spells_cast_this_turn: 0
+notes: >
+  "Choose two" means exactly two, and 700.2d forbids choosing the same mode twice (the card does not say "You may choose
+  the same mode more than once"). X = 1 costs {1}{C}{C} = Tomb + Mountain, enough for every legal combination. The legal
+  check proves at least three of the six two-mode combinations are offered. A wrong engine accepts a lone mode, three modes,
+  or a doubled mode.

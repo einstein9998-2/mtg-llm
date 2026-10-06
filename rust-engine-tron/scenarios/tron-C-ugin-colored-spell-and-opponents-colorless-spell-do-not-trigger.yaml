@@ -1,0 +1,52 @@
+id: tron-c-ugin-does-not-trigger-on-a-colored-spell-or-the-opponents-colorless-spell
+title: "Ugin's trigger needs a colorless spell cast by its controller: Lightning Bolt (red) and the opponent's Warping Wail (colorless) trigger nothing"
+area: card
+cards: ["Ugin, Eye of the Storms", Lightning Bolt, Mountain, Warping Wail, "Urza's Tower", Island, "Phelia, Exuberant Shepherd", Eldrazi Scion Token]
+tags: [ugin, planeswalker, colorless-spell-trigger, negative-case, controller-restriction, colored-spell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Lightning Bolt @bolt]
+    battlefield: [{card: "Ugin, Eye of the Storms", as: ugin, counters: {loyalty: 7}}, Mountain @m]
+    library_pad: 10
+  p1:
+    hand: [Warping Wail @ww]
+    battlefield: ["Urza's Tower @tw", Island @isl, "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@ww", modes: [3], pay: {tap: ["@tw", "@isl"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@ww", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: "Ugin, Eye of the Storms", counters: {loyalty: 7}}, {card: Mountain, tapped: true}]
+    p1:
+      life: 17
+      graveyard: [Warping Wail]
+      exile: []
+      battlefield_contains: [{card: "Phelia, Exuberant Shepherd"}, {token: Eldrazi Scion Token}]
+notes: >
+  Lightning Bolt is red, so it is not a colorless spell; Warping Wail is colorless but cast by the opponent ("you cast"
+  means Ugin's controller). Neither raises a trigger or a target decision; nothing is exiled. A wrong engine triggers on any colorless spell or on
+  every spell.

@@ -1,0 +1,43 @@
+id: tron-c-kozileks-command-x0-makes-no-tokens-no-scry-draws-one
+title: "Kozilek's Command with X = 0 (paid with Ancient Tomb): no tokens, no scry (no decision), the draw still happens"
+area: card
+cards: ["Kozilek's Command", Ancient Tomb, Brainstorm]
+tags: [kozileks-command, x-spell, x-zero, scry-zero, ancient-tomb, spawn-tokens, modal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Target player creates X 0/1 colorless Eldrazi Spawn creature tokens", verified: true}
+  - {kind: oracle, card: "Kozilek's Command", text: "Target player scries X, then draws a card.", verified: true}
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: cr, ref: "701.22b", text: "If a player is instructed to scry 0, no scry event occurs.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb]
+    library: [Brainstorm @top]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@kc", x: 0, modes: [1, 2], targets: [{player: p0}, {player: p0}], pay: {tap: ["@tomb"]}}
+  - check:
+      p0: {life: 18}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      hand: [Brainstorm]
+      graveyard: ["Kozilek's Command"]
+      library_count: 10
+      battlefield: [{card: Ancient Tomb, tapped: true}]
+    p1: {library_count: 10}
+notes: >
+  X = 0 costs {C}{C}, which Ancient Tomb pays in one tap (and p0 takes 2 damage as the mana ability resolves).
+  Mode 1 creates zero tokens; mode 2 scries 0, which is no scry event (701.22b) so the script has no scry decision, and
+  then draws one card (Brainstorm). A wrong engine raises a scry decision for zero cards or skips the draw when X is 0.

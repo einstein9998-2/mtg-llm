@@ -1,0 +1,41 @@
+id: tron-b-torpor-orb-acererak-enters-no-bounce-no-venture
+title: With Torpor Orb on the battlefield (opponent's), Acererak's enters trigger never triggers, so Acererak stays and no dungeon is entered
+area: card
+cards: [Torpor Orb, Acererak the Archlich, Swamp]
+tags: [torpor-orb, acererak, etb-trigger, trigger-suppressed, negative, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Torpor Orb, text: "Creatures entering don't cause abilities to trigger.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Acererak the Archlich @acer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Torpor Orb @orb"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@acer", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      command: []
+      battlefield_contains: [{card: Acererak the Archlich, pt: [5, 5], sick: true, controller: p0}]
+    p1:
+      battlefield: [{card: Torpor Orb}]
+notes: >
+  Acererak has not completed Tomb of Annihilation, so without the Orb the enters trigger would return him to hand and venture.
+  Torpor Orb (controlled by the opponent: it affects every creature) means entering creatures do not cause abilities to
+  trigger, so the stack is empty right after the spell resolves, no choose_dungeon decision is raised, Acererak stays as a 5/5
+  and p0's command zone is empty. A wrong engine suppresses only the Orb controller's own creatures, or checks the Orb only at
+  resolution time of the trigger.

@@ -1,0 +1,30 @@
+id: tron-c-null-rod-stops-lotus-petal-but-not-eldrazi-spawn
+title: "Null Rod stops an artifact's activated ability (Lotus Petal) but not an Eldrazi Spawn token, which is a creature and not an artifact"
+area: card
+cards: [Null Rod, Lotus Petal, Eldrazi Spawn Token]
+tags: [eldrazi-spawn, token, null-rod, artifacts-only, negative-case, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Null Rod, text: "Activated abilities of artifacts can't be activated.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [Lotus Petal @lp, {token: Eldrazi Spawn Token, as: sp}]
+    library_pad: 10
+  p1:
+    battlefield: [Null Rod]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@lp", ability: 0, choose_color: U}}
+  - p0: {t: activate, source: "@sp", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 1}
+      battlefield: [{card: Lotus Petal, tapped: false}]
+notes: >
+  Null Rod affects artifacts only. The Spawn token is a colorless creature (not an artifact) and its mana ability works; the Petal's does not.

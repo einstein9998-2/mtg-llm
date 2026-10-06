@@ -1,0 +1,38 @@
+id: tron-c-ugin-plus-two-gain-three-life-and-draw
+title: "Ugin's +2: loyalty 7 to 9 on activation, the ability uses the stack, then gain 3 life and draw a card"
+area: card
+cards: ["Ugin, Eye of the Storms", Brainstorm]
+tags: [ugin, planeswalker, loyalty-ability, plus-ability, life-gain, draw, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "+2: You gain 3 life and draw a card.", verified: true}
+  - {kind: cr, ref: "606.4", text: "The cost to activate a loyalty ability of a permanent is to put on or remove from that permanent a certain number of loyalty counters, as shown by the loyalty symbol in the ability’s cost. This cost may be modified by other effects.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Ugin, Eye of the Storms", as: ugin, counters: {loyalty: 7}}]
+    library: [Brainstorm]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ugin", ability: 0}
+  - check:
+      stack: [{kind: activated, source: "@ugin", controller: p0}]
+      p0: {life: 20, hand: [], battlefield: [{card: "Ugin, Eye of the Storms", counters: {loyalty: 9}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: activate, source: "@ugin", ability: 1}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 23
+      hand: [Brainstorm]
+      battlefield: [{card: "Ugin, Eye of the Storms", counters: {loyalty: 9}}]
+notes: >
+  Ability index 0 is +2, index 1 is the 0 (the -11 is index 2, not tested). The loyalty cost is paid on activation,
+  the effect happens on resolution. A second loyalty ability this turn is not offered. A wrong engine gains the life on activation
+  or lets the 0 follow the +2 this turn.

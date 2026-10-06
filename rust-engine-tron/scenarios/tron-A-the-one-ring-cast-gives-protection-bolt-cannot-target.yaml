@@ -1,0 +1,55 @@
+id: tron-a-the-one-ring-cast-gives-protection-bolt-cannot-target
+title: "A cast The One Ring gives its controller protection from everything, so the opponent cannot target them with Lightning Bolt"
+area: card
+cards: [The One Ring, Lightning Bolt, Island, Mountain]
+tags: [the-one-ring, protection-from-everything, targeting, enters-trigger, legal-action-mask, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: The One Ring, text: "When The One Ring enters, if you cast it, you gain protection from everything until your next turn.", verified: true, note: "The One Ring Oracle text supplied in the brief (Scryfall via Savecraft); entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "702.16j", text: "A permanent or player with protection from everything has protection from each object regardless of that object’s characteristic values. Such a permanent or player can’t be targeted by spells or abilities and can’t be enchanted by Auras.", verified: true}
+  - {kind: cr, ref: "702.16b", text: "A permanent or player with protection can’t be targeted by spells with the stated quality and can’t be targeted by abilities from a source with the stated quality.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["The One Ring @ring"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mt"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ring", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@ring", controller: p0, text_contains: "protection"}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - check:
+      phase: main1
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@bolt", targets: [{player: p1}]}]}}
+  - expect_illegal: {p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      battlefield_contains: [{card: The One Ring}]
+    p1:
+      hand: [Lightning Bolt]
+      battlefield: [{card: Mountain, tapped: false}]
+notes: >
+  The enters trigger is checked on entering and resolution (603.4): the Ring was cast, so it triggers and p0 gains
+  protection from everything (702.16j). p1, who holds priority after p0 passes with an empty stack, can cast Bolt at its
+  own face (offered) but not at p0. A wrong engine ignores the "if you cast it" condition or never checks targeting
+  legality against the player's protection.

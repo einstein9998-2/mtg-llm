@@ -1,0 +1,66 @@
+id: tron-b-extinguisher-battleship-etb-destroys-noncreature-then-four-damage-to-all-creatures
+title: "Extinguisher Battleship's enters trigger targets a noncreature permanent, destroys it, then deals 4 damage to every creature on both sides (the Spacecraft itself is not a creature)"
+area: card
+cards: [Extinguisher Battleship, Aluren, Ocelot Pride, "Atraxa, Grand Unifier", Flickerwisp, Archon of Cruelty, Island]
+tags: [extinguisher-battleship, etb-trigger, targeting, noncreature-permanent, damage-to-each-creature, both-players, spacecraft-not-a-creature, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Extinguisher Battleship, text: "When this Spacecraft enters, destroy target noncreature permanent. Then this Spacecraft deals 4 damage to each creature.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Extinguisher Battleship @ship"]
+    battlefield:
+      - "Island @i1"
+      - "Island @i2"
+      - "Island @i3"
+      - "Island @i4"
+      - "Island @i5"
+      - "Island @i6"
+      - "Island @i7"
+      - "Island @i8"
+      - "Ocelot Pride @op0"
+      - "Atraxa, Grand Unifier @atx"
+    library_pad: 10
+  p1:
+    battlefield: ["Aluren @alu", "Island @pi", "Flickerwisp @wisp", "Archon of Cruelty @arch"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ship", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_target
+      slot: 0
+      answer: "@alu"
+      expect_options:
+        include: ["@alu", "@pi", "@ship", "@i1"]
+        exclude: ["@op0", "@atx", "@wisp", "@arch"]
+  - label: trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@ship", controller: p0}]
+      p0:
+        battlefield_contains: [{card: Extinguisher Battleship, types: [Artifact], subtypes: [Spacecraft], damage: 0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Ocelot Pride]
+      battlefield_contains:
+        - {card: Extinguisher Battleship, types: [Artifact], damage: 0}
+        - {card: "Atraxa, Grand Unifier", damage: 4, pt: [7, 7]}
+    p1:
+      graveyard: [Aluren, Flickerwisp]
+      battlefield: [{card: Island}, {card: Archon of Cruelty, damage: 4}]
+notes: >
+  {8} is paid with eight Islands. The target mask contains noncreature permanents only (Aluren, the opponent's Island, a land of
+  p0's, and the Battleship itself) and no creature. Aluren is destroyed, then every creature takes 4 damage: Ocelot Pride and
+  Flickerwisp die (p0's own creature too), Atraxa 7/7 and Archon 6/6 survive with 4 damage marked. The Battleship is an artifact
+  that is not a creature unless stationed, so it takes no damage and stays. A wrong engine spares the controller's creatures,
+  damages the Spacecraft, or allows creature targets.

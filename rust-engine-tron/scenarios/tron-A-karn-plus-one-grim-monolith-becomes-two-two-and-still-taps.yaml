@@ -1,0 +1,45 @@
+id: tron-a-karn-plus-one-grim-monolith-becomes-two-two-and-still-taps
+title: "Karn's +1 turns Grim Monolith (mana value 2) into a 2/2 artifact creature; having been under p0's control since the turn began, it can still tap for {C}{C}{C}"
+area: card
+cards: ["Karn, the Great Creator", Grim Monolith]
+tags: [karn-the-great-creator, loyalty-ability, becomes-creature, mana-value, power-toughness, summoning-sickness, grim-monolith, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "606.3", text: "A player may activate a loyalty ability of a permanent they control any time they have priority and the stack is empty during a main phase of their turn, but only if no player has previously activated a loyalty ability of that permanent that turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Karn, the Great Creator", as: karn, counters: {loyalty: 4}}, "Grim Monolith @gm"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@karn", ability: 0, targets: ["@gm"]}
+  - check:
+      stack: [{kind: activated, source: "@karn", controller: p0, targets: ["@gm"]}]
+      p0: {battlefield_contains: [{card: "Karn, the Great Creator", counters: {loyalty: 5}}, {card: Grim Monolith, types: [Artifact]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {battlefield_contains: [{card: Grim Monolith, types: [Artifact, Creature], pt: [2, 2]}]}
+  - p0: {t: activate, source: "@gm", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 3}
+      battlefield:
+        - {card: "Karn, the Great Creator", counters: {loyalty: 5}}
+        - {card: Grim Monolith, types: [Artifact, Creature], pt: [2, 2], tapped: true, sick: false}
+notes: >
+  Loyalty +1 is the cost (4 -> 5 on activation, before the ability resolves); the Monolith is still a noncreature artifact
+  while the ability is on the stack and a 2/2 artifact creature after it resolves (power and toughness equal its mana value
+  2). It has been under p0's control since the turn began, so summoning sickness (302.6) does not stop its {T} ability.
+  Karn's starting loyalty is not asserted (4 is set in setup).

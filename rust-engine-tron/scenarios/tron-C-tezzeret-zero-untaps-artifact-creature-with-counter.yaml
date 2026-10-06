@@ -1,0 +1,43 @@
+id: tron-c-tezzeret-zero-untaps-artifact-creature-and-adds-counter
+title: "A Scion made an artifact by Liquimetal Coating: Tezzeret's 0 untaps it and puts a +1/+1 counter on it (2/2)"
+area: card
+cards: ["Tezzeret, Cruel Captain", Liquimetal Coating, Eldrazi Scion Token]
+tags: [tezzeret, planeswalker, loyalty-ability, untap, artifact-creature, plus-one-counter, liquimetal-coating, type-changing]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.", verified: true}
+  - {kind: oracle, card: Liquimetal Coating, text: "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.", verified: true}
+  - {kind: cr, ref: "205.1b", text: "This rule applies to effects that use phrases such as “in addition to its other types” or that state that something is “still a [type, supertype, or subtype].”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 4}}
+      - {card: Liquimetal Coating, as: lc}
+      - {token: Eldrazi Scion Token, as: sc, tapped: true}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@lc", ability: 0, targets: ["@sc"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {battlefield_contains: [{token: Eldrazi Scion Token, types: [Artifact, Creature], subtypes: [Eldrazi, Scion], tapped: true, pt: [1, 1]}]}
+  - p0: {t: activate, source: "@tz", ability: 0, targets: ["@sc"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield:
+        - {card: "Tezzeret, Cruel Captain", counters: {loyalty: 4}}
+        - {card: Liquimetal Coating, tapped: true}
+        - {token: Eldrazi Scion Token, tapped: false, types: [Artifact, Creature], counters: {"+1/+1": 1}, pt: [2, 2]}
+notes: >
+  Liquimetal Coating adds the artifact type to the Scion until end of turn (205.1b "in addition"), so on resolution
+  of Tezzeret's 0 the target IS an artifact creature: it untaps and gets one +1/+1 counter. The condition is checked
+  on resolution. A wrong engine checks card printing instead of current types.

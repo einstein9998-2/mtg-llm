@@ -1,0 +1,57 @@
+id: tron-c-kozileks-command-resolves-when-only-one-modes-target-is-illegal
+title: "If the creature targeted by Kozilek's Command mode 3 is exiled in response, the spell still resolves for its other mode (the Spawn tokens are made)"
+area: card
+cards: ["Kozilek's Command", Ancient Tomb, Mountain, "Phelia, Exuberant Shepherd", Swords to Plowshares, Plains, Eldrazi Spawn Token]
+tags: [kozileks-command, partial-fizzle, target-legality, resolution, swords-to-plowshares, modal]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Exile target creature with mana value X or less.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "Illegal targets, if any, won’t be affected by parts of a resolving spell’s effect for which they’re illegal. Other parts of the effect for which those targets are not illegal may still affect them.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb, Mountain @m1, Mountain @m2]
+    library_pad: 10
+  p1:
+    hand: [Swords to Plowshares @stp]
+    battlefield: ["Phelia, Exuberant Shepherd @ph", Plains @pl]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@kc", x: 2, modes: [1, 3], targets: [{player: p0}, "@ph"], pay: {tap: ["@tomb", "@m1", "@m2"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@ph"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@kc", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {life: 22, exile: ["Phelia, Exuberant Shepherd"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: ["Kozilek's Command"]
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {token: Eldrazi Spawn Token}
+        - {token: Eldrazi Spawn Token}
+    p1:
+      life: 22
+      exile: ["Phelia, Exuberant Shepherd"]
+      graveyard: [Swords to Plowshares]
+notes: >
+  X = 2 ({2}{C}{C}: the Tomb pays {C}{C}, two Mountains the generic part; the Tomb deals 2 damage, so p0 is at 18);
+  Phelia ({1}{W}) has mana value 2, a legal target at X = 2. p1 exiles its own Phelia in response, so mode 3's only
+  target is gone, but mode 1's target (a player) is still legal: the spell is not "all targets illegal" (608.2b), it
+  resolves, the exile part does nothing and two Eldrazi Spawn are created for p0. A wrong engine fizzles the whole
+  spell when any target is illegal. Swords gives p1 life equal to Phelia's power (2): 22.

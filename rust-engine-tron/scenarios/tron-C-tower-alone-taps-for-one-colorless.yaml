@@ -1,0 +1,34 @@
+id: tron-c-urzas-tower-alone-taps-for-one-colorless
+title: Urza's Tower with no other Urza's land adds only {C}, and it is an Urza's Tower land
+area: card
+cards: ["Urza's Tower"]
+tags: [urzas-tower, tron, mana-ability, land-types, colorless-mana, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Urza's Tower", text: "{T}: Add {C}.", verified: true}
+  - {kind: oracle, card: "Urza's Tower", text: "If you control an Urza's Mine and an Urza's Power-Plant, add {C}{C}{C} instead.", verified: true}
+  - {kind: cr, ref: "205.3i", text: "Lands have their own unique set of subtypes; these subtypes are called land types.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn’t go on the stack, so it can’t be targeted, countered, or otherwise responded to.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Tower @tw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tw", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 1}
+      battlefield: [{card: "Urza's Tower", tapped: true, types: [Land], subtypes: ["Urza's", Tower]}]
+notes: >
+  Without an Urza's Mine and an Urza's Power-Plant the replacement ("add {C}{C}{C} instead") does not apply, so the
+  Tower makes exactly one colorless mana. The mana ability uses no stack (605.3b): the stack is empty and p0 still has
+  priority. Types per 205.3i: Urza's and Tower are land types (the Oracle type line "Land - Urza's Tower"). A wrong
+  engine gives three mana unconditionally, or fails to give the Tower its land types (which Planar Nexus scenarios need).

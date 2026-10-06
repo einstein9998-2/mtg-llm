@@ -1,0 +1,48 @@
+id: tron-c-ugin-triggers-on-kozileks-command-kindred-instant
+title: "Kozilek's Command ({X}{C}{C}, Kindred Instant) is colorless: casting it with Ugin in play exiles a colored permanent before the Command resolves"
+area: card
+cards: ["Ugin, Eye of the Storms", "Kozilek's Command", Ancient Tomb, Aluren, Brainstorm]
+tags: [ugin, planeswalker, colorless-spell-trigger, kozileks-command, kindred, x-spell, stack-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", verified: true}
+  - {kind: cr, ref: "202.2b", text: "Objects with no colored mana symbols in their mana costs are colorless.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [{card: "Ugin, Eye of the Storms", as: ugin, counters: {loyalty: 7}}, Ancient Tomb @tomb]
+    library: [Brainstorm]
+    library_pad: 10
+  p1:
+    battlefield: [Aluren @alu]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@kc", x: 0, modes: [1, 2], targets: [{player: p0}, {player: p0}], pay: {tap: ["@tomb"]}}
+  - p0: {decision: choose_target, slot: 0, answer: "@alu"}
+  - check:
+      stack:
+        - {kind: spell, card: "@kc", controller: p0}
+        - {kind: triggered, source: "@ugin", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p1: {exile: [Aluren]}
+      stack: [{kind: spell, card: "@kc", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 18
+      hand: [Brainstorm]
+      graveyard: ["Kozilek's Command"]
+    p1:
+      exile: [Aluren]
+      battlefield: []
+notes: >
+  Kozilek's Command has only {X}{C}{C} in its mana cost: no colored symbol, so it is colorless (a Kindred instant, but still
+  a colorless spell). Ugin triggers and exiles Aluren; then the Command (X = 0, modes 1 and 2) resolves and p0 draws.

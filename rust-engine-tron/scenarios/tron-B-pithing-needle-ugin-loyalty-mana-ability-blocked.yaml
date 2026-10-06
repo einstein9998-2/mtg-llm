@@ -1,0 +1,58 @@
+id: tron-b-pithing-needle-ugin-loyalty-mana-ability-blocked
+title: "Pithing Needle naming Ugin stops all of Ugin's loyalty abilities, including 0: Add {C}{C}{C}, which is not a mana ability"
+area: card
+cards: [Pithing Needle, "Ugin, Eye of the Storms", Island]
+tags: [pithing-needle, choose-name, ugin, planeswalker, loyalty-ability, not-a-mana-ability, mask-validity, negative, tron-specific]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pithing Needle, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "0: Add {C}{C}{C}.", verified: true, note: "Oracle text from the engine owner's brief (Scryfall via Savecraft), supplied in oracle-additions-B.json"}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "606.1", text: "Some activated abilities are loyalty abilities, which are subject to special rules.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pithing Needle @pn"]
+    battlefield: ["Island @isl", {card: "Ugin, Eye of the Storms", as: ugin, counters: {loyalty: 7}}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - label: before-needle
+    check:
+      legal: {p0: {include: [{t: activate, source: "@ugin", ability: 0}, {t: activate, source: "@ugin", ability: 1}]}}
+  - p0: {t: cast, card: "@pn", pay: auto}
+  - label: needle-and-ugin-trigger-on-stack
+    check:
+      stack:
+        - {kind: spell, card: "@pn", controller: p0}
+        - {kind: triggered, source: "@ugin", controller: p0, text_contains: "colorless spell"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: ugin-trigger-resolved-no-target
+    check:
+      stack: [{kind: spell, card: "@pn", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: "Ugin, Eye of the Storms"}
+  - expect_illegal: {p0: {t: activate, source: "@ugin", ability: 1}}
+  - expect_illegal: {p0: {t: activate, source: "@ugin", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      life: 20
+      battlefield_contains: [{card: "Ugin, Eye of the Storms", counters: {loyalty: 7}}, {card: Pithing Needle}]
+notes: >
+  Pithing Needle is a colorless spell, so Ugin's "whenever you cast a colorless spell" trigger (up to one target colored permanent) goes
+  on the stack above it with no target (no colored permanent exists, no target decision); it resolves first, then the Needle.
+  Ugin's 0 ability adds mana but is a loyalty ability, so by 605.1a it is not a mana ability and the Needle's exception does not
+  apply: it cannot be activated. Neither can +2. Ability indexes in Oracle order counting only activated abilities: +2 is 0, the
+  0 ability is 1 (the two Ugin triggers are not activated; the -11 is index 2 and unused). Before the Needle both are offered
+  (loyalty 7, empty stack, main phase, first loyalty activation this turn). Loyalty stays 7, no life gained, no mana. A wrong
+  engine exempts mana-producing loyalty abilities.

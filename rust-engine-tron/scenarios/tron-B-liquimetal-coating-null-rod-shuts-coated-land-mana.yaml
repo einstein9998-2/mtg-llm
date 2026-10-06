@@ -1,0 +1,44 @@
+id: tron-b-liquimetal-coating-null-rod-shuts-coated-land-mana
+title: "Liquimetal Coating on the opponent's Island plus Null Rod: the coated Island (an artifact) cannot be tapped for mana, the other Island can"
+area: card
+cards: [Liquimetal Coating, Null Rod, Island]
+tags: [liquimetal-coating, null-rod, type-change, artifact-land, mana-ability, activated-ability, mask-validity, layers]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Liquimetal Coating, text: "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.", verified: true}
+  - {kind: oracle, card: Null Rod, text: "Activated abilities of artifacts can't be activated.", verified: true}
+  - {kind: cr, ref: "613.1d", text: "Layer 4: Type-changing effects are applied.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Null Rod @nr"]
+    battlefield: ["Liquimetal Coating @coat", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @pi1", "Island @pi2"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@coat", ability: 0, targets: ["@pi1"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@nr", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: activate, source: "@pi1", ability: 0, choose_color: U}}
+  - p1: {t: activate, source: "@pi2", ability: 0, choose_color: U}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      mana_pool: {U: 1}
+      battlefield:
+        - {card: Island, tapped: false, types: [Artifact, Land]}
+        - {card: Island, tapped: true, types: [Land]}
+notes: >
+  Null Rod stops all activated abilities of artifacts, mana abilities included. The Coating (until end of turn) makes p1's first
+  Island an artifact land, so while Null Rod is out that Island cannot tap for mana; p1's other Island is untouched. A wrong
+  engine exempts mana abilities, or evaluates "artifact" against the printed card.

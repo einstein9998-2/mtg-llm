@@ -1,0 +1,37 @@
+id: tron-a-voltaic-key-targets-only-artifacts-any-controller
+title: "Voltaic Key cannot target a tapped land, but can untap an opponent's tapped artifact"
+area: card
+cards: [Voltaic Key, Grim Monolith, Island]
+tags: [voltaic-key, targeting, untap, legal-action-mask, opponent-permanent, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Voltaic Key @key", {card: Island, as: tl, tapped: true}, "Island @is1"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Grim Monolith, as: pm, tapped: true}]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@key", ability: 0, targets: ["@tl"], pay: {tap: ["@is1"]}}}
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@key", ability: 0, targets: ["@pm"]}]}}
+  - p0: {t: activate, source: "@key", ability: 0, targets: ["@pm"], pay: {tap: ["@is1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Voltaic Key, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1:
+      battlefield: [{card: Grim Monolith, tapped: false}]
+notes: >
+  The target must be an artifact: a tapped Island (a land, not an artifact) is not offered. Any artifact qualifies,
+  including an opponent's: p1's tapped Grim Monolith is untapped. (Legal but unwise; the point is that the engine does not
+  restrict the target to the Key's controller.) A wrong engine allows any tapped permanent.

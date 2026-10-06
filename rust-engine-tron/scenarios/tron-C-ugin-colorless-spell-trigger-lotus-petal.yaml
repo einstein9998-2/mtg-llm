@@ -1,0 +1,51 @@
+id: tron-c-ugin-on-battlefield-exiles-a-colored-permanent-when-p0-casts-lotus-petal
+title: "With Ugin in play, casting a colorless spell (Lotus Petal) triggers an exile of a colored permanent; the trigger is above the spell"
+area: card
+cards: ["Ugin, Eye of the Storms", Lotus Petal, Ocelot Pride, Aluren, "Phelia, Exuberant Shepherd", Aether Vial, Mountain]
+tags: [ugin, planeswalker, colorless-spell-trigger, exile, targeting, colorless, mask-validity, stack-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", verified: true}
+  - {kind: cr, ref: "202.2b", text: "Objects with no colored mana symbols in their mana costs are colorless.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Once the steps described in 601.2a–h are completed, effects that modify the characteristics of the spell as it’s cast are applied, then the spell becomes cast. Any abilities that trigger when a spell is cast or put onto the stack trigger at this time. If the spell’s controller had priority before casting it, they get priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Lotus Petal @lp]
+    battlefield: [{card: "Ugin, Eye of the Storms", as: ugin, counters: {loyalty: 7}}, Ocelot Pride @mycat, Mountain]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph", Aluren @alu, Aether Vial @pv]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lp", pay: auto}
+  - p0:
+      decision: choose_target
+      slot: 0
+      answer: "@ph"
+      expect_options: {include: ["@ph", "@alu", "@mycat"], exclude: ["@lp", "@pv", "@ugin"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@lp", controller: p0}
+        - {kind: triggered, source: "@ugin", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@lp", controller: p0}]
+      p1: {exile: ["Phelia, Exuberant Shepherd"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield_contains: [{card: Lotus Petal}, {card: "Ugin, Eye of the Storms", counters: {loyalty: 7}}, {card: Ocelot Pride}]
+    p1:
+      exile: ["Phelia, Exuberant Shepherd"]
+      battlefield: [{card: Aluren}, {card: Aether Vial}]
+notes: >
+  Lotus Petal ({0}) has no colored mana symbol: it is a colorless spell, so Ugin triggers on cast. Targets: any colored
+  permanent, including p0's own Ocelot Pride; colorless permanents (Vial, Ugin) are not offered. The trigger is on
+  top of Petal. A wrong engine treats "{0}" as colorless only when it has no cost at all or counts a zero-cost spell as colored.

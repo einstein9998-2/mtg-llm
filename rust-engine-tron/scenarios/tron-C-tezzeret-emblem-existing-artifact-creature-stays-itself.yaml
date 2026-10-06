@@ -1,0 +1,50 @@
+id: tron-c-tezzeret-emblem-on-an-artifact-creature-only-adds-counters
+title: "Tezzeret's emblem on an artifact creature (Scion made an artifact by Liquimetal Coating) adds three counters but does not turn it into a 0/0 Robot: 1/1 + 3 = 4/4"
+area: card
+cards: ["Tezzeret, Cruel Captain", Liquimetal Coating, Eldrazi Scion Token]
+tags: [tezzeret, planeswalker, emblem, beginning-of-combat, artifact-creature, counters, liquimetal-coating, conditional-effect, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "You get an emblem with \"At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.\"", verified: true}
+  - {kind: oracle, card: Liquimetal Coating, text: "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 7}}
+      - {card: Liquimetal Coating, as: lc}
+      - {token: Eldrazi Scion Token, as: sc}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@lc", ability: 0, targets: ["@sc"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@tz", ability: 2}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_target
+      slot: 0
+      answer: "@sc"
+      expect_options: {include: ["@sc", "@lc"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    phase: begin_combat
+    stack: []
+    p0:
+      command: [{emblem: "put three +1/+1 counters"}]
+      battlefield:
+        - {card: Liquimetal Coating, tapped: true}
+        - {token: Eldrazi Scion Token, types: [Artifact, Creature], subtypes: [Eldrazi, Scion], counters: {"+1/+1": 3}, pt: [4, 4]}
+notes: >
+  Liquimetal Coating's effect lasts until end of turn, so at beginning of combat the Scion is an artifact creature; the emblem
+  gives it three counters and the "if it's not a creature" clause does not apply, so it stays a 1/1 Scion (4/4 with the
+  counters, not 3/3 from a 0/0 base). The Coating itself is also a legal target (an artifact), hence two candidates. A wrong engine overwrites P/T
+  regardless of the creature condition.

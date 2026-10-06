@@ -1,0 +1,44 @@
+id: tron-c-kozileks-command-cost-increase-on-opponents-turn-with-defense-grid
+title: "With Defense Grid out, Kozilek's Command cast on the opponent's turn costs {3} more (X = 0 costs five, X = 1 is not affordable)"
+area: card
+cards: ["Kozilek's Command", Defense Grid, Ancient Tomb, Mountain, Brainstorm]
+tags: [kozileks-command, defense-grid, cost-increase, x-spell, instant-speed, opponents-turn]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+  - {kind: oracle, card: "Kozilek's Command", text: "Target player scries X, then draws a card.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost. First, they pay all costs that don’t involve random elements or moving objects from the library to a public zone, in any order. Then they pay all remaining costs in any order. Partial payments are not allowed. Unpayable costs can’t be paid.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb, Mountain @m1, Mountain @m2, Mountain @m3]
+    library: [Brainstorm]
+    library_pad: 10
+  p1:
+    battlefield: [Defense Grid]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 1, modes: [1, 2], targets: [{player: p0}, {player: p0}], pay: auto}}
+  - p0: {t: cast, card: "@kc", x: 0, modes: [1, 2], targets: [{player: p0}, {player: p0}], pay: auto}
+  - check:
+      p0:
+        life: 18
+        battlefield: [{card: Ancient Tomb, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      hand: [Brainstorm]
+      graveyard: ["Kozilek's Command"]
+notes: >
+  Defense Grid taxes every spell not cast during its controller's turn: it is p1's turn, so p0's Command costs
+  {X}{C}{C} + {3}. p0 has exactly five mana (Tomb {C}{C} + three Mountains): X = 0 costs 5 (castable), X = 1 costs 6
+  (not offered). Instant speed on the opponent's turn: p1 passes with an empty stack in its own main phase and p0 gets
+  priority. The Tomb must pay the {C}{C} and the Mountains the generic part; the auto payment taps all four lands.
+  A wrong engine ignores the tax for an X spell or applies it to the controller's own turn.

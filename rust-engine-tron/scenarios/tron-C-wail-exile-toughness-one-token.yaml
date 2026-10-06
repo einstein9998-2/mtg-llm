@@ -1,0 +1,34 @@
+id: tron-c-warping-wail-exile-two-power-one-toughness-token
+title: "Warping Wail mode 1 can exile a 2/1 Cat Warrior token (toughness 1, power 2); the token ceases to exist"
+area: card
+cards: [Warping Wail, "Urza's Tower", Island, "Ajani, Nacatl Pariah", Cat Warrior Token]
+tags: [warping-wail, exile, targeting, power-or-toughness, token, tokens-cease-to-exist]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Warping Wail, text: "Exile target creature with power or toughness 1 or less.", verified: true}
+  - {kind: oracle, card: "Ajani, Nacatl Pariah", text: "When Ajani enters, create a 2/1 white Cat Warrior creature token.", verified: true}
+  - {kind: cr, ref: "704.5d", text: "If a token is in a zone other than the battlefield, it ceases to exist.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Warping Wail @ww]
+    battlefield: ["Urza's Tower @tw", Island @isl]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Cat Warrior Token, as: cat}]
+    library_pad: 10
+script:
+  - check:
+      p1: {battlefield: [{token: Cat Warrior Token, pt: [2, 1]}]}
+  - p0: {t: cast, card: "@ww", modes: [1], targets: ["@cat"], pay: {tap: ["@tw", "@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p1: {battlefield: [], exile: [], graveyard: []}
+    p0: {graveyard: [Warping Wail]}
+notes: >
+  Toughness 1 alone qualifies (power 2). The token goes to exile and ceases to exist. A wrong engine tests only power.

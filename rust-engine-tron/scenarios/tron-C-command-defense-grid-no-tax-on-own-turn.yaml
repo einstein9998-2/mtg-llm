@@ -1,0 +1,33 @@
+id: tron-c-kozileks-command-no-defense-grid-tax-on-own-turn
+title: "With the opponent's Defense Grid out, Kozilek's Command cast on its controller's own turn costs no extra: X = 3 is castable with five mana"
+area: card
+cards: ["Kozilek's Command", Defense Grid, Ancient Tomb, Mountain, Eldrazi Spawn Token]
+tags: [kozileks-command, defense-grid, cost-increase, x-spell, own-turn, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Defense Grid, text: "Each spell costs {3} more to cast except during its controller's turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb, Mountain @m1, Mountain @m2, Mountain @m3]
+    library_pad: 10
+  p1:
+    battlefield: [Defense Grid]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@kc", x: 3, modes: [1, 2], targets: [{player: p0}, {player: p0}], pay: {tap: ["@tomb", "@m1", "@m2", "@m3"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@kc", controller: p0, x: 3, modes: [1, 2]}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      spells_cast_this_turn: 1
+      battlefield: [{card: Ancient Tomb, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+notes: >
+  "Except during its controller's turn" refers to the SPELL's controller, not Defense Grid's: during p0's own turn
+  p0's Command is not taxed, though p1 controls the Grid. X = 3 costs {3}{C}{C} = five mana, all of p0's lands. Pair of the
+  opponent's-turn scenario. A wrong engine reads "its controller" as Defense Grid's controller and taxes p0 here.

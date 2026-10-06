@@ -1,0 +1,49 @@
+id: tron-b-liquimetal-coating-creature-becomes-artifact-abrade-destroys
+title: "Liquimetal Coating makes the opponent's Atraxa an artifact creature, which makes it a legal target for Abrade's destroy-artifact mode"
+area: card
+cards: [Liquimetal Coating, "Atraxa, Grand Unifier", Abrade, Mountain]
+tags: [liquimetal-coating, type-change, in-addition, artifact-creature, targeting, abrade, layers, alurentell-specific]
+derived_from: cr
+source:
+  - {kind: oracle, card: Liquimetal Coating, text: "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.", verified: true}
+  - {kind: oracle, card: Abrade, text: "Destroy target artifact.", verified: true}
+  - {kind: cr, ref: "205.1b", text: "This rule applies to effects that use phrases such as “in addition to its other types”", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If the spell or ability specifies targets, it checks whether the targets are still legal.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Abrade @ab"]
+    battlefield: ["Liquimetal Coating @coat", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Atraxa, Grand Unifier @atx"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ab", modes: [2], targets: ["@atx"]}}
+  - p0: {t: activate, source: "@coat", ability: 0, targets: ["@atx"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: atraxa-is-artifact-creature
+    check:
+      stack: []
+      p1:
+        battlefield: [{card: "Atraxa, Grand Unifier", types: [Artifact, Creature], supertypes: [Legendary], pt: [7, 7]}]
+  - p0: {t: cast, card: "@ab", modes: [2], targets: ["@atx"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Abrade]
+      battlefield: [{card: Liquimetal Coating, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+    p1:
+      battlefield: []
+      graveyard: ["Atraxa, Grand Unifier"]
+notes: >
+  Before the Coating, Abrade's destroy-artifact mode (mode 2) has no legal target (Atraxa is not an artifact). After the
+  Coating resolves she is an artifact creature (types exactly Artifact and Creature, still Legendary and 7/7), the target is
+  legal and the destroy resolves. A wrong engine evaluates target legality against printed types, or replaces her creature type.

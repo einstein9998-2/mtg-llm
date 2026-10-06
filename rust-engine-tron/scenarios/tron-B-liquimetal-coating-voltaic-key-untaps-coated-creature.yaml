@@ -1,0 +1,45 @@
+id: tron-b-liquimetal-coating-voltaic-key-untaps-coated-creature
+title: "Voltaic Key can untap a tapped creature that Liquimetal Coating made an artifact, but not before"
+area: card
+cards: [Liquimetal Coating, Voltaic Key, Ocelot Pride, Island]
+tags: [liquimetal-coating, voltaic-key, type-change, untap, targeting, mask-validity, tron-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Liquimetal Coating, text: "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.", verified: true}
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true, note: "Voltaic Key text from the engine owner's brief; entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "205.1b", text: "This rule applies to effects that use phrases such as “in addition to its other types”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - "Liquimetal Coating @coat"
+      - "Voltaic Key @key"
+      - {card: Ocelot Pride, as: op, tapped: true}
+      - "Island @isl"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@key", ability: 0, targets: ["@op"]}}
+  - p0: {t: activate, source: "@coat", ability: 0, targets: ["@op"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@key", ability: 0, targets: ["@op"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Liquimetal Coating, tapped: true}
+        - {card: Voltaic Key, tapped: true}
+        - {card: Ocelot Pride, tapped: false, types: [Artifact, Creature]}
+        - {card: Island, tapped: true}
+notes: >
+  Voltaic Key's "target artifact" cannot pick the tapped Ocelot Pride until the Coating makes it an artifact. Afterwards the Key
+  ({1} from the Island, {T}) untaps it. A wrong engine checks the printed card types for "artifact", or lets the Key target any
+  permanent.

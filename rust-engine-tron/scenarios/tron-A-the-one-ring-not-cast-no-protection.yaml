@@ -1,0 +1,54 @@
+id: tron-a-the-one-ring-not-cast-no-protection
+title: "The One Ring put onto the battlefield by Show and Tell was not cast, so it gives no protection and does not even trigger"
+area: card
+cards: [The One Ring, Show and Tell, Lightning Bolt, Island, Mountain]
+tags: [the-one-ring, show-and-tell, intervening-if, not-cast, protection-from-everything, targeting, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: The One Ring, text: "When The One Ring enters, if you cast it, you gain protection from everything until your next turn.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is; otherwise it does nothing.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "The One Ring @ring"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mt"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@ring"}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: The One Ring}]}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@bolt", targets: [{player: p0}]}]}}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      battlefield_contains: [{card: The One Ring}]
+    p1:
+      graveyard: [Lightning Bolt]
+      hand: []
+notes: >
+  Nothing is cast: Show and Tell puts the Ring onto the battlefield (601.2a: casting starts by moving the card to the
+  stack). The condition "if you cast it" is false when the Ring enters, so the ability does not trigger at all (603.4,
+  stack empty) and p0 has no protection: p1's Bolt at p0's face is legal and resolves, p0 20 -> 17. p1's hand holds only
+  Bolt, so p1 has no eligible card and no Show and Tell decision. A wrong engine always grants the protection.

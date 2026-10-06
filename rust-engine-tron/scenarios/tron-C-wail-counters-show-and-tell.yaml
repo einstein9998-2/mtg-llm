@@ -1,0 +1,44 @@
+id: tron-c-warping-wail-counters-show-and-tell-nothing-enters
+title: "Warping Wail mode 2 counters the opponent's Show and Tell: neither player puts anything onto the battlefield"
+area: card
+cards: [Warping Wail, "Urza's Tower", Island, Show and Tell, Omniscience, Lotus Petal]
+tags: [warping-wail, counter-spell, sorcery, show-and-tell, alurentell, matchup]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Warping Wail, text: "Counter target sorcery spell.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: [Warping Wail @ww, Lotus Petal]
+    battlefield: ["Urza's Tower @tw", Island @isl]
+    library_pad: 10
+  p1:
+    hand: [Show and Tell @snt, Omniscience]
+    battlefield: [Island, Island, Island]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@snt", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@ww", modes: [2], targets: ["@snt"], pay: {tap: ["@tw", "@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Lotus Petal]
+      graveyard: [Warping Wail]
+      battlefield: [{card: "Urza's Tower", tapped: true}, {card: Island, tapped: true}]
+    p1:
+      hand: [Omniscience]
+      graveyard: [Show and Tell]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Show and Tell is a sorcery spell, a legal target for mode 2 (an instant-speed counter on the opponent's turn). Countered,
+  it never resolves: p1 keeps Omniscience in hand and p0 keeps Lotus Petal (no "each player may put" prompt is raised for
+  either player). A wrong engine resolves Show and Tell anyway, or offers the counter only against the controller's own turn.

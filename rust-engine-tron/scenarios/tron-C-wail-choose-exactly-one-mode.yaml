@@ -1,0 +1,31 @@
+id: tron-c-warping-wail-chooses-exactly-one-mode
+title: "Warping Wail is 'choose one': two modes (or zero) are not offered"
+area: card
+cards: [Warping Wail, "Urza's Tower", Island, Dragon's Rage Channeler]
+tags: [warping-wail, modal, choose-one, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Warping Wail, text: "Choose one —", verified: true}
+  - {kind: cr, ref: "700.2", text: "A spell or ability is modal if it has two or more options in a bulleted list preceded by instructions for a player to choose a number of those options, such as “Choose one —.” Each of those options is a mode.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Warping Wail @ww]
+    battlefield: ["Urza's Tower @tw", Island @isl]
+    library_pad: 10
+  p1:
+    battlefield: [Dragon's Rage Channeler @drc]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ww", modes: [1, 3], targets: ["@drc"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@ww", modes: [], pay: auto}}
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@ww", modes: [1]}, {t: cast, card: "@ww", modes: [3]}]}}
+expect:
+  - at: after_script
+    stack: []
+    p0: {hand: [Warping Wail], spells_cast_this_turn: 0}
+notes: >
+  Mode 1 (exile Dragon's Rage Channeler, 1/1) and mode 3 (Scion) are each offered alone, never together.

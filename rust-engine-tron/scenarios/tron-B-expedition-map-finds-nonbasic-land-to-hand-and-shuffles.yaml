@@ -1,0 +1,48 @@
+id: tron-b-expedition-map-finds-nonbasic-land-to-hand-and-shuffles
+title: "Expedition Map ({2}, tap, sacrifice) finds any land card (a nonbasic Wasteland, not a spell) into the hand and shuffles"
+area: card
+cards: [Expedition Map, Wasteland, Lightning Bolt, Island]
+tags: [expedition-map, search, land-card, nonbasic, to-hand, shuffle, sacrifice-as-cost, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Expedition Map, text: "{2}, {T}, Sacrifice this artifact: Search your library for a land card, reveal it, put it into your hand, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it’s a hidden zone) and find a card that matches the given description.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Expedition Map @map", "Island @i1", "Island @i2"]
+    library: ["Wasteland @waste", "Lightning Bolt @bolt", "Island @lisl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Lightning Bolt, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island]}
+script:
+  - p0: {t: activate, source: "@map", ability: 0, pay: auto}
+  - label: on-stack
+    check:
+      stack: [{kind: activated, source: "@map", controller: p0}]
+      p0:
+        graveyard: [Expedition Map]
+        battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+        library_count: 13
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@waste", expect_options: {include: ["@waste", "@lisl"], exclude: ["@bolt"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Wasteland]
+      graveyard: [Expedition Map]
+      library_count: 12
+      library_top: [Lightning Bolt]
+notes: >
+  The cost is {2} (both Islands), {T} and the sacrifice, all paid on activation. The search offers every land card (the nonbasic
+  Wasteland and the library Island) but not Lightning Bolt; the found card goes to the hand (not the battlefield). The library is
+  then shuffled; the scripted shuffle outcome puts Lightning Bolt on top of eleven Islands, so a missing shuffle fails the
+  library_top assertion and an extra shuffle fails the random queue. A wrong engine limits the search to basic lands, puts
+  the land onto the battlefield, or forgets to shuffle.

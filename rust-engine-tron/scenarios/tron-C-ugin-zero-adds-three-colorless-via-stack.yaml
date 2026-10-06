@@ -1,0 +1,39 @@
+id: tron-c-ugin-zero-adds-three-colorless-and-is-not-a-mana-ability
+title: "Ugin's 0 adds {C}{C}{C} only when it resolves from the stack (a loyalty ability is not a mana ability); loyalty stays 7"
+area: card
+cards: ["Ugin, Eye of the Storms"]
+tags: [ugin, planeswalker, loyalty-ability, zero-ability, mana, not-a-mana-ability, stack]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "0: Add {C}{C}{C}.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability. (See rule 606, “Loyalty Abilities.”)", verified: true}
+  - {kind: cr, ref: "606.3", text: "A player may activate a loyalty ability of a permanent they control any time they have priority and the stack is empty during a main phase of their turn, but only if no player has previously activated a loyalty ability of that permanent that turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Ugin, Eye of the Storms", as: ugin, counters: {loyalty: 7}}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ugin", ability: 1}
+  - check:
+      stack: [{kind: activated, source: "@ugin", controller: p0}]
+      p0: {mana_pool: {}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: activate, source: "@ugin", ability: 1}}
+  - expect_illegal: {p0: {t: activate, source: "@ugin", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 3}
+      battlefield: [{card: "Ugin, Eye of the Storms", counters: {loyalty: 7}}]
+notes: >
+  The 0 is a loyalty ability, so it is excluded from mana abilities (605.1a): it uses the stack and the mana arrives on
+  resolution (pool empty while the ability is on the stack), and the player holds priority afterwards with {C}{C}{C} floating
+  in the same phase. Only one loyalty ability per turn (606.3). A wrong engine adds the mana on activation without the stack.

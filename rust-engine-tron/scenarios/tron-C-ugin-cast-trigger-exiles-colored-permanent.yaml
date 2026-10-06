@@ -1,0 +1,69 @@
+id: tron-c-ugin-cast-trigger-exiles-a-colored-permanent-only
+title: "Casting Ugin, Eye of the Storms: the cast trigger exiles a colored permanent (Aluren) but cannot target colorless permanents (artifact, land, token); the trigger resolves before Ugin"
+area: card
+cards: ["Ugin, Eye of the Storms", Mountain, Aluren, "Phelia, Exuberant Shepherd", Lotus Petal, "Urza's Tower", Ocelot Pride, Eldrazi Spawn Token]
+tags: [ugin, planeswalker, cast-trigger, exile, targeting, colorless, colored-permanent, mask-validity, stack-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "When you cast this spell, exile up to one target permanent that's one or more colors.", verified: true, note: "Printed loyalty 7 is given by the engine owner's brief."}
+  - {kind: cr, ref: "601.2i", text: "Once the steps described in 601.2a–h are completed, effects that modify the characteristics of the spell as it’s cast are applied, then the spell becomes cast. Any abilities that trigger when a spell is cast or put onto the stack trigger at this time. If the spell’s controller had priority before casting it, they get priority.", verified: true}
+  - {kind: cr, ref: "202.2b", text: "Objects with no colored mana symbols in their mana costs are colorless.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ugin, Eye of the Storms @ugin"]
+    battlefield:
+      - Mountain
+      - Mountain
+      - Mountain
+      - Mountain
+      - Mountain
+      - Mountain
+      - Mountain
+      - Ocelot Pride @mycat
+    library_pad: 10
+  p1:
+    battlefield:
+      - Aluren @alu
+      - "Phelia, Exuberant Shepherd @ph"
+      - Lotus Petal @lp
+      - "Urza's Tower @tw"
+      - {token: Eldrazi Spawn Token, as: sp}
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ugin", pay: auto}
+  - p0:
+      decision: choose_target
+      slot: 0
+      answer: "@alu"
+      expect_options: {include: ["@alu", "@ph", "@mycat"], exclude: ["@lp", "@tw", "@sp", "@ugin"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@ugin", controller: p0}
+        - {kind: triggered, source: "@ugin", controller: p0, text_contains: "exile"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@ugin", controller: p0}]
+      p1: {exile: [Aluren]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      spells_cast_this_turn: 1
+      battlefield_contains: [{card: "Ugin, Eye of the Storms", counters: {loyalty: 7}, types: [Planeswalker]}, {card: Ocelot Pride}]
+    p1:
+      exile: [Aluren]
+      battlefield: [{card: "Phelia, Exuberant Shepherd"}, {card: Lotus Petal}, {card: "Urza's Tower"}, {token: Eldrazi Spawn Token}]
+notes: >
+  Seven Mountains pay {7}. The trigger is put on the stack as soon as Ugin is cast (601.2i), its target chosen then; it is
+  above the Ugin spell, so it resolves first. Lands, Petal and the token are colorless (no colored mana symbol, 202.2b), so
+  they are not offered; colored permanents of either player are (Phelia, Aluren, p0's own Ocelot Pride). The spell itself is not a permanent. Ugin's own colorless-spell
+  trigger does not fire for casting Ugin (it is not on the battlefield yet): only one exile. Loyalty 7 on entry (brief). A wrong engine
+  allows colorless targets, exiles lands, or lets the trigger resolve after Ugin.

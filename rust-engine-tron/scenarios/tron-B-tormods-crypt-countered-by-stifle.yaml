@@ -1,0 +1,41 @@
+id: tron-b-tormods-crypt-countered-by-stifle
+title: "Stifle on Tormod's Crypt's ability: the Crypt is already sacrificed and the graveyard is not exiled"
+area: card
+cards: [Tormod's Crypt, Stifle, Lightning Bolt, Island]
+tags: [tormods-crypt, stifle, counter-ability, sacrifice-as-cost, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tormod's Crypt, text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Tormod's Crypt @crypt"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @pi"]
+    graveyard: ["Lightning Bolt"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@crypt", ability: 0, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@crypt", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Tormod's Crypt"]
+      battlefield: []
+    p1:
+      graveyard: ["Lightning Bolt", Stifle]
+      exile: []
+notes: >
+  Tap and sacrifice are costs paid on activation. Stifle counters the ability; p1's graveyard keeps Lightning Bolt (and gains
+  the resolved Stifle). A wrong engine returns the Crypt or exiles anyway.

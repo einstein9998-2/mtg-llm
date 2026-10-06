@@ -1,0 +1,137 @@
+// Colorless Tron (Brady's list, 2026-10-06), RFC 0007. Oracle text per Savecraft card_search (Scryfall).
+// Not modeled (documented limits, see rfcs/0007): Urza's Saga and Summon: Bahamut (Saga rules, RFC 0006), Karn -2, Ugin -11,
+// Argentum Masticore, Mycosynth Lattice, Eldrazi Confluence, Extinguisher Battleship station, Mishra's Research Desk unearth.
+[
+  (name: "Urza's Tower", types: "LAND", subtypes: ["Urza's", "Tower"], abilities: [
+    // 1 + 2 * [Mine] * [Power-Plant]
+    Activated(text: "{T}: Add {C}. If you control an Urza's Mine and an Urza's Power-Plant, add {C}{C}{C} instead.", cost: [TapSelf], is_mana: true,
+      effect: AddManaExpr(color: C, n: Plus(Const(1), Times(Const(2), Times(Min(Const(1), Count(subtypes_any: ["Mine"], controller: You)), Min(Const(1), Count(subtypes_any: ["Power-Plant"], controller: You))))))),
+  ]),
+  (name: "Urza's Workshop", types: "LAND", subtypes: ["Urza's"], abilities: [
+    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
+    // Metalcraft: the amount is 0 (not offered) without three artifacts; the activation condition of the Oracle text is the amount.
+    Activated(text: "Metalcraft: {T}: Add {C} for each Urza's land you control. Activate only if you control three or more artifacts.", cost: [TapSelf], is_mana: true,
+      effect: AddManaExpr(color: C, n: Times(Count(subtypes_any: ["Urza's"], controller: You), Min(Const(1), Max(Const(0), Minus(Count(types_any: "ARTIFACT", controller: You), Const(2))))))),
+  ]),
+  (name: "Urza's Mine", types: "LAND", subtypes: ["Urza's", "Mine"], abilities: [
+    Activated(text: "{T}: Add {C}. If you control an Urza's Power-Plant and an Urza's Tower, add {C}{C} instead.", cost: [TapSelf], is_mana: true,
+      effect: AddManaExpr(color: C, n: Plus(Const(1), Times(Min(Const(1), Count(subtypes_any: ["Power-Plant"], controller: You)), Min(Const(1), Count(subtypes_any: ["Tower"], controller: You)))))),
+  ]),
+  (name: "Urza's Power Plant", types: "LAND", subtypes: ["Urza's", "Power-Plant"], abilities: [
+    Activated(text: "{T}: Add {C}. If you control an Urza's Mine and an Urza's Tower, add {C}{C} instead.", cost: [TapSelf], is_mana: true,
+      effect: AddManaExpr(color: C, n: Plus(Const(1), Times(Min(Const(1), Count(subtypes_any: ["Mine"], controller: You)), Min(Const(1), Count(subtypes_any: ["Tower"], controller: You)))))),
+  ]),
+  (name: "Planar Nexus", types: "LAND", subtypes: ["Cave", "Desert", "Gate", "Lair", "Locus", "Mine", "Power-Plant", "Sphere", "Tower", "Urza's"], abilities: [
+    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
+    Activated(text: "{1}, {T}: Add one mana of any color.", cost: [Mana("{1}"), TapSelf], is_mana: true, effect: AddManaAny(n: Const(1))),
+  ]),
+  (name: "Expedition Map", cost: "{1}", types: "ARTIFACT", abilities: [
+    Activated(text: "{2}, {T}, Sacrifice this artifact: Search your library for a land card, reveal it, put it into your hand, then shuffle.", cost: [Mana("{2}"), TapSelf, SacrificeSelf],
+      effect: Search(filter: (zone: Library, types_any: "LAND"), dest: Hand)),
+  ]),
+  (name: "Pithing Needle", cost: "{1}", types: "ARTIFACT", abilities: [
+    EntersChoice(CardName),
+    Restrict(what: CantActivate(sources: (chosen_name: true), except_mana: true)),
+  ]),
+  (name: "Voltaic Key", cost: "{1}", types: "ARTIFACT", abilities: [
+    Activated(text: "{1}, {T}: Untap target artifact.", cost: [Mana("{1}"), TapSelf], targets: [(objects: (types_any: "ARTIFACT"))], effect: Untap(One(Target(0)))),
+  ]),
+  (name: "Manifold Key", cost: "{1}", types: "ARTIFACT", abilities: [
+    Activated(text: "{1}, {T}: Untap another target artifact.", cost: [Mana("{1}"), TapSelf], targets: [(objects: (types_any: "ARTIFACT", not_self: true))], effect: Untap(One(Target(0)))),
+    Activated(text: "{3}, {T}: Target creature can't be blocked this turn.", cost: [Mana("{3}"), TapSelf], targets: [(objects: (types_any: "CREATURE"))],
+      effect: Continuous(objs: One(Target(0)), layer: L6, effect: GrantKeywords("UNBLOCKABLE"), until: EndOfTurn)),
+  ]),
+  (name: "Tormod's Crypt", cost: "{0}", types: "ARTIFACT", abilities: [
+    Activated(text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", cost: [TapSelf, SacrificeSelf], targets: [(players: Any)], effect: ExileGraveyard(who: Target(0))),
+  ]),
+  (name: "Liquimetal Coating", cost: "{2}", types: "ARTIFACT", abilities: [
+    Activated(text: "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.", cost: [TapSelf], targets: [(objects: ())],
+      effect: Continuous(objs: One(Target(0)), layer: L4, effect: AddTypes("ARTIFACT"), until: EndOfTurn)),
+  ]),
+  (name: "Warping Wail", cost: "{1}{C}", types: "INSTANT", abilities: [
+    Spell(choose: (1, 1), modes: [
+      (label: "Exile target creature with power or toughness 1 or less.", targets: [(objects: (types_any: "CREATURE", power: (Le, 1), alt: [(types_any: "CREATURE", toughness: (Le, 1))]))],
+        effect: Exile(One(Target(0)))),
+      (label: "Counter target sorcery spell.", targets: [(objects: (zone: Stack, stack: Spell, types_any: "SORCERY"))], effect: CounterSpell(0)),
+      (label: "Create a 1/1 colorless Eldrazi Scion creature token. It has \"Sacrifice this token: Add {C}.\"", effect: CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)),
+    ]),
+  ]),
+  (name: "Eldrazi Scion Token", types: "CREATURE", subtypes: ["Eldrazi", "Scion"], pt: (1, 1), is_token: true, abilities: [
+    Activated(text: "Sacrifice this token: Add {C}.", cost: [SacrificeSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
+  ]),
+  (name: "Eldrazi Spawn Token", types: "CREATURE", subtypes: ["Eldrazi", "Spawn"], pt: (0, 1), is_token: true, abilities: [
+    Activated(text: "Sacrifice this token: Add {C}.", cost: [SacrificeSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
+  ]),
+  (name: "Construct Token", types: "ARTIFACT | CREATURE", subtypes: ["Construct"], pt: (0, 0), is_token: true, abilities: [
+    Static(layer: L7a, applies_to: (self_only: true), effect: SetPTExpr(x: Count(types_any: "ARTIFACT", controller: You), t_plus: 0)),
+  ]),
+  (name: "Karn, the Great Creator", cost: "{4}", types: "PLANESWALKER", supertypes: "LEGENDARY", subtypes: ["Karn"], abilities: [
+    Enters(filter: (self_only: true), effect: Counters(Loyalty, 5)),
+    Restrict(who: Opp, what: CantActivate(sources: (types_any: "ARTIFACT"))),
+    Activated(text: "+1: Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.", cost: [Loyalty(1)],
+      targets: [(objects: (types_any: "ARTIFACT", types_not: "CREATURE"), optional: true)],
+      effect: Seq([Continuous(objs: One(Target(0)), layer: L4, effect: AddTypes("CREATURE"), until: YourNextTurn), SetPTX(objs: One(Target(0)), x: CmcOf(Target(0)), until: YourNextTurn)])),
+  ]),
+  (name: "Tezzeret, Cruel Captain", cost: "{3}", types: "PLANESWALKER", supertypes: "LEGENDARY", subtypes: ["Tezzeret"], abilities: [
+    Enters(filter: (self_only: true), effect: Counters(Loyalty, 4)),
+    Triggered(text: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.", on: Enters(filter: (types_any: "ARTIFACT", controller: You)), effect: AddCounters(objs: One(This), kind: Loyalty, n: Const(1))),
+    Activated(text: "0: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.", cost: [Loyalty(0)], targets: [(objects: (types_any: "ARTIFACT | CREATURE"))],
+      effect: Seq([Untap(One(Target(0))), If(cond: And([Matches(Target(0), (types_any: "ARTIFACT")), Matches(Target(0), (types_any: "CREATURE"))]), then: AddCounters(objs: One(Target(0)), kind: PlusOne, n: Const(1)))])),
+    Activated(text: "-3: Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle.", cost: [Loyalty(-3)],
+      effect: Search(filter: (zone: Library, types_any: "ARTIFACT", cmc: (Le, 1)), dest: Hand)),
+    Activated(text: "-7: You get an emblem with \"At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.\"", cost: [Loyalty(-7)],
+      effect: CreateEmblem("Emblem: Tezzeret robots")),
+  ]),
+  (name: "Emblem: Tezzeret robots", types: "EMBLEM", is_token: true, abilities: [
+    Triggered(text: "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.", zone: Command,
+      on: BeginStep(step: BeginCombat, whose: You), targets: [(objects: (types_any: "ARTIFACT", controller: You))],
+      effect: Seq([If(cond: Not(Matches(Target(0), (types_any: "CREATURE"))), then: Seq([Continuous(objs: One(Target(0)), layer: L4, effect: AddTypes("CREATURE"), until: Forever), Continuous(objs: One(Target(0)), layer: L4, effect: AddSubtypes(["Robot"]), until: Forever), Continuous(objs: One(Target(0)), layer: L7b, effect: SetPT(0, 0), until: Forever)])), AddCounters(objs: One(Target(0)), kind: PlusOne, n: Const(3))])),
+  ]),
+  (name: "Ugin, Eye of the Storms", cost: "{7}", types: "PLANESWALKER", supertypes: "LEGENDARY", subtypes: ["Ugin"], abilities: [
+    Enters(filter: (self_only: true), effect: Counters(Loyalty, 7)),
+    Triggered(text: "When you cast this spell, exile up to one target permanent that's one or more colors.", zone: Stack, on: SpellCast(caster: You, filter: (self_only: true)),
+      targets: [(objects: (colorless: false), optional: true)], effect: Exile(One(Target(0)))),
+    Triggered(text: "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", on: SpellCast(caster: You, filter: (colorless: true)),
+      targets: [(objects: (colorless: false), optional: true)], effect: Exile(One(Target(0)))),
+    Activated(text: "+2: You gain 3 life and draw a card.", cost: [Loyalty(2)], effect: Seq([GainLife(who: You, n: Const(3)), Draw(who: You, n: Const(1))])),
+    Activated(text: "0: Add {C}{C}{C}.", cost: [Loyalty(0)], effect: AddMana(color: C, n: 3)),
+  ]),
+  (name: "The One Ring", cost: "{4}", types: "ARTIFACT", supertypes: "LEGENDARY", keywords: "INDESTRUCTIBLE", abilities: [
+    Triggered(text: "When The One Ring enters, if you cast it, you gain protection from everything until your next turn.", on: Enters(filter: (self_only: true)), cond: WasCast(), effect: PlayerFx(who: You, fx: ProtectionFromEverything, until: YourNextTurn)),
+    Triggered(text: "At the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.", on: BeginStep(step: Upkeep, whose: You), effect: LoseLife(who: You, n: Counters(This, Other(0)))),
+    Activated(text: "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.", cost: [TapSelf],
+      effect: Seq([AddCounters(objs: One(This), kind: Other(0), n: Const(1)), Draw(who: You, n: Counters(This, Other(0)))])),
+  ]),
+  (name: "Kozilek's Command", cost: "{X}{C}{C}", types: "KINDRED | INSTANT", subtypes: ["Eldrazi"], abilities: [
+    Spell(choose: (2, 2), modes: [
+      (label: "Target player creates X 0/1 colorless Eldrazi Spawn creature tokens.", targets: [(players: You)], effect: CreateToken(token: "Eldrazi Spawn Token", n: X, who: Target(0))),
+      (label: "Target player scries X, then draws a card.", targets: [(players: You)], effect: Seq([Scry(X), Draw(who: Target(0), n: Const(1))])),
+      (label: "Exile target creature with mana value X or less.", targets: [(objects: (types_any: "CREATURE", cmc_x_max: true))], effect: Exile(One(Target(0)))),
+      (label: "Exile up to X target cards from graveyards.", targets: [(objects: (zone: Graveyard), optional: true, distinct: true, x_count: true)], effect: Exile(TargetsFrom(0))),
+    ]),
+  ]),
+  (name: "Grim Monolith", cost: "{2}", types: "ARTIFACT", keywords: "NO_UNTAP", abilities: [
+    Activated(text: "{T}: Add {C}{C}{C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 3)),
+    Activated(text: "{4}: Untap this artifact.", cost: [Mana("{4}")], effect: Untap(One(This))),
+  ]),
+  (name: "Trinisphere", cost: "{3}", types: "ARTIFACT", abilities: [
+    CostFloor(min: 3, cond: Matches(This, (tapped: false))),
+  ]),
+  (name: "Portable Hole", cost: "{W}", types: "ARTIFACT", abilities: [
+    Triggered(text: "When this artifact enters, exile target nonland permanent an opponent controls with mana value 2 or less until this artifact leaves the battlefield.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_not: "LAND", controller: Opp, cmc: (Le, 2)))], effect: ExileTargetUntilLeaves(target: 0)),
+  ]),
+  (name: "Mishra's Research Desk", cost: "{1}", types: "ARTIFACT", abilities: [
+    Activated(text: "{1}, {T}, Sacrifice this artifact: Exile the top two cards of your library. Choose one of them. Until the end of your next turn, you may play that card.", cost: [Mana("{1}"), TapSelf, SacrificeSelf], effect: ExileChoosePlay(n: Const(2))),
+  ]),
+  (name: "Torpor Orb", cost: "{2}", types: "ARTIFACT", abilities: [
+    Restrict(what: NoCreatureEnterTriggers),
+  ]),
+  (name: "Ensnaring Bridge", cost: "{3}", types: "ARTIFACT", abilities: [
+    Restrict(what: AttackPowerOverHand),
+  ]),
+  (name: "Extinguisher Battleship", cost: "{8}", types: "ARTIFACT", subtypes: ["Spacecraft"], abilities: [
+    Triggered(text: "When this Spacecraft enters, destroy target noncreature permanent. Then this Spacecraft deals 4 damage to each creature.", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_not: "CREATURE"))], effect: Seq([Destroy(One(Target(0))), ForEach(filter: (types_any: "CREATURE"), body: Damage(amount: Const(4), to: Obj(Each(0))))])),
+  ]),
+]

@@ -1,0 +1,88 @@
+{
+ "_meta": {
+  "group": "B",
+  "note": "additions to rust-engine-spec/reference/oracle.json (cards only); merge into oracle.json['cards']"
+ },
+ "cards": {
+  "Portable Hole": {
+   "name": "Portable Hole",
+   "mana_cost": "{W}",
+   "type_line": "Artifact",
+   "oracle_text": "When this artifact enters, exile target nonland permanent an opponent controls with mana value 2 or less until this artifact leaves the battlefield.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)"
+  },
+  "Mishra's Research Desk": {
+   "name": "Mishra's Research Desk",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "{1}, {T}, Sacrifice this artifact: Exile the top two cards of your library. Choose one of them. Until the end of your next turn, you may play that card.\nUnearth {1}{R}",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)"
+  },
+  "Torpor Orb": {
+   "name": "Torpor Orb",
+   "mana_cost": "{2}",
+   "type_line": "Artifact",
+   "oracle_text": "Creatures entering don't cause abilities to trigger.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)"
+  },
+  "Ensnaring Bridge": {
+   "name": "Ensnaring Bridge",
+   "mana_cost": "{3}",
+   "type_line": "Artifact",
+   "oracle_text": "Creatures with power greater than the number of cards in your hand can't attack.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)"
+  },
+  "Pithing Needle": {
+   "name": "Pithing Needle",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "As this artifact enters, choose a card name.\nActivated abilities of sources with the chosen name can't be activated unless they're mana abilities.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)"
+  },
+  "Tormod's Crypt": {
+   "name": "Tormod's Crypt",
+   "mana_cost": "{0}",
+   "type_line": "Artifact",
+   "oracle_text": "{T}, Sacrifice this artifact: Exile target player's graveyard.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)"
+  },
+  "Liquimetal Coating": {
+   "name": "Liquimetal Coating",
+   "mana_cost": "{2}",
+   "type_line": "Artifact",
+   "oracle_text": "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)"
+  },
+  "Expedition Map": {
+   "name": "Expedition Map",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "{2}, {T}, Sacrifice this artifact: Search your library for a land card, reveal it, put it into your hand, then shuffle.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)"
+  },
+  "Extinguisher Battleship": {
+   "name": "Extinguisher Battleship",
+   "mana_cost": "{8}",
+   "type_line": "Artifact — Spacecraft",
+   "oracle_text": "When this Spacecraft enters, destroy target noncreature permanent. Then this Spacecraft deals 4 damage to each creature.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)",
+   "note": "Station (out of scope) omitted; it is a creature (10/10) only when stationed, so scenarios treat it as a noncreature artifact."
+  },
+  "Voltaic Key": {
+   "name": "Voltaic Key",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "{1}, {T}: Untap target artifact.",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)",
+   "note": "support card for Liquimetal Coating scenarios (group A owns its own scenarios)"
+  },
+  "Ugin, Eye of the Storms": {
+   "name": "Ugin, Eye of the Storms",
+   "mana_cost": "{7}",
+   "type_line": "Legendary Planeswalker — Ugin",
+   "oracle_text": "When you cast this spell, exile up to one target permanent that's one or more colors.\nWhenever you cast a colorless spell, exile up to one target permanent that's one or more colors.\n+2: You gain 3 life and draw a card.\n0: Add {C}{C}{C}.\n−11: (out of scope)",
+   "source": "Scryfall oracle data supplied in SCENARIO-BRIEF.md (Savecraft, 2026-10-06)",
+   "note": "support card for a Pithing Needle scenario; text as in the brief, the -11 line is deliberately not given; printed loyalty 7 (confirmed in the brief) is set in setup, not stored here"
+  }
+ }
+}

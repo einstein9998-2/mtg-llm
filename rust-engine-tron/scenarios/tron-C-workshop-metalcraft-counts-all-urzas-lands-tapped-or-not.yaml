@@ -1,0 +1,41 @@
+id: tron-c-urzas-workshop-metalcraft-counts-tron-lands-even-tapped
+title: Workshop's Metalcraft adds one {C} per Urza's land you control, tapped lands included (Workshop, Tower, Mine, Power Plant = 4)
+area: card
+cards: ["Urza's Workshop", "Urza's Tower", "Urza's Mine", "Urza's Power Plant", Lotus Petal, "Mishra's Bauble", Aether Vial, Island]
+tags: [urzas-workshop, tron, metalcraft, mana-ability, count-urzas-lands, tapped-lands]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Urza's Workshop", text: "Metalcraft — {T}: Add {C} for each Urza's land you control. Activate only if you control three or more artifacts.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - "Urza's Workshop @ws"
+      - "Urza's Tower @tw"
+      - {card: "Urza's Mine", as: mine, tapped: true}
+      - "Urza's Power Plant @pp"
+      - Lotus Petal
+      - "Mishra's Bauble"
+      - Aether Vial
+      - Island
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ws", ability: 1}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 4}
+      battlefield_contains:
+        - {card: "Urza's Workshop", tapped: true}
+        - {card: "Urza's Tower", tapped: false}
+        - {card: "Urza's Mine", tapped: true}
+        - {card: "Urza's Power Plant", tapped: false}
+notes: >
+  Four Urza's lands (the Mine is tapped from the start, which does not matter: "you control"). The Island is not one.
+  A wrong engine counts only untapped Urza's lands (3), or counts only Mine/Power-Plant/Tower by name and misses the
+  Workshop itself (3).

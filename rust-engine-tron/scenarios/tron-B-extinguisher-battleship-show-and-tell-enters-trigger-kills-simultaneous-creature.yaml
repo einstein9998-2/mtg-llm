@@ -1,0 +1,51 @@
+id: tron-b-extinguisher-battleship-show-and-tell-enters-trigger-kills-simultaneous-creature
+title: "Show and Tell puts Extinguisher Battleship onto the battlefield with no mana paid, its enters trigger still goes on the stack and kills the creature the opponent put in at the same time"
+area: card
+cards: [Extinguisher Battleship, Show and Tell, "Atraxa, Grand Unifier", "Phelia, Exuberant Shepherd", Aluren, Island]
+tags: [extinguisher-battleship, show-and-tell, not-cast, etb-trigger, simultaneous-entry, damage-to-each-creature, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: Extinguisher Battleship, text: "When this Spacecraft enters, destroy target noncreature permanent. Then this Spacecraft deals 4 damage to each creature.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Extinguisher Battleship @ship"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Atraxa, Grand Unifier @atx"]
+    library_pad: 10
+  p1:
+    hand: ["Phelia, Exuberant Shepherd @ph"]
+    battlefield: ["Aluren @alu", "Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@ship"}
+  - p1: {decision: simultaneous_secret_choice, answer: "@ph"}
+  - p0: {decision: choose_target, slot: 0, answer: "@alu", expect_options: {include: ["@alu", "@pi", "@ship"], exclude: ["@atx", "@ph"]}}
+  - label: trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@ship", controller: p0}]
+      p1:
+        battlefield_contains: [{card: "Phelia, Exuberant Shepherd", damage: 0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      spells_cast_this_turn: 1
+      graveyard: [Show and Tell]
+      battlefield_contains: [{card: Extinguisher Battleship}, {card: "Atraxa, Grand Unifier", damage: 4}]
+    p1:
+      graveyard: [Aluren, "Phelia, Exuberant Shepherd"]
+      battlefield: [{card: Island}]
+notes: >
+  The Battleship costs {8} but arrives by Show and Tell (no cost, not a cast: one spell cast this turn). Its enters trigger goes
+  on the stack as p0 chooses a target; p1's Phelia entered at the same time and is a legal creature for the 4 damage but not a
+  legal target (noncreature only). Aluren is destroyed and Phelia (2/2) dies; Atraxa survives with 4 damage.

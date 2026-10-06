@@ -1,0 +1,38 @@
+id: tron-a-voltaic-key-can-target-itself-but-not-tapped
+title: "Voltaic Key can target itself (it untaps again on resolution) but cannot be activated while tapped"
+area: card
+cards: [Voltaic Key, Island]
+tags: [voltaic-key, self-target, untap, tap-cost, activated-ability, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Voltaic Key @key", "Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@key", ability: 0, targets: ["@key"]}]}}
+  - p0: {t: activate, source: "@key", ability: 0, targets: ["@key"], pay: {tap: ["@is1"]}}
+  - check:
+      stack: [{kind: activated, source: "@key", controller: p0, targets: ["@key"]}]
+      p0: {battlefield_contains: [{card: Voltaic Key, tapped: true}]}
+  - expect_illegal: {p0: {t: activate, source: "@key", ability: 0, targets: ["@key"], pay: {tap: ["@is2"]}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Voltaic Key, tapped: false}, {card: Island, tapped: true}, {card: Island, tapped: false}]
+notes: >
+  "Untap target artifact" has no "another": the Key is an artifact and a legal target for its own ability (contrast Manifold
+  Key). The {T} cost is paid on activation, so while the ability waits on the stack the Key is tapped and a second
+  activation is impossible even with a spare Island; on resolution the Key untaps itself. A wrong engine forbids the
+  self-target or lets a tapped Key activate.

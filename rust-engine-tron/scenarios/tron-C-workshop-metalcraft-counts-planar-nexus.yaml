@@ -1,0 +1,30 @@
+id: tron-c-urzas-workshop-metalcraft-counts-planar-nexus-as-urzas-land
+title: Planar Nexus is an Urza's land, so Workshop's Metalcraft with a Nexus adds {C}{C}
+area: card
+cards: ["Urza's Workshop", Planar Nexus, Lotus Petal, "Mishra's Bauble", Aether Vial]
+tags: [urzas-workshop, planar-nexus, tron, metalcraft, land-types, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Planar Nexus, text: "This land is every nonbasic land type.", verified: true}
+  - {kind: oracle, card: "Urza's Workshop", text: "Metalcraft — {T}: Add {C} for each Urza's land you control. Activate only if you control three or more artifacts.", verified: true}
+  - {kind: cr, ref: "205.3i", text: "The land types are Cave, Desert, Forest, Gate, Island, Lair, Locus, Mine, Mountain, Plains, Planet, Power-Plant, Sphere, Swamp, Tower, Town, and Urza’s.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Workshop @ws", Planar Nexus, Lotus Petal, "Mishra's Bauble", Aether Vial]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ws", ability: 1}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 2}
+      battlefield_contains: [{card: "Urza's Workshop", tapped: true}, {card: Planar Nexus, tapped: false}]
+notes: >
+  Urza's is one of the nonbasic land types (205.3i, and the card's own reminder text), so Planar Nexus has it: two Urza's
+  lands, two {C}. A wrong engine gives Planar Nexus only the land types of the Tron lands by name, or none.

@@ -1,0 +1,33 @@
+id: tron-c-urzas-workshop-metalcraft-alone-counts-itself-once
+title: With three artifacts and no other Urza's land, Workshop's Metalcraft ability adds one {C} (it counts itself)
+area: card
+cards: ["Urza's Workshop", Lotus Petal, "Mishra's Bauble", Aether Vial, Island]
+tags: [urzas-workshop, tron, metalcraft, mana-ability, count-urzas-lands]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Urza's Workshop", text: "Metalcraft — {T}: Add {C} for each Urza's land you control. Activate only if you control three or more artifacts.", verified: true}
+  - {kind: cr, ref: "205.3i", text: "Lands have their own unique set of subtypes; these subtypes are called land types.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Workshop @ws", Lotus Petal, "Mishra's Bauble", Aether Vial, Island]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: "Urza's Workshop", types: [Land], subtypes: ["Urza's"]}]}
+  - p0: {t: activate, source: "@ws", ability: 1}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 1}
+      battlefield_contains: [{card: "Urza's Workshop", tapped: true}, {card: Island, tapped: false}]
+notes: >
+  "Urza's" is a land type and the Workshop has it, so it counts itself: {C} for each Urza's land = 1 (the Island is not an
+  Urza's land). Ability index 1 is the Metalcraft ability (see the note in the no-metalcraft scenario about the engine's one-ability model).
+  A wrong engine adds one {C} per artifact (3) or zero.

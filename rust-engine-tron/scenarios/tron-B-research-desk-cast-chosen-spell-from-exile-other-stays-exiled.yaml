@@ -1,0 +1,60 @@
+id: tron-b-research-desk-cast-chosen-spell-from-exile-other-stays-exiled
+title: Mishra's Research Desk sacrifices as a cost, exiles the top two, and only the chosen card (Ponder) can be cast from exile; the other (an Island) cannot be played
+area: card
+cards: [Mishra's Research Desk, Ponder, Island]
+tags: [mishras-research-desk, sacrifice-as-cost, exile-top-cards, play-from-exile, choose-one, negative, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mishra's Research Desk, text: "{1}, {T}, Sacrifice this artifact: Exile the top two cards of your library. Choose one of them. Until the end of your next turn, you may play that card.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast an instant spell any time they have priority. A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mishra's Research Desk @desk", "Island @i1", "Island @i2"]
+    library: ["Ponder @pd", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@desk", ability: 0, pay: auto}
+  - label: desk-ability-on-stack
+    check:
+      stack: [{kind: activated, source: "@desk", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: ["Mishra's Research Desk"]
+        exile: []
+        library_count: 12
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: choose_one_to_play, answer: ["@pd"], expect_options: {include: ["@pd", "@isl"], count: 2}}
+  - label: both-exiled
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        exile: [Ponder, Island]
+        library_count: 10
+        lands_played: 0
+  - expect_illegal: {p0: {t: play_land, card: "@isl"}}
+  - p0: {t: cast, card: "@pd", pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@pd", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: [Island]
+      graveyard: ["Mishra's Research Desk"]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+      lands_played: 0
+notes: >
+  Desk's cost is {1}, {T} and sacrificing itself; the ability is on the stack while the Desk is already in the graveyard
+  (113.7a: the ability exists independently of its source). On resolution both top cards (Ponder, Island) are exiled and p0
+  chooses one. Ponder, a sorcery, is cast from exile in main phase 1 with an empty stack (one Island pays {U}; the other paid
+  the Desk's {1}). The Island that was not chosen is also in exile but has no play permission, so playing it as a land is
+  illegal although p0 has not used its land drop. A wrong engine lets both cards be played, or never asks which one.
+  Ability index 0 is the {1},{T},Sacrifice ability (unearth is the Desk's second activated ability and out of scope).

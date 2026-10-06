@@ -1,0 +1,46 @@
+id: tron-a-karn-plus-one-new-artifact-is-summoning-sick-cannot-tap
+title: "Karn's +1 on a Grim Monolith that entered this turn makes it a summoning-sick creature, so its {T} mana ability can no longer be activated"
+area: card
+cards: ["Karn, the Great Creator", Grim Monolith]
+tags: [karn-the-great-creator, loyalty-ability, becomes-creature, summoning-sickness, tap-ability, grim-monolith, legal-action-mask, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.", verified: true}
+  - {kind: oracle, card: Grim Monolith, text: "{T}: Add {C}{C}{C}.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "602.5a", text: "A creature’s activated ability with the tap symbol ({T}) or the untap symbol ({Q}) in its activation cost can’t be activated unless the creature has been under its controller’s control since the start of their most recent turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Karn, the Great Creator", as: karn, counters: {loyalty: 4}}, {card: Grim Monolith, as: gm, sick: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@gm", ability: 0}]}}
+  - p0: {t: activate, source: "@karn", ability: 0, targets: ["@gm"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {battlefield_contains: [{card: Grim Monolith, types: [Artifact, Creature], pt: [2, 2], sick: true}]}
+  - expect_illegal: {p0: {t: activate, source: "@gm", ability: 0}}
+  - check:
+      legal: {p0: {exclude: [{t: activate, source: "@gm", ability: 0}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      battlefield:
+        - {card: "Karn, the Great Creator", counters: {loyalty: 5}}
+        - {card: Grim Monolith, types: [Artifact, Creature], tapped: false}
+notes: >
+  As a noncreature artifact the Monolith (entered this turn, sick: true) can tap for mana immediately (first check). After
+  Karn's +1 it is a creature that has not been under p0's control since the turn began, so its {T} ability can't be
+  activated (302.6, 602.5a). A wrong engine ignores the creature status for sickness. Karn's own loyalty ability is not
+  affected (a planeswalker is not a creature).

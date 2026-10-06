@@ -1,0 +1,29 @@
+id: tron-c-tezzeret-zero-untaps-a-nonartifact-creature-without-a-counter
+title: "Tezzeret's 0 untaps a tapped Ocelot Pride; it is a creature but not an artifact creature, so it stays 1/1"
+area: card
+cards: ["Tezzeret, Cruel Captain", Ocelot Pride]
+tags: [tezzeret, planeswalker, loyalty-ability, untap, creature, negative-case, zero-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 4}}, {card: Ocelot Pride, as: cat, tapped: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tz", ability: 0, targets: ["@cat"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 4}}, {card: Ocelot Pride, tapped: false, pt: [1, 1], types: [Creature]}]
+notes: >
+  Any creature is a legal target ("artifact or creature"), but only an ARTIFACT creature gets the counter. A wrong engine
+  puts a counter on every creature.

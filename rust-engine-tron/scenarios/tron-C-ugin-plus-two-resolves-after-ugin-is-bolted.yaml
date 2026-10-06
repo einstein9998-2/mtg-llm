@@ -1,0 +1,49 @@
+id: tron-c-ugin-plus-two-still-resolves-after-lightning-bolt-kills-ugin
+title: "Ugin at 1 loyalty activates +2 (3 loyalty), the opponent Bolts Ugin in response: Ugin dies at 0 but the +2 still gains 3 and draws"
+area: card
+cards: ["Ugin, Eye of the Storms", Lightning Bolt, Mountain, Brainstorm]
+tags: [ugin, planeswalker, loyalty-ability, damage-to-planeswalker, state-based-actions, ability-independent-of-source, response]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "+2: You gain 3 life and draw a card.", verified: true}
+  - {kind: cr, ref: "120.3c", text: "Damage dealt to a planeswalker causes that many loyalty counters to be removed from that planeswalker.", verified: true}
+  - {kind: cr, ref: "704.5i", text: "If a planeswalker has loyalty 0, it’s put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Ugin, Eye of the Storms", as: ugin, counters: {loyalty: 1}}]
+    library: [Brainstorm]
+    library_pad: 10
+  p1:
+    hand: [Lightning Bolt @bolt]
+    battlefield: [Mountain]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ugin", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: ["@ugin"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: activated, source: "@ugin", controller: p0}]
+      p0: {battlefield: [], graveyard: ["Ugin, Eye of the Storms"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      hand: [Brainstorm]
+      graveyard: ["Ugin, Eye of the Storms"]
+      battlefield: []
+    p1:
+      graveyard: [Lightning Bolt]
+notes: >
+  The artificial 1 loyalty (not a printed number) makes the +2 cost bring Ugin to 3, which exactly equals Bolt's damage:
+  120.3c removes three counters, loyalty 0, and 704.5i puts Ugin into the graveyard while the +2 is still on the stack.
+  The ability resolves anyway (113.7a). A wrong engine drops the ability with its source.

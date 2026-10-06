@@ -1,0 +1,43 @@
+id: tron-c-tezzeret-minus-three-with-three-loyalty-dies-and-ability-still-resolves
+title: "Tezzeret at 3 loyalty: -3 puts him to 0, he goes to the graveyard, but the ability on the stack still finds Lotus Petal"
+area: card
+cards: ["Tezzeret, Cruel Captain", Lotus Petal, Null Rod]
+tags: [tezzeret, planeswalker, loyalty-ability, state-based-actions, ability-independent-of-source, search]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle.", verified: true}
+  - {kind: cr, ref: "704.5i", text: "If a planeswalker has loyalty 0, it’s put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 3}}]
+    library: [Null Rod @rod, Lotus Petal @lp]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tz", ability: 1}
+  - check:
+      stack: [{kind: activated, source: "@tz", controller: p0}]
+      p0: {battlefield: [], graveyard: ["Tezzeret, Cruel Captain"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: search
+      found: "@lp"
+      expect_options: {include: ["@lp"], exclude: ["@rod"]}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      hand: [Lotus Petal]
+      graveyard: ["Tezzeret, Cruel Captain"]
+      battlefield: []
+      library_count: 11
+notes: >
+  Exactly 3 loyalty is enough to pay -3 (606.6). Loyalty 0 is a state-based action (704.5i) done before anyone
+  gets priority, so Tezzeret is in the graveyard while the ability is on the stack; the ability is independent of its source (113.7a)
+  and resolves: the search happens. A wrong engine drops the ability when its source leaves.

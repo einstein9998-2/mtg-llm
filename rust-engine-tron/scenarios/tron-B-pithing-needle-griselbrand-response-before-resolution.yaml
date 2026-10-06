@@ -1,0 +1,66 @@
+id: tron-b-pithing-needle-griselbrand-response-before-resolution
+title: "Pithing Needle on the stack does nothing yet: Griselbrand's draw-seven can be activated in response, but not again after the Needle names Griselbrand"
+area: card
+cards: [Pithing Needle, Griselbrand, Island]
+tags: [pithing-needle, choose-name, griselbrand, response, timing, activated-ability, life-payment, reanimator-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pithing Needle, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: Griselbrand, text: "Pay 7 life: Draw seven cards.", verified: true}
+  - {kind: cr, ref: "117.3c", text: "If a player has priority when they cast a spell, activate an ability, or take a special action, that player receives priority afterward.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pithing Needle @pn"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Griselbrand @gris"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pn", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@gris", ability: 0}
+  - label: ability-over-needle
+    check:
+      stack:
+        - {kind: spell, card: "@pn", controller: p0}
+        - {kind: activated, source: "@gris", controller: p1}
+      p1:
+        life: 13
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: seven-drawn
+    check:
+      stack: [{kind: spell, card: "@pn", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1:
+        hand_count: 7
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: Griselbrand}
+  - p0: {t: pass}
+  - label: p1-has-priority
+    check:
+      pending: {actor: p1, kind: priority}
+      p1:
+        life: 13
+  - expect_illegal: {p1: {t: activate, source: "@gris", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: [{card: Pithing Needle}, {card: Island, tapped: true}]
+    p1:
+      life: 13
+      hand_count: 7
+      library_count: 3
+      battlefield: [{card: Griselbrand}]
+notes: >
+  p1 responds to the Needle spell by paying 7 life (20 to 13): legal because the Needle is not on the battlefield yet. After
+  the Needle resolves and p0 names Griselbrand, p1 still has 13 life (the cost would be payable) but the activation is no longer
+  offered. A wrong engine blocks the response, or applies the name restriction only to cards that were on the battlefield when
+  the Needle was cast.

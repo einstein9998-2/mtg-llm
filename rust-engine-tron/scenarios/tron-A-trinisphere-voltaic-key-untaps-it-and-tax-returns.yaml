@@ -1,0 +1,52 @@
+id: tron-a-trinisphere-voltaic-key-untaps-it-and-tax-returns
+title: "Voltaic Key untapping a tapped Trinisphere switches the tax back on, so the next Lightning Bolt is no longer castable with one Mountain"
+area: card
+cards: [Trinisphere, Voltaic Key, Lightning Bolt, Mountain]
+tags: [trinisphere, voltaic-key, untap, untapped-condition, cost-increase, activated-ability, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "As long as this artifact is untapped, each spell that would cost less than three mana to cast costs three mana to cast.", verified: true}
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "Some effects may increase or reduce the cost to pay, or may provide other alternative costs.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Voltaic Key @key", "Mountain @mt1", "Mountain @mt2"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Trinisphere, as: tri, tapped: true}]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@bolt"}]}}
+  - p0: {t: activate, source: "@key", ability: 0, targets: ["@tri"], pay: {tap: ["@mt1"]}}
+  - check:
+      stack: [{kind: activated, source: "@key", controller: p0}]
+      p0: {battlefield_contains: [{card: Voltaic Key, tapped: true}, {card: Mountain, tapped: true}]}
+      p1: {battlefield: [{card: Trinisphere, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p1: {battlefield: [{card: Trinisphere, tapped: false}]}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@mt2"]}}}
+  - check:
+      legal: {p0: {exclude: [{t: cast, card: "@bolt"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      battlefield: [{card: Voltaic Key, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: false}]
+    p1:
+      life: 20
+      battlefield: [{card: Trinisphere, tapped: false}]
+notes: >
+  Before the activation Bolt is castable with one Mountain (Trinisphere tapped). Voltaic Key's ability ({1}, {T}) is
+  put on the stack; when it resolves Trinisphere untaps and Bolt (now {2}{R}) is not castable with the one Mountain left.
+  The tax is evaluated when a spell is cast, not when Trinisphere entered or tapped. A wrong engine caches the tapped
+  state.

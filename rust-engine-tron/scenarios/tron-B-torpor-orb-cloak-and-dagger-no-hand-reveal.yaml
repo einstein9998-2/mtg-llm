@@ -1,0 +1,41 @@
+id: tron-b-torpor-orb-cloak-and-dagger-no-hand-reveal
+title: "Torpor Orb stops Cloak and Dagger's enters trigger: no target is chosen and nothing is exiled from the opponent's hand or battlefield"
+area: card
+cards: [Torpor Orb, "Cloak and Dagger, Entwined", Flickerwisp, Brainstorm, Island, Scrubland, Plains, Swamp]
+tags: [torpor-orb, cloak-and-dagger, etb-trigger, trigger-suppressed, hand-disruption, negative, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Torpor Orb, text: "Creatures entering don't cause abilities to trigger.", verified: true}
+  - {kind: oracle, card: "Cloak and Dagger, Entwined", text: "When Cloak and Dagger enter, choose target opponent and up to one target creature they control.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Cloak and Dagger, Entwined @cd"]
+    battlefield: ["Scrubland @s1", "Plains @w1", "Swamp @b1"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Island @isl"]
+    battlefield: ["Torpor Orb @orb", "Flickerwisp @wisp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@cd", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: "Cloak and Dagger, Entwined", keywords: [deathtouch, lifelink], sick: true}]
+    p1:
+      hand: [Brainstorm, Island]
+      exile: []
+      battlefield: [{card: Torpor Orb}, {card: Flickerwisp}]
+notes: >
+  Compare cloak-and-dagger-etb-exiles-nonland-card-from-hand in the main set, where the same cast puts a trigger on the stack
+  and p0 picks targets. Here the opponent controls Torpor Orb, so the enters trigger does not trigger: no choose_target
+  decision, the stack is empty after Cloak and Dagger resolves, p1's hand and Flickerwisp are untouched. {1}{W}{B} is paid by
+  the three lands. A wrong engine lets "enter" triggers of legendary multi-target creatures through.

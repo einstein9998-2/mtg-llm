@@ -1,0 +1,29 @@
+id: tron-c-warping-wail-needs-one-colorless-mana
+title: "Warping Wail's {C} cannot be paid with Plains, Island or Lotus Petal mana"
+area: card
+cards: [Warping Wail, Plains, Island, Lotus Petal]
+tags: [warping-wail, colorless-mana-cost, mana-payment, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Warping Wail, text: "({C} represents colorless mana.)", verified: true}
+  - {kind: cr, ref: "107.4c", text: "The colorless mana symbol {C} is used to represent one colorless mana, and also to represent a cost that can be paid only with one colorless mana.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Warping Wail @ww]
+    battlefield: [Plains, Island, Lotus Petal]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ww", modes: [3], pay: auto}}
+  - check:
+      legal: {p0: {exclude: [{t: cast, card: "@ww"}]}}
+expect:
+  - at: after_script
+    stack: []
+    p0: {hand: [Warping Wail], spells_cast_this_turn: 0}
+notes: >
+  Three sources of colored mana, none of colorless: {1}{C} cannot be paid. A wrong engine treats {C} as generic.

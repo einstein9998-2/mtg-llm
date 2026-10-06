@@ -1,0 +1,1144 @@
+diff -ruN a/crates/mtg-cards/cards/deps-reviewed.txt b/crates/mtg-cards/cards/deps-reviewed.txt
+--- a/crates/mtg-cards/cards/deps-reviewed.txt	2026-10-06 06:23:34.199951149 +0000
++++ b/crates/mtg-cards/cards/deps-reviewed.txt	2026-10-06 06:23:34.203605008 +0000
+@@ -4,3 +4,4 @@
+ # Review 2026-10-01 (implementer; a second reader should confirm before the core freeze).
+ Kaito, Bane of Nightmares | Magus of the Moon | L4 | independent: Kaito's type change applies only to Kaito, a planeswalker that is never a land, and Magus applies only to nonbasic lands; neither changes whether the other applies. Breaks only if a pool card could make Kaito a land or make a land a Kaito.
+ Magus of the Moon | Overlord of the Balemurk | L4 | independent: Overlord's "isn't a creature while it has time counters" applies only to itself, never a land; Magus's affected set (nonbasic lands) and result (Mountain, no abilities) are the same in either order.
++Emblem: Tezzeret robots | Magus of the Moon | L4 | independent: the emblem only adds the Creature type and the Robot subtype to an artifact (it never adds or removes Land), and Magus of the Moon applies to nonbasic lands and turns them into Mountains; whether Magus applies depends on the Land type and the basic supertype, which the emblem leaves alone, and Magus's result (subtypes, lost abilities) does not change whether the emblem's target is an artifact. Breaks only if a pool card could remove the Land type or the Artifact type in layer 4.
+diff -ruN a/crates/mtg-cards/cards/tron.cards.ron b/crates/mtg-cards/cards/tron.cards.ron
+--- a/crates/mtg-cards/cards/tron.cards.ron	1970-01-01 00:00:00.000000000 +0000
++++ b/crates/mtg-cards/cards/tron.cards.ron	2026-10-06 06:23:34.211911745 +0000
+@@ -0,0 +1,137 @@
++// Colorless Tron (Brady's list, 2026-10-06), RFC 0007. Oracle text per Savecraft card_search (Scryfall).
++// Not modeled (documented limits, see rfcs/0007): Urza's Saga and Summon: Bahamut (Saga rules, RFC 0006), Karn -2, Ugin -11,
++// Argentum Masticore, Mycosynth Lattice, Eldrazi Confluence, Extinguisher Battleship station, Mishra's Research Desk unearth.
++[
++  (name: "Urza's Tower", types: "LAND", subtypes: ["Urza's", "Tower"], abilities: [
++    // 1 + 2 * [Mine] * [Power-Plant]
++    Activated(text: "{T}: Add {C}. If you control an Urza's Mine and an Urza's Power-Plant, add {C}{C}{C} instead.", cost: [TapSelf], is_mana: true,
++      effect: AddManaExpr(color: C, n: Plus(Const(1), Times(Const(2), Times(Min(Const(1), Count(subtypes_any: ["Mine"], controller: You)), Min(Const(1), Count(subtypes_any: ["Power-Plant"], controller: You))))))),
++  ]),
++  (name: "Urza's Workshop", types: "LAND", subtypes: ["Urza's"], abilities: [
++    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
++    // Metalcraft: the amount is 0 (not offered) without three artifacts; the activation condition of the Oracle text is the amount.
++    Activated(text: "Metalcraft: {T}: Add {C} for each Urza's land you control. Activate only if you control three or more artifacts.", cost: [TapSelf], is_mana: true,
++      effect: AddManaExpr(color: C, n: Times(Count(subtypes_any: ["Urza's"], controller: You), Min(Const(1), Max(Const(0), Minus(Count(types_any: "ARTIFACT", controller: You), Const(2))))))),
++  ]),
++  (name: "Urza's Mine", types: "LAND", subtypes: ["Urza's", "Mine"], abilities: [
++    Activated(text: "{T}: Add {C}. If you control an Urza's Power-Plant and an Urza's Tower, add {C}{C} instead.", cost: [TapSelf], is_mana: true,
++      effect: AddManaExpr(color: C, n: Plus(Const(1), Times(Min(Const(1), Count(subtypes_any: ["Power-Plant"], controller: You)), Min(Const(1), Count(subtypes_any: ["Tower"], controller: You)))))),
++  ]),
++  (name: "Urza's Power Plant", types: "LAND", subtypes: ["Urza's", "Power-Plant"], abilities: [
++    Activated(text: "{T}: Add {C}. If you control an Urza's Mine and an Urza's Tower, add {C}{C} instead.", cost: [TapSelf], is_mana: true,
++      effect: AddManaExpr(color: C, n: Plus(Const(1), Times(Min(Const(1), Count(subtypes_any: ["Mine"], controller: You)), Min(Const(1), Count(subtypes_any: ["Tower"], controller: You)))))),
++  ]),
++  (name: "Planar Nexus", types: "LAND", subtypes: ["Cave", "Desert", "Gate", "Lair", "Locus", "Mine", "Power-Plant", "Sphere", "Tower", "Urza's"], abilities: [
++    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
++    Activated(text: "{1}, {T}: Add one mana of any color.", cost: [Mana("{1}"), TapSelf], is_mana: true, effect: AddManaAny(n: Const(1))),
++  ]),
++  (name: "Expedition Map", cost: "{1}", types: "ARTIFACT", abilities: [
++    Activated(text: "{2}, {T}, Sacrifice this artifact: Search your library for a land card, reveal it, put it into your hand, then shuffle.", cost: [Mana("{2}"), TapSelf, SacrificeSelf],
++      effect: Search(filter: (zone: Library, types_any: "LAND"), dest: Hand)),
++  ]),
++  (name: "Pithing Needle", cost: "{1}", types: "ARTIFACT", abilities: [
++    EntersChoice(CardName),
++    Restrict(what: CantActivate(sources: (chosen_name: true), except_mana: true)),
++  ]),
++  (name: "Voltaic Key", cost: "{1}", types: "ARTIFACT", abilities: [
++    Activated(text: "{1}, {T}: Untap target artifact.", cost: [Mana("{1}"), TapSelf], targets: [(objects: (types_any: "ARTIFACT"))], effect: Untap(One(Target(0)))),
++  ]),
++  (name: "Manifold Key", cost: "{1}", types: "ARTIFACT", abilities: [
++    Activated(text: "{1}, {T}: Untap another target artifact.", cost: [Mana("{1}"), TapSelf], targets: [(objects: (types_any: "ARTIFACT", not_self: true))], effect: Untap(One(Target(0)))),
++    Activated(text: "{3}, {T}: Target creature can't be blocked this turn.", cost: [Mana("{3}"), TapSelf], targets: [(objects: (types_any: "CREATURE"))],
++      effect: Continuous(objs: One(Target(0)), layer: L6, effect: GrantKeywords("UNBLOCKABLE"), until: EndOfTurn)),
++  ]),
++  (name: "Tormod's Crypt", cost: "{0}", types: "ARTIFACT", abilities: [
++    Activated(text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", cost: [TapSelf, SacrificeSelf], targets: [(players: Any)], effect: ExileGraveyard(who: Target(0))),
++  ]),
++  (name: "Liquimetal Coating", cost: "{2}", types: "ARTIFACT", abilities: [
++    Activated(text: "{T}: Target permanent becomes an artifact in addition to its other types until end of turn.", cost: [TapSelf], targets: [(objects: ())],
++      effect: Continuous(objs: One(Target(0)), layer: L4, effect: AddTypes("ARTIFACT"), until: EndOfTurn)),
++  ]),
++  (name: "Warping Wail", cost: "{1}{C}", types: "INSTANT", abilities: [
++    Spell(choose: (1, 1), modes: [
++      (label: "Exile target creature with power or toughness 1 or less.", targets: [(objects: (types_any: "CREATURE", power: (Le, 1), alt: [(types_any: "CREATURE", toughness: (Le, 1))]))],
++        effect: Exile(One(Target(0)))),
++      (label: "Counter target sorcery spell.", targets: [(objects: (zone: Stack, stack: Spell, types_any: "SORCERY"))], effect: CounterSpell(0)),
++      (label: "Create a 1/1 colorless Eldrazi Scion creature token. It has \"Sacrifice this token: Add {C}.\"", effect: CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)),
++    ]),
++  ]),
++  (name: "Eldrazi Scion Token", types: "CREATURE", subtypes: ["Eldrazi", "Scion"], pt: (1, 1), is_token: true, abilities: [
++    Activated(text: "Sacrifice this token: Add {C}.", cost: [SacrificeSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
++  ]),
++  (name: "Eldrazi Spawn Token", types: "CREATURE", subtypes: ["Eldrazi", "Spawn"], pt: (0, 1), is_token: true, abilities: [
++    Activated(text: "Sacrifice this token: Add {C}.", cost: [SacrificeSelf], is_mana: true, effect: AddMana(color: C, n: 1)),
++  ]),
++  (name: "Construct Token", types: "ARTIFACT | CREATURE", subtypes: ["Construct"], pt: (0, 0), is_token: true, abilities: [
++    Static(layer: L7a, applies_to: (self_only: true), effect: SetPTExpr(x: Count(types_any: "ARTIFACT", controller: You), t_plus: 0)),
++  ]),
++  (name: "Karn, the Great Creator", cost: "{4}", types: "PLANESWALKER", supertypes: "LEGENDARY", subtypes: ["Karn"], abilities: [
++    Enters(filter: (self_only: true), effect: Counters(Loyalty, 5)),
++    Restrict(who: Opp, what: CantActivate(sources: (types_any: "ARTIFACT"))),
++    Activated(text: "+1: Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.", cost: [Loyalty(1)],
++      targets: [(objects: (types_any: "ARTIFACT", types_not: "CREATURE"), optional: true)],
++      effect: Seq([Continuous(objs: One(Target(0)), layer: L4, effect: AddTypes("CREATURE"), until: YourNextTurn), SetPTX(objs: One(Target(0)), x: CmcOf(Target(0)), until: YourNextTurn)])),
++  ]),
++  (name: "Tezzeret, Cruel Captain", cost: "{3}", types: "PLANESWALKER", supertypes: "LEGENDARY", subtypes: ["Tezzeret"], abilities: [
++    Enters(filter: (self_only: true), effect: Counters(Loyalty, 4)),
++    Triggered(text: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.", on: Enters(filter: (types_any: "ARTIFACT", controller: You)), effect: AddCounters(objs: One(This), kind: Loyalty, n: Const(1))),
++    Activated(text: "0: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.", cost: [Loyalty(0)], targets: [(objects: (types_any: "ARTIFACT | CREATURE"))],
++      effect: Seq([Untap(One(Target(0))), If(cond: And([Matches(Target(0), (types_any: "ARTIFACT")), Matches(Target(0), (types_any: "CREATURE"))]), then: AddCounters(objs: One(Target(0)), kind: PlusOne, n: Const(1)))])),
++    Activated(text: "-3: Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle.", cost: [Loyalty(-3)],
++      effect: Search(filter: (zone: Library, types_any: "ARTIFACT", cmc: (Le, 1)), dest: Hand)),
++    Activated(text: "-7: You get an emblem with \"At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.\"", cost: [Loyalty(-7)],
++      effect: CreateEmblem("Emblem: Tezzeret robots")),
++  ]),
++  (name: "Emblem: Tezzeret robots", types: "EMBLEM", is_token: true, abilities: [
++    Triggered(text: "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.", zone: Command,
++      on: BeginStep(step: BeginCombat, whose: You), targets: [(objects: (types_any: "ARTIFACT", controller: You))],
++      effect: Seq([If(cond: Not(Matches(Target(0), (types_any: "CREATURE"))), then: Seq([Continuous(objs: One(Target(0)), layer: L4, effect: AddTypes("CREATURE"), until: Forever), Continuous(objs: One(Target(0)), layer: L4, effect: AddSubtypes(["Robot"]), until: Forever), Continuous(objs: One(Target(0)), layer: L7b, effect: SetPT(0, 0), until: Forever)])), AddCounters(objs: One(Target(0)), kind: PlusOne, n: Const(3))])),
++  ]),
++  (name: "Ugin, Eye of the Storms", cost: "{7}", types: "PLANESWALKER", supertypes: "LEGENDARY", subtypes: ["Ugin"], abilities: [
++    Enters(filter: (self_only: true), effect: Counters(Loyalty, 7)),
++    Triggered(text: "When you cast this spell, exile up to one target permanent that's one or more colors.", zone: Stack, on: SpellCast(caster: You, filter: (self_only: true)),
++      targets: [(objects: (colorless: false), optional: true)], effect: Exile(One(Target(0)))),
++    Triggered(text: "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", on: SpellCast(caster: You, filter: (colorless: true)),
++      targets: [(objects: (colorless: false), optional: true)], effect: Exile(One(Target(0)))),
++    Activated(text: "+2: You gain 3 life and draw a card.", cost: [Loyalty(2)], effect: Seq([GainLife(who: You, n: Const(3)), Draw(who: You, n: Const(1))])),
++    Activated(text: "0: Add {C}{C}{C}.", cost: [Loyalty(0)], effect: AddMana(color: C, n: 3)),
++  ]),
++  (name: "The One Ring", cost: "{4}", types: "ARTIFACT", supertypes: "LEGENDARY", keywords: "INDESTRUCTIBLE", abilities: [
++    Triggered(text: "When The One Ring enters, if you cast it, you gain protection from everything until your next turn.", on: Enters(filter: (self_only: true)), cond: WasCast(), effect: PlayerFx(who: You, fx: ProtectionFromEverything, until: YourNextTurn)),
++    Triggered(text: "At the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.", on: BeginStep(step: Upkeep, whose: You), effect: LoseLife(who: You, n: Counters(This, Other(0)))),
++    Activated(text: "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.", cost: [TapSelf],
++      effect: Seq([AddCounters(objs: One(This), kind: Other(0), n: Const(1)), Draw(who: You, n: Counters(This, Other(0)))])),
++  ]),
++  (name: "Kozilek's Command", cost: "{X}{C}{C}", types: "KINDRED | INSTANT", subtypes: ["Eldrazi"], abilities: [
++    Spell(choose: (2, 2), modes: [
++      (label: "Target player creates X 0/1 colorless Eldrazi Spawn creature tokens.", targets: [(players: You)], effect: CreateToken(token: "Eldrazi Spawn Token", n: X, who: Target(0))),
++      (label: "Target player scries X, then draws a card.", targets: [(players: You)], effect: Seq([Scry(X), Draw(who: Target(0), n: Const(1))])),
++      (label: "Exile target creature with mana value X or less.", targets: [(objects: (types_any: "CREATURE", cmc_x_max: true))], effect: Exile(One(Target(0)))),
++      (label: "Exile up to X target cards from graveyards.", targets: [(objects: (zone: Graveyard), optional: true, distinct: true, x_count: true)], effect: Exile(TargetsFrom(0))),
++    ]),
++  ]),
++  (name: "Grim Monolith", cost: "{2}", types: "ARTIFACT", keywords: "NO_UNTAP", abilities: [
++    Activated(text: "{T}: Add {C}{C}{C}.", cost: [TapSelf], is_mana: true, effect: AddMana(color: C, n: 3)),
++    Activated(text: "{4}: Untap this artifact.", cost: [Mana("{4}")], effect: Untap(One(This))),
++  ]),
++  (name: "Trinisphere", cost: "{3}", types: "ARTIFACT", abilities: [
++    CostFloor(min: 3, cond: Matches(This, (tapped: false))),
++  ]),
++  (name: "Portable Hole", cost: "{W}", types: "ARTIFACT", abilities: [
++    Triggered(text: "When this artifact enters, exile target nonland permanent an opponent controls with mana value 2 or less until this artifact leaves the battlefield.", on: Enters(filter: (self_only: true)),
++      targets: [(objects: (types_not: "LAND", controller: Opp, cmc: (Le, 2)))], effect: ExileTargetUntilLeaves(target: 0)),
++  ]),
++  (name: "Mishra's Research Desk", cost: "{1}", types: "ARTIFACT", abilities: [
++    Activated(text: "{1}, {T}, Sacrifice this artifact: Exile the top two cards of your library. Choose one of them. Until the end of your next turn, you may play that card.", cost: [Mana("{1}"), TapSelf, SacrificeSelf], effect: ExileChoosePlay(n: Const(2))),
++  ]),
++  (name: "Torpor Orb", cost: "{2}", types: "ARTIFACT", abilities: [
++    Restrict(what: NoCreatureEnterTriggers),
++  ]),
++  (name: "Ensnaring Bridge", cost: "{3}", types: "ARTIFACT", abilities: [
++    Restrict(what: AttackPowerOverHand),
++  ]),
++  (name: "Extinguisher Battleship", cost: "{8}", types: "ARTIFACT", subtypes: ["Spacecraft"], abilities: [
++    Triggered(text: "When this Spacecraft enters, destroy target noncreature permanent. Then this Spacecraft deals 4 damage to each creature.", on: Enters(filter: (self_only: true)),
++      targets: [(objects: (types_not: "CREATURE"))], effect: Seq([Destroy(One(Target(0))), ForEach(filter: (types_any: "CREATURE"), body: Damage(amount: Const(4), to: Obj(Each(0))))])),
++  ]),
++]
+diff -ruN a/crates/mtg-cards/src/legacy.rs b/crates/mtg-cards/src/legacy.rs
+--- a/crates/mtg-cards/src/legacy.rs	2026-10-06 06:23:34.327951157 +0000
++++ b/crates/mtg-cards/src/legacy.rs	2026-10-06 06:23:34.332502848 +0000
+@@ -5,7 +5,9 @@
+ 
+ pub const LEGACY_CARDS: &str = include_str!("../cards/legacy.cards.ron");
+ 
++pub const TRON_CARDS: &str = include_str!("../cards/tron.cards.ron");
++
+ pub fn build() -> Arc<CardDb> {
+-    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
++    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
+     Arc::new(db)
+ }
+diff -ruN a/crates/mtg-cards/tests/tron_load.rs b/crates/mtg-cards/tests/tron_load.rs
+--- a/crates/mtg-cards/tests/tron_load.rs	1970-01-01 00:00:00.000000000 +0000
++++ b/crates/mtg-cards/tests/tron_load.rs	2026-10-06 06:23:34.394679539 +0000
+@@ -0,0 +1,7 @@
++#[test]
++fn tron_loads() {
++    let db = mtg_cards::legacy::build();
++    for n in ["Urza's Tower", "Karn, the Great Creator", "Kozilek's Command"] {
++        assert!(db.id(n).is_some(), "{n}");
++    }
++}
+diff -ruN a/crates/mtg-core/src/card.rs b/crates/mtg-core/src/card.rs
+--- a/crates/mtg-core/src/card.rs	2026-10-06 06:23:34.559951171 +0000
++++ b/crates/mtg-core/src/card.rs	2026-10-06 06:23:34.567100615 +0000
+@@ -197,7 +197,7 @@
+                         None => Vec::new(),
+                     }
+                 }
+-                AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit => Vec::new(),
++                AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) => Vec::new(),
+             };
+             self.code.push(code);
+         }
+@@ -231,6 +231,8 @@
+     pub has_restrict: bool,
+     /// Some card has Ascend.
+     pub has_ascend: bool,
++    /// Some card has a `CostFloor` ability (lets `cost_floor` skip the battlefield scan).
++    pub has_cost_floor: bool,
+     /// The dungeon cards, in definition order (the choices of a fresh venture).
+     pub dungeons: Vec<CardDefId>,
+ }
+@@ -255,6 +257,7 @@
+                 }
+                 AbilityDef::Restrict(_) => self.has_restrict = true,
+                 AbilityDef::Ascend => self.has_ascend = true,
++                AbilityDef::CostFloor(_) => self.has_cost_floor = true,
+                 _ => {}
+             }
+         }
+@@ -313,7 +316,7 @@
+                     AbilityDef::Spell(s) => s.modes.iter().filter_map(|m| m.effect.as_ref()).for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+                     AbilityDef::Activated(ad) => ad.effect.iter().for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+                     AbilityDef::Triggered(t) => t.effect.iter().for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+-                    AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit => {}
++                    AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) => {}
+                 }
+                 for t in toks {
+                     match self.id(t) {
+diff -ruN a/crates/mtg-core/src/cast.rs b/crates/mtg-core/src/cast.rs
+--- a/crates/mtg-core/src/cast.rs	2026-10-06 06:23:34.691951178 +0000
++++ b/crates/mtg-core/src/cast.rs	2026-10-06 06:23:34.698589576 +0000
+@@ -111,7 +111,29 @@
+             let sd = def.spell_def().unwrap().1;
+             let mut opts: Vec<Opt> = Vec::new();
+             for i in f.mode_next..n {
+-                let ok = sd.modes[i as usize].targets.iter().all(|spec| spec.optional || spec.x_count || cx.legal_targets(spec, seat, Some(f.obj)).into_iter().any(|t| t != Target::Obj(f.obj)));
++                let ok = sd.modes[i as usize].targets.iter().all(|spec| {
++                    if spec.optional || spec.x_count {
++                        return true;
++                    }
++                    // "mana value X (or less)" targets: some affordable X must leave a target.
++                    if spec.objects.as_ref().map_or(false, |o| o.cmc_x || o.cmc_x_max.0) {
++                        for x in 0..=20u8 {
++                            let mut c = f.ctx.clone();
++                            c.x = x;
++                            if !cx.affordable_with_best_phy(seat, f.obj, None, &c, [0; 6]) {
++                                break;
++                            }
++                            cx.s.cur_x = Some(x);
++                            let has = cx.legal_targets(spec, seat, Some(f.obj)).into_iter().any(|t| t != Target::Obj(f.obj));
++                            cx.s.cur_x = None;
++                            if has {
++                                return true;
++                            }
++                        }
++                        return false;
++                    }
++                    cx.legal_targets(spec, seat, Some(f.obj)).into_iter().any(|t| t != Target::Obj(f.obj))
++                });
+                 // An additional mode must be affordable with its escalate payment.
+                 let ok = ok && (f.mode_count == 0 || escalate_of(def).is_none() || {
+                     let mut c = f.ctx.clone();
+@@ -177,13 +199,14 @@
+                     let entry = cx.s.stack.iter().rev().find(|e| e.obj == f.obj).unwrap().clone();
+                     let specs = entry_specs(cx.db, &entry);
+                     let mut has_target = true;
+-                    for spec in specs.iter().filter(|s| !s.optional && s.objects.as_ref().map(|o| o.cmc_x).unwrap_or(false)) {
++                    for spec in specs.iter().filter(|s| !s.optional && s.objects.as_ref().map(|o| o.cmc_x || o.cmc_x_max.0).unwrap_or(false)) {
+                         cx.s.cur_x = Some(x);
+                         has_target &= !cx.legal_targets(spec, seat, Some(src)).is_empty();
+                         cx.s.cur_x = None;
+                     }
+                     // "X target ...": enough distinct targets must exist.
+-                    for spec in specs_raw_x(cx.db, &entry) {
++                    // ("up to X target" specs are optional and need no minimum.)
++                    for spec in specs_raw_x(cx.db, &entry).into_iter().filter(|s| !s.optional) {
+                         let n = cx.legal_targets(&spec, seat, Some(src)).into_iter().filter(|t| *t != Target::Obj(f.obj)).count();
+                         has_target &= n >= x as usize;
+                     }
+diff -ruN a/crates/mtg-core/src/combat.rs b/crates/mtg-core/src/combat.rs
+--- a/crates/mtg-core/src/combat.rs	2026-10-06 06:23:34.779951184 +0000
++++ b/crates/mtg-core/src/combat.rs	2026-10-06 06:23:34.785151039 +0000
+@@ -20,9 +20,13 @@
+         if self.s.player_fx.iter().any(|f| f.player == seat && f.fx == PlayerFx::CreaturesCantAttack) {
+             return v;
+         }
++        let power_limit = self.attack_power_limit();
+         for &r in self.s.battlefield.iter() {
+             let o = &self.s.objs[r.slot as usize];
+             let c = self.s.derived[r.slot as usize];
++            if power_limit.map_or(false, |l| c.power > l) {
++                continue;
++            }
+             if o.controller == seat
+                 && !o.tapped
+                 && !o.phased
+@@ -43,6 +47,9 @@
+     fn can_block_pair(&self, attacker: ObjRef, blocker: ObjRef) -> bool {
+         let a = self.chars(attacker);
+         let b = self.chars(blocker);
++        if a.keywords.contains(Keywords::UNBLOCKABLE) {
++            return false;
++        }
+         if a.keywords.contains(Keywords::FLYING) && !b.keywords.intersects(Keywords::FLYING | Keywords::REACH) {
+             return false;
+         }
+diff -ruN a/crates/mtg-core/src/cost.rs b/crates/mtg-core/src/cost.rs
+--- a/crates/mtg-core/src/cost.rs	2026-10-06 06:23:34.911951192 +0000
++++ b/crates/mtg-core/src/cost.rs	2026-10-06 06:23:34.915612274 +0000
+@@ -199,6 +199,15 @@
+             } else {
+                 plan.mana.generic = plan.mana.generic.saturating_sub((-delta) as u8);
+             }
++            // A cost floor (Trinisphere) applies after every other cost change (601.2f), to every way of
++            // casting the spell, and before delve pays for part of the total cost.
++            let floor = self.cost_floor(card) as u32;
++            if floor > 0 {
++                let total = plan.mana.mana_value() + plan.mana.x as u32 * ctx.x as u32;
++                if total < floor {
++                    plan.mana.generic = plan.mana.generic.saturating_add((floor - total).min(255) as u8);
++                }
++            }
+             // Delve pays for generic mana of the total cost (702.66a).
+             if has_delve(self.db.def(self.s.obj(card).def)) {
+                 let n = ctx.delve.len().min(plan.mana.generic as usize) as u8;
+@@ -219,6 +228,41 @@
+             .count()
+     }
+ 
++    /// The highest cost floor (`AbilityDef::CostFloor`) in effect for `spell`, or 0.
++    pub fn cost_floor(&mut self, spell: ObjRef) -> u8 {
++        if !self.db.has_cost_floor {
++            return 0;
++        }
++        self.refresh();
++        let _ = spell;
++        let mut best = 0u8;
++        let bf: SmallVec<[ObjRef; 24]> = self.s.battlefield.iter().copied().collect();
++        for src in bf {
++            let o = self.s.obj(src);
++            if o.phased {
++                continue;
++            }
++            let (ctrl, def_id) = (o.controller, o.def);
++            let def = self.db.def(def_id);
++            for a in &def.abilities {
++                if let AbilityDef::CostFloor(f) = a {
++                    if f.min <= best {
++                        continue;
++                    }
++                    if let Some(cond) = &f.cond {
++                        let cap = Captured::default();
++                        let env = Env { controller: ctrl, source: Some(src), source_lki: None, targets: &[], legal: &[], base: 0, x: 0, cap: &cap, each: [None, None], tlki: &[] };
++                        if !self.eval_cond(&env, cond) {
++                            continue;
++                        }
++                    }
++                    best = f.min;
++                }
++            }
++        }
++        best
++    }
++
+     /// Net generic-mana change from `CostMod` abilities of permanents on the battlefield.
+     pub fn cost_mod_total(&mut self, caster: Seat, spell: ObjRef, not_hand: bool) -> i32 {
+         self.refresh();
+@@ -293,7 +337,10 @@
+                 self.filter_match(f, r, &c, false, seat)
+             })
+             .collect();
+-        v.sort_by_key(|&r| self.obj_key(seat, r));
++        // A named payment source (scenario hint) is the last candidate to be chosen as the permanent
++        // to give up: interchangeable permanents collapse to the first one, and the player who
++        // names the Islands they tap does not mean to return one of them.
++        v.sort_by_key(|&r| (self.s.pay_hint.contains(&r), self.obj_key(seat, r)));
+         // Collapse interchangeable candidates (identical cards in hand/graveyard, identical
+         // permanents on the battlefield).
+         let mut out: Vec<ObjRef> = Vec::new();
+diff -ruN a/crates/mtg-core/src/decision.rs b/crates/mtg-core/src/decision.rs
+--- a/crates/mtg-core/src/decision.rs	2026-10-06 06:23:34.995951197 +0000
++++ b/crates/mtg-core/src/decision.rs	2026-10-06 06:23:35.001982792 +0000
+@@ -112,6 +112,8 @@
+     RevealPick,
+     /// Delve: graveyard cards exiled to pay generic mana; `Done` ends the selection.
+     Delve,
++    /// Mishra's Research Desk: the exiled card the controller may play.
++    PlayChosen,
+ }
+ 
+ impl CardsPurpose {
+diff -ruN a/crates/mtg-core/src/derive.rs b/crates/mtg-core/src/derive.rs
+--- a/crates/mtg-core/src/derive.rs	2026-10-06 06:23:35.075951201 +0000
++++ b/crates/mtg-core/src/derive.rs	2026-10-06 06:23:35.082766150 +0000
+@@ -382,6 +382,13 @@
+                 }
+             }
+         }
++        if f.cmc_x_max.0 {
++            if let Some(x) = self.s.cur_x {
++                if self.db.def(o.def).mana_value() as i32 > x as i32 {
++                    return false;
++                }
++            }
++        }
+         if let Some((cmp, n)) = f.cmc {
+             if !cmp.test(self.db.def(o.def).mana_value() as i32, n) {
+                 return false;
+diff -ruN a/crates/mtg-core/src/ir.rs b/crates/mtg-core/src/ir.rs
+--- a/crates/mtg-core/src/ir.rs	2026-10-06 06:23:35.251951212 +0000
++++ b/crates/mtg-core/src/ir.rs	2026-10-06 06:23:35.257662686 +0000
+@@ -55,6 +55,20 @@
+     ZoneKind::Battlefield
+ }
+ 
++/// A flag added to an existing struct: it adds nothing to a hash while it is false, so the content
++/// hash of every existing card (and every golden record) is unchanged. Written as a plain bool in card data.
++#[derive(Copy, Clone, PartialEq, Eq, Default, Debug, Serialize, Deserialize)]
++#[serde(transparent)]
++pub struct HashFalseFlag(pub bool);
++
++impl std::hash::Hash for HashFalseFlag {
++    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
++        if self.0 {
++            true.hash(state);
++        }
++    }
++}
++
+ /// Object predicate used for targets, statics, costs and "each"/"all" effects (doc 03 section
+ /// 3.2). Empty/`None` fields mean "don't care".
+ #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+@@ -78,6 +92,8 @@
+     pub cmc: Option<(Cmp, i32)>,
+     /// The mana value equals X of the ability or spell being put on the stack.
+     pub cmc_x: bool,
++    /// The mana value is X or less (X of the ability or spell being put on the stack).
++    pub cmc_x_max: HashFalseFlag,
+     pub power: Option<(Cmp, i32)>,
+     pub toughness: Option<(Cmp, i32)>,
+     pub names: Vec<String>,
+@@ -135,6 +151,7 @@
+             owner: Rel::Any,
+             cmc: None,
+             cmc_x: false,
++            cmc_x_max: HashFalseFlag(false),
+             power: None,
+             toughness: None,
+             names: Vec::new(),
+@@ -578,6 +595,15 @@
+     TakeMoved { filter: ObjFilter, to: ZoneKind, #[serde(default)] optional: bool },
+     /// Sets power and toughness of the objects to `x`/`x`, for `until`.
+     SetPTX { objs: Objs, x: Expr, until: Until },
++    /// Portable Hole: exile the permanent in the target slot until the source leaves the battlefield
++    /// (CR 610.3), using the same link as `ExileUntilLeaves`. Does nothing if the source already left.
++    ExileTargetUntilLeaves { target: u8 },
++    /// Mishra's Research Desk: exile the top `n` cards of the library, the controller chooses one of
++    /// them and may play it for as long as it stays exiled (the expiry of the real card, the end of
++    /// the controller's next turn, is not modeled: see RFC 0007). The other cards stay exiled.
++    ExileChoosePlay { n: Expr },
++    /// `n` mana of one color, with `n` evaluated when the ability is used (Urza's Tower, Workshop).
++    AddManaExpr { color: ManaColor, n: Expr },
+ }
+ 
+ fn pref_you() -> PRef {
+@@ -814,6 +840,9 @@
+     CantCast,
+     /// Creatures the player controls can't attack (Orim's Chant, kicked: applied to each player).
+     CreaturesCantAttack,
++    /// The player has protection from everything (The One Ring): damage dealt to them is
++    /// prevented and they can't be the target of spells or abilities.
++    ProtectionFromEverything,
+ }
+ 
+ #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+@@ -949,6 +978,19 @@
+     EmptyDrawWins,
+     /// "You have no maximum hand size." (on an emblem)
+     NoHandLimit,
++    /// A cost floor (Trinisphere): each spell that would cost less than `min` mana costs `min`.
++    CostFloor(CostFloorDef),
++}
++
++/// "As long as <cond>, each spell that would cost less than `min` mana to cast costs `min` mana
++/// to cast." Applies to every spell and every way of casting it (alternative and free casts
++/// included), after all other cost changes (CR 601.2f).
++#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
++pub struct CostFloorDef {
++    pub min: u8,
++    /// Evaluated with the permanent's controller as `You` and the permanent as the source.
++    #[serde(default)]
++    pub cond: Option<Cond>,
+ }
+ 
+ #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+@@ -991,6 +1033,11 @@
+         #[serde(default)]
+         except_mana: bool,
+     },
++    /// Creatures entering don't cause abilities to trigger (Torpor Orb).
++    NoCreatureEnterTriggers,
++    /// Creatures with power greater than the number of cards in the permanent controller's hand
++    /// can't attack (Ensnaring Bridge). `who` is ignored: it binds every creature.
++    AttackPowerOverHand,
+ }
+ 
+ /// "You may cast <spells> without paying their mana costs (and with flash)". Casting this way is
+diff -ruN a/crates/mtg-core/src/legal.rs b/crates/mtg-core/src/legal.rs
+--- a/crates/mtg-core/src/legal.rs	2026-10-06 06:23:35.339951217 +0000
++++ b/crates/mtg-core/src/legal.rs	2026-10-06 06:23:35.345946363 +0000
+@@ -25,6 +25,10 @@
+     /// The ability also sacrifices a permanent (Lazotep Quarry); automatic payment picks the
+     /// cheapest one that is not itself a mana source of this payment (see `sac_pick`).
+     pub sac: bool,
++    /// The permanent also has a filter ability ("{1}, {T}: Add one mana of any color", Planar
++    /// Nexus): automatic payment may tap it together with another source to make one mana of
++    /// any color (see `plan_cost_with`).
++    pub filter: bool,
+ }
+ 
+ impl<'a> Cx<'a> {
+@@ -63,7 +67,10 @@
+             if self.db.has_restrict && self.activation_blocked(r, true) {
+                 continue;
+             }
+-            let o = &self.s.objs[r.slot as usize];
++            let (o_def, o_entered) = {
++                let o = &self.s.objs[r.slot as usize];
++                (o.def, o.entered_turn)
++            };
+             let c = self.s.derived[r.slot as usize];
+             let mut mask = 0u8;
+             let mut n = 1u8;
+@@ -71,6 +78,7 @@
+             let mut consumes = false;
+             let mut sac = false;
+             let mut sac_ab: Option<u8> = None;
++            let mut filter = false;
+             if c.types.contains(Types::LAND) {
+                 for (st, mc) in [(SUB_PLAINS, ManaColor::W), (SUB_ISLAND, ManaColor::U), (SUB_SWAMP, ManaColor::B), (SUB_MOUNTAIN, ManaColor::R), (SUB_FOREST, ManaColor::G)] {
+                     if c.subtypes.has(st) {
+@@ -78,13 +86,19 @@
+                     }
+                 }
+             }
+-            let def = self.db.def(o.def);
++            let db = self.db;
++            let def = db.def(o_def);
+             let mut extra = 0u8;
+             for (i, a) in def.abilities.iter().enumerate().filter(|_| !c.lost) {
+                 if let AbilityDef::Activated(ad) = a {
+                     if ad.is_mana {
+                         if let Some(m) = simple_mana_ability(ad) {
+                             mask |= m.colors;
++                            let mn = match ad.effect.as_ref().and_then(dyn_mana_expr) {
++                                Some(ex) => self.dyn_mana_n(seat, r, ex),
++                                None => m.n,
++                            };
++                            let m = SimpleMana { n: mn, ..m };
+                             if m.n > n || ability == 255 {
+                                 n = m.n.max(n);
+                                 ability = i as u8;
+@@ -92,6 +106,8 @@
+                             consumes |= m.consumes;
+                         } else if sac_left > 0 && sac_mana_ability(ad) {
+                             sac_ab = Some(i as u8);
++                        } else if filter_mana_ability(ad) {
++                            filter = true;
+                         }
+                     } else {
+                         extra += 1;
+@@ -111,14 +127,14 @@
+             if mask == 0 {
+                 continue;
+             }
+-            if c.types.contains(Types::CREATURE) && o.entered_turn >= self.s.turn.own_turn[seat.idx()] && !c.keywords.contains(Keywords::HASTE) {
++            if c.types.contains(Types::CREATURE) && o_entered >= self.s.turn.own_turn[seat.idx()] && !c.keywords.contains(Keywords::HASTE) {
+                 continue;
+             }
+             let mut pref = extra + if c.supertypes.contains(Supertypes::BASIC) { 0 } else { 1 } + if consumes { 8 } else { 0 };
+             if !self.s.pay_hint.is_empty() {
+                 pref = if self.s.pay_hint.contains(&r) { 0 } else { 100 + pref };
+             }
+-            out.push(SrcInfo { obj: r, colors: mask, pref, n, ability, sac });
++            out.push(SrcInfo { obj: r, colors: mask, pref, n, ability, sac, filter: filter && !sac });
+         }
+         // A sacrifice source needs its own victim: a permanent that is not itself providing mana
+         // to this payment. Keep as many such sources as there are victims.
+@@ -244,7 +260,10 @@
+         };
+         let mut pay = match hinted {
+             Some(p) => p,
+-            None => plan_payment(cost.pips, cost.hyb, generic, &pool, &ms)?,
++            None => match plan_payment(cost.pips, cost.hyb, generic, &pool, &ms) {
++                Some(p) => p,
++                None => self.plan_with_filters(cost, generic, &pool, &srcs)?,
++            },
+         };
+         // Restricted mana is spent first (it is useless otherwise).
+         for c in 0..6 {
+@@ -253,6 +272,46 @@
+         Some((pay, srcs))
+     }
+ 
++    /// Second attempt when the plain payment fails: `k` filter sources (Planar Nexus) are tapped as
++    /// the "{1}" of their filter ability, each turning one other source into a mana of any color
++    /// (net: two permanents make one colored mana). Tries k = 1, 2, ... and converts the sources
++    /// with the fewest colors first (the colorless ones).
++    fn plan_with_filters(&self, cost: &ManaCost, generic: u32, pool: &ManaPool, srcs: &[SrcInfo]) -> Option<Payment> {
++        let mut filters: SmallVec<[usize; 4]> = srcs.iter().enumerate().filter(|(_, s)| s.filter && s.n == 1).map(|(i, _)| i).collect();
++        if filters.is_empty() {
++            return None;
++        }
++        filters.sort_by_key(|&i| (srcs[i].pref, i));
++        for k in 1..=filters.len() {
++            let removed = &filters[..k];
++            let mut cands: SmallVec<[usize; 16]> = (0..srcs.len()).filter(|i| !removed.contains(i)).collect();
++            if cands.len() < k {
++                break;
++            }
++            cands.sort_by_key(|&i| (srcs[i].colors.count_ones(), srcs[i].pref, i));
++            let upgraded = &cands[..k];
++            let mut ms: SmallVec<[ManaSource; 16]> = SmallVec::new();
++            for (i, s) in srcs.iter().enumerate() {
++                if removed.contains(&i) {
++                    continue;
++                }
++                for u in 0..s.n {
++                    let colors = if u == 0 && upgraded.contains(&i) { 0b11111 } else { s.colors };
++                    ms.push(ManaSource { tag: i as u32, colors, pref: s.pref });
++                }
++            }
++            if let Some(mut p) = plan_payment(cost.pips, cost.hyb, generic, pool, &ms) {
++                // Every filter source is tapped, whether or not its converted source was used.
++                for &f in removed {
++                    p.taps.push((f as u32, ManaColor::C));
++                }
++                p.taps.sort_by_key(|t| t.0);
++                return Some(p);
++            }
++        }
++        None
++    }
++
+     /// Executes a planned payment: spends pool mana and taps the chosen sources. A source that
+     /// makes more mana than the payment used puts the rest in the pool.
+     pub fn apply_payment(&mut self, seat: Seat, pay: &Payment, srcs: &[SrcInfo], avoid: &[ObjRef]) {
+@@ -333,6 +392,12 @@
+                     self.add_mana(seat, *c, *n);
+                 }
+             }
++            Effect::AddManaExpr { color: c, n } => {
++                if add {
++                    let k = self.dyn_mana_n(seat, src, n);
++                    self.add_mana(seat, *c, k);
++                }
++            }
+             Effect::AddManaAny { n: Expr::Const(n) } => {
+                 if add {
+                     self.add_mana(seat, ManaColor::ALL[color as usize], *n as u8);
+@@ -353,6 +418,13 @@
+         }
+     }
+ 
++    /// The amount a dynamic mana ability (`AddManaExpr`) produces right now.
++    pub fn dyn_mana_n(&mut self, seat: Seat, src: ObjRef, e: &Expr) -> u8 {
++        let cap = crate::state::Captured::default();
++        let env = crate::eval::Env { controller: seat, source: Some(src), source_lki: None, targets: &[], legal: &[], base: 0, x: 0, cap: &cap, each: [None, None], tlki: &[] };
++        self.eval_expr(&env, e).clamp(0, 255) as u8
++    }
++
+     pub fn add_mana(&mut self, seat: Seat, color: ManaColor, n: u8) {
+         self.s.players[seat.idx()].pool.add(color, n);
+         self.emit(crate::event::Event::ManaAdded { player: seat, color, n });
+@@ -392,10 +464,25 @@
+                     AbilityDef::Activated(ad) if ad.is_mana => ad,
+                     _ => continue,
+                 };
++                // A filter ability ("{1}, {T}: Add one mana of any color", Planar Nexus) is an explicit option
++                // only in explicit mana mode and only if its {1} can be paid by something else; automatic
++                // payment uses it through `plan_with_filters`.
++                if let Some(CostItem::Mana(m)) = ad.cost.iter().find(|x| matches!(x, CostItem::Mana(_))) {
++                    if !explicit || !filter_mana_ability(ad) || tapped || self.plan_cost(seat, m, 0, Some(r), None).is_none() {
++                        continue;
++                    }
++                }
+                 let simple = simple_mana_ability(ad).is_some();
+                 if simple && !explicit {
+                     continue;
+                 }
++                // A dynamic mana ability that would add nothing right now (Urza's Workshop's metalcraft
++                // ability without three artifacts) is not offered.
++                if let Some(ex) = ad.effect.as_ref().and_then(dyn_mana_expr) {
++                    if self.dyn_mana_n(seat, r, ex) == 0 {
++                        continue;
++                    }
++                }
+                 let tap = ad.cost.iter().any(|x| matches!(x, CostItem::TapSelf));
+                 if tap && (tapped || sick) {
+                     continue;
+@@ -452,6 +539,11 @@
+             match item {
+                 CostItem::TapSelf => self.tap(src),
+                 CostItem::SacrificeSelf => sac = true,
++                CostItem::Mana(m) => {
++                    if let Some((pay, srcs)) = self.plan_cost(seat, m, 0, Some(src), None) {
++                        self.apply_payment(seat, &pay, &srcs, &[src]);
++                    }
++                }
+                 CostItem::PayLife(n) => self.lose_life(seat, *n as u32),
+                 CostItem::Sacrifice(_) => {
+                     if let Some(p) = pick {
+@@ -490,7 +582,8 @@
+         };
+         match t {
+             Target::None => false,
+-            Target::Player(p) => !hexproof_from(p),
++            // Protection from everything (The One Ring): the player can't be targeted by anything, even by their own spells.
++            Target::Player(p) => !hexproof_from(p) && !self.s.player_fx.iter().any(|f| f.player == p && f.fx == PlayerFx::ProtectionFromEverything),
+             Target::Obj(r) => {
+                 if !self.s.is_live(r) {
+                     return false;
+@@ -668,10 +761,35 @@
+     tap && sac && matches!(ad.effect, Some(Effect::AddManaAny { n: Expr::Const(1) }))
+ }
+ 
++/// "{1}, {T}: Add one mana of any color" (Planar Nexus). Only automatic payment uses it, as a
++/// pair with another source; explicit mana mode does not offer it.
++pub fn filter_mana_ability(ad: &ActivatedDef) -> bool {
++    let mut tap = false;
++    let mut one = false;
++    for c in &ad.cost {
++        match c {
++            CostItem::TapSelf => tap = true,
++            CostItem::Mana(m) if m.mana_value() == 1 && m.generic == 1 => one = true,
++            _ => return false,
++        }
++    }
++    tap && one && matches!(ad.effect, Some(Effect::AddManaAny { n: Expr::Const(1) }))
++}
++
++/// The amount expression of a dynamic mana ability, if its effect has one.
++pub fn dyn_mana_expr(e: &Effect) -> Option<&Expr> {
++    match e {
++        Effect::AddManaExpr { n, .. } => Some(n),
++        Effect::Seq(v) => v.iter().find_map(dyn_mana_expr),
++        _ => None,
++    }
++}
++
+ /// (color mask, amount) of the mana-producing leaf of a mana ability's effect.
+ pub fn mana_leaf(e: &Effect) -> Option<(u8, u8)> {
+     match e {
+         Effect::AddMana { color, n } => Some((1 << color.idx(), *n)),
++        Effect::AddManaExpr { color, .. } => Some((1 << color.idx(), 1)),
+         Effect::AddManaAny { n: Expr::Const(n) } => Some((0b11111, *n as u8)),
+         Effect::AddManaRestricted => Some((0b11111, 1)),
+         Effect::Seq(v) => v.iter().find_map(mana_leaf),
+diff -ruN a/crates/mtg-core/src/lint.rs b/crates/mtg-core/src/lint.rs
+--- a/crates/mtg-core/src/lint.rs	2026-10-06 06:23:35.459951224 +0000
++++ b/crates/mtg-core/src/lint.rs	2026-10-06 06:23:35.467902513 +0000
+@@ -84,6 +84,7 @@
+         Effect::CreateToken { n, who, .. } => tmax(expr(n), p(who)),
+         Effect::AddCounters { objs: o, n, .. } => tmax(objs(o), expr(n)),
+         Effect::AddMana { .. } => -1,
++        Effect::AddManaExpr { n, .. } => expr(n),
+         Effect::AddManaAny { n } => expr(n),
+         Effect::Scry(e) | Effect::Surveil(e) | Effect::PutBack(e) | Effect::Reorder(e) => expr(e),
+         Effect::LookTake { look, .. } => expr(look),
+@@ -127,6 +128,8 @@
+         Effect::Amass { n, .. } => expr(n),
+         Effect::TakeMoved { .. } => -1,
+         Effect::SetPTX { objs: o, x, .. } => tmax(objs(o), expr(x)),
++        Effect::ExileTargetUntilLeaves { target } => *target as i32,
++        Effect::ExileChoosePlay { n } => expr(n),
+     }
+ }
+ 
+diff -ruN a/crates/mtg-core/src/ops.rs b/crates/mtg-core/src/ops.rs
+--- a/crates/mtg-core/src/ops.rs	2026-10-06 06:23:35.591951232 +0000
++++ b/crates/mtg-core/src/ops.rs	2026-10-06 06:23:35.599006687 +0000
+@@ -512,6 +512,8 @@
+         };
+         match to {
+             Target::None => return Outcome::Prevented,
++            // Protection from everything: all damage dealt to the player is prevented (702.16e).
++            Target::Player(p) if self.s.player_fx.iter().any(|f| f.player == p && f.fx == crate::ir::PlayerFx::ProtectionFromEverything) => return Outcome::Prevented,
+             Target::Player(p) => {
+                 self.propose(ProposedEvent::LifeChange { player: p, delta: -(amount as i32) });
+             }
+diff -ruN a/crates/mtg-core/src/priority.rs b/crates/mtg-core/src/priority.rs
+--- a/crates/mtg-core/src/priority.rs	2026-10-06 06:23:35.675951237 +0000
++++ b/crates/mtg-core/src/priority.rs	2026-10-06 06:23:35.683485256 +0000
+@@ -292,7 +292,7 @@
+             }
+         }
+         // "mana value X" targets: some affordable X must have a target.
+-        if ad.targets.iter().any(|s| !s.optional && s.objects.as_ref().map_or(false, |o| o.cmc_x)) {
++        if ad.targets.iter().any(|s| !s.optional && s.objects.as_ref().map_or(false, |o| o.cmc_x || o.cmc_x_max.0)) {
+             let mut ok = false;
+             for x in 0..=20u8 {
+                 let mut c = CastCtx::default();
+@@ -301,7 +301,7 @@
+                     break;
+                 }
+                 self.s.cur_x = Some(x);
+-                let has = ad.targets.iter().filter(|s| !s.optional && s.objects.as_ref().map_or(false, |o| o.cmc_x)).all(|sp| !self.legal_targets(sp, seat, Some(src)).is_empty());
++                let has = ad.targets.iter().filter(|s| !s.optional && s.objects.as_ref().map_or(false, |o| o.cmc_x || o.cmc_x_max.0)).all(|sp| !self.legal_targets(sp, seat, Some(src)).is_empty());
+                 self.s.cur_x = None;
+                 if has {
+                     ok = true;
+diff -ruN a/crates/mtg-core/src/resolve.rs b/crates/mtg-core/src/resolve.rs
+--- a/crates/mtg-core/src/resolve.rs	2026-10-06 06:23:35.771951243 +0000
++++ b/crates/mtg-core/src/resolve.rs	2026-10-06 06:23:35.775947672 +0000
+@@ -1254,6 +1254,11 @@
+             cx.add_mana(env.controller, *color, *n);
+             Flow::Next
+         }
++        Effect::AddManaExpr { color, n } => {
++            let k = cx.eval_expr(env, n).clamp(0, 255) as u8;
++            cx.add_mana(env.controller, *color, k);
++            Flow::Next
++        }
+         Effect::AddManaAny { n } => match *aux {
+             0 => {
+                 ask(cx, env.controller, DecisionKind::ChooseColor, (0..5).map(Opt::Choice).collect());
+@@ -1547,6 +1552,44 @@
+             }
+             Flow::Next
+         }
++        Effect::ExileTargetUntilLeaves { target } => {
++            if let (Some(src), Some(Target::Obj(r))) = (env.source, env.target(*target)) {
++                // The source must still be on the battlefield (610.3b); the card comes back when it leaves (ops.rs).
++                if cx.s.is_live(src) && cx.s.obj(src).zone == ZoneKind::Battlefield && cx.s.is_live(r) {
++                    let from = cx.s.obj(r).zone;
++                    if let Some(nr) = cx.move_zone(r, ZoneKind::Exile, MoveOpts::default()) {
++                        cx.s.until_links.push(UntilLink { src, card: nr, from });
++                    }
++                }
++            }
++            Flow::Next
++        }
++        Effect::ExileChoosePlay { n } => {
++            let p = env.controller;
++            if *aux != 0 {
++                return Flow::Next;
++            }
++            let n = cx.eval_expr(env, n).max(0);
++            let mut got: Vec<ObjRef> = Vec::new();
++            for _ in 0..n {
++                let Some(&top) = cx.s.players[p.idx()].library.last() else { break };
++                if let Some(nr) = cx.move_zone(top, ZoneKind::Exile, MoveOpts::default()) {
++                    got.push(nr);
++                }
++            }
++            match got.len() {
++                0 => Flow::Next,
++                1 => {
++                    cx.s.exile_plays.push((got[0], p));
++                    Flow::Next
++                }
++                _ => {
++                    let opts = card_options(cx, p, &got);
++                    ask(cx, p, DecisionKind::ChooseCards { purpose: CardsPurpose::PlayChosen, remaining: 1 }, opts);
++                    Flow::Await
++                }
++            }
++        }
+         Effect::ExilePlay { n } => {
+             let p = env.controller;
+             let n = cx.eval_expr(env, n).max(0);
+@@ -1799,6 +1842,13 @@
+             f.aux = 1;
+             Next::Stay
+         }
++        (DecisionKind::ChooseCards { purpose: CardsPurpose::PlayChosen, .. }, o) => {
++            f.aux = 1;
++            if let Opt::Card(r) = o {
++                cx.s.exile_plays.push((r, p.seat));
++            }
++            Next::Stay
++        }
+         (DecisionKind::ChooseCards { purpose: CardsPurpose::ExileUntilLeaves, .. }, o) => {
+             f.aux = 1;
+             if let (Opt::Card(r), StackKind::Ability { source, .. }) = (o, f.entry.kind) {
+diff -ruN a/crates/mtg-core/src/restrict.rs b/crates/mtg-core/src/restrict.rs
+--- a/crates/mtg-core/src/restrict.rs	2026-10-06 06:23:35.839951247 +0000
++++ b/crates/mtg-core/src/restrict.rs	2026-10-06 06:23:35.848430563 +0000
+@@ -131,6 +131,64 @@
+         false
+     }
+ 
++    /// "Creatures with power greater than the number of cards in your hand can't attack"
++    /// (`Restriction::AttackPowerOverHand`): the largest power that may still attack, if any such
++    /// restriction is in effect (the smallest limit when there are several).
++    pub(crate) fn attack_power_limit(&mut self) -> Option<i32> {
++        if !self.db.has_restrict {
++            return None;
++        }
++        self.refresh();
++        let mut limit: Option<i32> = None;
++        let bf: Vec<ObjRef> = self.s.battlefield.clone();
++        for src in bf {
++            let (ctrl, def_id, phased) = {
++                let o = self.s.obj(src);
++                (o.controller, o.def, o.phased)
++            };
++            if phased {
++                continue;
++            }
++            let db = self.db;
++            for a in &db.def(def_id).abilities {
++                if let AbilityDef::Restrict(r) = a {
++                    if matches!(r.what, Restriction::AttackPowerOverHand) && self.static_cond_holds(&r.cond, ctrl, src) {
++                        let n = self.s.players[ctrl.idx()].hand.len() as i32;
++                        limit = Some(limit.map_or(n, |l| l.min(n)));
++                    }
++                }
++            }
++        }
++        limit
++    }
++
++    /// Is "creatures entering don't cause abilities to trigger" (`Restriction::NoCreatureEnterTriggers`) in effect?
++    pub(crate) fn creature_enter_triggers_off(&mut self) -> bool {
++        if !self.db.has_restrict {
++            return false;
++        }
++        self.refresh();
++        let bf: Vec<ObjRef> = self.s.battlefield.clone();
++        for src in bf {
++            let (ctrl, def_id, phased) = {
++                let o = self.s.obj(src);
++                (o.controller, o.def, o.phased)
++            };
++            if phased {
++                continue;
++            }
++            let db = self.db;
++            for a in &db.def(def_id).abilities {
++                if let AbilityDef::Restrict(r) = a {
++                    if matches!(r.what, Restriction::NoCreatureEnterTriggers) && self.static_cond_holds(&r.cond, ctrl, src) {
++                        return true;
++                    }
++                }
++            }
++        }
++        false
++    }
++
+     /// Is an activated ability of `src` (a permanent) forbidden right now?
+     pub(crate) fn activation_blocked(&mut self, src: ObjRef, is_mana: bool) -> bool {
+         if !self.db.has_restrict {
+@@ -162,6 +220,13 @@
+                 if !self.static_cond_holds(&r.cond, ctrl, rs) {
+                     continue;
+                 }
++                // `who` binds the controller of the source ("artifacts your opponents control", Karn).
++                let sc = self.s.obj(src).controller;
++                match r.who {
++                    Rel::Opp if sc == ctrl => continue,
++                    Rel::You if sc != ctrl => continue,
++                    _ => {}
++                }
+                 let c = self.chars(src);
+                 let mut f = sources.clone();
+                 f.controller = Rel::Any;
+diff -ruN a/crates/mtg-core/src/trigger.rs b/crates/mtg-core/src/trigger.rs
+--- a/crates/mtg-core/src/trigger.rs	2026-10-06 06:23:35.919951251 +0000
++++ b/crates/mtg-core/src/trigger.rs	2026-10-06 06:23:35.925846004 +0000
+@@ -66,7 +66,13 @@
+             return;
+         }
+         self.refresh();
+-        for z in [ZoneKind::Battlefield, ZoneKind::Graveyard, ZoneKind::Hand, ZoneKind::Exile, ZoneKind::Stack] {
++        // Torpor Orb: a creature entering causes no "enters" triggers (its own or anyone's).
++        let enter_off = match e {
++            Event::ZoneChange { obj, to: ZoneKind::Battlefield, .. } => self.s.is_live(*obj) && self.chars(*obj).types.contains(Types::CREATURE) && self.creature_enter_triggers_off(),
++            _ => false,
++        };
++        // The command zone is scanned for emblems with triggered abilities (Tezzeret, Cruel Captain).
++        for z in [ZoneKind::Battlefield, ZoneKind::Graveyard, ZoneKind::Hand, ZoneKind::Exile, ZoneKind::Stack, ZoneKind::Command] {
+             if self.db.trig_zones & (1 << (z as u8)) == 0 {
+                 continue;
+             }
+@@ -111,6 +117,9 @@
+                     if t.zone != z {
+                         continue;
+                     }
++                    if enter_off && matches!(&t.on, EventPat::Enters { .. } | EventPat::ZoneChange { to: Some(ZoneKind::Battlefield), .. }) {
++                        continue;
++                    }
+                     if t.once_per_turn && self.s.used.contains(&(src, ai)) {
+                         continue;
+                     }
+diff -ruN a/crates/mtg-core/src/turn.rs b/crates/mtg-core/src/turn.rs
+--- a/crates/mtg-core/src/turn.rs	2026-10-06 06:23:36.019951257 +0000
++++ b/crates/mtg-core/src/turn.rs	2026-10-06 06:23:36.024887220 +0000
+@@ -72,7 +72,9 @@
+     let active = cx.s.turn.active;
+     match step {
+         Step::Untap => {
+-            let mine: Vec<ObjRef> = cx.s.battlefield.iter().copied().filter(|&r| cx.s.obj(r).controller == active).collect();
++            cx.refresh();
++            // "Doesn't untap during your untap step" (Grim Monolith).
++            let mine: Vec<ObjRef> = cx.s.battlefield.iter().copied().filter(|&r| cx.s.obj(r).controller == active && !cx.s.derived[r.slot as usize].keywords.contains(Keywords::NO_UNTAP)).collect();
+             for r in mine {
+                 cx.untap(r);
+             }
+diff -ruN a/crates/mtg-core/src/types.rs b/crates/mtg-core/src/types.rs
+--- a/crates/mtg-core/src/types.rs	2026-10-06 06:23:36.123951264 +0000
++++ b/crates/mtg-core/src/types.rs	2026-10-06 06:23:36.127262001 +0000
+@@ -117,6 +117,10 @@
+         const SWAMPWALK     = 1 << 18;
+         /// "Can block only creatures with flying" (Brazen Borrower).
+         const BLOCKS_ONLY_FLYERS = 1 << 19;
++        /// "Doesn't untap during its controller's untap step" (Grim Monolith).
++        const NO_UNTAP      = 1 << 20;
++        /// "Can't be blocked" (Manifold Key grants it until end of turn).
++        const UNBLOCKABLE   = 1 << 21;
+     }
+ }
+ 
+@@ -193,6 +197,7 @@
+     "Vampire", "Spider", "Hero", "Mutant", "Turtle", "Eldrazi", "Wall", "Sliver", "Pirate", "Citizen", "Cyberman", "Coil", "Kor", "Gnome", "Detective", "Assassin",
+     "God", "Archer", "Bard", "Halfling", "Kithkin", "Wraith", "Serpent", "Dog", "Elder", "Incarnation", "Dinosaur", "Jace", "Kaito", "Sand",
+     "Ajani", "Tamiyo", "Moonfolk", "Warlock",
++    "Karn", "Ugin", "Tezzeret", "Saga", "Tower", "Mine", "Power-Plant", "Spawn", "Scion", "Masticore", "Spacecraft", "Robot", "Cave", "Gate", "Lair", "Locus", "Sphere",
+ ];
+ 
+ /// Subtype set; bit `i` = `SUBTYPE_NAMES[i]`.
+diff -ruN a/crates/mtg-spec/src/expect.rs b/crates/mtg-spec/src/expect.rs
+--- a/crates/mtg-spec/src/expect.rs	2026-10-06 06:23:36.431951282 +0000
++++ b/crates/mtg-spec/src/expect.rs	2026-10-06 06:23:36.436787026 +0000
+@@ -346,7 +346,19 @@
+                             _ => unsupported!("command expectation {e}"),
+                         }
+                     }
+-                    let have_emblems: Vec<String> = st.emblems_of(seat).iter().map(|&d| self.db.def(d).name.clone()).collect();
++                    // An emblem is named by its card name or by a phrase of its ability text.
++                    let have_emblems: Vec<String> = st
++                        .emblems_of(seat)
++                        .iter()
++                        .map(|&d| {
++                            let mut t = self.db.def(d).name.clone();
++                            for i in 0..self.db.def(d).abilities.len() {
++                                t.push(' ');
++                                t.push_str(&self.ability_text(d, i));
++                            }
++                            t
++                        })
++                        .collect();
+                     if have_emblems.len() != want_emblems.len() || !want_emblems.iter().all(|w| have_emblems.iter().any(|h| h.contains(w.as_str()))) {
+                         fail!("{who} emblems are {have_emblems:?}, expected {want_emblems:?}");
+                     }
+@@ -639,7 +651,23 @@
+             }
+             "activate" | "activate_from_hand" => {
+                 let want = self.obj_alias(pat["source"].as_str().unwrap_or(""))?;
+-                p.options.iter().any(|o| matches!(o, Opt::Activate { src, .. } | Opt::Mana { src, .. } if self.same_obj(*src, want)))
++                // `ability` (when given) counts the source's activated abilities in card order, as `activate` does;
++                // a pattern without it matches any ability of the source.
++                let want_ab: Option<u8> = match pat.get("ability").and_then(|v| v.as_u64()) {
++                    None => None,
++                    Some(i) => {
++                        let def = self.db.def(self.st().def_of(want));
++                        let acts: Vec<usize> = def.abilities.iter().enumerate().filter_map(|(k, x)| matches!(x, AbilityDef::Activated(_)).then_some(k)).collect();
++                        match acts.get(i as usize) {
++                            Some(&k) => Some(k as u8),
++                            None => Some(255),
++                        }
++                    }
++                };
++                p.options.iter().any(|o| match o {
++                    Opt::Activate { src, ability } | Opt::Mana { src, ability, .. } => self.same_obj(*src, want) && want_ab.map_or(true, |w| w == *ability),
++                    _ => false,
++                })
+             }
+             other => unsupported!("legal pattern {other}"),
+         })
+diff -ruN a/crates/mtg-spec/src/runner.rs b/crates/mtg-spec/src/runner.rs
+--- a/crates/mtg-spec/src/runner.rs	2026-10-06 06:23:36.575951290 +0000
++++ b/crates/mtg-spec/src/runner.rs	2026-10-06 06:23:36.581863327 +0000
+@@ -229,6 +229,8 @@
+         "stun" => CounterKind::Stun,
+         "charge" => CounterKind::Charge,
+         "flying" => CounterKind::Flying,
++        // The One Ring's burden counters are `Other(0)` (RFC 0008).
++        "burden" => CounterKind::Other(0),
+         other => unsupported!("counter kind {other:?}"),
+     })
+ }
+@@ -940,6 +942,8 @@
+         }
+         let idx = a["ability"].as_u64().unwrap_or(0) as usize;
+         let def = self.db.def(self.st().def_of(src));
++        // A permanent that lost its abilities (Magus of the Moon) has only its intrinsic land-type mana ability.
++        let lost = self.st().obj_data(&self.db, src).chars.lost;
+         let acts: Vec<(usize, &ActivatedDef)> = def.abilities.iter().enumerate().filter_map(|(i, x)| if let AbilityDef::Activated(d) = x { Some((i, d)) } else { None }).collect();
+         let want_color: Option<u8> = a.get("choose_color").and_then(|x| x.as_str()).map(|c| match c {
+             "W" => 0,
+@@ -952,9 +956,9 @@
+         // Mana abilities are activated through `Opt::Mana`.
+         let intrinsic = {
+             let sub = self.st().obj_data(&self.db, src).chars.subtypes;
+-            acts.get(idx).is_none() && [SUB_PLAINS, SUB_ISLAND, SUB_SWAMP, SUB_MOUNTAIN, SUB_FOREST].iter().any(|s| sub.has(*s))
++            (lost || acts.get(idx).is_none()) && [SUB_PLAINS, SUB_ISLAND, SUB_SWAMP, SUB_MOUNTAIN, SUB_FOREST].iter().any(|s| sub.has(*s))
+         };
+-        let mana_ab: Option<u8> = match acts.get(idx) {
++        let mana_ab: Option<u8> = match acts.get(idx).filter(|_| !(lost && intrinsic)) {
+             Some((i, d)) if d.is_mana => Some(*i as u8),
+             Some(_) => None,
+             None if intrinsic && idx == 0 => Some(255),
+@@ -1031,6 +1035,7 @@
+             delve_aliases.extend(l.iter().filter_map(|x| x.as_str().map(|s| s.to_string())));
+         }
+         let x_val = a.get("x").and_then(|v| v.as_u64());
++        let mut x_asked = false;
+         for _ in 0..64 {
+             let p = match self.pending() {
+                 Some(p) => p,
+@@ -1048,11 +1053,14 @@
+                     let n = a.get("replicate").and_then(|v| v.as_u64()).unwrap_or(0) as u32;
+                     self.choose("replicate", |_, o| *o == Opt::Number(n))?
+                 }
+-                DecisionKind::ChooseX => match x_val {
++                DecisionKind::ChooseX => {
++                    x_asked = true;
++                    match x_val {
+                     Some(x) => self.choose("x", |_, o| *o == Opt::Number(x as u32))?,
+                     None if self.lenient => self.apply_opt(0)?,
+                     None => fail!("cast needs X but the action gives none"),
+-                },
++                    }
++                }
+                 DecisionKind::ChooseTarget { .. } => match targets.pop() {
+                     Some(t) => self.choose_target_spec(&t)?,
+                     None => {
+@@ -1142,6 +1150,12 @@
+         if !targets.is_empty() {
+             fail!("action gave more targets than the engine asked for");
+         }
++        if !modes.is_empty() && !self.lenient {
++            fail!("action names more modes than the card lets the caster choose (700.2): {modes:?}");
++        }
++        if !x_asked && x_val.map_or(false, |x| x > 0) && !self.lenient {
++            fail!("action gives X = {} but X is not offered (it can only be 0)", x_val.unwrap());
++        }
+         if delve_aliases.iter().any(|x| delve_key.contains(x)) {
+             fail!("action names more delve cards than the generic cost can take (702.66a): {delve_aliases:?}");
+         }
+@@ -1553,7 +1567,7 @@
+ /// The color of a mana ability that always makes one color.
+ fn mana_fixed_color(e: &Effect) -> Option<u8> {
+     match e {
+-        Effect::AddMana { color, .. } => Some(color.idx() as u8),
++        Effect::AddMana { color, .. } | Effect::AddManaExpr { color, .. } => Some(color.idx() as u8),
+         Effect::Seq(v) => v.iter().find_map(mana_fixed_color),
+         _ => None,
+     }

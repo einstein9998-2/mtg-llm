@@ -1,0 +1,36 @@
+id: tron-a-grim-monolith-taps-for-three-colorless
+title: "Grim Monolith taps for {C}{C}{C} as a mana ability (no stack), stays tapped, and cannot be tapped again"
+area: card
+cards: [Grim Monolith]
+tags: [grim-monolith, mana-ability, colorless-mana, artifact, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Grim Monolith, text: "{T}: Add {C}{C}{C}.", verified: true, note: "Grim Monolith Oracle text supplied in the brief (Scryfall via Savecraft); entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn’t go on the stack, so it can’t be targeted, countered, or otherwise responded to.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Grim Monolith @gm"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@gm", ability: 0}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {mana_pool: {C: 3}, battlefield: [{card: Grim Monolith, tapped: true}]}
+  - expect_illegal: {p0: {t: activate, source: "@gm", ability: 0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 3}
+      battlefield: [{card: Grim Monolith, tapped: true}]
+notes: >
+  A single activation adds three colorless mana at once, uses no stack and leaves p0 holding priority. A tapped
+  Monolith cannot be tapped for mana again (the ability index 0 is the {T} ability, 1 is the {4} untap ability).

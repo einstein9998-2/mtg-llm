@@ -1,0 +1,50 @@
+{
+ "_meta": {
+  "group": "A",
+  "note": "Entries to merge into reference/oracle.json cards{}; text from Savecraft card_search (Scryfall oracle), retrieved 2026-10-06"
+ },
+ "cards": {
+  "Trinisphere": {
+   "name": "Trinisphere",
+   "mana_cost": "{3}",
+   "type_line": "Artifact",
+   "oracle_text": "As long as this artifact is untapped, each spell that would cost less than three mana to cast costs three mana to cast. (Additional mana in the cost may be paid with any color of mana or colorless mana. For example, a spell that would cost {1}{B} to cast costs {2}{B} to cast instead.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Grim Monolith": {
+   "name": "Grim Monolith",
+   "mana_cost": "{2}",
+   "type_line": "Artifact",
+   "oracle_text": "This artifact doesn't untap during your untap step.\n{T}: Add {C}{C}{C}.\n{4}: Untap this artifact.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "The One Ring": {
+   "name": "The One Ring",
+   "mana_cost": "{4}",
+   "type_line": "Legendary Artifact",
+   "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Voltaic Key": {
+   "name": "Voltaic Key",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "{1}, {T}: Untap target artifact.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Manifold Key": {
+   "name": "Manifold Key",
+   "mana_cost": "{1}",
+   "type_line": "Artifact",
+   "oracle_text": "{1}, {T}: Untap another target artifact.\n{3}, {T}: Target creature can't be blocked this turn.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Karn, the Great Creator": {
+   "name": "Karn, the Great Creator",
+   "mana_cost": "{4}",
+   "type_line": "Legendary Planeswalker — Karn",
+   "oracle_text": "Activated abilities of artifacts your opponents control can't be activated.\n+1: Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.\n−2: You may reveal an artifact card you own from outside the game or choose a face-up artifact card you own in exile. Put that card into your hand.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06; starting loyalty not in Oracle data and not asserted by any scenario"
+  }
+ }
+}
