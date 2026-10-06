@@ -1,6 +1,38 @@
+diff -ruN a/crates/mtg-agent/src/bin/bo3.rs b/crates/mtg-agent/src/bin/bo3.rs
+--- a/crates/mtg-agent/src/bin/bo3.rs	2026-10-06 06:23:34.039951140 +0000
++++ b/crates/mtg-agent/src/bin/bo3.rs	2026-10-06 06:23:34.045492900 +0000
+@@ -2,10 +2,8 @@
+ //!
+ //! Usage: bo3 <decks dir> <plans dir> <deck A> <deck B> [matches] [iterations]
+ //!        [--net w.bin] [--rollout N] [--board both|a|b|none] [--opp-view plan|main]
+-//!        [--threads T] [--seed S] [--csv out.csv] [--trace games.jsonl] [--plans-b <dir>] [--public <dir>]
++//!        [--threads T] [--seed S] [--csv out.csv] [--trace games.jsonl] [--plans-b <dir>]
+ //! --plans-b gives deck B its own plan directory (a mirror with two different plans).
+-//! --public gives the standard plan directory both seats are assumed to know (default: each seat's own
+-//! directory). Always pass it when testing a variant, else the opponent's belief reads the variant.
+ //!        bo3 <decks dir> <plans dir> --check      (validate every plan, print the swaps)
+ //!
+ //! Deck A sits in seat 0. Game one's first player alternates by match; later games the loser plays
+@@ -42,7 +40,6 @@
+     let db = mtg_cards::legacy::build();
+     let (names, decks) = load_deck_dir(&db, &dir);
+     let book = PlanBook::load_dir(&db, std::path::Path::new(&plans)).unwrap_or_else(|e| panic!("plans: {e}"));
+-    let public_book = flag("--public").map(|d| PlanBook::load_dir(&db, std::path::Path::new(&d)).unwrap_or_else(|e| panic!("public: {e}")));
+     let book_b = flag("--plans-b").map(|d| PlanBook::load_dir(&db, std::path::Path::new(&d)).unwrap_or_else(|e| panic!("plans-b: {e}")));
+     let cfg0 = MatchConfig::default();
+     if a.iter().any(|x| x == "--check") {
+@@ -117,7 +114,7 @@
+                         break;
+                     }
+                     let cfg = MatchConfig { board: board_seats, opp_view, first: Seat((i % 2) as u8), seed: seed0 * 7919 + i, ..cfg0.clone() };
+-                    let r = play_match(&db, [&na, &nb], [&decks[ia], &decks[ib]], [Some(&book), Some(book_b.as_ref().unwrap_or(&book))], [Some(public_book.as_ref().unwrap_or(&book)), Some(public_book.as_ref().or(book_b.as_ref()).unwrap_or(&book))], &cfg, &mut fac).unwrap_or_else(|e| panic!("{e}"));
++                    let r = play_match(&db, [&na, &nb], [&decks[ia], &decks[ib]], [Some(&book), Some(book_b.as_ref().unwrap_or(&book))], &cfg, &mut fac).unwrap_or_else(|e| panic!("{e}"));
+                     results.lock().unwrap().push((i, r));
+                 }
+             });
 diff -ruN a/crates/mtg-cards/cards/deps-reviewed.txt b/crates/mtg-cards/cards/deps-reviewed.txt
---- a/crates/mtg-cards/cards/deps-reviewed.txt	2026-10-06 05:11:55.792793914 +0000
-+++ b/crates/mtg-cards/cards/deps-reviewed.txt	2026-10-06 05:11:55.803698761 +0000
+--- a/crates/mtg-cards/cards/deps-reviewed.txt	2026-10-06 06:23:34.199951149 +0000
++++ b/crates/mtg-cards/cards/deps-reviewed.txt	2026-10-06 06:23:34.203605008 +0000
 @@ -4,3 +4,4 @@
  # Review 2026-10-01 (implementer; a second reader should confirm before the core freeze).
  Kaito, Bane of Nightmares | Magus of the Moon | L4 | independent: Kaito's type change applies only to Kaito, a planeswalker that is never a land, and Magus applies only to nonbasic lands; neither changes whether the other applies. Breaks only if a pool card could make Kaito a land or make a land a Kaito.
@@ -8,7 +40,7 @@ diff -ruN a/crates/mtg-cards/cards/deps-reviewed.txt b/crates/mtg-cards/cards/de
 +Emblem: Tezzeret robots | Magus of the Moon | L4 | independent: the emblem only adds the Creature type and the Robot subtype to an artifact (it never adds or removes Land), and Magus of the Moon applies to nonbasic lands and turns them into Mountains; whether Magus applies depends on the Land type and the basic supertype, which the emblem leaves alone, and Magus's result (subtypes, lost abilities) does not change whether the emblem's target is an artifact. Breaks only if a pool card could remove the Land type or the Artifact type in layer 4.
 diff -ruN a/crates/mtg-cards/cards/tron.cards.ron b/crates/mtg-cards/cards/tron.cards.ron
 --- a/crates/mtg-cards/cards/tron.cards.ron	1970-01-01 00:00:00.000000000 +0000
-+++ b/crates/mtg-cards/cards/tron.cards.ron	2026-10-06 05:11:55.819299074 +0000
++++ b/crates/mtg-cards/cards/tron.cards.ron	2026-10-06 06:23:34.211911745 +0000
 @@ -0,0 +1,137 @@
 +// Colorless Tron (Brady's list, 2026-10-06), RFC 0007. Oracle text per Savecraft card_search (Scryfall).
 +// Not modeled (documented limits, see rfcs/0007): Urza's Saga and Summon: Bahamut (Saga rules, RFC 0006), Karn -2, Ugin -11,
@@ -114,7 +146,7 @@ diff -ruN a/crates/mtg-cards/cards/tron.cards.ron b/crates/mtg-cards/cards/tron.
 +    Activated(text: "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.", cost: [TapSelf],
 +      effect: Seq([AddCounters(objs: One(This), kind: Other(0), n: Const(1)), Draw(who: You, n: Counters(This, Other(0)))])),
 +  ]),
-+  (name: "Kozilek's Command", cost: "{X}{C}{C}", types: "INSTANT", subtypes: [], abilities: [
++  (name: "Kozilek's Command", cost: "{X}{C}{C}", types: "KINDRED | INSTANT", subtypes: ["Eldrazi"], abilities: [
 +    Spell(choose: (2, 2), modes: [
 +      (label: "Target player creates X 0/1 colorless Eldrazi Spawn creature tokens.", targets: [(players: You)], effect: CreateToken(token: "Eldrazi Spawn Token", n: X, who: Target(0))),
 +      (label: "Target player scries X, then draws a card.", targets: [(players: You)], effect: Seq([Scry(X), Draw(who: Target(0), n: Const(1))])),
@@ -148,8 +180,8 @@ diff -ruN a/crates/mtg-cards/cards/tron.cards.ron b/crates/mtg-cards/cards/tron.
 +  ]),
 +]
 diff -ruN a/crates/mtg-cards/src/legacy.rs b/crates/mtg-cards/src/legacy.rs
---- a/crates/mtg-cards/src/legacy.rs	2026-10-06 05:11:55.904793920 +0000
-+++ b/crates/mtg-cards/src/legacy.rs	2026-10-06 05:11:55.911611061 +0000
+--- a/crates/mtg-cards/src/legacy.rs	2026-10-06 06:23:34.327951157 +0000
++++ b/crates/mtg-cards/src/legacy.rs	2026-10-06 06:23:34.332502848 +0000
 @@ -5,7 +5,9 @@
  
  pub const LEGACY_CARDS: &str = include_str!("../cards/legacy.cards.ron");
@@ -163,7 +195,7 @@ diff -ruN a/crates/mtg-cards/src/legacy.rs b/crates/mtg-cards/src/legacy.rs
  }
 diff -ruN a/crates/mtg-cards/tests/tron_load.rs b/crates/mtg-cards/tests/tron_load.rs
 --- a/crates/mtg-cards/tests/tron_load.rs	1970-01-01 00:00:00.000000000 +0000
-+++ b/crates/mtg-cards/tests/tron_load.rs	2026-10-06 05:11:55.927425180 +0000
++++ b/crates/mtg-cards/tests/tron_load.rs	2026-10-06 06:23:34.394679539 +0000
 @@ -0,0 +1,7 @@
 +#[test]
 +fn tron_loads() {
@@ -173,8 +205,8 @@ diff -ruN a/crates/mtg-cards/tests/tron_load.rs b/crates/mtg-cards/tests/tron_lo
 +    }
 +}
 diff -ruN a/crates/mtg-core/src/card.rs b/crates/mtg-core/src/card.rs
---- a/crates/mtg-core/src/card.rs	2026-10-06 05:11:56.004793926 +0000
-+++ b/crates/mtg-core/src/card.rs	2026-10-06 05:11:56.011521196 +0000
+--- a/crates/mtg-core/src/card.rs	2026-10-06 06:23:34.559951171 +0000
++++ b/crates/mtg-core/src/card.rs	2026-10-06 06:23:34.567100615 +0000
 @@ -197,7 +197,7 @@
                          None => Vec::new(),
                      }
@@ -184,7 +216,24 @@ diff -ruN a/crates/mtg-core/src/card.rs b/crates/mtg-core/src/card.rs
              };
              self.code.push(code);
          }
-@@ -313,7 +313,7 @@
+@@ -231,6 +231,8 @@
+     pub has_restrict: bool,
+     /// Some card has Ascend.
+     pub has_ascend: bool,
++    /// Some card has a `CostFloor` ability (lets `cost_floor` skip the battlefield scan).
++    pub has_cost_floor: bool,
+     /// The dungeon cards, in definition order (the choices of a fresh venture).
+     pub dungeons: Vec<CardDefId>,
+ }
+@@ -255,6 +257,7 @@
+                 }
+                 AbilityDef::Restrict(_) => self.has_restrict = true,
+                 AbilityDef::Ascend => self.has_ascend = true,
++                AbilityDef::CostFloor(_) => self.has_cost_floor = true,
+                 _ => {}
+             }
+         }
+@@ -313,7 +316,7 @@
                      AbilityDef::Spell(s) => s.modes.iter().filter_map(|m| m.effect.as_ref()).for_each(|e| crate::lint::tokens_used(e, &mut toks)),
                      AbilityDef::Activated(ad) => ad.effect.iter().for_each(|e| crate::lint::tokens_used(e, &mut toks)),
                      AbilityDef::Triggered(t) => t.effect.iter().for_each(|e| crate::lint::tokens_used(e, &mut toks)),
@@ -194,8 +243,8 @@ diff -ruN a/crates/mtg-core/src/card.rs b/crates/mtg-core/src/card.rs
                  for t in toks {
                      match self.id(t) {
 diff -ruN a/crates/mtg-core/src/cast.rs b/crates/mtg-core/src/cast.rs
---- a/crates/mtg-core/src/cast.rs	2026-10-06 05:11:56.124793933 +0000
-+++ b/crates/mtg-core/src/cast.rs	2026-10-06 05:11:56.135477898 +0000
+--- a/crates/mtg-core/src/cast.rs	2026-10-06 06:23:34.691951178 +0000
++++ b/crates/mtg-core/src/cast.rs	2026-10-06 06:23:34.698589576 +0000
 @@ -111,7 +111,29 @@
              let sd = def.spell_def().unwrap().1;
              let mut opts: Vec<Opt> = Vec::new();
@@ -245,8 +294,8 @@ diff -ruN a/crates/mtg-core/src/cast.rs b/crates/mtg-core/src/cast.rs
                          has_target &= n >= x as usize;
                      }
 diff -ruN a/crates/mtg-core/src/combat.rs b/crates/mtg-core/src/combat.rs
---- a/crates/mtg-core/src/combat.rs	2026-10-06 05:11:56.204793938 +0000
-+++ b/crates/mtg-core/src/combat.rs	2026-10-06 05:11:56.215554597 +0000
+--- a/crates/mtg-core/src/combat.rs	2026-10-06 06:23:34.779951184 +0000
++++ b/crates/mtg-core/src/combat.rs	2026-10-06 06:23:34.785151039 +0000
 @@ -20,9 +20,13 @@
          if self.s.player_fx.iter().any(|f| f.player == seat && f.fx == PlayerFx::CreaturesCantAttack) {
              return v;
@@ -272,8 +321,8 @@ diff -ruN a/crates/mtg-core/src/combat.rs b/crates/mtg-core/src/combat.rs
              return false;
          }
 diff -ruN a/crates/mtg-core/src/cost.rs b/crates/mtg-core/src/cost.rs
---- a/crates/mtg-core/src/cost.rs	2026-10-06 05:11:56.332793946 +0000
-+++ b/crates/mtg-core/src/cost.rs	2026-10-06 05:11:56.343631638 +0000
+--- a/crates/mtg-core/src/cost.rs	2026-10-06 06:23:34.911951192 +0000
++++ b/crates/mtg-core/src/cost.rs	2026-10-06 06:23:34.915612274 +0000
 @@ -199,6 +199,15 @@
              } else {
                  plan.mana.generic = plan.mana.generic.saturating_sub((-delta) as u8);
@@ -290,12 +339,15 @@ diff -ruN a/crates/mtg-core/src/cost.rs b/crates/mtg-core/src/cost.rs
              // Delve pays for generic mana of the total cost (702.66a).
              if has_delve(self.db.def(self.s.obj(card).def)) {
                  let n = ctx.delve.len().min(plan.mana.generic as usize) as u8;
-@@ -219,6 +228,38 @@
+@@ -219,6 +228,41 @@
              .count()
      }
  
 +    /// The highest cost floor (`AbilityDef::CostFloor`) in effect for `spell`, or 0.
 +    pub fn cost_floor(&mut self, spell: ObjRef) -> u8 {
++        if !self.db.has_cost_floor {
++            return 0;
++        }
 +        self.refresh();
 +        let _ = spell;
 +        let mut best = 0u8;
@@ -329,7 +381,7 @@ diff -ruN a/crates/mtg-core/src/cost.rs b/crates/mtg-core/src/cost.rs
      /// Net generic-mana change from `CostMod` abilities of permanents on the battlefield.
      pub fn cost_mod_total(&mut self, caster: Seat, spell: ObjRef, not_hand: bool) -> i32 {
          self.refresh();
-@@ -293,7 +334,10 @@
+@@ -293,7 +337,10 @@
                  self.filter_match(f, r, &c, false, seat)
              })
              .collect();
@@ -342,8 +394,8 @@ diff -ruN a/crates/mtg-core/src/cost.rs b/crates/mtg-core/src/cost.rs
          // permanents on the battlefield).
          let mut out: Vec<ObjRef> = Vec::new();
 diff -ruN a/crates/mtg-core/src/decision.rs b/crates/mtg-core/src/decision.rs
---- a/crates/mtg-core/src/decision.rs	2026-10-06 05:11:56.536793958 +0000
-+++ b/crates/mtg-core/src/decision.rs	2026-10-06 05:11:56.543491271 +0000
+--- a/crates/mtg-core/src/decision.rs	2026-10-06 06:23:34.995951197 +0000
++++ b/crates/mtg-core/src/decision.rs	2026-10-06 06:23:35.001982792 +0000
 @@ -112,6 +112,8 @@
      RevealPick,
      /// Delve: graveyard cards exiled to pay generic mana; `Done` ends the selection.
@@ -354,8 +406,8 @@ diff -ruN a/crates/mtg-core/src/decision.rs b/crates/mtg-core/src/decision.rs
  
  impl CardsPurpose {
 diff -ruN a/crates/mtg-core/src/derive.rs b/crates/mtg-core/src/derive.rs
---- a/crates/mtg-core/src/derive.rs	2026-10-06 05:11:56.632793963 +0000
-+++ b/crates/mtg-core/src/derive.rs	2026-10-06 05:11:56.636858366 +0000
+--- a/crates/mtg-core/src/derive.rs	2026-10-06 06:23:35.075951201 +0000
++++ b/crates/mtg-core/src/derive.rs	2026-10-06 06:23:35.082766150 +0000
 @@ -382,6 +382,13 @@
                  }
              }
@@ -371,8 +423,8 @@ diff -ruN a/crates/mtg-core/src/derive.rs b/crates/mtg-core/src/derive.rs
              if !cmp.test(self.db.def(o.def).mana_value() as i32, n) {
                  return false;
 diff -ruN a/crates/mtg-core/src/ir.rs b/crates/mtg-core/src/ir.rs
---- a/crates/mtg-core/src/ir.rs	2026-10-06 05:11:56.736793970 +0000
-+++ b/crates/mtg-core/src/ir.rs	2026-10-06 05:11:56.743577748 +0000
+--- a/crates/mtg-core/src/ir.rs	2026-10-06 06:23:35.251951212 +0000
++++ b/crates/mtg-core/src/ir.rs	2026-10-06 06:23:35.257662686 +0000
 @@ -55,6 +55,20 @@
      ZoneKind::Battlefield
  }
@@ -470,8 +522,8 @@ diff -ruN a/crates/mtg-core/src/ir.rs b/crates/mtg-core/src/ir.rs
  
  /// "You may cast <spells> without paying their mana costs (and with flash)". Casting this way is
 diff -ruN a/crates/mtg-core/src/legal.rs b/crates/mtg-core/src/legal.rs
---- a/crates/mtg-core/src/legal.rs	2026-10-06 05:11:56.816793974 +0000
-+++ b/crates/mtg-core/src/legal.rs	2026-10-06 05:11:56.823858314 +0000
+--- a/crates/mtg-core/src/legal.rs	2026-10-06 06:23:35.339951217 +0000
++++ b/crates/mtg-core/src/legal.rs	2026-10-06 06:23:35.345946363 +0000
 @@ -25,6 +25,10 @@
      /// The ability also sacrifices a permanent (Lazotep Quarry); automatic payment picks the
      /// cheapest one that is not itself a mana source of this payment (see `sac_pick`).
@@ -721,8 +773,8 @@ diff -ruN a/crates/mtg-core/src/legal.rs b/crates/mtg-core/src/legal.rs
          Effect::AddManaRestricted => Some((0b11111, 1)),
          Effect::Seq(v) => v.iter().find_map(mana_leaf),
 diff -ruN a/crates/mtg-core/src/lint.rs b/crates/mtg-core/src/lint.rs
---- a/crates/mtg-core/src/lint.rs	2026-10-06 05:11:56.896793979 +0000
-+++ b/crates/mtg-core/src/lint.rs	2026-10-06 05:11:56.904445819 +0000
+--- a/crates/mtg-core/src/lint.rs	2026-10-06 06:23:35.459951224 +0000
++++ b/crates/mtg-core/src/lint.rs	2026-10-06 06:23:35.467902513 +0000
 @@ -84,6 +84,7 @@
          Effect::CreateToken { n, who, .. } => tmax(expr(n), p(who)),
          Effect::AddCounters { objs: o, n, .. } => tmax(objs(o), expr(n)),
@@ -741,8 +793,8 @@ diff -ruN a/crates/mtg-core/src/lint.rs b/crates/mtg-core/src/lint.rs
  }
  
 diff -ruN a/crates/mtg-core/src/ops.rs b/crates/mtg-core/src/ops.rs
---- a/crates/mtg-core/src/ops.rs	2026-10-06 05:11:57.004793986 +0000
-+++ b/crates/mtg-core/src/ops.rs	2026-10-06 05:11:57.012551344 +0000
+--- a/crates/mtg-core/src/ops.rs	2026-10-06 06:23:35.591951232 +0000
++++ b/crates/mtg-core/src/ops.rs	2026-10-06 06:23:35.599006687 +0000
 @@ -512,6 +512,8 @@
          };
          match to {
@@ -753,8 +805,8 @@ diff -ruN a/crates/mtg-core/src/ops.rs b/crates/mtg-core/src/ops.rs
                  self.propose(ProposedEvent::LifeChange { player: p, delta: -(amount as i32) });
              }
 diff -ruN a/crates/mtg-core/src/priority.rs b/crates/mtg-core/src/priority.rs
---- a/crates/mtg-core/src/priority.rs	2026-10-06 05:11:57.084793990 +0000
-+++ b/crates/mtg-core/src/priority.rs	2026-10-06 05:11:57.090694120 +0000
+--- a/crates/mtg-core/src/priority.rs	2026-10-06 06:23:35.675951237 +0000
++++ b/crates/mtg-core/src/priority.rs	2026-10-06 06:23:35.683485256 +0000
 @@ -292,7 +292,7 @@
              }
          }
@@ -774,8 +826,8 @@ diff -ruN a/crates/mtg-core/src/priority.rs b/crates/mtg-core/src/priority.rs
                  if has {
                      ok = true;
 diff -ruN a/crates/mtg-core/src/resolve.rs b/crates/mtg-core/src/resolve.rs
---- a/crates/mtg-core/src/resolve.rs	2026-10-06 05:11:57.200793997 +0000
-+++ b/crates/mtg-core/src/resolve.rs	2026-10-06 05:11:57.207274273 +0000
+--- a/crates/mtg-core/src/resolve.rs	2026-10-06 06:23:35.771951243 +0000
++++ b/crates/mtg-core/src/resolve.rs	2026-10-06 06:23:35.775947672 +0000
 @@ -1254,6 +1254,11 @@
              cx.add_mana(env.controller, *color, *n);
              Flow::Next
@@ -848,8 +900,8 @@ diff -ruN a/crates/mtg-core/src/resolve.rs b/crates/mtg-core/src/resolve.rs
              f.aux = 1;
              if let (Opt::Card(r), StackKind::Ability { source, .. }) = (o, f.entry.kind) {
 diff -ruN a/crates/mtg-core/src/restrict.rs b/crates/mtg-core/src/restrict.rs
---- a/crates/mtg-core/src/restrict.rs	2026-10-06 05:11:57.376794008 +0000
-+++ b/crates/mtg-core/src/restrict.rs	2026-10-06 05:11:57.383613555 +0000
+--- a/crates/mtg-core/src/restrict.rs	2026-10-06 06:23:35.839951247 +0000
++++ b/crates/mtg-core/src/restrict.rs	2026-10-06 06:23:35.848430563 +0000
 @@ -131,6 +131,64 @@
          false
      }
@@ -930,8 +982,8 @@ diff -ruN a/crates/mtg-core/src/restrict.rs b/crates/mtg-core/src/restrict.rs
                  let mut f = sources.clone();
                  f.controller = Rel::Any;
 diff -ruN a/crates/mtg-core/src/trigger.rs b/crates/mtg-core/src/trigger.rs
---- a/crates/mtg-core/src/trigger.rs	2026-10-06 05:11:57.464794013 +0000
-+++ b/crates/mtg-core/src/trigger.rs	2026-10-06 05:11:57.475826291 +0000
+--- a/crates/mtg-core/src/trigger.rs	2026-10-06 06:23:35.919951251 +0000
++++ b/crates/mtg-core/src/trigger.rs	2026-10-06 06:23:35.925846004 +0000
 @@ -66,7 +66,13 @@
              return;
          }
@@ -958,8 +1010,8 @@ diff -ruN a/crates/mtg-core/src/trigger.rs b/crates/mtg-core/src/trigger.rs
                          continue;
                      }
 diff -ruN a/crates/mtg-core/src/turn.rs b/crates/mtg-core/src/turn.rs
---- a/crates/mtg-core/src/turn.rs	2026-10-06 05:11:57.552794018 +0000
-+++ b/crates/mtg-core/src/turn.rs	2026-10-06 05:11:57.559611898 +0000
+--- a/crates/mtg-core/src/turn.rs	2026-10-06 06:23:36.019951257 +0000
++++ b/crates/mtg-core/src/turn.rs	2026-10-06 06:23:36.024887220 +0000
 @@ -72,7 +72,9 @@
      let active = cx.s.turn.active;
      match step {
@@ -972,8 +1024,8 @@ diff -ruN a/crates/mtg-core/src/turn.rs b/crates/mtg-core/src/turn.rs
                  cx.untap(r);
              }
 diff -ruN a/crates/mtg-core/src/types.rs b/crates/mtg-core/src/types.rs
---- a/crates/mtg-core/src/types.rs	2026-10-06 05:11:57.668794025 +0000
-+++ b/crates/mtg-core/src/types.rs	2026-10-06 05:11:57.679540429 +0000
+--- a/crates/mtg-core/src/types.rs	2026-10-06 06:23:36.123951264 +0000
++++ b/crates/mtg-core/src/types.rs	2026-10-06 06:23:36.127262001 +0000
 @@ -117,6 +117,10 @@
          const SWAMPWALK     = 1 << 18;
          /// "Can block only creatures with flying" (Brazen Borrower).
@@ -993,9 +1045,137 @@ diff -ruN a/crates/mtg-core/src/types.rs b/crates/mtg-core/src/types.rs
  ];
  
  /// Subtype set; bit `i` = `SUBTYPE_NAMES[i]`.
+diff -ruN a/crates/mtg-match/src/play.rs b/crates/mtg-match/src/play.rs
+--- a/crates/mtg-match/src/play.rs	2026-10-06 06:23:36.247951271 +0000
++++ b/crates/mtg-match/src/play.rs	2026-10-06 06:23:36.253771617 +0000
+@@ -15,10 +15,9 @@
+ pub enum OppView {
+     /// The opponent's game-one main deck. Cards from their sideboard are surprises when first seen.
+     Main,
+-    /// The opponent's base 75 with the *public* plan for this matchup applied (the `public` books
+-    /// given to `play_match`): the prepared-player assumption. The plans are fixed public knowledge;
+-    /// the opponent's actual list is never read, so a variant under test is not leaked to the
+-    /// searching seat. Equal to `Main` for a seat that does not board.
++    /// The opponent's main deck with the standard plan for this matchup applied: the prepared-player
++    /// assumption (the plans are fixed public knowledge, not something read from the opponent's
++    /// hidden choices). Equal to `Main` for a seat that does not board.
+     Plan,
+ }
+ 
+@@ -95,35 +94,28 @@
+     Ok((decks, boarded))
+ }
+ 
+-/// Each seat's belief model for a game: its own list exactly, the opponent's list as expected. The
+-/// expectation comes from the public plan (`pub_decks`) or the opponent's base main deck, never from
+-/// `decks`, the lists actually played, which would leak what a plan under test brought in.
+-pub fn beliefs(base: [&DeckList; 2], decks: &[DeckList; 2], pub_decks: &[DeckList; 2], view: OppView) -> [ExpectedModel; 2] {
+-    [0usize, 1].map(|s| {
+-        let opp = 1 - s;
+-        let mut d: [Vec<CardDefId>; 2] = [Vec::new(), Vec::new()];
+-        d[s] = decks[s].main.clone();
+-        d[opp] = match view {
+-            OppView::Plan => pub_decks[opp].main.clone(),
+-            OppView::Main => base[opp].main.clone(),
+-        };
+-        ExpectedModel { decks: d, exact: [s == 0, s == 1] }
+-    })
+-}
+-
+ /// Plays one match between `base[0]` (seat 0) and `base[1]` (seat 1). Each seat boards from its own
+ /// plan book (the same book for both seats, or two books to play one plan against another).
+-/// `public` is each seat's *standard* plan book, the one the other seat is assumed to know under
+-/// `OppView::Plan`. It is separate from `books` so that a plan under test never reaches the other
+-/// seat's belief; pass the same books as `books` when no plan is under test.
+-pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], books: [Option<&PlanBook>; 2], public: [Option<&PlanBook>; 2], cfg: &MatchConfig, fac: &mut dyn PlayerFactory) -> Result<MatchResult, String> {
++pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], books: [Option<&PlanBook>; 2], cfg: &MatchConfig, fac: &mut dyn PlayerFactory) -> Result<MatchResult, String> {
+     let mut res = MatchResult { games: Vec::new(), wins: [0, 0] };
+     let mut first = cfg.first;
+     let mut game_no = 0u32;
+     while res.wins[0] < 2 && res.wins[1] < 2 && game_no < cfg.max_games {
+         let (decks, boarded) = game_decks(db, names, base, books, cfg, game_no, first)?;
+-        let (pub_decks, _) = game_decks(db, names, base, public, cfg, game_no, first)?;
+-        let models = beliefs(base, &decks, &pub_decks, cfg.opp_view);
++        // What each seat believes about the other's deck.
++        let expected = |s: usize| -> Vec<CardDefId> {
++            let opp = 1 - s;
++            match cfg.opp_view {
++                OppView::Plan => decks[opp].main.clone(),
++                OppView::Main => base[opp].main.clone(),
++            }
++        };
++        let models = [0usize, 1].map(|s| {
++            let mut d: [Vec<CardDefId>; 2] = [Vec::new(), Vec::new()];
++            d[s] = decks[s].main.clone();
++            d[1 - s] = expected(s);
++            ExpectedModel { decks: d, exact: [s == 0, s == 1] }
++        });
+         let seed = cfg.seed.wrapping_mul(1_000_003).wrapping_add(game_no as u64);
+         let mut pols = [fac.make(Seat(0), game_no, &models[0], seed ^ 0x51), fac.make(Seat(1), game_no, &models[1], seed ^ 0xA7)];
+         let mut g = Game::new(db.clone(), [&decks[0], &decks[1]], seed, GameConfig { first_player: first, ..GameConfig::default() });
+diff -ruN a/crates/mtg-match/tests/matches.rs b/crates/mtg-match/tests/matches.rs
+--- a/crates/mtg-match/tests/matches.rs	2026-10-06 06:23:36.355951277 +0000
++++ b/crates/mtg-match/tests/matches.rs	2026-10-06 06:23:36.360463126 +0000
+@@ -145,7 +145,7 @@
+     let mut seen_three = false;
+     for seed in 0..40u64 {
+         let cfg = MatchConfig { seed, first: Seat((seed % 2) as u8), max_decisions: 20000, ..MatchConfig::default() };
+-        let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
++        let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
+         assert!(r.games.len() >= 2 && r.games.len() <= 5);
+         assert_eq!(r.wins[0] as usize, r.games.iter().filter(|g| g.winner == Some(Seat(0))).count());
+         assert!(r.wins[0] <= 2 && r.wins[1] <= 2);
+@@ -165,10 +165,10 @@
+     assert!(seen_three, "no match went to three games in 40 tries");
+     // --board a: only seat 0 boards; a pair without a plan never boards.
+     let cfg = MatchConfig { board: [true, false], seed: 5, max_decisions: 20000, ..MatchConfig::default() };
+-    let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
++    let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
+     assert!(r.games.iter().skip(1).all(|g| g.boarded == [true, false]));
+     let (d, e) = (names.iter().position(|n| n == "dimir-tempo").unwrap(), names.iter().position(|n| n == "boros-aggro").unwrap());
+-    let r = play_match(&db, ["dimir-tempo", "boros-aggro"], [&decks[d], &decks[e]], [Some(&book), Some(&book)], [Some(&book), Some(&book)], &MatchConfig { seed: 9, max_decisions: 20000, ..MatchConfig::default() }, &mut RandFac).unwrap();
++    let r = play_match(&db, ["dimir-tempo", "boros-aggro"], [&decks[d], &decks[e]], [Some(&book), Some(&book)], &MatchConfig { seed: 9, max_decisions: 20000, ..MatchConfig::default() }, &mut RandFac).unwrap();
+     assert!(r.games.iter().all(|g| g.boarded == [false, false]), "no plan for this pair");
+ }
+ 
+@@ -253,34 +253,3 @@
+     assert_eq!(decks2[0].main.len(), 60);
+     assert_ne!(decks2[0].main, decks2[1].main);
+ }
+-
+-/// A plan under test must not reach the opponent's belief: the searching seat expects the public
+-/// plan's list, not the list the variant actually plays.
+-#[test]
+-fn belief_comes_from_the_public_plan_not_the_played_list() {
+-    let (db, names, decks, public) = load();
+-    let ai = names.iter().position(|n| n == "alurentell").unwrap();
+-    let bi = names.iter().position(|n| n == "ur-cutter").unwrap();
+-    let base = [&decks[ai], &decks[bi]];
+-    // A variant for Alurentell that differs from the public plan: one more Prismatic Ending, one fewer Stock Up.
+-    let dir = std::env::temp_dir().join(format!("mtg-match-variant-{}", std::process::id()));
+-    std::fs::create_dir_all(&dir).unwrap();
+-    std::fs::write(dir.join("alurentell.txt"), "vs ur-cutter\n-1 Stock Up\n+1 Prismatic Ending\n").unwrap();
+-    let variant = PlanBook::load_dir(&db, &dir).unwrap();
+-    std::fs::remove_dir_all(&dir).unwrap();
+-    let cfg = MatchConfig::default();
+-    let names2 = ["alurentell", "ur-cutter"];
+-    let (played, _) = game_decks(&db, names2, base, [Some(&variant), Some(&public)], &cfg, 1, Seat(0)).unwrap();
+-    let (pub_decks, _) = game_decks(&db, names2, base, [Some(&public), Some(&public)], &cfg, 1, Seat(0)).unwrap();
+-    assert_ne!(played[0].main, pub_decks[0].main, "the variant must differ from the public plan");
+-    let m = beliefs(base, &played, &pub_decks, OppView::Plan);
+-    let sorted = |v: &Vec<_>| { let mut v = v.clone(); v.sort(); v };
+-    // Seat 1 (UR) expects the public Alurentell list, not the played variant; seat 0 knows its own list exactly.
+-    assert_eq!(sorted(&m[1].decks[0]), sorted(&pub_decks[0].main));
+-    assert_ne!(sorted(&m[1].decks[0]), sorted(&played[0].main));
+-    assert_eq!(sorted(&m[0].decks[0]), sorted(&played[0].main));
+-    assert!(m[1].exact[1] && !m[1].exact[0]);
+-    // Main view: the opponent's game-one list.
+-    let mm = beliefs(base, &played, &pub_decks, OppView::Main);
+-    assert_eq!(sorted(&mm[1].decks[0]), sorted(&base[0].main));
+-}
 diff -ruN a/crates/mtg-spec/src/expect.rs b/crates/mtg-spec/src/expect.rs
---- a/crates/mtg-spec/src/expect.rs	2026-10-06 05:11:57.776794031 +0000
-+++ b/crates/mtg-spec/src/expect.rs	2026-10-06 05:11:57.784737734 +0000
+--- a/crates/mtg-spec/src/expect.rs	2026-10-06 06:23:36.431951282 +0000
++++ b/crates/mtg-spec/src/expect.rs	2026-10-06 06:23:36.436787026 +0000
 @@ -346,7 +346,19 @@
                              _ => unsupported!("command expectation {e}"),
                          }
@@ -1043,8 +1223,8 @@ diff -ruN a/crates/mtg-spec/src/expect.rs b/crates/mtg-spec/src/expect.rs
              other => unsupported!("legal pattern {other}"),
          })
 diff -ruN a/crates/mtg-spec/src/runner.rs b/crates/mtg-spec/src/runner.rs
---- a/crates/mtg-spec/src/runner.rs	2026-10-06 05:11:57.860794036 +0000
-+++ b/crates/mtg-spec/src/runner.rs	2026-10-06 05:11:57.866233199 +0000
+--- a/crates/mtg-spec/src/runner.rs	2026-10-06 06:23:36.575951290 +0000
++++ b/crates/mtg-spec/src/runner.rs	2026-10-06 06:23:36.581863327 +0000
 @@ -229,6 +229,8 @@
          "stun" => CounterKind::Stun,
          "charge" => CounterKind::Charge,

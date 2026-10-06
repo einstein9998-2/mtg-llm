@@ -8,7 +8,7 @@ Brady's own Colorless Tron 75 (`decks/colorless-tron.txt`, deck 10) is an Aluren
 
 ## Proposed change
 `mtg-core` (all enum cases are appended; existing discriminants do not move):
-1. **Cost floor** (Trinisphere): `AbilityDef::CostFloor(CostFloorDef { min, cond })`. `finish_plan` (`cost.rs`), the one place every cast goes through, raises the mana cost to `min` after all other cost changes and before delve (CR 601.2f), whatever the way (hard cast, Force of Will pitch, Daze, Aluren/Omniscience free casts, Lotus Petal). Extra mana is generic.
+1. **Cost floor** (Trinisphere): `AbilityDef::CostFloor(CostFloorDef { min, cond })`. `finish_plan` (`cost.rs`), the one place every cast goes through, raises the mana cost to `min` after all other cost changes and before delve (CR 601.2f), whatever the way (hard cast, Force of Will pitch, Daze, Aluren/Omniscience free casts, Lotus Petal). Extra mana is generic. `CardDb::has_cost_floor` (like `has_restrict`) lets `cost_floor` skip the battlefield scan when no card in the pool has a floor.
 2. **No untap** (Grim Monolith): `Keywords::NO_UNTAP`, read in the untap step (`turn.rs`).
 3. **Unblockable** (Manifold Key): `Keywords::UNBLOCKABLE`, read in `can_block_pair` (`combat.rs`).
 4. **Protection from everything for a player** (The One Ring): `PlayerFx::ProtectionFromEverything`. Damage to the player is prevented (`ops.rs`) and the player is not a legal target (`legal.rs`, `can_target_from`). Lasts until the controller's next turn (`Until::YourNextTurn`).
@@ -24,16 +24,16 @@ Brady's own Colorless Tron 75 (`decks/colorless-tron.txt`, deck 10) is an Aluren
 14. **Card database hash**: `ObjFilter.cmc_x_max` is a `HashFalseFlag` (hashes like an absent field when false), and every new enum case is appended, so the goldens replay bit-identically even though the card definitions of the 8 older decks are unchanged.
 15. **Spec adapter** (`mtg-spec`, test-only): honors the `ability` index in legal-action patterns (card-order among activated abilities), matches emblems by name and ability text, maps `burden` counters, and checks "extra modes" and "X not offered" in illegal-action scenarios. Visible spec stays 838/838.
 
-Card data: `crates/mtg-cards/cards/tron.cards.ron` (second source file in `legacy.rs`).
+Card data: `crates/mtg-cards/cards/tron.cards.ron` (second source file in `legacy.rs`). Kozilek's Command is a Kindred Instant — Eldrazi (`KINDRED | INSTANT`, subtype Eldrazi), as in its Oracle text.
 
 ## Documented limits (not modeled; `known-divergences` entries to be added on approval)
-Urza's Saga and Summon: Bahamut (RFC 0007), Karn -2, Ugin -11, Argentum Masticore, Mycosynth Lattice, Eldrazi Confluence (distinct modes only), Extinguisher Battleship station, Mishra's Research Desk unearth and expiry, Kozilek's Command "target player" modes only target yourself, Urza's Workshop's two mana abilities modeled as one (same outcomes), Planar Nexus filter only via automatic payment.
+Urza's Saga and Summon: Bahamut (RFC 0007), Karn -2, Ugin -11, Argentum Masticore, Mycosynth Lattice and Eldrazi Confluence (not defined at all), Extinguisher Battleship station (it is never a creature), Planar Nexus's filter only via automatic payment. Also: Kozilek's Command's two "target player" modes only target you (so while The One Ring's protection is up they are unavailable, where real Magic lets you target the opponent); Mishra's Research Desk's chosen card stays playable indefinitely instead of until the end of your next turn, and its unearth is missing; the Construct token's "+1/+1 for each artifact" (layer 7c in the rules) is a layer 7a set-P/T here, the same value unless another P/T effect applies, and the token is orphaned until Urza's Saga (RFC 0007) lands.
 
 ## Rules basis
 Quotes are from the scenario writers' retrieved excerpts (`cr-excerpts-tron-{A,B,C}.md`, Savecraft rules module); Oracle text from Savecraft card data.
 - **Cost floor** (Trinisphere). 601.2f: the total cost is the mana cost or alternative cost plus cost increases, minus reductions. 118.9d: "any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost", so Force of Will's pitch and Daze's return still pay {3}. Trinisphere's floor applies after all other changes, hence the single place in `finish_plan`. "You may cast [this object] without paying its mana cost" is itself an alternative cost (118.9), so Aluren's and Omniscience's free casts still pay {3}; scenarios `tron-a-trinisphere-*` pin each (Force of Will pitch, Daze, Aluren, Omniscience).
 - **No untap** (Grim Monolith). 502.3: the active player untaps all permanents "but effects can keep one or more of a player's permanents from untapping".
-- **Protection of a player** (The One Ring). 702.16b: can't be targeted by spells or abilities from a source with the quality. 702.16e: damage from such sources is prevented. Protection from everything means every source.
+- **Protection of a player** (The One Ring). 702.16j: "protection from everything" is protection from each object regardless of its characteristics; 702.16b: can't be targeted by spells or abilities from such a source; 702.16e: damage from such sources is prevented.
 - **Static restrictions**. 508.1c: attack restrictions are checked when attackers are declared (Ensnaring Bridge counts the Bridge controller's hand). 603.2 / 603.6a: enter-the-battlefield triggers; Torpor Orb makes creatures entering not cause abilities to trigger (a static effect that stops the trigger event matching).
 - **Exile until leaves** (Portable Hole). 610.3: a one-shot "until" effect, the return happens when the source leaves; 610.3b covers the leave-before-resolve case (nothing is exiled).
 - **Mana abilities with dynamic amounts and filter costs** (Tower, Workshop, Planar Nexus). 605.1a: an activated ability that could add mana, has no target and is not a loyalty ability is a mana ability; 605.3b: resolves immediately, no stack. Amounts are counted on resolution (Tower: 7 only with Mine and Power-Plant).
@@ -50,7 +50,7 @@ Quotes are from the scenario writers' retrieved excerpts (`cr-excerpts-tron-{A,B
 
 ## Test plan and results
 Scenarios were written by three separate agents from Oracle text and the CR only (the implementer did not write or see them first); defects found in them were sent back to their writers.
-- 156 Tron scenarios: 156 pass. Visible spec: 838 of 838. Workspace tests: 81 passed, 0 failed. Goldens (test pool and real pool) bit-identical.
+- 156 Tron scenarios: 156 pass. Visible spec: 838 of 838. Workspace tests: 81 passed, 0 failed here (the independent review's run, without the sideboarding `mtg-match` tests that live in PR #4, got 73 passed, 0 failed, and 994/994 spec with the 156 added). Goldens (test pool and real pool) bit-identical.
 - 9-deck fuzz, 3000 games, 2.04 M decisions, 0 violations. It found two Kozilek's Command bugs (items 12), fixed.
 - Matchup-critical checks pinned by scenarios: Trinisphere against Force of Will, Daze, Aluren and Omniscience (14 `tron-a-trinisphere-*` files); Torpor Orb (`tron-B-*orb*`); Planar Nexus payment and land types (`tron-C-nexus-*`); Pithing Needle against Boseiju's channel.
 - Not run: the sealed holdout and Forge differential testing (this change adds no holdout cards).

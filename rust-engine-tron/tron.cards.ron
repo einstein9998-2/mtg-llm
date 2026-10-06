@@ -102,7 +102,7 @@
     Activated(text: "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.", cost: [TapSelf],
       effect: Seq([AddCounters(objs: One(This), kind: Other(0), n: Const(1)), Draw(who: You, n: Counters(This, Other(0)))])),
   ]),
-  (name: "Kozilek's Command", cost: "{X}{C}{C}", types: "INSTANT", subtypes: [], abilities: [
+  (name: "Kozilek's Command", cost: "{X}{C}{C}", types: "KINDRED | INSTANT", subtypes: ["Eldrazi"], abilities: [
     Spell(choose: (2, 2), modes: [
       (label: "Target player creates X 0/1 colorless Eldrazi Spawn creature tokens.", targets: [(players: You)], effect: CreateToken(token: "Eldrazi Spawn Token", n: X, who: Target(0))),
       (label: "Target player scries X, then draws a card.", targets: [(players: You)], effect: Seq([Scry(X), Draw(who: Target(0), n: Const(1))])),
