@@ -62,6 +62,9 @@ header { display: flex; flex-direction: column; gap: 10px; }
 .card-head .meta { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .life { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px 0; font-family: var(--font-mono); font-size: 13px; }
 .life .you b { color: var(--accent); }
+.land { padding: 0 8px; border-radius: 3px; background: var(--surface-2); }
+.land.open { background: var(--good-soft); color: var(--good); }
+.land.done { color: var(--muted); }
 .life .opp b { color: var(--opp); }
 .board { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; padding: 12px 16px; }
 .board > div { min-width: 0; }
@@ -177,7 +180,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
   function cardHtml(p, idx) {
     var v = p.view, a = answers[p.id] || {};
     var answered = a.pick != null;
-    var lifeLine = '<div class="life"><span class="you">You <b>' + v.my_life + '</b> life · library ' + v.my_lib + '</span><span class="opp">Opponent <b>' + v.opp_life + '</b> life · ' + v.opp_hand + ' cards in hand · library ' + v.opp_lib + '</span></div>';
+    var lifeLine = '<div class="life"><span class="you">You <b>' + v.my_life + '</b> life · library ' + v.my_lib + '</span>' + landNote(p, v) + '<span class="opp">Opponent <b>' + v.opp_life + '</b> life · ' + v.opp_hand + ' cards in hand · library ' + v.opp_lib + '</span></div>';
     var stack = v.stack && v.stack.length ? '<div class="stack"><b>On the stack</b>' + esc(v.stack.join(' → ')) + '</div>' : '';
     var log = '';
     if (p.game_log && p.game_log.length > 3) {
@@ -218,6 +221,14 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       '<textarea id="note-' + esc(p.id) + '" data-note="' + esc(p.id) + '" placeholder="Why? (optional, one line is plenty)">' + esc(a.note || '') + '</textarea>' +
       '<div class="status" id="st-' + esc(p.id) + '"></div></div>' +
       '</article>';
+  }
+
+  function landNote(p, v) {
+    if (p.category === 'keep') return '';
+    if (v.whose !== 'your') return '<span class="land">Opponent\'s turn</span>';
+    var n = v.lands_played || 0;
+    var pool = (v.pool || []).some(function (x) { return x > 0; }) ? ' · mana floating ' + v.pool.join('/') : '';
+    return '<span class="land ' + (n > 0 ? 'done' : 'open') + '">' + (n > 0 ? 'Land played this turn (' + n + ')' : 'No land played yet this turn') + pool + '</span>';
   }
 
   function setStatus(id, t) { var el = document.getElementById('st-' + id); if (el) el.textContent = t; }
