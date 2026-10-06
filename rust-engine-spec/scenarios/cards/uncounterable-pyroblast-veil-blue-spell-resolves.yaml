@@ -1,0 +1,63 @@
+id: uncounterable-pyroblast-veil-blue-spell-resolves
+title: Pyroblast's counter mode on a blue spell made uncounterable by Veil of Summer does not counter it, and the creature resolves
+area: card
+cards: [Veil of Summer, "Bilbo, Thief in the Night", Pyroblast, Forest, Island, Mountain]
+tags: [pyroblast, counterspell, conditional-counter, cant-be-countered, veil-of-summer, rule-modification]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyroblast, text: "Counter target spell if it's blue.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil", "Bilbo, Thief in the Night @bilbo"]
+    battlefield: ["Forest @f", "Island @i1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Pyroblast @pyro"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bilbo", pay: {tap: ["@i1", "@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@pyro", modes: [1], targets: ["@bilbo"], pay: {tap: ["@pm"]}}
+  - check:
+      stack: [{kind: spell, card: "@bilbo", controller: p0}, {kind: spell, card: "@pyro", controller: p1, targets: ["@bilbo"]}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bilbo", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Pyroblast]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Veil of Summer]
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: "Bilbo, Thief in the Night", controller: p0}
+    p1:
+      hand: []
+      graveyard: [Pyroblast]
+      battlefield: [{card: Mountain, tapped: true}]
+notes: >
+  Bilbo is a blue spell, so Pyroblast's "if it's blue" condition holds and Pyroblast's instruction is to counter it.
+  Veil resolved earlier this turn: Bilbo can't be countered (101.2), so the instruction does nothing, and Bilbo resolves
+  onto the battlefield. Pyroblast itself still resolves (target legal) and goes to the graveyard. Veil's hexproof from
+  blue and black is irrelevant (Pyroblast is red and targets a spell, not a player or permanent). Expressed as a creature
+  to avoid Brainstorm's put-back decisions. A wrong engine counters Bilbo because Pyroblast's conditional counter path
+  ignores the uncounterable flag.

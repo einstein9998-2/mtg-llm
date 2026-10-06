@@ -1,0 +1,71 @@
+id: uncounterable-lavinia-trigger-veil-spell-resolves
+title: Lavinia's "counter that spell" trigger does not counter a zero-mana Force of Will cast after Veil of Summer, so it still counters Lightning Bolt
+area: card
+cards: ["Lavinia, Azorius Renegade", Veil of Summer, Force of Will, Brainstorm, Lightning Bolt, Forest, Island, Mountain]
+tags: [lavinia, triggered-ability, intervening-if, cant-be-countered, veil-of-summer, force-of-will, alternative-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Lavinia, Azorius Renegade", text: "Whenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+  - {kind: cr, ref: "603.4", text: "When the trigger event occurs, the ability checks whether the stated condition is true. The ability triggers only if it is", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil", "Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Forest @f", "Island @j1", "Island @j2", "Island @j3", "Island @j4"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Veil of Summer]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@fow", controller: p1}
+        - {kind: triggered, source: "@lav", controller: p0}
+      p1: {life: 19, exile: [Brainstorm]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}, {kind: spell, card: "@fow", controller: p1}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1:
+      life: 19
+      graveyard: [Veil of Summer, Force of Will]
+      exile: [Brainstorm]
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+notes: >
+  Lavinia is p0's. p1 has five lands, so the mana value 5 Force of Will is castable under Lavinia's first ability; Veil
+  (mana value 1) is paid with mana, so Lavinia does not trigger for it. After Veil resolves, Force of Will cast by its
+  alternative cost (no mana spent) triggers Lavinia. The trigger resolves first but the Force of Will is a spell p1
+  controls and can't be countered this turn (101.2), so the trigger does nothing; Force of Will then resolves and counters
+  Lightning Bolt (graveyard, p1 life stays 19 after the 1 life paid). Compare lavinia-counters-spell-cast-without-mana,
+  where the counter works. A wrong engine counters Force of Will (Bolt then deals 3: p1 at 16).

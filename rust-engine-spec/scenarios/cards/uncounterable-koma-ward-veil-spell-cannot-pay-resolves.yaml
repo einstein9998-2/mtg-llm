@@ -1,0 +1,52 @@
+id: uncounterable-koma-ward-veil-spell-cannot-pay-resolves
+title: Koma's ward trigger does not counter a spell made uncounterable by Veil of Summer even when its controller cannot pay {4}
+area: card
+cards: [Veil of Summer, Lightning Bolt, "Koma, World-Eater", Forest, Mountain]
+tags: [ward, koma-world-eater, counter-unless-pay, cant-be-countered, veil-of-summer, triggered-ability, cannot-pay, no-decision]
+derived_from: cr
+source:
+  - {kind: cr, ref: "702.21a", text: "Ward is a triggered ability. Ward [cost] means “Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].”", verified: true}
+  - {kind: oracle, card: "Koma, World-Eater", text: "Trample, ward {4}", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+setup:
+  turn: 8
+  active: p1
+  phase: main1
+  p0:
+    battlefield: [{card: "Koma, World-Eater", as: koma}]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil", "Lightning Bolt @bolt"]
+    battlefield: ["Forest @f", "Mountain @m1"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: ["@koma"], pay: {tap: ["@m1"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: triggered, source: "@koma", controller: p0}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: [{card: "Koma, World-Eater", controller: p0, damage: 3}]
+    p1:
+      hand: []
+      graveyard: [Veil of Summer, Lightning Bolt]
+      battlefield: [{card: Forest, tapped: true}, {card: Mountain, tapped: true}]
+notes: >
+  Variant of the decline scenario where p1 is tapped out: the ward payment is impossible, so no prompt is raised (the
+  convention of koma-ward-counters-swords-to-plowshares-when-unpaid). The spell would normally be countered, but it can't
+  be (101.2): Lightning Bolt resolves and deals 3 damage to Koma. A wrong engine counters it on the implicit decline.

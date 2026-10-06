@@ -1,0 +1,61 @@
+id: uncounterable-daze-cavern-creature-decline-resolves
+title: A creature cast with Cavern of Souls' colored mana is uncounterable, so declining Daze's {1} does not counter it
+area: card
+cards: [Cavern of Souls, Plains, "Phelia, Exuberant Shepherd", Daze, Island]
+tags: [daze, counter-unless-pay, cant-be-countered, cavern-of-souls, mana-restriction, yes-no-decision]
+derived_from: cr
+source:
+  - {kind: oracle, card: Cavern of Souls, text: "{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Phelia, Exuberant Shepherd @ph"]
+    battlefield: [{card: Cavern of Souls, as: cav, flags: {chosen_type: Dog}}, "Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@cav", ability: 1, choose_color: W}
+  - p0: {t: cast, card: "@ph", pay: {tap: ["@pl1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", targets: ["@ph"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@ph", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Daze]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {}
+      hand: []
+      graveyard: []
+      battlefield:
+        - {card: Cavern of Souls, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Plains, tapped: false}
+        - {card: "Phelia, Exuberant Shepherd", controller: p0}
+    p1:
+      hand: []
+      graveyard: [Daze]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Cavern of Souls (chosen type Dog) makes {W} for Phelia (a Dog), the first Plains pays {1}: the spell was cast with
+  mana from Cavern, so it can't be countered. Daze may still target it; p0 is offered the unless-payment (a second
+  untapped Plains is available), declines (118.12a), and the counter cannot happen (101.2). Phelia resolves onto the
+  battlefield. Companion to cavern-of-souls-creature-cannot-be-countered-by-force-of-will, which covers an
+  unconditional counterspell. A wrong engine treats "unless pays" as a separate counter path that ignores the
+  Cavern protection.

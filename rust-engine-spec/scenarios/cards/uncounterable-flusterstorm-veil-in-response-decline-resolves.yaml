@@ -1,0 +1,84 @@
+id: uncounterable-flusterstorm-veil-in-response-decline-resolves
+title: Veil of Summer cast in response to a Flusterstorm and its storm copy; declining both {1} payments does not counter Lightning Bolt
+area: card
+cards: [Veil of Summer, Flusterstorm, Lightning Bolt, Forest, Mountain, Island]
+tags: [flusterstorm, storm, copy, counter-unless-pay, cant-be-countered, veil-of-summer, in-response, yes-no-decision]
+derived_from: cr
+source:
+  - {kind: oracle, card: Flusterstorm, text: "Counter target instant or sorcery spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+  - {kind: cr, ref: "707.10", text: "A copy of a spell or ability copies both the characteristics of the spell or ability and all decisions made for it, including modes, targets, the value of X, and additional or alternative costs.", verified: true}
+setup:
+  turn: 5
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Veil of Summer @veil"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Forest @f"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    hand: ["Flusterstorm @flu"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@flu", targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@flu", controller: p1}
+        - {kind: spell, card: Flusterstorm, copy: true, controller: p1, targets: ["@bolt"]}
+      pending: {actor: p0, kind: priority}
+  - p0: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@flu", controller: p1}
+        - {kind: spell, card: Flusterstorm, copy: true, controller: p1}
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [Island]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_flusterstorm, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}, {kind: spell, card: "@flu", controller: p1}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_flusterstorm, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: [Lightning Bolt, Veil of Summer]
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: false}
+        - {card: Forest, tapped: true}
+    p1: {life: 17, graveyard: [Flusterstorm]}
+notes: >
+  Storm count: Veil of Summer has to be cast this turn for its effect, so a Flusterstorm cast after it would have at
+  least two earlier spells; here Veil is cast AFTER Flusterstorm (in response, above the original and its copy), so
+  only Lightning Bolt was cast before Flusterstorm: exactly one copy, as in flusterstorm-copy-and-original-each-demand-
+  payment. Veil resolves first and draws the Island (p1 cast the blue Flusterstorm this turn). The copy then resolves:
+  p0 is asked to pay {1} (118.12a), declines; Bolt can't be countered (101.2) and stays. The original resolves: asked
+  again, declines again; Bolt still stays and finally deals 3 to p1 (20 to 17). p0's untapped Mountain is never spent.
+  A wrong engine counters Bolt on the first decline (the second prompt would then be missing and the script fail with
+  Bolt in the graveyard and p1 at 20), or never prompts.
