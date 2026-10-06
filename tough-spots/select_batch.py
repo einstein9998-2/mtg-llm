@@ -127,7 +127,7 @@ QUESTIONS = {
     'PutBack': 'Brainstorm: put a card back on top of your library ({r} left to choose).',
     'OrderTop': 'Order the cards for the top of your library ({r} left to place).',
     'OrderBottom': 'Order the cards for the bottom of your library ({r} left to place).',
-    'RevealPick': 'Pick a card from the revealed cards.',
+    'RevealPick': 'Atraxa reveal: you take one card per type, one pick at a time. This pick is one card from the revealed cards (a card of a type already taken is not offered; Done stops).',
     'LookTake': 'Look at the cards: pick one to take ({r} left to take).',
     'ScryBottom': 'Scry: choose a card to put on the bottom (Done keeps the rest on top).',
     'SurveilGraveyard': 'Surveil: choose a card to put into the graveyard (Done keeps the rest).',
