@@ -63,6 +63,9 @@ The implementer found three failures that were defects in the scenarios, and an 
 2. `storm-b-urzas-saga-wasteland-in-response-to-chapter-one-no-mana-ever`: once p1 has passed and p0 passes, the top of the stack resolves (117.4) and p0 gets priority (117.3b); the extra `p1: pass` was removed.
 3. `storm-b-runehorn-hellkite-exiled-as-cost-no-graveyard-hate-response`: same priority pattern; the trailing `p0: pass` was removed.
 
+## Applying together with Tron (RFC 0008)
+`storm-on-tron.patch` is the same change as one patch on top of the live engine with RFC 0008 applied (see README). Differences from `storm-core.patch`: one `Saga` subtype (Tron's) with `Lesson`, `Sorcerer` after Tron's names; the Construct token is defined in `tron.cards.ron` only; Giant's Boulder uses Tron's filter-mana mechanism (the pool-paid cost code of this RFC's item on mana abilities is dropped there). Earlier text claiming the two patches overlap in "14 hunks in 8 files, all at append points" was wrong: the overlap is 17 hunks in 9 files and includes a real merge in `legal.rs`.
+
 ## Alternatives considered
 - Suspend as a new `Opt` kind (a real special action). It is cleaner in the views but changes the option enum every consumer matches on; the stackless activation behaves the same in every scenario.
 - Imprint as a replacement effect "as it enters". Rejected: the Oracle text is a triggered ability and the scenarios require that it can be Stifled.

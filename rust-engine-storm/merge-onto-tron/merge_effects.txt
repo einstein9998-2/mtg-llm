@@ -1,0 +1,29 @@
+    // ---- RFC 0007 (Storm) ----
+    /// Burning Wish: the controller may reveal a card matching the filter that they own from outside
+    /// the game (their sideboard) and put it into their hand.
+    Wish { filter: ObjFilter },
+    /// `who` discards `n` cards chosen at random from their hand (Gamble).
+    DiscardRandom { who: PRef, n: Expr },
+    /// The controller may cast, without paying its mana cost, one of the cards the previous instruction
+    /// moved to exile (Beseech the Mirror) whose mana value is at most `max_cmc`.
+    CastMovedFree { max_cmc: u8 },
+    /// The controller may cast the card the reference names (it is in exile, a suspended card) without
+    /// paying its mana cost. Nothing happens if it can't be cast.
+    CastFree(ORef),
+    /// Imprint (Chrome Mox): the controller may exile a card matching the filter from their hand;
+    /// the source remembers the colors of that card.
+    Imprint { filter: ObjFilter },
+    /// A mana ability: one mana of any color among those of the card imprinted on the source (nothing
+    /// if there is none or it is colorless).
+    AddManaImprinted,
+    /// Ward-style: counter the spell or ability that caused this trigger unless its controller pays
+    /// this much life (Hexing Squelcher).
+    CounterEventUnlessLife { n: u8 },
+    /// `Search` without the shuffle: the card's own `Shuffle` instruction follows later (Gamble
+    /// discards at random between the search and the shuffle).
+    SearchNoShuffle {
+        #[serde(default = "pref_you")]
+        who: PRef,
+        filter: ObjFilter,
+        dest: ZoneKind,
+    },
