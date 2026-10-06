@@ -1,0 +1,40 @@
+id: tron-c-warping-wail-exile-power-one-or-less-guide-of-souls
+title: "Warping Wail mode 1: Guide of Souls (power 1, toughness 2) is a legal target, Phelia (2/2) and Murktide Regent (3/3) are not"
+area: card
+cards: [Warping Wail, "Urza's Tower", Island, Guide of Souls, "Phelia, Exuberant Shepherd", Murktide Regent]
+tags: [warping-wail, exile, targeting, power-or-toughness, mask-validity, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Warping Wail, text: "Exile target creature with power or toughness 1 or less.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Warping Wail @ww]
+    battlefield: ["Urza's Tower @tw", Island @isl]
+    library_pad: 10
+  p1:
+    battlefield: [Guide of Souls @guide, "Phelia, Exuberant Shepherd @ph", Murktide Regent @murk]
+    library_pad: 10
+script:
+  - check:
+      p1: {battlefield: [{card: Guide of Souls, pt: [1, 2]}, {card: "Phelia, Exuberant Shepherd", pt: [2, 2]}, {card: Murktide Regent, pt: [3, 3]}]}
+  - expect_illegal: {p0: {t: cast, card: "@ww", modes: [1], targets: ["@ph"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@ww", modes: [1], targets: ["@murk"], pay: auto}}
+  - p0: {t: cast, card: "@ww", modes: [1], targets: ["@guide"], pay: {tap: ["@tw", "@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Warping Wail]
+      battlefield: [{card: "Urza's Tower", tapped: true}, {card: Island, tapped: true}]
+    p1:
+      exile: [Guide of Souls]
+      battlefield: [{card: "Phelia, Exuberant Shepherd"}, {card: Murktide Regent}]
+notes: >
+  "Power OR toughness 1 or less": Guide of Souls is 1/2, so its power qualifies although its toughness is 2. Phelia (2/2)
+  and Murktide (3/3) have neither. {C} is paid by the Tower, {1} by the Island. A wrong engine requires both stats (power AND toughness).

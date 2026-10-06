@@ -1,0 +1,49 @@
+id: tron-b-pithing-needle-boseiju-channel-from-hand-blocked
+title: "Pithing Needle naming Boseiju stops its Channel ability from hand but not playing it as a land or tapping it for mana"
+area: card
+cards: [Pithing Needle, "Boseiju, Who Endures", Wasteland, Island, Forest]
+tags: [pithing-needle, choose-name, boseiju, channel, activate-from-hand, mana-ability, land-play, mask-validity, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pithing Needle, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: "Boseiju, Who Endures", text: "Channel — {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls.", verified: true}
+  - {kind: cr, ref: "602.2a", text: "If an activated ability is being activated from a hidden zone, the card that has that ability is revealed (see rule 701.20a).", verified: true}
+  - {kind: ruling, card: Pithing Needle, date: "2012-07-01", text: "Pithing Needle stops activated abilities of cards in hidden zones that have the chosen name (for example channel and cycling), since the card is the source of the ability.", verified: false, note: "recalled, not retrieved; follows from the Oracle text (any source with the name) but is not stated in the CR"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pithing Needle @pn", "Boseiju, Who Endures @bos"]
+    battlefield: ["Island @isl", "Forest @f1", "Forest @f2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @w1"]
+    library_pad: 10
+script:
+  - label: before-needle
+    check:
+      legal: {p0: {include: [{t: activate_from_hand, source: "@bos", ability: 1}]}}
+  - p0: {t: cast, card: "@pn", pay: {tap: ["@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: "Boseiju, Who Endures"}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@bos", ability: 1, targets: ["@w1"]}}
+  - p0: {t: play_land, card: "@bos"}
+  - p0: {t: activate, source: "@bos", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      hand: []
+      mana_pool: {G: 1}
+      battlefield_contains: [{card: "Boseiju, Who Endures", tapped: true}, {card: Pithing Needle}]
+    p1:
+      battlefield: [{card: Wasteland}]
+notes: >
+  Before the Needle, Channel ({1}{G}, payable with the two Forests, target Wasteland) is offered. After the Needle names
+  Boseiju, the Channel ability is not offered although everything else is payable. The card can still be played as a land and
+  its {T}: Add {G} (a mana ability) works. The hand-source reading rests on the Oracle text "sources with the chosen name" and is
+  marked unverified as a ruling (the CR text cited only shows hidden-zone activation exists).

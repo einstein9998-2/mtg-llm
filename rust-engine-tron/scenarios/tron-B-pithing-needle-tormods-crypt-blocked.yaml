@@ -1,0 +1,40 @@
+id: tron-b-pithing-needle-tormods-crypt-blocked
+title: "Pithing Needle naming Tormod's Crypt shuts the opponent's Crypt off: its graveyard exile cannot be activated against either player"
+area: card
+cards: [Pithing Needle, Tormod's Crypt, Brainstorm, Island]
+tags: [pithing-needle, choose-name, tormods-crypt, graveyard-hate, sacrifice-as-cost, mask-validity, negative, reanimator-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pithing Needle, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: Tormod's Crypt, text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pithing Needle @pn"]
+    battlefield: ["Island @isl"]
+    graveyard: [Brainstorm]
+    library_pad: 10
+  p1:
+    battlefield: ["Tormod's Crypt @crypt"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pn", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: "Tormod's Crypt"}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: activate, source: "@crypt", ability: 0, targets: [{player: p0}]}}
+  - expect_illegal: {p1: {t: activate, source: "@crypt", ability: 0, targets: [{player: p1}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Brainstorm]
+    p1:
+      battlefield: [{card: "Tormod's Crypt", tapped: false}]
+notes: >
+  The Crypt's ability has a target and makes no mana, so the Needle stops it for either target. The Crypt stays untapped on the
+  battlefield and p0's graveyard is untouched. Cheap artifact answer used against Reanimator graveyard hate.

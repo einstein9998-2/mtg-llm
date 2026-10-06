@@ -1,0 +1,46 @@
+id: tron-a-the-one-ring-upkeep-lose-life-per-burden-counter
+title: "At its controller's upkeep The One Ring makes them lose 1 life per burden counter (3 counters, 3 life), and not at the opponent's upkeep"
+area: card
+cards: [The One Ring]
+tags: [the-one-ring, burden-counter, upkeep-trigger, life-loss, controller-only, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: The One Ring, text: "At the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: end
+  priority: p0
+  p0:
+    battlefield: [{card: The One Ring, as: ring, counters: {burden: 3}}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p1}
+  - check:
+      turn: 4
+      stack: []
+      p0: {life: 20}
+      p1: {life: 20}
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 5
+      stack: [{kind: triggered, source: "@ring", controller: p0, text_contains: "burden"}]
+      p0: {life: 20}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    turn: 5
+    phase: upkeep
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      battlefield: [{card: The One Ring, counters: {burden: 3}}]
+    p1: {life: 20}
+notes: >
+  The trigger exists only in p0's upkeep ("your upkeep"): nothing happens at p1's upkeep on turn 4. At p0's turn-5
+  upkeep it goes on the stack, life is still 20 until it resolves, then p0 loses 3 (one per burden counter). The
+  counters stay. A wrong engine triggers at every upkeep or loses a flat 1 life.

@@ -1,0 +1,45 @@
+id: tron-a-grim-monolith-colorless-mana-pays-trinisphere-generic
+title: "Grim Monolith's {C}{C}{C} can pay the two extra generic mana of a Trinisphere-taxed Lightning Bolt, but cannot pay the {R}"
+area: card
+cards: [Grim Monolith, Trinisphere, Lightning Bolt, Mountain]
+tags: [grim-monolith, trinisphere, colorless-mana, colored-mana, mana-payment, floating-mana, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Grim Monolith, text: "{T}: Add {C}{C}{C}.", verified: true}
+  - {kind: oracle, card: Trinisphere, text: "a spell that would cost {1}{B} to cast costs {2}{B} to cast instead", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Mountain @mt"]
+    battlefield: ["Grim Monolith @gm"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@gm", ability: 0}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}}
+  - p0: {t: play_land, card: "@mt"}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - check:
+      p0: {mana_pool: {C: 1}, battlefield_contains: [{card: Mountain, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt]
+      mana_pool: {C: 1}
+      battlefield: [{card: Grim Monolith, tapped: true}, {card: Mountain, tapped: true}]
+    p1:
+      life: 17
+notes: >
+  Bolt costs {2}{R} under Trinisphere. With only {C}{C}{C} floating (no red source) it cannot be cast. After a Mountain is
+  played, the Mountain pays {R} and two of the three floating {C} pay the generic part, leaving {C} in the pool. The only
+  legal payment is deterministic, so pay: auto is safe. A wrong engine lets colorless mana pay the colored symbol.

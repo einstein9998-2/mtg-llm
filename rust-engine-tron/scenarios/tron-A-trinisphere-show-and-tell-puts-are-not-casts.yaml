@@ -1,0 +1,52 @@
+id: tron-a-trinisphere-show-and-tell-puts-are-not-casts
+title: "Under Trinisphere, Show and Tell itself costs exactly three, and the cards it puts onto the battlefield (Atraxa, Lotus Petal) cost nothing because nothing is cast"
+area: card
+cards: [Trinisphere, Show and Tell, "Atraxa, Grand Unifier", Lotus Petal, Island]
+tags: [trinisphere, show-and-tell, put-onto-battlefield, not-cast, cost-increase, simultaneous-secret-choice, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+  - {kind: cr, ref: "112.1", text: "A spell is a card on the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Atraxa, Grand Unifier @atx"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 15
+  p1:
+    hand: ["Lotus Petal @lp"]
+    battlefield: ["Trinisphere @tri"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@atx"}
+  - p1: {decision: simultaneous_secret_choice, answer: "@lp"}
+expect:
+  - at: after_script
+    stack: [{kind: triggered, source: "@atx", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Show and Tell]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: false}
+        - {card: "Atraxa, Grand Unifier", sick: true}
+    p1:
+      hand: []
+      spells_cast_this_turn: 0
+      battlefield: [{card: Trinisphere}, {card: Lotus Petal}]
+notes: >
+  Show and Tell costs {2}{U} = three mana, which is not less than three: Trinisphere adds nothing (three Islands tap,
+  the fourth stays untapped). Atraxa (mana value 7) and p1's Lotus Petal ({0}) are put onto the battlefield, not cast
+  (601.2a: casting moves the card to the stack first), so no cost applies: p1 has no lands at all and still puts Petal
+  onto the battlefield. Cast counts: p0 one (Show and Tell), p1 zero. Atraxa's enters trigger is left on the stack.

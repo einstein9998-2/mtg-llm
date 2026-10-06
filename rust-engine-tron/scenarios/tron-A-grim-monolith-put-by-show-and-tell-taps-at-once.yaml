@@ -1,0 +1,44 @@
+id: tron-a-grim-monolith-put-by-show-and-tell-taps-at-once
+title: "Grim Monolith put onto the battlefield by Show and Tell can tap for {C}{C}{C} immediately (an artifact is not subject to summoning sickness)"
+area: card
+cards: [Grim Monolith, Show and Tell, Island]
+tags: [grim-monolith, show-and-tell, summoning-sickness, noncreature-artifact, simultaneous-secret-choice, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Grim Monolith, text: "{T}: Add {C}{C}{C}.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Grim Monolith @gm"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@gm"}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: Grim Monolith, tapped: false}]}
+      legal: {p0: {include: [{t: activate, source: "@gm", ability: 0}]}}
+  - p0: {t: activate, source: "@gm", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Show and Tell]
+      mana_pool: {C: 3}
+      battlefield: [{card: Grim Monolith, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  p1 has no card in hand, so p1 has no choice and no decision is raised for p1 (SCHEMA addenda). The Monolith enters
+  untapped and "new" this turn, but the summoning-sickness rule (302.6) is about creatures: a noncreature artifact's
+  {T} ability can be used at once. Contrast with the Karn +1 scenario where the same artifact has been made a creature.

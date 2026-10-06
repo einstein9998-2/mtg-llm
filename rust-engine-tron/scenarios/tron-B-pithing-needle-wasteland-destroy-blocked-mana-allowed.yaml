@@ -1,0 +1,52 @@
+id: tron-b-pithing-needle-wasteland-destroy-blocked-mana-allowed
+title: "Pithing Needle naming Wasteland stops both players' Wasteland sacrifice ability but not their mana ability; the name is chosen as it enters, not on the stack"
+area: card
+cards: [Pithing Needle, Wasteland, Island]
+tags: [pithing-needle, choose-name, as-enters, wasteland, mana-ability, activated-ability, both-players, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pithing Needle, text: "As this artifact enters, choose a card name.", verified: true}
+  - {kind: oracle, card: Pithing Needle, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pithing Needle @pn"]
+    battlefield: ["Island @isl", "Wasteland @w0"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @w1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pn", pay: {tap: ["@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: choosing-name
+    check:
+      stack: []
+      pending: {actor: p0, kind: choose_name}
+      p0:
+        battlefield_contains: [{card: Pithing Needle}]
+  - p0: {decision: choose_name, answer: Wasteland}
+  - expect_illegal: {p0: {t: activate, source: "@w0", ability: 1, targets: ["@w1"]}}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: activate, source: "@w1", ability: 1, targets: ["@w0"]}}
+  - p1: {t: activate, source: "@w1", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: [{card: Pithing Needle}, {card: Island, tapped: true}, {card: Wasteland, tapped: false}]
+    p1:
+      mana_pool: {C: 1}
+      battlefield: [{card: Wasteland, tapped: true}]
+notes: >
+  Same shape as the Disruptor Flute Wasteland scenario but for the Needle, and for both players (the Needle affects all
+  sources with the name). Wasteland's sacrifice ability has a target and makes no mana, so it cannot be activated by p0 (the
+  Needle's controller) nor by p1, while each Wasteland's {T}: Add {C} still works. The name choice is made as the Needle enters
+  (no trigger, no stack object): the check at the pending choose_name decision shows an empty stack and the Needle already on
+  the battlefield. Ability 1 is the sacrifice ability, ability 0 the mana ability. Failed probes must not tap or sacrifice.

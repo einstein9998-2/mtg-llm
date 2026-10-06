@@ -1,0 +1,52 @@
+id: tron-a-trinisphere-force-of-will-pitch-needs-three-mana-not-offered
+title: "Under Trinisphere, Force of Will's free alternative cost still needs {3}: with two Islands neither the pitch cast nor the hard cast is offered"
+area: card
+cards: [Trinisphere, Force of Will, Brainstorm, Voltaic Key, Plains, Island]
+tags: [trinisphere, force-of-will, alternative-cost, pitch-spell, cost-increase, legal-action-mask, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Voltaic Key @key"]
+    battlefield: ["Trinisphere @tri", "Plains @pl1", "Plains @pl2", "Plains @pl3"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@key", pay: {tap: ["@pl1", "@pl2", "@pl3"]}}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      stack: [{kind: spell, card: "@key", controller: p0}]
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@key"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: null, targets: ["@key"], pay: auto}}
+  - check:
+      legal: {p1: {include: [{t: pass}], exclude: [{t: cast, card: "@fow"}]}}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Voltaic Key, controller: p0}]
+      graveyard: []
+    p1:
+      life: 20
+      hand: [Force of Will, Brainstorm]
+      exile: []
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: false}]
+notes: >
+  p0 controls Trinisphere and casts Voltaic Key ({1}, so {3} under Trinisphere: three Plains tapped). p1 holds Force of
+  Will and a blue card but only two Islands. The pitch alternative cost is "pay 1 life and exile a blue card", which is
+  zero mana, but Trinisphere raises the mana part of the total cost to three (118.9d, 601.2f): the cast is not
+  offered with two mana. The hard cast ({3}{U}{U}) is out of reach as well. Nothing is paid: p1 stays at 20 life with
+  both cards in hand and Key resolves. A wrong engine applies Trinisphere only to spells cast for their mana cost.

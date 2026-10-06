@@ -1,0 +1,43 @@
+id: tron-b-tormods-crypt-exile-shrinks-nethergoyf-lethal-damage
+title: "Exiling a graveyard with Tormod's Crypt shrinks Nethergoyf from 3/4 to 0/1 and a damaged Nethergoyf dies"
+area: card
+cards: [Tormod's Crypt, Nethergoyf, Lightning Bolt, Island, Faithless Looting]
+tags: [tormods-crypt, graveyard-hate, nethergoyf, state-based-actions, lethal-damage, characteristic-defining-ability, layers]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tormod's Crypt, text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", verified: true}
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Tormod's Crypt @crypt"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Nethergoyf, as: goyf, damage: 1}]
+    graveyard: ["Lightning Bolt", "Island", "Faithless Looting"]
+    library_pad: 10
+script:
+  - label: before
+    check:
+      p1:
+        battlefield: [{card: Nethergoyf, pt: [3, 4], damage: 1}]
+  - p0: {t: activate, source: "@crypt", ability: 0, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Tormod's Crypt"]
+    p1:
+      battlefield: []
+      graveyard: [Nethergoyf]
+      exile: ["Lightning Bolt", Island, "Faithless Looting"]
+notes: >
+  With instant, land and sorcery in the graveyard, Nethergoyf is 3/4 and survives 1 marked damage. When the graveyard is exiled
+  it has zero card types: 0/1 with 1 damage marked, which is lethal (704.5g), so it dies and then sits alone in the new
+  graveyard. A wrong engine does not recompute the characteristic-defining P/T after the exile, or keeps the stale value.

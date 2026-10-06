@@ -1,0 +1,40 @@
+id: tron-c-warping-wail-scion-token-then-sacrifice-for-colorless
+title: "Warping Wail mode 3 makes a 1/1 Eldrazi Scion; the summoning-sick token can be sacrificed at once for {C}"
+area: card
+cards: [Warping Wail, "Urza's Tower", Island, Eldrazi Scion Token]
+tags: [warping-wail, eldrazi-scion, token, mana-ability, summoning-sickness, sacrifice-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Warping Wail, text: "Create a 1/1 colorless Eldrazi Scion creature token.", verified: true}
+  - {kind: oracle, card: Warping Wail, text: "It has \"Sacrifice this token: Add {C}.\"", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability. (See rule 606, “Loyalty Abilities.”)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Warping Wail @ww]
+    battlefield: ["Urza's Tower @tw", Island @isl]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ww", modes: [3], pay: {tap: ["@tw", "@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {battlefield_contains: [{token: Eldrazi Scion Token, pt: [1, 1], types: [Creature], subtypes: [Eldrazi, Scion], sick: true, tapped: false}]}
+  - bind: {as: scion, find: {name: "Eldrazi Scion Token", controller: p0}}
+  - p0: {t: activate, source: "@scion", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 1}
+      graveyard: [Warping Wail]
+      battlefield: [{card: "Urza's Tower", tapped: true}, {card: Island, tapped: true}]
+notes: >
+  The sacrifice ability has no {T} in its cost, so summoning sickness does not stop it; it is a mana ability, so nothing goes on
+  the stack. The token is gone (cease to exist) and {C} floats. A wrong engine applies summoning sickness to a sacrifice
+  cost, or leaves the token on the battlefield.

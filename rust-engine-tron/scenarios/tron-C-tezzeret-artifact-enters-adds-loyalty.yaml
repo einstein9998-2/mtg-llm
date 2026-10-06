@@ -1,0 +1,38 @@
+id: tron-c-tezzeret-lotus-petal-entering-adds-a-loyalty-counter
+title: "Casting Lotus Petal with Tezzeret in play: the trigger goes on the stack when Petal enters and puts a fifth loyalty counter on him"
+area: card
+cards: ["Tezzeret, Cruel Captain", Lotus Petal]
+tags: [tezzeret, planeswalker, triggered-ability, artifact-enters, loyalty-counter, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Lotus Petal @lp]
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 4}}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lp", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@lp", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@tz", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 4}}, {card: Lotus Petal}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 5}}, {card: Lotus Petal}]
+notes: >
+  The trigger waits for Petal to ENTER (not for it to be cast): after the spell resolves the trigger is on the stack
+  with loyalty still 4, and only after it resolves is loyalty 5. A wrong engine adds the counter on cast or without the stack.

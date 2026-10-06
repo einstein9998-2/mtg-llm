@@ -1,0 +1,46 @@
+id: tron-b-torpor-orb-acererak-attack-trigger-still-works
+title: "Torpor Orb only stops enters triggers: Acererak's attack trigger still creates a Zombie token"
+area: card
+cards: [Torpor Orb, Acererak the Archlich, Zombie Token]
+tags: [torpor-orb, acererak, attack-trigger, trigger-not-suppressed, token, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Torpor Orb, text: "Creatures entering don't cause abilities to trigger.", verified: true}
+  - {kind: oracle, card: Acererak the Archlich, text: "Whenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice.", verified: true}
+  - {kind: cr, ref: "603.2", text: "Whenever a game event or game state matches a triggered ability's trigger event, that ability automatically triggers.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Acererak the Archlich @acer", "Torpor Orb @orb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@acer", target: {player: p1}}]}
+  - label: attack-trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@acer", controller: p0, text_contains: "Zombie"}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    phase: declare_attackers
+    p0:
+      battlefield:
+        - {card: Acererak the Archlich, tapped: true}
+        - {card: Torpor Orb}
+        - {token: Zombie Token, pt: [2, 2]}
+    p1:
+      life: 20
+notes: >
+  Torpor Orb changes only the consequences of creatures entering. Acererak's attack trigger goes on the stack and resolves
+  normally. p1 controls no creature, so it has no sacrifice option and no prompt (as in acererak-attack-opponent-without-creature-
+  gets-no-prompt). The Zombie token itself entering causes no triggers (nothing here would anyway). A wrong engine turns off
+  every creature trigger while the Orb is out.

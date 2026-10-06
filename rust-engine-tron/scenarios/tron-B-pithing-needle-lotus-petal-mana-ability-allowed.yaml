@@ -1,0 +1,39 @@
+id: tron-b-pithing-needle-lotus-petal-mana-ability-allowed
+title: "Pithing Needle naming Lotus Petal does not stop sacrificing it for mana (a mana ability)"
+area: card
+cards: [Pithing Needle, Lotus Petal, Island]
+tags: [pithing-needle, choose-name, lotus-petal, mana-ability, sacrifice-as-cost, alurentell-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pithing Needle, text: "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pithing Needle @pn"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Lotus Petal @petal"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pn", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_name, answer: Lotus Petal}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@petal", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      mana_pool: {R: 1}
+      battlefield: []
+      graveyard: [Lotus Petal]
+notes: >
+  Lotus Petal's ability needs no target, adds mana and is not a loyalty ability, so it is a mana ability and exempt. Contrast
+  with Wasteland's second ability. A wrong engine blocks every activated ability of the named card.

@@ -1,0 +1,34 @@
+id: tron-b-ensnaring-bridge-opponent-hand-counts-for-controller-only
+title: "Ensnaring Bridge: with three cards in the Bridge controller's hand, both of the attacker's creatures (power 1 and 2) may attack although the attacker's hand is empty"
+area: card
+cards: [Ensnaring Bridge, Ocelot Pride, "Phelia, Exuberant Shepherd", Island]
+tags: [ensnaring-bridge, declare-attackers, hand-size, controller-hand, attacker-empty-hand, symmetric-check]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ensnaring Bridge, text: "Creatures with power greater than the number of cards in your hand can't attack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: []
+    battlefield: ["Ocelot Pride @op", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+  p1:
+    hand: [Island, Island, Island]
+    battlefield: ["Ensnaring Bridge @br"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@op", target: {player: p1}}, {creature: "@ph", target: {player: p1}}], expect_options: {include: ["@op", "@ph"]}}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    p0:
+      battlefield:
+        - {card: Ocelot Pride, attacking: true}
+        - {card: "Phelia, Exuberant Shepherd", attacking: true}
+notes: >
+  Mirror of the first Bridge scenario: p0 has an empty hand but the Bridge is p1's and p1 holds three cards, so powers 1 and 2
+  are both legal. A wrong engine counts the attacking player's hand (0) and bars both.

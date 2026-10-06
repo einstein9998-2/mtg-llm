@@ -1,0 +1,49 @@
+id: tron-a-the-one-ring-and-voltaic-key-draw-one-then-two
+title: "Tapping The One Ring, untapping it with Voltaic Key and tapping it again draws one card and then two (counters 1 then 2)"
+area: card
+cards: [The One Ring, Voltaic Key, Island, Mountain, Plains]
+tags: [the-one-ring, voltaic-key, burden-counter, draw, untap, activated-ability, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: The One Ring, text: "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.", verified: true}
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["The One Ring @ring", "Voltaic Key @key", "Island @is1"]
+    library: ["Island @c1", "Mountain @c2", "Plains @c3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@ring", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {hand: [Island], battlefield_contains: [{card: The One Ring, tapped: true, counters: {burden: 1}}]}
+  - expect_illegal: {p0: {t: activate, source: "@ring", ability: 0}}
+  - p0: {t: activate, source: "@key", ability: 0, targets: ["@ring"], pay: {tap: ["@is1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {battlefield_contains: [{card: The One Ring, tapped: false}]}
+  - p0: {t: activate, source: "@ring", ability: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Mountain, Plains]
+      battlefield:
+        - {card: The One Ring, tapped: true, counters: {burden: 2}}
+        - {card: Voltaic Key, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  First activation: counter 1, draw 1 (Island). The Ring is tapped, so a second activation is not offered until Voltaic
+  Key untaps it ({1}, {T}). Second activation: counter 2, draw 2 (Mountain, Plains): three cards in all. An engine that
+  draws a fixed number of cards, or forgets to keep counters between activations, fails.
+

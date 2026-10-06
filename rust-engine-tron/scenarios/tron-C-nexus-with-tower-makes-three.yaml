@@ -1,0 +1,31 @@
+id: tron-c-urzas-tower-with-planar-nexus-alone-adds-three
+title: Planar Nexus is both an Urza's Mine and an Urza's Power-Plant, so Urza's Tower with only a Nexus adds {C}{C}{C}
+area: card
+cards: ["Urza's Tower", Planar Nexus]
+tags: [planar-nexus, urzas-tower, tron, land-types, conjunction-satisfied-by-one-permanent]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Planar Nexus, text: "This land is every nonbasic land type.", verified: true}
+  - {kind: oracle, card: "Urza's Tower", text: "If you control an Urza's Mine and an Urza's Power-Plant, add {C}{C}{C} instead.", verified: true}
+  - {kind: cr, ref: "205.3i", text: "The land types are Cave, Desert, Forest, Gate, Island, Lair, Locus, Mine, Mountain, Plains, Planet, Power-Plant, Sphere, Swamp, Tower, Town, and Urza’s.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Tower @tw", Planar Nexus @nx]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tw", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 3}
+      battlefield: [{card: "Urza's Tower", tapped: true}, {card: Planar Nexus, tapped: false}]
+notes: >
+  An Urza's Mine is a land with the land types Urza's and Mine; an Urza's Power-Plant has Urza's and Power-Plant. The Nexus
+  has all of them, so it is both, and "an Urza's Mine and an Urza's Power-Plant" needs no two distinct permanents. The Tower
+  alone yields {C}{C}{C}. A wrong engine matches the lands by card name, or insists on two different permanents.

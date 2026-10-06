@@ -1,0 +1,52 @@
+id: tron-c-ugin-trigger-targets-through-veil-of-summers-hexproof-from-blue-and-black
+title: "Veil of Summer gives the opponent's permanents hexproof from blue and black; Ugin's colorless trigger can still target Phelia"
+area: card
+cards: ["Ugin, Eye of the Storms", Lotus Petal, Veil of Summer, Forest, "Phelia, Exuberant Shepherd", Mountain]
+tags: [ugin, planeswalker, colorless-spell-trigger, veil-of-summer, hexproof-from, targeting, alurentell, matchup]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: cr, ref: "702.11d", text: "“Hexproof from [quality]” is a variant of the hexproof ability. “Hexproof from [quality]” on a permanent means “This permanent can’t be the target of [quality] spells your opponents control or abilities your opponents control from [quality] sources.” A “hexproof from [quality]” ability is a hexproof ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Lotus Petal @lp]
+    battlefield: [{card: "Ugin, Eye of the Storms", as: ugin, counters: {loyalty: 7}}, Mountain]
+    library_pad: 10
+  p1:
+    hand: [Veil of Summer @veil]
+    battlefield: ["Phelia, Exuberant Shepherd @ph", Forest @for]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lp", pay: auto}
+  - p0: {decision: choose_target, slot: 0, answer: "@ph"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@lp", controller: p0}
+        - {kind: triggered, source: "@ugin", controller: p0}
+        - {kind: spell, card: "@veil", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@lp", controller: p0}, {kind: triggered, source: "@ugin", controller: p0}]
+      p1: {hand_count: 0, graveyard: [Veil of Summer]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@lp", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p1:
+      exile: ["Phelia, Exuberant Shepherd"]
+      graveyard: [Veil of Summer]
+      hand_count: 0
+notes: >
+  Veil's hexproof is "from blue and from black" only (702.11d): Ugin is a colorless source, so its trigger may
+  still target and exile Phelia on resolution (the target stays legal). Veil's card draw needs an opponent's blue or
+  black spell this turn; Lotus Petal is colorless, so p1 draws nothing (hand_count 0). Lotus Petal remains on the stack
+  at the end. A wrong engine treats hexproof from blue/black as full hexproof and fizzles the trigger.

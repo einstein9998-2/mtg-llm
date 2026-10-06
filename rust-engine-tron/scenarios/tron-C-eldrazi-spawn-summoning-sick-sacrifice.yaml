@@ -1,0 +1,32 @@
+id: tron-c-eldrazi-spawn-just-created-can-be-sacrificed-for-mana
+title: "An Eldrazi Spawn that entered this turn (summoning sick, 0/1 colorless creature) can still be sacrificed for {C}"
+area: card
+cards: [Eldrazi Spawn Token]
+tags: [eldrazi-spawn, token, mana-ability, summoning-sickness, sacrifice-cost, colorless]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Target player creates X 0/1 colorless Eldrazi Spawn creature tokens", verified: true}
+  - {kind: oracle, card: "Kozilek's Command", text: "\"Sacrifice this token: Add {C}.\"", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{token: Eldrazi Spawn Token, as: sp, sick: true}, {token: Eldrazi Spawn Token, as: sp2, sick: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield: [{token: Eldrazi Spawn Token, pt: [0, 1], types: [Creature], subtypes: [Eldrazi, Spawn], sick: true}, {token: Eldrazi Spawn Token, pt: [0, 1], sick: true}]}
+  - p0: {t: activate, source: "@sp", ability: 0}
+  - p0: {t: activate, source: "@sp2", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 2}
+      battlefield: []
+notes: >
+  The cost is a sacrifice, not {T}, so summoning sickness (602.5a applies to {T} costs only) does not matter. Two
+  Spawn give {C}{C}; both tokens are gone. A wrong engine treats the sacrifice like a tap ability.

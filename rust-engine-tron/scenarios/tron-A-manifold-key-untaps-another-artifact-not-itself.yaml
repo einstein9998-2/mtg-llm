@@ -1,0 +1,46 @@
+id: tron-a-manifold-key-untaps-another-artifact-not-itself
+title: "Manifold Key's {1},{T} untap ability cannot target Manifold Key itself, can untap another artifact, and then the Key (tapped) offers no second ability"
+area: card
+cards: [Manifold Key, Grim Monolith, "Phelia, Exuberant Shepherd", Island]
+tags: [manifold-key, another-target, untap, tap-cost, legal-action-mask, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Manifold Key, text: "{1}, {T}: Untap another target artifact.", verified: true, note: "Manifold Key Oracle text supplied in the brief (Scryfall via Savecraft); entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Manifold Key, text: "{3}, {T}: Target creature can't be blocked this turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Manifold Key @mk", {card: Grim Monolith, as: gm, tapped: true}, "Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@mk", ability: 0, targets: ["@mk"], pay: {tap: ["@is1"]}}}
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@mk", ability: 0, targets: ["@gm"]}]}}
+  - p0: {t: activate, source: "@mk", ability: 0, targets: ["@gm"], pay: {tap: ["@is1"]}}
+  - check:
+      stack: [{kind: activated, source: "@mk", controller: p0, targets: ["@gm"]}]
+  - expect_illegal: {p0: {t: activate, source: "@mk", ability: 1, targets: ["@ph"], pay: {tap: ["@is2", "@is3", "@is4"]}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Manifold Key, tapped: true}
+        - {card: Grim Monolith, tapped: false}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+notes: >
+  "Another target artifact" excludes the Key itself (it is the first activation's source), so the self-target is not
+  offered even though the Key is an artifact. The legal target is the tapped Monolith. Both abilities need {T}: after
+  the first activation the Key is tapped and the second ability (unblockable, with {3} available) is not offered.
+  Ability 0 is the untap, 1 the can't-be-blocked ability.

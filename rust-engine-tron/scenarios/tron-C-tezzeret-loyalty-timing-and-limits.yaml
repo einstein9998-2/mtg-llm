@@ -1,0 +1,47 @@
+id: tron-c-tezzeret-loyalty-abilities-sorcery-speed-and-once-per-turn
+title: "Tezzeret's loyalty abilities need an empty stack and are limited to one per turn (a second is not offered even with the loyalty for it)"
+area: card
+cards: ["Tezzeret, Cruel Captain", Lotus Petal, Aether Vial]
+tags: [tezzeret, planeswalker, loyalty-ability, timing, one-per-turn, stack-nonempty, legal-action-mask]
+derived_from: cr
+source:
+  - {kind: cr, ref: "606.3", text: "A player may activate a loyalty ability of a permanent they control any time they have priority and the stack is empty during a main phase of their turn, but only if no player has previously activated a loyalty ability of that permanent that turn.", verified: true}
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Lotus Petal @lp]
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 4}}, {card: Aether Vial, as: vial, tapped: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@lp", pay: auto}
+  - expect_illegal: {p0: {t: activate, source: "@tz", ability: 0, targets: ["@vial"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: activate, source: "@tz", ability: 0, targets: ["@vial"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {battlefield_contains: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 5}}]}
+  - p0: {t: activate, source: "@tz", ability: 0, targets: ["@vial"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: activate, source: "@tz", ability: 1}}
+  - expect_illegal: {p0: {t: activate, source: "@tz", ability: 0, targets: ["@vial"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 5}}, {card: Aether Vial, tapped: false}]
+      hand: []
+notes: >
+  Not offered while Lotus Petal is on the stack, nor while Tezzeret's own trigger is on the stack. Once the stack is
+  empty the 0 is activated; afterwards neither the -3 (loyalty 5 would pay for it) nor the 0 again is offered this turn. The loyalty
+  counter from the trigger is not a loyalty ability activation, so it does not use up the turn's activation. A wrong engine counts the
+  trigger as the turn's activation, or allows a second activation.

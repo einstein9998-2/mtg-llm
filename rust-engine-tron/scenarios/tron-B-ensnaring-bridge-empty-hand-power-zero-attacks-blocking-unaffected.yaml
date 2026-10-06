@@ -1,0 +1,45 @@
+id: tron-b-ensnaring-bridge-empty-hand-power-zero-attacks-blocking-unaffected
+title: "Ensnaring Bridge with an empty hand: a power-0 Nethergoyf may attack, a power-1 creature may not, and the Bridge does not stop blockers"
+area: card
+cards: [Ensnaring Bridge, Nethergoyf, Ocelot Pride, "Phelia, Exuberant Shepherd", Island]
+tags: [ensnaring-bridge, declare-attackers, attack-restriction, power-zero, blockers-unaffected, mask-validity, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Ensnaring Bridge, text: "Creatures with power greater than the number of cards in your hand can't attack.", verified: true}
+  - {kind: oracle, card: Nethergoyf, text: "Nethergoyf's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.", verified: true}
+  - {kind: cr, ref: "509.1b", text: "The defending player checks each creature they control to see whether it’s affected by any restrictions (effects that say a creature can’t block, or that it can’t block unless some condition is met).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: [Island, Island, Island, Island]
+    battlefield: ["Nethergoyf @goyf", "Ocelot Pride @op"]
+    library_pad: 10
+  p1:
+    hand: []
+    battlefield: ["Ensnaring Bridge @br", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {decision: declare_attackers, attacks: [{creature: "@op", target: {player: p1}}]}}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@goyf", target: {player: p1}}], expect_options: {include: ["@goyf"], exclude: ["@op"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@ph", attacker: "@goyf"}], expect_options: {include: ["@ph"]}}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    phase: main2
+    p0:
+      graveyard: [Nethergoyf]
+      battlefield: [{card: Ocelot Pride, tapped: false}]
+    p1:
+      life: 20
+      battlefield: [{card: Ensnaring Bridge}, {card: "Phelia, Exuberant Shepherd", damage: 0}]
+notes: >
+  Both graveyards are empty so Nethergoyf is 0/1. p1's hand is empty: power 0 is not greater than 0, so it may attack; Ocelot
+  Pride (power 1) may not. The Bridge has no effect on blocking: Phelia (power 2, which could not attack under the Bridge) blocks
+  and kills the 0/1 (Phelia takes no damage). A wrong engine forbids attackers with power <= hand size 0 by a >= check, or
+  restricts blockers too.

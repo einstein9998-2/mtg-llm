@@ -1,0 +1,54 @@
+id: tron-a-trinisphere-taxes-its-own-controller-monolith-chain
+title: "Trinisphere taxes its controller too: Grim Monolith costs three, and Monolith's {C}{C}{C} then exactly pays for a Voltaic Key that costs three, not one"
+area: card
+cards: [Trinisphere, Grim Monolith, Voltaic Key, Island]
+tags: [trinisphere, grim-monolith, voltaic-key, cost-increase, controller-taxed, mana-payment, floating-mana, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Grim Monolith, text: "{T}: Add {C}{C}{C}.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Grim Monolith @gm", "Voltaic Key @key", "Island @is3"]
+    battlefield: ["Trinisphere @tri", "Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@gm", pay: auto}}
+  - p0: {t: play_land, card: "@is3"}
+  - p0: {t: cast, card: "@gm", pay: {tap: ["@is1", "@is2", "@is3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@gm", ability: 0}
+  - check:
+      p0: {mana_pool: {C: 3}}
+  - p0: {t: cast, card: "@key", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@key", controller: p0}]
+      p0: {mana_pool: {}, spells_cast_this_turn: 2}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      mana_pool: {}
+      battlefield:
+        - {card: Trinisphere, controller: p0}
+        - {card: Grim Monolith, tapped: true}
+        - {card: Voltaic Key, tapped: false}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  The static effect says "each spell", so it applies to its controller's spells: Grim Monolith ({2}) costs three, not
+  castable with two Islands. Once resolved, Monolith taps for {C}{C}{C} (it is an artifact, not a creature, so no
+  summoning sickness). Voltaic Key's printed {1} is raised to three, which empties the pool exactly (pool {} after the
+  cast; a wrong engine charging {1} leaves {C}{C}). A thorough chain test of the card's real use.

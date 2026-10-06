@@ -1,0 +1,44 @@
+id: tron-b-expedition-map-countered-ability-no-search-no-shuffle
+title: "Stifle on Expedition Map's ability: the Map is gone, no search happens and the library is not shuffled"
+area: card
+cards: [Expedition Map, Stifle, Wasteland, Island]
+tags: [expedition-map, stifle, counter-ability, sacrifice-as-cost, no-shuffle, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Expedition Map, text: "{2}, {T}, Sacrifice this artifact: Search your library for a land card, reveal it, put it into your hand, then shuffle.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Expedition Map @map", "Island @i1", "Island @i2"]
+    library: ["Wasteland", "Island"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+random: []
+script:
+  - p0: {t: activate, source: "@map", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@map", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Expedition Map]
+      library_top: [Wasteland, Island]
+      library_count: 12
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1:
+      graveyard: [Stifle]
+notes: >
+  No search decision is raised for p0 and no random event occurs (random: [] forbids a shuffle). The library keeps its order
+  (Wasteland on top), the Map stays sacrificed and the two Islands stay tapped.

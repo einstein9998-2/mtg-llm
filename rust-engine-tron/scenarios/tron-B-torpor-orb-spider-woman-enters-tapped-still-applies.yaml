@@ -1,0 +1,35 @@
+id: tron-b-torpor-orb-spider-woman-enters-tapped-still-applies
+title: "Torpor Orb does not stop static replacement effects: a creature still enters tapped under Spider-Woman"
+area: card
+cards: [Torpor Orb, "Spider-Woman, Stunning Savior", Ocelot Pride, Plains]
+tags: [torpor-orb, spider-woman, enters-tapped, static-ability, replacement-effect, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Torpor Orb, text: "Creatures entering don't cause abilities to trigger.", verified: true}
+  - {kind: oracle, card: "Spider-Woman, Stunning Savior", text: "Artifacts and creatures your opponents control enter tapped.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @op"]
+    battlefield: ["Plains @pl", "Torpor Orb @orb"]
+    library_pad: 10
+  p1:
+    battlefield: ["Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@op", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Ocelot Pride, tapped: true, sick: true}, {card: Torpor Orb}]
+notes: >
+  Torpor Orb stops abilities from triggering when creatures enter; it does not turn off static abilities or replacement
+  effects. Spider-Woman's "enter tapped" is a static effect that applies as the creature enters, so p0's Ocelot Pride (cast
+  with the one Plains) enters tapped and summoning sick even though p0 controls the Orb. A wrong engine implements Orb as
+  "creatures entering are not affected by anything".

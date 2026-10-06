@@ -1,0 +1,29 @@
+id: tron-c-urzas-mine-with-planar-nexus-alone-adds-two
+title: Planar Nexus is also an Urza's Power-Plant and an Urza's Tower, so Urza's Mine with only a Nexus adds {C}{C}
+area: card
+cards: ["Urza's Mine", Planar Nexus]
+tags: [planar-nexus, urzas-mine, tron, land-types, conjunction-satisfied-by-one-permanent]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Planar Nexus, text: "This land is every nonbasic land type.", verified: true}
+  - {kind: oracle, card: "Urza's Mine", text: "If you control an Urza's Power-Plant and an Urza's Tower, add {C}{C} instead.", verified: true, note: "Urza's Mine text retrieved with Savecraft card_search; entry in oracle-additions-C.json"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Mine @mine", Planar Nexus @nx]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@mine", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 2}
+      battlefield: [{card: "Urza's Mine", tapped: true}, {card: Planar Nexus, tapped: false}]
+notes: >
+  Same reasoning as the Tower scenario for the other Tron lands: the Nexus supplies both the Power-Plant and the Tower
+  that the Mine looks for, and the Mine adds {C}{C} instead of {C}.

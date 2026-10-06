@@ -1,0 +1,44 @@
+id: tron-c-tezzeret-minus-three-finds-an-artifact-of-mana-value-one-or-less
+title: "Tezzeret's -3 offers only artifact cards with mana value 1 or less (Lotus Petal, Aether Vial, Mishra's Bauble), not Null Rod, Cori-Steel Cutter or an Island"
+area: card
+cards: ["Tezzeret, Cruel Captain", Cori-Steel Cutter, Null Rod, Lotus Petal, Aether Vial, Island, "Mishra's Bauble"]
+tags: [tezzeret, planeswalker, loyalty-ability, search, tutor, mana-value, mask-validity, shuffle]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle.", verified: true}
+  - {kind: cr, ref: "606.6", text: "A loyalty ability with a negative loyalty cost, taking into account any additional costs, can’t be activated unless the permanent has at least that many loyalty counters on it.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it’s a hidden zone) and find a card that matches the given description.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 4}}]
+    library: [Cori-Steel Cutter @cut, Null Rod @rod, Lotus Petal @lp, Aether Vial @vial, Island @isl, "Mishra's Bauble @mb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tz", ability: 1}
+  - check:
+      stack: [{kind: activated, source: "@tz", controller: p0}]
+      p0: {battlefield: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: search
+      found: "@vial"
+      expect_options: {include: ["@lp", "@vial", "@mb"], exclude: ["@cut", "@rod", "@isl"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Aether Vial]
+      library_count: 15
+      battlefield: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 1}}]
+notes: >
+  Ability index 1 is the -3. Mana values: Lotus Petal 0, Mishra's Bauble 0, Aether Vial 1 (legal); Null Rod 2 and
+  Cori-Steel Cutter ({1}{R}, 2) are artifacts but too expensive; Island is not an artifact. Cost: loyalty 4 -> 1 on
+  activation. The library has 16 cards, one found: 15 (and it is shuffled: random outcome not asserted). A wrong engine
+  compares power or counts the Cutter, or allows any artifact.

@@ -1,0 +1,43 @@
+id: tron-b-extinguisher-battleship-under-torpor-orb-still-triggers-and-destroys-orb
+title: "Torpor Orb does not stop Extinguisher Battleship (a noncreature Spacecraft) from triggering; the trigger can destroy the Orb itself"
+area: card
+cards: [Extinguisher Battleship, Torpor Orb, "Phelia, Exuberant Shepherd", Island]
+tags: [extinguisher-battleship, torpor-orb, etb-trigger, noncreature, trigger-not-suppressed, spacecraft-not-a-creature]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Torpor Orb, text: "Creatures entering don't cause abilities to trigger.", verified: true}
+  - {kind: oracle, card: Extinguisher Battleship, text: "When this Spacecraft enters, destroy target noncreature permanent.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Extinguisher Battleship @ship"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6", "Island @i7", "Island @i8"]
+    library_pad: 10
+  p1:
+    battlefield: ["Torpor Orb @orb", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ship", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@orb", expect_options: {include: ["@orb", "@ship"], exclude: ["@ph"]}}
+  - label: trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@ship", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Extinguisher Battleship, damage: 0}]
+    p1:
+      graveyard: ["Torpor Orb", "Phelia, Exuberant Shepherd"]
+      battlefield: []
+notes: >
+  Torpor Orb affects only creatures entering. The Battleship is not a creature (station is out of scope and not used), so its
+  enters trigger is not suppressed. It destroys the Orb and then deals 4 damage to Phelia. A wrong engine treats every
+  Spacecraft as a creature, or turns off all enters triggers.

@@ -1,0 +1,44 @@
+id: tron-b-research-desk-land-drop-already-used-chosen-land-not-playable
+title: If p0 already played a land this turn, a land chosen with Mishra's Research Desk cannot be played from exile now
+area: card
+cards: [Mishra's Research Desk, Mountain, Lightning Bolt, Island]
+tags: [mishras-research-desk, play-from-exile, land-drop, negative, mask-validity]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mishra's Research Desk, text: "Until the end of your next turn, you may play that card.", verified: true}
+  - {kind: cr, ref: "305.2", text: "A player can normally play one land during their turn; however, continuous effects may increase this number.", verified: true}
+  - {kind: cr, ref: "305.2a", text: "If the number of lands the player can play is greater, the play is legal.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 1
+    battlefield: ["Mishra's Research Desk @desk", "Mountain @m1", "Mountain @m2"]
+    library: ["Mountain @lm", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@desk", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: choose_one_to_play, answer: ["@lm"], expect_options: {include: ["@lm", "@bolt"], count: 2}}
+  - expect_illegal: {p0: {t: play_land, card: "@lm"}}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      exile: [Mountain, Lightning Bolt]
+      graveyard: ["Mishra's Research Desk"]
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: false}]
+    p1:
+      life: 20
+notes: >
+  p0 has already used the land drop (lands_played 1), so the chosen Mountain cannot be played this turn (305.2a); the permission
+  itself is not asserted to expire (no scenario here covers "until the end of your next turn"). The unchosen Lightning Bolt
+  cannot be cast either although a Mountain is untapped. Both cards stay in exile. A wrong engine lets the land be played as an
+  extra land drop, or throws the permission away immediately.

@@ -1,0 +1,38 @@
+id: tron-c-urzas-workshop-metalcraft-gone-after-artifact-sacrificed
+title: Sacrificing Lotus Petal for mana drops p0 to two artifacts, so Workshop's Metalcraft ability is no longer available
+area: card
+cards: ["Urza's Workshop", Lotus Petal, "Mishra's Bauble", Aether Vial]
+tags: [urzas-workshop, tron, metalcraft, activation-restriction, lotus-petal, state-dependent]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Urza's Workshop", text: "Activate only if you control three or more artifacts.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Workshop @ws", Lotus Petal @lp, "Mishra's Bauble", Aether Vial]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@ws", ability: 1}]}}
+  - p0: {t: activate, source: "@lp", ability: 0, choose_color: U}
+  - check:
+      p0: {mana_pool: {U: 1}, graveyard: [Lotus Petal]}
+  - expect_illegal: {p0: {t: activate, source: "@ws", ability: 1}}
+  - p0: {t: activate, source: "@ws", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {U: 1, C: 1}
+      battlefield_contains: [{card: "Urza's Workshop", tapped: true}]
+notes: >
+  Metalcraft is an activation restriction, checked each time the ability is activated. With three artifacts the
+  Metalcraft ability is offered; after the Petal is sacrificed (its {U} floats) p0 controls two artifacts and the
+  Metalcraft ability is no longer offered, while the plain {C} ability still is (pool {U}{C}). A wrong engine
+  latches the restriction when the permanent entered, or counts the Petal after it left. Ability index 1 is Metalcraft
+  (see the one-ability-model note in the no-metalcraft scenario).

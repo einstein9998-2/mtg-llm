@@ -1,0 +1,73 @@
+id: tron-b-torpor-orb-bowmasters-enters-half-only
+title: Under Torpor Orb, Orcish Bowmasters' enters event does nothing but its "opponent draws" event still triggers (Consider)
+area: card
+cards: [Torpor Orb, Orcish Bowmasters, Consider, Island, Swamp, Orc Army Token]
+tags: [torpor-orb, orcish-bowmasters, etb-trigger, trigger-suppressed, draw-trigger, mixed-trigger-events, flash]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Torpor Orb, text: "Creatures entering don't cause abilities to trigger.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "603.2", text: "Whenever a game event or game state matches a triggered ability's trigger event, that ability automatically triggers.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Consider @cons"]
+    battlefield: ["Torpor Orb @orb", "Island @i1"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    hand: ["Orcish Bowmasters @bow"]
+    battlefield: ["Swamp @s1", "Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bow", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: bowmasters-entered
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        life: 20
+      p1:
+        battlefield:
+          - {card: Orcish Bowmasters, pt: [1, 1]}
+          - {card: Swamp, tapped: true}
+          - {card: Island, tapped: true}
+  - p0: {t: cast, card: "@cons", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: surveil, to_graveyard: [], on_top_order: ["@top"]}
+  - p1: {decision: choose_target, slot: 0, answer: {player: p0}, expect_options: {include: [{player: p0}, {player: p1}, "@bow"]}}
+  - label: draw-trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@bow", controller: p1}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        hand: [Island]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Island]
+      graveyard: [Consider]
+    p1:
+      life: 20
+      battlefield:
+        - {card: Orcish Bowmasters}
+        - {card: Swamp}
+        - {card: Island}
+        - {token: Orc Army Token, pt: [1, 1]}
+notes: >
+  Bowmasters has one triggered ability with two trigger events. Torpor Orb removes only the "enters" event: when p1 flashes it
+  in at the start of p0's main phase (p0 passes with an empty stack, p1 casts), nothing triggers: p0 stays at 20, no Orc Army
+  is amassed. Then p0 casts Consider (surveil 1 keeping the Island, then draw): that is a draw outside p0's draw step, so the
+  second event fires and p1 chooses the target (p0) as the trigger is put on the stack. Resolving it deals 1 damage to p0 and
+  amasses an Orc Army 1/1 for p1. A wrong engine disables the whole ability under the Orb, or lets the enters event through.

@@ -1,0 +1,43 @@
+id: tron-b-extinguisher-battleship-targets-itself-damage-still-dealt
+title: "Extinguisher Battleship may target itself; it is destroyed, yet the damage to each creature is still dealt"
+area: card
+cards: [Extinguisher Battleship, "Phelia, Exuberant Shepherd", Island]
+tags: [extinguisher-battleship, etb-trigger, target-self, last-known-information, damage-to-each-creature, source-left-battlefield]
+derived_from: cr
+source:
+  - {kind: oracle, card: Extinguisher Battleship, text: "When this Spacecraft enters, destroy target noncreature permanent. Then this Spacecraft deals 4 damage to each creature.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+  - {kind: cr, ref: "701.8a", text: "To destroy a permanent, move it from the battlefield to its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Extinguisher Battleship @ship"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6", "Island @i7", "Island @i8"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ship", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@ship", expect_options: {include: ["@ship"], exclude: ["@ph"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Extinguisher Battleship]
+      battlefield: [{card: Island}, {card: Island}, {card: Island}, {card: Island}, {card: Island}, {card: Island}, {card: Island}, {card: Island}]
+    p1:
+      battlefield: []
+      graveyard: ["Phelia, Exuberant Shepherd"]
+notes: >
+  The trigger may target the Battleship itself (a noncreature permanent on the battlefield). It is destroyed, but the ability
+  exists independently of its source (113.7a) and its second sentence still has the Spacecraft (by last known information) deal
+  4 damage to each creature, killing Phelia. This relies on the standard reading that "this Spacecraft" deals the damage using
+  last known information; no recalled ruling is cited. A wrong engine skips the damage when the source is gone.

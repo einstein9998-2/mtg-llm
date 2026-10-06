@@ -1,0 +1,47 @@
+id: tron-a-trinisphere-prismatic-ending-x0-three-colors-exiles-trinisphere
+title: "Under Trinisphere, Prismatic Ending with X=0 costs {2}{W}; paid with white, blue and red it spends three colors and exiles a mana value 3 permanent"
+area: card
+cards: [Trinisphere, Prismatic Ending, Plains, Island, Mountain]
+tags: [trinisphere, prismatic-ending, converge, x-spell, colors-of-mana-spent, additional-mana-any-color, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Trinisphere, text: "Additional mana in the cost may be paid with any color of mana or colorless mana.", verified: true}
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Plains @pl", "Island @is", "Mountain @mt"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@pe", x: 0}]}}
+  - p0: {t: cast, card: "@pe", x: 0, targets: ["@tri"], pay: {tap: ["@pl", "@is", "@mt"]}}
+  - check:
+      stack: [{kind: spell, card: "@pe", controller: p0, targets: ["@tri"], x: 0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Prismatic Ending]
+      battlefield: [{card: Plains, tapped: true}, {card: Island, tapped: true}, {card: Mountain, tapped: true}]
+    p1:
+      battlefield: []
+      exile: [Trinisphere]
+notes: >
+  Prismatic Ending with X=0 has mana cost {W}, which Trinisphere raises to {2}{W}. The two additional mana may be any
+  color (Oracle reminder text), and the number of colors of mana SPENT is what converge counts: white, blue and red is
+  three, and Trinisphere has mana value 3, so it is exiled. The spell's mana value on the stack is still 1; only the
+  amount paid changed. A wrong engine counts colors from the printed cost (one), or does not allow X=0 to be paid with
+  extra colors.

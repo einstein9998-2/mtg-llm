@@ -1,0 +1,43 @@
+id: tron-a-grim-monolith-does-not-untap-in-untap-step
+title: "A tapped Grim Monolith stays tapped through its controller's untap step while the rest of their permanents untap, but its {4} ability is offered"
+area: card
+cards: [Grim Monolith, Island]
+tags: [grim-monolith, untap-step, doesnt-untap, turn-structure, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Grim Monolith, text: "This artifact doesn't untap during your untap step.", verified: true}
+  - {kind: cr, ref: "502.3", text: "Normally, all of a player’s permanents untap, but effects can keep one or more of a player’s permanents from untapping.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: end
+  priority: p0
+  p0:
+    battlefield: [{card: Grim Monolith, as: gm, tapped: true}, {card: Island, as: is1, tapped: true}, {card: Island, as: is2, tapped: true}, {card: Island, as: is3, tapped: true}, {card: Island, as: is4, tapped: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: main1, of: p1}
+  - check:
+      turn: 4
+      p0: {battlefield: [{card: Grim Monolith, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]}
+  - advance: {to: main1, of: p0}
+  - check:
+      turn: 5
+      legal:
+        p0:
+          include: [{t: activate, source: "@gm", ability: 1}]
+          exclude: [{t: activate, source: "@gm", ability: 0}]
+expect:
+  - at: after_script
+    turn: 5
+    phase: main1
+    active: p0
+    stack: []
+    p0:
+      battlefield: [{card: Grim Monolith, tapped: true}, {card: Island, tapped: false}, {card: Island, tapped: false}, {card: Island, tapped: false}, {card: Island, tapped: false}]
+notes: >
+  p0's four Islands untap in p0's untap step of turn 5, Grim Monolith does not (502.3: effects can keep permanents from
+  untapping). During the opponent's turn 4 nothing of p0's untaps. With the Islands untapped the {4} untap ability is
+  offered and the {T} mana ability is not (the Monolith is still tapped). A wrong engine untaps every permanent.

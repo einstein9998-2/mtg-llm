@@ -1,0 +1,37 @@
+id: tron-c-eldrazi-spawn-sacrifice-pays-the-c-of-warping-wail
+title: "Sacrificing an Eldrazi Spawn token (no stack) provides the {C} that lets Warping Wail be cast with an Island"
+area: card
+cards: [Warping Wail, Island, Eldrazi Spawn Token]
+tags: [eldrazi-spawn, token, mana-ability, sacrifice-cost, colorless-mana-cost, warping-wail]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Warping Wail, text: "Create a 1/1 colorless Eldrazi Scion creature token.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn’t go on the stack, so it can’t be targeted, countered, or otherwise responded to. Rather, it resolves immediately after it is activated. (See rule 405.6c.)", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Warping Wail @ww]
+    battlefield: [Island @isl, {token: Eldrazi Spawn Token, as: sp}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@sp", ability: 0}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {mana_pool: {C: 1}, battlefield: [{card: Island, tapped: false}]}
+  - p0: {t: cast, card: "@ww", modes: [3], pay: auto}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@ww", controller: p0, modes: [3]}]
+    p0:
+      mana_pool: {}
+      spells_cast_this_turn: 1
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  With the Spawn sacrificed first the pool holds {C}, which pays Wail's {C}, and the Island
+  pays {1} (an Island alone could not pay {C}: see the wail-cost-needs-colorless scenario; with the Spawn present the cast would also be legal by sacrificing it during payment, so no illegality is asserted here). The Spawn is gone from the battlefield (the battlefield list is exact: only the tapped Island). The
+  sacrifice is a mana ability: the stack stays empty, p0 keeps priority. A wrong engine cannot sacrifice mid-payment, or sends it through the stack.

@@ -1,0 +1,43 @@
+id: tron-b-torpor-orb-portable-hole-still-triggers
+title: "Torpor Orb only affects creatures entering: Portable Hole's enters trigger still goes on the stack and exiles"
+area: card
+cards: [Torpor Orb, Portable Hole, Ocelot Pride, Plains]
+tags: [torpor-orb, portable-hole, etb-trigger, noncreature, trigger-not-suppressed, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Torpor Orb, text: "Creatures entering don't cause abilities to trigger.", verified: true}
+  - {kind: oracle, card: Portable Hole, text: "When this artifact enters, exile target nonland permanent an opponent controls with mana value 2 or less until this artifact leaves the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Portable Hole @hole"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Torpor Orb @orb", "Ocelot Pride @op"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hole", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@op", expect_options: {include: ["@op", "@orb"], exclude: ["@hole"]}}
+  - label: trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@hole", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Portable Hole}, {card: Plains, tapped: true}]
+    p1:
+      exile: [Ocelot Pride]
+      battlefield: [{card: Torpor Orb}]
+notes: >
+  The Hole is an artifact, not a creature, so entering does not fall under the Orb; its trigger is put on the stack and p0
+  must choose a target. Torpor Orb itself (mana value 2) is also a legal target, which the mask asserts. Ocelot Pride is
+  exiled. A wrong engine suppresses every enters trigger while the Orb is out.

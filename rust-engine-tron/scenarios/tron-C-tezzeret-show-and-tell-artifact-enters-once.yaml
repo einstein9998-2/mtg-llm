@@ -1,0 +1,42 @@
+id: tron-c-tezzeret-triggers-on-show-and-tell-put-but-only-for-own-artifact
+title: "Show and Tell puts Lotus Petal (p0) and Mishra's Bauble (p1) in: Tezzeret triggers once, for p0's artifact only"
+area: card
+cards: ["Tezzeret, Cruel Captain", Show and Tell, Lotus Petal, "Mishra's Bauble", Island]
+tags: [tezzeret, planeswalker, triggered-ability, artifact-enters, show-and-tell, not-cast, controller-restriction]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Show and Tell @snt, Lotus Petal @lp]
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 4}}, Island, Island, Island]
+    library_pad: 10
+  p1:
+    hand: ["Mishra's Bauble @mb"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@lp"}
+  - p1: {decision: simultaneous_secret_choice, answer: "@mb"}
+  - check:
+      stack: [{kind: triggered, source: "@tz", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      spells_cast_this_turn: 1
+      battlefield_contains: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 5}}, {card: Lotus Petal}]
+    p1:
+      battlefield: [{card: "Mishra's Bauble"}]
+notes: >
+  Entering without being cast still triggers "enters". Both artifacts enter at once, but only p0's counts: exactly one
+  trigger, loyalty 5 (not 6, and not 4). A wrong engine counts both artifacts or ignores permanents put onto the battlefield.

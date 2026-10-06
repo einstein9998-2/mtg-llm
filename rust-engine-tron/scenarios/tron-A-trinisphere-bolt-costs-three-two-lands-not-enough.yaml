@@ -1,0 +1,52 @@
+id: tron-a-trinisphere-bolt-costs-three-two-lands-not-enough
+title: "With an opponent's untapped Trinisphere, Lightning Bolt costs {2}{R}, so two Mountains cannot cast it and a third land can"
+area: card
+cards: [Trinisphere, Lightning Bolt, Mountain]
+tags: [trinisphere, cost-increase, minimum-cost, legal-action-mask, play-land, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "As long as this artifact is untapped, each spell that would cost less than three mana to cast costs three mana to cast.", verified: true, note: "Trinisphere Oracle text supplied in the brief (Scryfall via Savecraft); entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Trinisphere, text: "a spell that would cost {1}{B} to cast costs {2}{B} to cast instead", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Mountain @mt3"]
+    battlefield: ["Mountain @mt1", "Mountain @mt2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}}
+  - check:
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: pass}, {t: play_land, card: "@mt3"}], exclude: [{t: cast, card: "@bolt"}]}}
+  - p0: {t: play_land, card: "@mt3"}
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@bolt"}]}}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@mt1", "@mt2", "@mt3"]}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      p0: {spells_cast_this_turn: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt]
+      lands_played: 1
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+    p1:
+      life: 17
+      battlefield: [{card: Trinisphere, tapped: false}]
+notes: >
+  Bolt's mana cost {R} is less than three mana, so while Trinisphere is untapped it costs three mana; the colored
+  symbol stays and the two additional mana are generic ({2}{R}, Oracle reminder text, 601.2f). With two Mountains
+  (two mana) the cast is not offered at all; after the third land is played all three are tapped and Bolt resolves
+  (p1 20 - 3 = 17). Trinisphere belongs to the opponent: it taxes every player's spells. A wrong engine charges only {R}.

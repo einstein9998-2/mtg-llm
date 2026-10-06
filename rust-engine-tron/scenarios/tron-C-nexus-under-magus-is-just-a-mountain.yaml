@@ -1,0 +1,33 @@
+id: tron-c-planar-nexus-under-magus-of-the-moon-is-only-a-mountain
+title: "Under Magus of the Moon, Planar Nexus is a Mountain: it taps for {R} only and loses its colorless and any-color abilities"
+area: card
+cards: [Planar Nexus, Magus of the Moon, Mountain]
+tags: [planar-nexus, magus-of-the-moon, layers, type-changing, loses-abilities, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: Planar Nexus, text: "This land is every nonbasic land type.", verified: true}
+  - {kind: cr, ref: "305.7", text: "If an effect sets a land’s subtype to one or more of the basic land types, the land no longer has its old land type.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [Planar Nexus @nx]
+    library_pad: 10
+  p1:
+    battlefield: [Magus of the Moon @magus]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@nx", ability: 0, choose_color: U}}
+  - p0: {t: activate, source: "@nx", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {R: 1}
+      battlefield: [{card: Planar Nexus, tapped: true, subtypes: [Mountain]}]
+notes: >
+  Magus sets the Nexus's land type to Mountain: it loses all other land types and the abilities from its rules text
+  (305.7) and gains {T}: Add {R}. It makes {R}, never {C}, and has no any-color ability (asked for {U}: not offered).
+  A wrong engine keeps the Nexus's own abilities, or keeps its "every nonbasic land type" static ability so it is still an Urza's land.

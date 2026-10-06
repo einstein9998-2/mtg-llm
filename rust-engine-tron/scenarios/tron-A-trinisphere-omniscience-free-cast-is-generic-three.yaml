@@ -1,0 +1,45 @@
+id: tron-a-trinisphere-omniscience-free-cast-is-generic-three
+title: "Under Trinisphere, Omniscience's free Lightning Bolt costs three generic mana (no red needed), unlike a Bolt cast for its mana cost"
+area: card
+cards: [Trinisphere, Omniscience, Lightning Bolt, Plains]
+tags: [trinisphere, omniscience, free-cast, cost-increase, colored-mana, mana-payment, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Trinisphere, text: "Additional mana in the cost may be paid with any color of mana or colorless mana.", verified: true}
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Omniscience @omni", "Plains @pl1", "Plains @pl2", "Plains @pl3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bolt", alt_cost: null, targets: [{player: p1}], pay: auto}}
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@bolt", alt_cost: {free: omniscience}}]}}
+  - p0: {t: cast, card: "@bolt", alt_cost: {free: omniscience}, targets: [{player: p1}], pay: {tap: ["@pl1", "@pl2", "@pl3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt]
+      mana_pool: {}
+      battlefield: [{card: Omniscience}, {card: Plains, tapped: true}, {card: Plains, tapped: true}, {card: Plains, tapped: true}]
+    p1:
+      life: 17
+notes: >
+  Cast for its mana cost Bolt would be {2}{R}, and three Plains cannot pay it (the first expect_illegal). Cast through
+  Omniscience its total cost is {0}, raised to three mana with no colored symbol left (the reminder text: only the
+  symbols already in the cost stay colored), so three Plains pay it. Bolt resolves, p1 at 17. A wrong engine either keeps
+  the free cast free, or invents a colored requirement from the card's mana cost.

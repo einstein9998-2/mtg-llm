@@ -1,0 +1,43 @@
+id: tron-c-kozileks-command-x0-exiles-only-mana-value-zero-creatures-tokens
+title: "Kozilek's Command with X = 0 can exile only a mana value 0 creature: an Eldrazi Spawn token yes, Ocelot Pride no; the token ceases to exist"
+area: card
+cards: ["Kozilek's Command", Ancient Tomb, Ocelot Pride, Brainstorm, Eldrazi Spawn Token]
+tags: [kozileks-command, x-zero, mana-value, token, exile, tokens-cease-to-exist, scry-zero]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Kozilek's Command", text: "Exile target creature with mana value X or less.", verified: true}
+  - {kind: cr, ref: "202.3a", text: "The mana value of an object with no mana cost is 0, unless that object is the back face of a nonmodal double-faced permanent or spell, or it is a melded permanent.", verified: true}
+  - {kind: cr, ref: "704.5d", text: "If a token is in a zone other than the battlefield, it ceases to exist.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Ancient Tomb @tomb]
+    library: [Brainstorm]
+    library_pad: 10
+  p1:
+    battlefield: [Ocelot Pride @cat, {token: Eldrazi Spawn Token, as: sp}]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@kc", x: 0, modes: [2, 3], targets: [{player: p0}, "@cat"], pay: {tap: ["@tomb"]}}}
+  - p0: {t: cast, card: "@kc", x: 0, modes: [2, 3], targets: [{player: p0}, "@sp"], pay: {tap: ["@tomb"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      hand: [Brainstorm]
+      graveyard: ["Kozilek's Command"]
+    p1:
+      exile: []
+      graveyard: []
+      battlefield: [{card: Ocelot Pride}]
+notes: >
+  A token has no mana cost, so its mana value is 0 (202.3a): with X = 0 only mana value 0 creatures qualify (Ocelot
+  Pride, {W}, is 1). Mode 2 scries 0 (no decision) and draws Brainstorm. The token goes to exile and ceases to exist,
+  so p1's exile zone is empty at the end. A wrong engine gives tokens a nonzero value, or leaves the token in exile.

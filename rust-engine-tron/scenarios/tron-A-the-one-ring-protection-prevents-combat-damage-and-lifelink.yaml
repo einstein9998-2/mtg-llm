@@ -1,0 +1,48 @@
+id: tron-a-the-one-ring-protection-prevents-combat-damage-and-lifelink
+title: "A creature can still attack a player with The One Ring's protection from everything, but its damage is prevented and its lifelink gains nothing"
+area: card
+cards: [The One Ring, Ocelot Pride, Island]
+tags: [the-one-ring, protection-from-everything, combat, damage-prevention, lifelink, first-strike, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: The One Ring, text: "When The One Ring enters, if you cast it, you gain protection from everything until your next turn.", verified: true}
+  - {kind: oracle, card: Ocelot Pride, text: "First strike, lifelink", verified: true}
+  - {kind: cr, ref: "702.16j", text: "All damage that would be dealt to such a permanent or player is prevented.", verified: true}
+  - {kind: cr, ref: "120.3f", text: "Damage dealt by a source with lifelink causes that source’s controller to gain that much life, in addition to the damage’s other results.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["The One Ring @ring"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Ocelot Pride, as: pride}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ring", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: begin_combat, of: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@pride", target: {player: p0}}]}
+  - advance: {to: main2, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main2
+    stack: []
+    p0:
+      life: 20
+    p1:
+      life: 20
+      battlefield: [{card: Ocelot Pride, tapped: true}]
+notes: >
+  Protection from everything does not stop attacks (702.16j lists targeting, enchanting, equipping, blocking by creatures
+  and damage; being attacked is not on the list). Ocelot Pride (first strike, lifelink) attacks p0 and its 1 damage is
+  prevented, so no damage is dealt and lifelink (120.3f: "damage dealt") gives p1 no life: both players stay at 20. p0
+  has no creatures, so no blockers decision. A wrong engine gains life from prevented damage or lets the damage through.

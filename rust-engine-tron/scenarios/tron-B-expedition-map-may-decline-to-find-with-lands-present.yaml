@@ -1,0 +1,38 @@
+id: tron-b-expedition-map-may-decline-to-find-with-lands-present
+title: "Expedition Map: the searcher may fail to find even though lands are in the library; the library is still shuffled"
+area: card
+cards: [Expedition Map, Lightning Bolt, Island]
+tags: [expedition-map, search, fail-to-find, hidden-zone, shuffle]
+derived_from: cr
+source:
+  - {kind: oracle, card: Expedition Map, text: "Search your library for a land card, reveal it, put it into your hand, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.23b", text: "If a player is searching a hidden zone for cards with a stated quality, such as a card with a certain card type or color, that player isn’t required to find some or all of those cards even if they’re present in that zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Expedition Map @map", "Island @i1", "Island @i2"]
+    library: ["Island @isl1", "Lightning Bolt @bolt"]
+    library_pad: 3
+  p1:
+    library_pad: 10
+random:
+  - {kind: shuffle, player: p0, result: [Lightning Bolt, Island, Island, Island, Island]}
+script:
+  - p0: {t: activate, source: "@map", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: null, expect_options: {include: ["@isl1"], exclude: ["@bolt"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      library_count: 5
+      library_top: [Lightning Bolt]
+notes: >
+  Searching for a card with a stated quality in a hidden zone does not oblige the searcher to find a matching card (701.23b).
+  Island cards are offered (the mask is asserted) and p0 declines all of them; the library is still shuffled (scripted).
+  Low-value for play, but a wrong engine that forces a find would fail it.

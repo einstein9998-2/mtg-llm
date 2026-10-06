@@ -1,0 +1,39 @@
+# Colorless Tron (Karn / Ugin / Tezzeret / The One Ring + Trinisphere) | Prison-ramp (Tron lands, colorless)
+# Source: Brady's personal list, 2026-10-06 (not a tournament list), posted in the project chat 01:45Z. Added as an Alurentell opponent.
+# All 32 distinct card names and Oracle texts were checked against the Savecraft card search (Scryfall data); all are Legacy-legal. Banlist as of 2026-08-10.
+# Format: N Card Name; blank line, then sideboard.
+
+4 Ancient Tomb
+1 Karakas
+2 Boseiju, Who Endures
+4 Planar Nexus
+4 Urza's Saga
+4 Urza's Tower
+4 Urza's Workshop
+4 Karn, the Great Creator
+4 Ugin, Eye of the Storms
+4 Tezzeret, Cruel Captain
+4 The One Ring
+4 Trinisphere
+4 Kozilek's Command
+4 Grim Monolith
+2 Manifold Key
+1 Voltaic Key
+2 Mishra's Research Desk
+1 Pithing Needle
+1 Disruptor Flute
+1 Portable Hole
+1 Expedition Map
+
+1 Portable Hole
+1 Tormod's Crypt
+1 Grafdigger's Cage
+1 Eldrazi Confluence
+1 Liquimetal Coating
+1 Torpor Orb
+3 Warping Wail
+1 Ensnaring Bridge
+2 Argentum Masticore
+1 Mycosynth Lattice
+1 Extinguisher Battleship
+1 Summon: Bahamut

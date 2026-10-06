@@ -1,0 +1,47 @@
+id: tron-b-tormods-crypt-free-cast-and-immediate-use
+title: "Tormod's Crypt costs {0}: cast it with no lands and use it the same turn on the opponent; only the targeted graveyard is exiled"
+area: card
+cards: [Tormod's Crypt, Dark Ritual, Brainstorm, Ponder]
+tags: [tormods-crypt, zero-cost, summoning-sickness-not-applicable, only-target-graveyard, sacrifice-as-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tormod's Crypt, text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Tormod's Crypt @crypt"]
+    graveyard: ["Dark Ritual"]
+    library_pad: 10
+  p1:
+    graveyard: [Brainstorm, Ponder]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@crypt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: crypt-in-play
+    check:
+      stack: []
+      p0:
+        battlefield: [{card: "Tormod's Crypt", tapped: false}]
+  - p0: {t: activate, source: "@crypt", ability: 0, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      spells_cast_this_turn: 1
+      battlefield: []
+      graveyard: ["Dark Ritual", "Tormod's Crypt"]
+    p1:
+      graveyard: []
+      exile: [Brainstorm, Ponder]
+notes: >
+  The Crypt has no mana cost ({0}) so it is cast with no mana. It is not a creature, so the summoning sickness rule (302.6, which
+  only covers creatures) does not stop its {T} ability: it is activated in the turn it was cast. Only p1's graveyard is exiled;
+  p0's Dark Ritual stays (the sacrificed Crypt joins it). A wrong engine applies summoning sickness to all permanents.

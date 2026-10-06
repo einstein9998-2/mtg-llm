@@ -1,0 +1,35 @@
+id: tron-c-planar-nexus-and-mountain-pay-for-a-blue-spell
+title: "Planar Nexus plus a Mountain can pay Brainstorm's {U}: the Nexus's any-color ability is used while casting"
+area: card
+cards: [Planar Nexus, Mountain, Brainstorm]
+tags: [planar-nexus, mana-ability, any-color, colored-mana, casting, mana-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Planar Nexus, text: "{1}, {T}: Add one mana of any color.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "605.3a", text: "A player may activate an activated mana ability whenever they have priority, whenever they are casting a spell or activating an ability that requires a mana payment, or whenever a rule or effect asks for a mana payment, even if it’s in the middle of casting or resolving a spell or activating or resolving an ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Brainstorm @bs]
+    battlefield: [Planar Nexus @nx, Mountain @mtn]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: {tap: ["@nx", "@mtn"]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bs", controller: p0}]
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      mana_pool: {}
+      spells_cast_this_turn: 1
+      battlefield: [{card: Planar Nexus, tapped: true}, {card: Mountain, tapped: true}]
+notes: >
+  The Nexus's second ability is a mana ability, so it can be activated while Brainstorm's cost is being paid
+  (605.3a). The Mountain pays the {1}, the Nexus produces the {U}; nothing is left in the pool. A wrong engine
+  does not consider the Nexus's {1},{T} ability as a source of {U} for a spell.

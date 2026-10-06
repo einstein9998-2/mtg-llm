@@ -1,0 +1,51 @@
+id: tron-a-manifold-key-after-blockers-does-not-unblock
+title: "Activating Manifold Key's unblockable ability after blockers are declared does not remove the block: the attacker stays blocked and deals no damage to the player"
+area: card
+cards: [Manifold Key, Ocelot Pride, "Phelia, Exuberant Shepherd", Island]
+tags: [manifold-key, cant-be-blocked, combat, remains-blocked, timing, first-strike, lifelink, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Manifold Key, text: "{3}, {T}: Target creature can't be blocked this turn.", verified: true}
+  - {kind: cr, ref: "509.1h", text: "A creature remains blocked even if all the creatures blocking it are removed from combat.", verified: true}
+  - {kind: cr, ref: "509.1b", text: "The defending player checks each creature they control to see whether it’s affected by any restrictions", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Manifold Key @mk", "Ocelot Pride @op", "Island @is1", "Island @is2", "Island @is3"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@op", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@ph", attacker: "@op"}]}
+  - check:
+      phase: declare_blockers
+      pending: {actor: p0, kind: priority}
+  - p0: {t: activate, source: "@mk", ability: 1, targets: ["@op"], pay: {tap: ["@is1", "@is2", "@is3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main2
+    stack: []
+    p0:
+      life: 21
+      graveyard: [Ocelot Pride]
+    p1:
+      life: 20
+      battlefield: [{card: "Phelia, Exuberant Shepherd", damage: 1}]
+notes: >
+  The ability resolves after the block: "can't be blocked" is a restriction applied when blockers are declared; the creature
+  is already blocked and stays blocked (509.1h). Ocelot Pride (1/1 first strike, lifelink) deals its 1 damage to Phelia in
+  the first-strike step (p0 gains 1: 21, Phelia has 1 damage), then Phelia (2/2) deals 2 to the Pride, which dies. p1 takes
+  no damage (20). A wrong engine turns the blocked attacker into an unblocked one and hits p1.

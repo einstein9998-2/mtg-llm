@@ -1,0 +1,62 @@
+id: tron-b-tormods-crypt-in-response-to-reanimate-fizzles
+title: "Tormod's Crypt in response to Reanimate exiles the targeted Griselbrand, so Reanimate fizzles and its caster loses no life"
+area: card
+cards: [Tormod's Crypt, Reanimate, Griselbrand, Swamp]
+tags: [tormods-crypt, graveyard-hate, reanimate, fizzle, response, sacrifice-as-cost, reanimator-specific]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tormod's Crypt, text: "{T}, Sacrifice this artifact: Exile target player's graveyard.", verified: true}
+  - {kind: oracle, card: Reanimate, text: "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to that card's mana value.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Tormod's Crypt @crypt"]
+    library_pad: 10
+  p1:
+    life: 20
+    hand: ["Reanimate @rean"]
+    battlefield: ["Swamp @sw"]
+    graveyard: ["Griselbrand @gris"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@rean", targets: ["@gris"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@crypt", ability: 0, targets: [{player: p1}]}
+  - label: crypt-over-reanimate
+    check:
+      stack:
+        - {kind: spell, card: "@rean", controller: p1}
+        - {kind: activated, source: "@crypt", controller: p0}
+      p0:
+        battlefield: []
+        graveyard: ["Tormod's Crypt"]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: griselbrand-exiled
+    check:
+      stack: [{kind: spell, card: "@rean", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p1:
+        graveyard: []
+        exile: [Griselbrand]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: ["Tormod's Crypt"]
+    p1:
+      life: 20
+      graveyard: [Reanimate]
+      exile: [Griselbrand]
+      battlefield: [{card: Swamp, tapped: true}]
+notes: >
+  The Crypt is tapped and sacrificed as the cost, so it is in p0's graveyard while the ability is on the stack. The ability
+  resolves first and exiles p1's graveyard (Griselbrand). Reanimate's only target is then illegal, so the spell does not resolve
+  (608.2b): no Griselbrand enters and p1 does not lose 8 life; Reanimate itself goes to the graveyard after the Crypt resolved
+  (so it is not exiled). A wrong engine reanimates anyway from the exiled card, or loses life.

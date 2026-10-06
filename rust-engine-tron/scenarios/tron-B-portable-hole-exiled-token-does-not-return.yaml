@@ -1,0 +1,58 @@
+id: tron-b-portable-hole-exiled-token-does-not-return
+title: A token exiled by Portable Hole ceases to exist, so it does not come back when the Hole is destroyed
+area: card
+cards: [Portable Hole, Abrade, Plains, Mountain, Cat Token (Ocelot Pride)]
+tags: [portable-hole, etb-trigger, exile-until, token, ceases-to-exist, abrade, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Portable Hole, text: "exile target nonland permanent an opponent controls with mana value 2 or less until this artifact leaves the battlefield", verified: true}
+  - {kind: cr, ref: "111.7", text: "A token that’s in a zone other than the battlefield ceases to exist.", verified: true}
+  - {kind: cr, ref: "610.3", text: "A second one-shot effect is created immediately after the specified event. This second one-shot effect returns the object to its previous zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Portable Hole @hole"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Abrade @ab"]
+    battlefield:
+      - "Mountain @m1"
+      - "Mountain @m2"
+      - {token: Cat Token (Ocelot Pride), as: cat}
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hole", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@cat", expect_options: {include: ["@cat"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: token-exiled
+    check:
+      stack: []
+      p1:
+        exile: []
+        battlefield: [{card: Mountain}, {card: Mountain}]
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@ab", modes: [2], targets: ["@hole"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Portable Hole]
+    p1:
+      exile: []
+      graveyard: [Abrade]
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+notes: >
+  The Cat token (mana value 0) is a legal target. Once it is exiled it ceases to exist as a state-based action (111.7), so p1's
+  exile zone is empty at once. When Abrade later destroys the Hole there is nothing to return: the battlefield holds only the
+  two Mountains. A wrong engine keeps the token in exile and returns it, or returns a fresh token.

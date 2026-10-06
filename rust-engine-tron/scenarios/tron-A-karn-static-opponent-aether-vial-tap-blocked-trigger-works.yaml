@@ -1,0 +1,49 @@
+id: tron-a-karn-static-opponent-aether-vial-tap-blocked-trigger-works
+title: "Under Karn the opponent's Aether Vial still gets its upkeep charge counter (a triggered ability) but its {T} ability cannot be activated"
+area: card
+cards: ["Karn, the Great Creator", Aether Vial, "Phelia, Exuberant Shepherd"]
+tags: [karn-the-great-creator, static-ability, cant-be-activated, aether-vial, triggered-ability, negative-case, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Activated abilities of artifacts your opponents control can't be activated.", verified: true}
+  - {kind: oracle, card: Aether Vial, text: "At the beginning of your upkeep, you may put a charge counter on this artifact.", verified: true}
+  - {kind: oracle, card: Aether Vial, text: "{T}: You may put a creature card with mana value equal to the number of charge counters on this artifact from your hand onto the battlefield.", verified: true}
+  - {kind: cr, ref: "602.5", text: "A player can’t begin to activate an ability that’s prohibited from being activated.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: end
+  priority: p0
+  p0:
+    battlefield: [{card: "Karn, the Great Creator", as: karn, counters: {loyalty: 5}}]
+    library_pad: 10
+  p1:
+    hand: ["Phelia, Exuberant Shepherd @ph"]
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 1}}]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p1}
+  - check:
+      turn: 4
+      stack: [{kind: triggered, source: "@vial", controller: p1}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: add_charge_counter, answer: true}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      p1: {battlefield: [{card: Aether Vial, counters: {charge: 2}}]}
+  - expect_illegal: {p1: {t: activate, source: "@vial", ability: 0}}
+  - check:
+      legal: {p1: {exclude: [{t: activate, source: "@vial"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: ["Phelia, Exuberant Shepherd"]
+      battlefield: [{card: Aether Vial, counters: {charge: 2}, tapped: false}]
+notes: >
+  Karn only forbids ACTIVATING abilities of the opponent's artifacts. Aether Vial's upkeep trigger is a triggered ability
+  and still goes on the stack and resolves (counters 1 -> 2). With two counters Phelia (mana value 2) would be a legal
+  put, but the Vial's activated {T} ability is not offered. A wrong engine blocks triggers too, or lets the Vial work.

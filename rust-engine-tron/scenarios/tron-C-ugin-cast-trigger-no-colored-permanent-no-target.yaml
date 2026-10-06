@@ -1,0 +1,51 @@
+id: tron-c-ugin-cast-trigger-with-no-colored-permanent-has-no-target-and-ugin-resolves
+title: "If no permanent is colored, Ugin's 'up to one' cast trigger goes on the stack with no target and Ugin still resolves"
+area: card
+cards: ["Ugin, Eye of the Storms", Mountain, Lotus Petal, "Urza's Tower", Eldrazi Spawn Token]
+tags: [ugin, planeswalker, cast-trigger, up-to-one-target, no-legal-target, colorless, negative-case]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Ugin, Eye of the Storms", text: "When you cast this spell, exile up to one target permanent that's one or more colors.", verified: true}
+  - {kind: cr, ref: "115.6", text: "A spell or ability that requires targets may allow zero targets to be chosen. Such a spell or ability is still said to require targets, but that spell or ability is targeted only if one or more targets have been chosen for it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ugin, Eye of the Storms @ugin"]
+    battlefield:
+      - Mountain
+      - Mountain
+      - Mountain
+      - Mountain
+      - Mountain
+      - Mountain
+      - Mountain
+    library_pad: 10
+  p1:
+    battlefield: [Lotus Petal, "Urza's Tower", {token: Eldrazi Spawn Token, as: sp}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ugin", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@ugin", controller: p0}
+        - {kind: triggered, source: "@ugin", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield_contains: [{card: "Ugin, Eye of the Storms", counters: {loyalty: 7}}]
+    p1:
+      exile: []
+      battlefield: [{card: Lotus Petal}, {card: "Urza's Tower"}, {token: Eldrazi Spawn Token}]
+notes: >
+  Every permanent on the battlefield is colorless (Mountains are lands), so no target exists; "up to one" lets the trigger exist with zero
+  targets (115.6; same shape as the Loran/Skyclave scenarios: no target decision is raised). Nothing is exiled and Ugin resolves.
+  A wrong engine fizzles Ugin or raises a decision with no candidates. NOTE: the engine may instead drop the trigger
+  instead of putting it on the stack (603.3d applies only when a choice is *required*); this scenario assumes it is put on the stack,
+  as in the existing Loran scenario.

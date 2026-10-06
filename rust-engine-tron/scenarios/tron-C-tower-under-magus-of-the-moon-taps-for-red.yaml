@@ -1,0 +1,42 @@
+id: tron-c-magus-of-the-moon-turns-urzas-tower-into-a-mountain-no-tron
+title: Under Magus of the Moon, Urza's Tower is a Mountain; with Mine and Power Plant (also Mountains) it adds {R}, not {C}{C}{C}
+area: card
+cards: ["Urza's Tower", "Urza's Mine", "Urza's Power Plant", Magus of the Moon, Mountain]
+tags: [urzas-tower, tron, magus-of-the-moon, layers, type-changing, loses-abilities]
+derived_from: cr
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: cr, ref: "305.7", text: "If an effect sets a land’s subtype to one or more of the basic land types, the land no longer has its old land type.", verified: true}
+  - {kind: cr, ref: "305.6", text: "An object with the land card type and a basic land type has the intrinsic ability “{T}: Add [mana symbol],” even if the text box doesn’t actually contain that text or the object has no text box.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Tower @tw", "Urza's Mine @mine", "Urza's Power Plant @pp"]
+    library_pad: 10
+  p1:
+    battlefield: ["Magus of the Moon @magus"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: "Urza's Tower", subtypes: [Mountain]}]}
+  - p0: {t: activate, source: "@tw", ability: 0, choose_color: R}
+  - check:
+      p0: {mana_pool: {R: 1}}
+  - p0: {t: activate, source: "@mine", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {R: 2}
+      battlefield:
+        - {card: "Urza's Tower", tapped: true}
+        - {card: "Urza's Mine", tapped: true}
+        - {card: "Urza's Power Plant", tapped: false}
+notes: >
+  Magus sets each nonbasic land's subtype to Mountain (305.7): the lands lose their Urza's types and their rules-text
+  mana abilities, and each gains the intrinsic {T}: Add {R}. No colorless mana is produced at all, and the Tron
+  condition is moot (nobody is an Urza's land any more). Per the SCHEMA addendum, `ability: 0` with `choose_color` names the
+  land's intrinsic mana ability. A wrong engine leaves the Tron ability in place on the Mountains (types and abilities
+  must change together).

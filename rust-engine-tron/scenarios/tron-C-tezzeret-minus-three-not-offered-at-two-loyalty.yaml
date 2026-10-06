@@ -1,0 +1,32 @@
+id: tron-c-tezzeret-with-two-loyalty-cannot-minus-three-or-minus-seven
+title: "Tezzeret with 2 loyalty is not offered -3 or -7, but the 0 is"
+area: card
+cards: ["Tezzeret, Cruel Captain", Aether Vial, Lotus Petal]
+tags: [tezzeret, planeswalker, loyalty-ability, cost-too-high, legal-action-mask, negative-case]
+derived_from: cr
+source:
+  - {kind: cr, ref: "606.6", text: "A loyalty ability with a negative loyalty cost, taking into account any additional costs, can’t be activated unless the permanent has at least that many loyalty counters on it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 2}}, {card: Aether Vial, as: vial, tapped: true}]
+    library: [Lotus Petal]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@tz", ability: 1}}
+  - expect_illegal: {p0: {t: activate, source: "@tz", ability: 2}}
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@tz", ability: 0}], exclude: [{t: activate, source: "@tz", ability: 1}, {t: activate, source: "@tz", ability: 2}]}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      hand_count: 0
+      battlefield: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 2}}, {card: Aether Vial, tapped: true}]
+notes: >
+  Index 1 is -3 and index 2 is -7 (the loyalty abilities in Oracle order; the triggered ability is not counted).
+  Loyalty 2 is below both costs. A wrong engine lets a planeswalker go below 0 loyalty to pay.

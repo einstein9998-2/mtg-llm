@@ -1,0 +1,32 @@
+id: tron-c-tezzeret-ignores-artifacts-the-opponent-controls
+title: "An artifact entering under the opponent's control does not trigger Tezzeret"
+area: card
+cards: ["Tezzeret, Cruel Captain", "Mishra's Bauble"]
+tags: [tezzeret, planeswalker, triggered-ability, artifact-enters, controller-restriction, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 4}}]
+    library_pad: 10
+  p1:
+    hand: ["Mishra's Bauble @mb"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@mb", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 4}}]
+    p1:
+      battlefield: [{card: "Mishra's Bauble"}]
+notes: >
+  The artifact enters under p1's control, so nothing triggers: no trigger on the stack and loyalty stays 4.

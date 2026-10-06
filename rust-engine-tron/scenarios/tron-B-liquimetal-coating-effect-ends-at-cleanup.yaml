@@ -1,0 +1,44 @@
+id: tron-b-liquimetal-coating-effect-ends-at-cleanup
+title: "Liquimetal Coating's artifact type lasts through the turn (still there in the end step) and is gone in the opponent's next upkeep"
+area: card
+cards: [Liquimetal Coating, Island]
+tags: [liquimetal-coating, type-change, until-end-of-turn, duration, cleanup]
+derived_from: cr
+source:
+  - {kind: oracle, card: Liquimetal Coating, text: "Target permanent becomes an artifact in addition to its other types until end of turn.", verified: true}
+  - {kind: cr, ref: "514.2", text: "all “until end of turn” and “this turn” effects end.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Liquimetal Coating @coat", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@coat", ability: 0, targets: ["@isl"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: end, of: p0}
+  - label: end-step
+    check:
+      turn: 3
+      phase: end
+      p0:
+        battlefield_contains: [{card: Island, types: [Artifact, Land]}]
+  - advance: {to: upkeep, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: upkeep
+    active: p1
+    p0:
+      battlefield:
+        - {card: Liquimetal Coating, tapped: true}
+        - {card: Island, types: [Land]}
+notes: >
+  The effect has duration "until end of turn": it is still in force in p0's end step and ends in the cleanup step (514.2), so in
+  p1's upkeep the Island is only a Land again. (p0's Coating stays tapped until p0's own untap step.) A wrong engine ends the
+  effect at end of the phase or never ends it. The advance steps assume no decisions arise (no creatures, empty hands, padded
+  libraries).

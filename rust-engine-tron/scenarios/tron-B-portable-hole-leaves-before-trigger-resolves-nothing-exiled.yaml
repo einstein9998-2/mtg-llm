@@ -1,0 +1,64 @@
+id: tron-b-portable-hole-leaves-before-trigger-resolves-nothing-exiled
+title: If the Portable Hole is destroyed in response to its own enters trigger, the trigger resolves but the target is never exiled
+area: card
+cards: [Portable Hole, Ocelot Pride, Abrade, Plains, Mountain]
+tags: [portable-hole, etb-trigger, exile-until, response, leaves-battlefield, abrade, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Portable Hole, text: "exile target nonland permanent an opponent controls with mana value 2 or less until this artifact leaves the battlefield", verified: true}
+  - {kind: cr, ref: "610.3b", text: "If a resolving triggered ability creates the initial one-shot effect that causes the object to change zones, and the specified event has already occurred before that one-shot effect would occur but after that ability triggered, the object doesn’t move.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Portable Hole @hole"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Abrade @ab"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Ocelot Pride @op"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hole", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@op"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@ab", modes: [2], targets: ["@hole"], pay: auto}
+  - label: abrade-over-trigger
+    check:
+      stack:
+        - {kind: triggered, source: "@hole", controller: p0}
+        - {kind: spell, card: "@ab", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: hole-gone-trigger-still-waiting
+    check:
+      stack: [{kind: triggered, source: "@hole", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: [Portable Hole]
+      p1:
+        exile: []
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Portable Hole]
+    p1:
+      exile: []
+      graveyard: [Abrade]
+      battlefield:
+        - {card: Ocelot Pride, sick: false, controller: p1}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+notes: >
+  The enters trigger is on the stack (it exists independently of its source, 113.7a). p1 destroys the Hole in response. The
+  Hole has left before the exile would happen, so Ocelot Pride does not move (610.3b): it never leaves, it keeps its status
+  (not summoning sick) and nothing is in exile. A wrong engine exiles the creature forever because the "until" duration
+  already ended, or fizzles the trigger because its source is gone.

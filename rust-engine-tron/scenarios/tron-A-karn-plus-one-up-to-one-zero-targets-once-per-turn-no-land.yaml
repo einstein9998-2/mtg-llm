@@ -1,0 +1,41 @@
+id: tron-a-karn-plus-one-up-to-one-zero-targets-once-per-turn-no-land
+title: "Karn's +1 may be activated with no target (loyalty still goes up), cannot target a land, and cannot be activated twice in a turn"
+area: card
+cards: ["Karn, the Great Creator", Voltaic Key, Island]
+tags: [karn-the-great-creator, loyalty-ability, up-to-one-target, targeting, once-per-turn, legal-action-mask, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.", verified: true}
+  - {kind: cr, ref: "606.3", text: "A player may activate a loyalty ability of a permanent they control any time they have priority and the stack is empty during a main phase of their turn, but only if no player has previously activated a loyalty ability of that permanent that turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Karn, the Great Creator", as: karn, counters: {loyalty: 4}}, "Voltaic Key @key", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@karn", ability: 0, targets: ["@isl"]}}
+  - p0: {t: activate, source: "@karn", ability: 0, targets: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {battlefield_contains: [{card: "Karn, the Great Creator", counters: {loyalty: 5}}, {card: Voltaic Key, types: [Artifact]}]}
+  - expect_illegal: {p0: {t: activate, source: "@karn", ability: 0, targets: ["@key"]}}
+  - expect_illegal: {p0: {t: activate, source: "@karn", ability: 0, targets: []}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: "Karn, the Great Creator", counters: {loyalty: 5}}
+        - {card: Voltaic Key, types: [Artifact]}
+        - {card: Island, types: [Land]}
+notes: >
+  "Up to one" allows zero targets: the +1 is activated with `targets: []` (SCHEMA addenda), loyalty goes 4 -> 5 and the Key
+  stays a plain artifact even though a legal target existed. An Island is not an artifact: not a legal target. The loyalty
+  ability can be used only once per turn (606.3), even with another legal target.

@@ -1,0 +1,36 @@
+id: tron-c-warping-wail-counter-mode-needs-a-sorcery-spell
+title: "Warping Wail mode 2 cannot target an instant spell (Brainstorm), and the mode is not offered when no sorcery spell is on the stack"
+area: card
+cards: [Warping Wail, "Urza's Tower", Island, Brainstorm]
+tags: [warping-wail, counter-spell, sorcery, negative-case, mask-validity, modal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Warping Wail, text: "Counter target sorcery spell.", verified: true}
+  - {kind: cr, ref: "700.2a", text: "The controller of a modal spell or activated ability chooses the mode(s) as part of casting that spell or activating that ability. If one of the modes would be illegal (due to an inability to choose legal targets, for example), that mode can’t be chosen.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: [Warping Wail @ww]
+    battlefield: ["Urza's Tower @tw", Island @isl]
+    library_pad: 10
+  p1:
+    hand: [Brainstorm @bs]
+    battlefield: [Island @pi]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@ww", modes: [2], targets: ["@bs"], pay: auto}}
+  - check:
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: cast, card: "@ww", modes: [3]}], exclude: [{t: cast, card: "@ww", modes: [2]}, {t: cast, card: "@ww", modes: [1]}]}}
+expect:
+  - at: after_script
+    stack: [{kind: spell, card: "@bs", controller: p1}]
+    p0: {hand: [Warping Wail]}
+notes: >
+  Brainstorm is an instant, so mode 2 has no legal target; with a modal spell, a mode with no legal target cannot be
+  chosen (700.2a). Mode 1 (no creature on the battlefield) is not offered either; mode 3 (no target) is. A wrong engine
+  counts any spell as a legal target of "counter target sorcery spell".

@@ -1,0 +1,35 @@
+id: tron-c-tezzeret-zero-untaps-a-noncreature-artifact-without-a-counter
+title: "Tezzeret's 0 untaps a tapped Aether Vial; it is not a creature, so no +1/+1 counter, and loyalty stays 4"
+area: card
+cards: ["Tezzeret, Cruel Captain", Aether Vial]
+tags: [tezzeret, planeswalker, loyalty-ability, untap, artifact, negative-case, zero-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Tezzeret, Cruel Captain", text: "Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.", verified: true}
+  - {kind: cr, ref: "606.4", text: "The cost to activate a loyalty ability of a permanent is to put on or remove from that permanent a certain number of loyalty counters, as shown by the loyalty symbol in the ability’s cost. This cost may be modified by other effects.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: "Tezzeret, Cruel Captain", as: tz, counters: {loyalty: 4}}, {card: Aether Vial, as: vial, tapped: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tz", ability: 0, targets: ["@vial"]}
+  - check:
+      stack: [{kind: activated, source: "@tz", controller: p0}]
+      p0: {battlefield_contains: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 4}}, {card: Aether Vial, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: "Tezzeret, Cruel Captain", counters: {loyalty: 4}}, {card: Aether Vial, tapped: false, types: [Artifact]}]
+notes: >
+  Ability index 0 is the 0 ability (the triggered ability is not counted). It costs no loyalty and goes on the stack; the
+  Vial untaps only on resolution. The "if it's an artifact creature" rider is false for a plain artifact. A wrong engine
+  adds a counter to any artifact or untaps on activation.

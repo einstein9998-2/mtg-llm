@@ -1,0 +1,39 @@
+id: tron-c-planar-nexus-alone-cannot-pay-its-own-one-so-no-colored-mana
+title: "A lone Planar Nexus cannot cast Brainstorm: it cannot pay its own {1} for the any-color ability"
+area: card
+cards: [Planar Nexus, Brainstorm]
+tags: [planar-nexus, mana-ability, any-color, negative-case, mana-payment, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Planar Nexus, text: "{T}: Add {C}.", verified: true}
+  - {kind: oracle, card: Planar Nexus, text: "{1}, {T}: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost. First, they pay all costs that don’t involve random elements or moving objects from the library to a public zone, in any order. Then they pay all remaining costs in any order. Partial payments are not allowed. Unpayable costs can’t be paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: [Brainstorm @bs]
+    battlefield: [Planar Nexus @nx]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bs", pay: auto}}
+  - expect_illegal: {p0: {t: activate, source: "@nx", ability: 1, choose_color: U}}
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@nx", ability: 0}], exclude: [{t: cast, card: "@bs"}]}}
+  - p0: {t: activate, source: "@nx", ability: 0}
+  - expect_illegal: {p0: {t: cast, card: "@bs", pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      hand: [Brainstorm]
+      mana_pool: {C: 1}
+      spells_cast_this_turn: 0
+      battlefield: [{card: Planar Nexus, tapped: true}]
+notes: >
+  The {1} cost must be paid with mana from some other source: the Nexus's own {T}: Add {C} would tap it, and it
+  cannot tap again for the second ability. With {C} floating after the first ability the Nexus is tapped, and {C} is not {U}, so Brainstorm is
+  still not castable. A wrong engine lets one land pay {1} for the activation and then tap again for the colored mana.

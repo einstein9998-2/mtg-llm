@@ -1,0 +1,40 @@
+id: tron-a-the-one-ring-indestructible-survives-meltdown
+title: "Meltdown with X=4 destroys Lotus Petal and Voltaic Key but not the indestructible One Ring"
+area: card
+cards: [The One Ring, Meltdown, Lotus Petal, Voltaic Key, Mountain]
+tags: [the-one-ring, indestructible, meltdown, destroy, mana-value, x-spell, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: The One Ring, text: "Indestructible", verified: true}
+  - {kind: oracle, card: Meltdown, text: "Destroy each artifact with mana value X or less.", verified: true}
+  - {kind: cr, ref: "702.12b", text: "A permanent with indestructible can’t be destroyed.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["The One Ring @ring", "Lotus Petal @lp", "Voltaic Key @key"]
+    library_pad: 10
+  p1:
+    hand: ["Meltdown @melt"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Mountain @m4", "Mountain @m5"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@melt", x: 4, pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Lotus Petal, Voltaic Key]
+      battlefield: [{card: The One Ring}]
+    p1:
+      graveyard: [Meltdown]
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+notes: >
+  Meltdown X=4 ({4}{R}, five Mountains) destroys every artifact with mana value 4 or less: Petal (0) and Key (1) die, the
+  Ring (mana value 4, also qualifies) is "destroyed" but indestructible, so it stays (702.12b). A wrong engine
+  special-cases nothing and destroys the Ring.

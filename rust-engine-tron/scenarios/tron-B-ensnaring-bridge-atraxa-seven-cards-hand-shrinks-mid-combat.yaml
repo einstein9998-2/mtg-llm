@@ -1,0 +1,46 @@
+id: tron-b-ensnaring-bridge-atraxa-seven-cards-hand-shrinks-mid-combat
+title: "Ensnaring Bridge: Atraxa (power 7) attacks with seven cards in hand and keeps attacking after Dark Ritual shrinks the hand to six"
+area: card
+cards: [Ensnaring Bridge, "Atraxa, Grand Unifier", Dark Ritual, Swamp, Island]
+tags: [ensnaring-bridge, atraxa, declare-attackers, hand-size, mid-combat, restriction-checked-on-declaration, alurentell-specific]
+derived_from: cr
+source:
+  - {kind: oracle, card: Ensnaring Bridge, text: "Creatures with power greater than the number of cards in your hand can't attack.", verified: true}
+  - {kind: cr, ref: "508.1c", text: "The active player checks each creature they control to see whether it’s affected by any restrictions", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Dark Ritual @dr", Island, Island, Island, Island, Island, Island]
+    battlefield: ["Ensnaring Bridge @br", "Atraxa, Grand Unifier @atx", "Swamp @sw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@atx", target: {player: p1}}], expect_options: {include: ["@atx"]}}
+  - p0: {t: cast, card: "@dr", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: hand-now-six
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        hand_count: 6
+        battlefield_contains: [{card: "Atraxa, Grand Unifier", attacking: true}]
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    phase: main2
+    p0:
+      life: 27
+    p1:
+      life: 13
+notes: >
+  p0 controls the Bridge and holds seven cards, so Atraxa (power 7, not greater than 7) may attack. After the declaration p0
+  casts Dark Ritual (six cards left, power 7 > 6), but the restriction applies only when attackers are declared (508.1c): Atraxa
+  stays attacking and deals 7 combat damage (p1 13), lifelink gains 7 (p0 27). A wrong engine re-checks the restriction and
+  removes the attacker from combat, or refuses the original declaration.

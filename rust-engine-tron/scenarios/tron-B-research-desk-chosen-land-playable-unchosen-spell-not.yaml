@@ -1,0 +1,51 @@
+id: tron-b-research-desk-chosen-land-playable-unchosen-spell-not
+title: A land chosen with Mishra's Research Desk can be played from exile as the land drop; the unchosen Lightning Bolt cannot be cast even with a Mountain untapped
+area: card
+cards: [Mishra's Research Desk, Mountain, Lightning Bolt, Island]
+tags: [mishras-research-desk, play-from-exile, land-drop, choose-one, negative, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mishra's Research Desk, text: "Exile the top two cards of your library. Choose one of them. Until the end of your next turn, you may play that card.", verified: true}
+  - {kind: cr, ref: "305.2a", text: "To determine whether a player can play a land, compare the number of lands the player can play this turn with the number of lands they have already played this turn", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 0
+    battlefield: ["Mishra's Research Desk @desk", "Island @i1"]
+    library: ["Mountain @lm", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@desk", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: choose_one_to_play, answer: ["@lm"], expect_options: {include: ["@lm", "@bolt"], count: 2}}
+  - p0: {t: play_land, card: "@lm"}
+  - label: land-played-from-exile
+    check:
+      stack: []
+      p0:
+        lands_played: 1
+        exile: [Lightning Bolt]
+        battlefield_contains: [{card: Mountain, tapped: false}]
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      exile: [Lightning Bolt]
+      graveyard: ["Mishra's Research Desk"]
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Mountain, tapped: false}
+    p1:
+      life: 20
+notes: >
+  p0 chooses the Mountain and plays it from exile (a land play counts as the land drop). The new Mountain is untapped and
+  could pay for Lightning Bolt, but the Bolt was exiled and not chosen, so it carries no permission and cannot be cast.
+  A wrong engine grants permission to both exiled cards. The Desk's {1} is paid with the only Island.

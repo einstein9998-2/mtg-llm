@@ -1,0 +1,35 @@
+id: tron-c-urzas-tower-with-mine-but-no-power-plant-taps-for-one
+title: Urza's Tower needs both an Urza's Mine and an Urza's Power-Plant; with only the Mine it adds {C}
+area: card
+cards: ["Urza's Tower", "Urza's Mine", Island]
+tags: [urzas-tower, urzas-mine, tron, mana-ability, negative-case, conjunction]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Urza's Tower", text: "If you control an Urza's Mine and an Urza's Power-Plant, add {C}{C}{C} instead.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Urza's Tower @tw", "Urza's Mine @mine", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@tw", ability: 0}
+  - check:
+      p0: {mana_pool: {C: 1}}
+  - p0: {t: activate, source: "@mine", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      mana_pool: {C: 2}
+      battlefield:
+        - {card: "Urza's Tower", tapped: true}
+        - {card: "Urza's Mine", tapped: true}
+        - {card: Island, tapped: false}
+notes: >
+  Two of three Tron lands: the Tower adds {C} and the Mine adds {C} (its own condition needs a Power-Plant and a Tower;
+  it has no Power-Plant). Total pool {C}{C}. The Island (a non-Urza's land) does not count as a Power-Plant. A wrong
+  engine treats "Mine and Power-Plant" as "any other Urza's land" and gives three.

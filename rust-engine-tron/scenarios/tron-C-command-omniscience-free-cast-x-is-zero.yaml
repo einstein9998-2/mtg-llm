@@ -1,0 +1,39 @@
+id: tron-c-kozileks-command-cast-free-with-omniscience-forces-x-zero
+title: "Omniscience casts Kozilek's Command for no mana, but then X can only be 0"
+area: card
+cards: ["Kozilek's Command", Omniscience, Brainstorm]
+tags: [kozileks-command, omniscience, free-cast, x-spell, x-zero, alternative-cost, alurentell]
+derived_from: cr
+source:
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: cr, ref: "107.3b", text: "If a player is casting a spell that has an {X} in its mana cost, the value of X isn’t defined by the text of that spell, and an effect lets that player cast that spell while paying neither its mana cost nor an alternative cost that includes X, then the only legal choice for X is 0.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Kozilek's Command @kc"]
+    battlefield: [Omniscience @omni]
+    library: [Brainstorm]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@kc", alt_cost: {free: omniscience}, x: 2, modes: [1, 2], targets: [{player: p0}, {player: p0}]}}
+  - p0: {t: cast, card: "@kc", alt_cost: {free: omniscience}, x: 0, modes: [1, 2], targets: [{player: p0}, {player: p0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Brainstorm]
+      graveyard: ["Kozilek's Command"]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Omniscience}]
+notes: >
+  p0 controls no mana source at all. Omniscience lets it cast Command from hand for free, and with the whole mana cost
+  waived the only legal X is 0 (107.3b), so X = 2 is not offered. At X = 0 modes 1 and 2 make no tokens and scry 0 (no
+  decision) and then draw Brainstorm. A wrong engine lets the free cast pick any X (a free X = 7) or charges {C}{C}.

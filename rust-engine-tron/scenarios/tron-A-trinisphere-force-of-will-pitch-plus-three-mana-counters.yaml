@@ -1,0 +1,54 @@
+id: tron-a-trinisphere-force-of-will-pitch-plus-three-mana-counters
+title: "Under Trinisphere, Force of Will cast by exiling a blue card costs 1 life, the exiled card AND three mana"
+area: card
+cards: [Trinisphere, Force of Will, Brainstorm, Voltaic Key, Plains, Island]
+tags: [trinisphere, force-of-will, alternative-cost, pitch-spell, cost-increase, mana-payment, tron, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "118.9d", text: "If an alternative cost is being paid to cast a spell, any additional costs, cost increases, and cost reductions that affect that spell are applied to that alternative cost.", verified: true}
+  - {kind: cr, ref: "118.9c", text: "An alternative cost doesn’t change a spell’s mana cost, only what its controller has to pay to cast it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Voltaic Key @key"]
+    battlefield: ["Trinisphere @tri", "Plains @pl1", "Plains @pl2", "Plains @pl3"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@key", pay: {tap: ["@pl1", "@pl2", "@pl3"]}}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}}]}}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@key"], pay: {tap: ["@j1", "@j2", "@j3"]}}
+  - check:
+      stack: [{kind: spell, card: "@key", controller: p0}, {kind: spell, card: "@fow", controller: p1, targets: ["@key"]}]
+      p1: {life: 19, exile: [Brainstorm], spells_cast_this_turn: 1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Voltaic Key]
+      battlefield_contains: [{card: Trinisphere}]
+    p1:
+      life: 19
+      hand: []
+      exile: [Brainstorm]
+      graveyard: [Force of Will]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Same setup as the "not offered" scenario but p1 has three Islands. The alternative cost (1 life, exile Brainstorm)
+  is paid in full AND the three mana Trinisphere adds: all three Islands tap, life 20 -> 19, Brainstorm is exiled,
+  Force of Will counters Voltaic Key. A wrong engine charges the pitch cost without the mana (Islands untapped) or
+  the mana without the pitch cost.

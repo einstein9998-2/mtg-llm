@@ -1,0 +1,42 @@
+id: tron-a-voltaic-key-untaps-grim-monolith-for-net-mana
+title: "Voltaic Key ({1}, {T}) untaps a tapped Grim Monolith on resolution, so the Monolith can tap for {C}{C}{C} again"
+area: card
+cards: [Voltaic Key, Grim Monolith, Island]
+tags: [voltaic-key, grim-monolith, untap, activated-ability, stack, targeting, tron]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true, note: "Voltaic Key Oracle text supplied in the brief (Scryfall via Savecraft); entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Grim Monolith, text: "This artifact doesn't untap during your untap step.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Voltaic Key @key", {card: Grim Monolith, as: gm, tapped: true}, "Island @is1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@key", ability: 0, targets: ["@gm"], pay: {tap: ["@is1"]}}
+  - check:
+      stack: [{kind: activated, source: "@key", controller: p0, targets: ["@gm"]}]
+      p0: {battlefield_contains: [{card: Voltaic Key, tapped: true}, {card: Island, tapped: true}, {card: Grim Monolith, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {battlefield_contains: [{card: Grim Monolith, tapped: false}]}
+  - p0: {t: activate, source: "@gm", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 3}
+      battlefield: [{card: Voltaic Key, tapped: true}, {card: Grim Monolith, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  The Key's cost ({1} from the Island, {T}) is paid on activation; the untap happens only when the ability resolves
+  (the Monolith is still tapped while the ability is on the stack). The Monolith's "doesn't untap during your untap step"
+  restricts only the untap step, so an effect can untap it. One Island buys {C}{C}{C}: net two extra mana. A wrong engine
+  refuses to untap the Monolith or untaps it at activation.
