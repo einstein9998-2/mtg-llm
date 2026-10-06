@@ -1,0 +1,12 @@
+# UR Cutter sideboard plans.
+# Sideboard (15): 2 Hydroblast, 2 Meltdown, 2 Null Rod, 4 Pyroblast, 2 Pyroclasm, 3 Surgical
+# Extraction.
+
+vs alurentell
+# Pyroblast kills Atraxa and Omniscience (both blue) and counters Show and Tell, Brainstorm, Force
+# of Will. Alurentell has almost no creatures worth burning: Unholy Heat and one Bolt come out, and
+# the lone Prismari Charm. Null Rod stays out: it would turn off their own Bauble and Cutter equip.
+-2 Unholy Heat
+-1 Lightning Bolt
+-1 Prismari Charm
++4 Pyroblast

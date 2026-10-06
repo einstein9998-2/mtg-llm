@@ -29,6 +29,7 @@ version = "0.1.0"
 dependencies = [
  "mtg-cards",
  "mtg-core",
+ "mtg-match",
  "mtg-view",
  "serde_json",
 ]
@@ -77,6 +78,16 @@ dependencies = [
  "mtg-core",
  "mtg-debug",
  "mtg-dsl",
+ "mtg-match",
+ "mtg-view",
+]
+
+[[package]]
+name = "mtg-match"
+version = "0.1.0"
+dependencies = [
+ "mtg-cards",
+ "mtg-core",
  "mtg-view",
 ]
 

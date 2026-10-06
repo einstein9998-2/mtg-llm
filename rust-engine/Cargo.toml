@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/mtg-spec", "crates/mtg-core", "crates/mtg-cards", "crates/mtg-view", "crates/mtg-debug", "crates/mtg-fuzz", "crates/mtg-dsl", "crates/mtg-agent"]
+members = ["crates/mtg-spec", "crates/mtg-core", "crates/mtg-cards", "crates/mtg-view", "crates/mtg-debug", "crates/mtg-fuzz", "crates/mtg-dsl", "crates/mtg-agent", "crates/mtg-match"]
 
 [workspace.package]
 version = "0.1.0"
@@ -19,6 +19,7 @@ mtg-dsl = { path = "crates/mtg-dsl" }
 mtg-view = { path = "crates/mtg-view" }
 mtg-debug = { path = "crates/mtg-debug" }
 mtg-agent = { path = "crates/mtg-agent" }
+mtg-match = { path = "crates/mtg-match" }
 
 [profile.release]
 opt-level = 3

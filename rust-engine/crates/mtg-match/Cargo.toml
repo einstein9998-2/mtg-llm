@@ -1,0 +1,14 @@
+[package]
+name = "mtg-match"
+version.workspace = true
+edition.workspace = true
+
+# Best-of-three matches with sideboarding, layered above the frozen core: it builds a new decklist
+# per game and starts a fresh `Game`. Built against `mtg-view` without `diff-harness` features of
+# its own, so an agent crate can depend on it without reaching the raw engine.
+[dependencies]
+mtg-core.workspace = true
+mtg-view.workspace = true
+
+[dev-dependencies]
+mtg-cards.workspace = true
