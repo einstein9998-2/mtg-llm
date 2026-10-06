@@ -42,7 +42,7 @@ CR 106.5, 116.2f, 118.6, 601.2, 614, 702.40 (storm), 702.62 (suspend), 702.21 (w
 - Beseech the Mirror's bargain is modelled as an alternative way to cast it (key "bargained"), but in the rules it is an additional cost (CR 702.166a). A Beseech that is cast for free (found by another Beseech) therefore can never be bargained, which removes a real chain line (the same shape as the kicker limit of RFC 0005).
 - Urza's Saga lacks the "Urza's" land subtype, and chapter III uses `cmc <= 1` instead of "mana cost {0} or {1}" (identical for this library). The Construct token's +1/+1 is a layer 7a set rather than 7c (same value unless another power/toughness effect applies). "Discard your hand" is discard 99.
 - In a search world the opponent's Burning Wish finds no card (the fork forgets the sideboard), so a searching bot undervalues a Storm opponent's Wish line.
-- Giant's Boulder's Oracle text is from three store pages (not in Savecraft); it is still to be confirmed against the real card.
+- Giant's Boulder's Oracle text is from three store pages (not in Savecraft); Brady confirmed it is the card's text (2026-10-06).
 - The free cast from suspend cannot be declined (the card has no targets, and a "may" would cost a decision per game). Beseech's free cast keeps its "may".
 - Suspend is "an activated ability that skips the stack", not a separate action kind. Views show it as an activation.
 - Urza's Saga's gained abilities are marker counters, so a copy or a "loses all abilities" effect would not interact correctly (no such effect in the pool).
