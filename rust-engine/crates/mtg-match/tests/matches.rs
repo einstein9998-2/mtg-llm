@@ -145,7 +145,7 @@ fn match_structure_first_player_and_boarding() {
     let mut seen_three = false;
     for seed in 0..40u64 {
         let cfg = MatchConfig { seed, first: Seat((seed % 2) as u8), max_decisions: 20000, ..MatchConfig::default() };
-        let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
+        let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
         assert!(r.games.len() >= 2 && r.games.len() <= 5);
         assert_eq!(r.wins[0] as usize, r.games.iter().filter(|g| g.winner == Some(Seat(0))).count());
         assert!(r.wins[0] <= 2 && r.wins[1] <= 2);
@@ -165,10 +165,10 @@ fn match_structure_first_player_and_boarding() {
     assert!(seen_three, "no match went to three games in 40 tries");
     // --board a: only seat 0 boards; a pair without a plan never boards.
     let cfg = MatchConfig { board: [true, false], seed: 5, max_decisions: 20000, ..MatchConfig::default() };
-    let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
+    let r = play_match(&db, ["alurentell", "ur-cutter"], [&decks[a], &decks[b]], [Some(&book), Some(&book)], [Some(&book), Some(&book)], &cfg, &mut RandFac).unwrap();
     assert!(r.games.iter().skip(1).all(|g| g.boarded == [true, false]));
     let (d, e) = (names.iter().position(|n| n == "dimir-tempo").unwrap(), names.iter().position(|n| n == "boros-aggro").unwrap());
-    let r = play_match(&db, ["dimir-tempo", "boros-aggro"], [&decks[d], &decks[e]], [Some(&book), Some(&book)], &MatchConfig { seed: 9, max_decisions: 20000, ..MatchConfig::default() }, &mut RandFac).unwrap();
+    let r = play_match(&db, ["dimir-tempo", "boros-aggro"], [&decks[d], &decks[e]], [Some(&book), Some(&book)], [Some(&book), Some(&book)], &MatchConfig { seed: 9, max_decisions: 20000, ..MatchConfig::default() }, &mut RandFac).unwrap();
     assert!(r.games.iter().all(|g| g.boarded == [false, false]), "no plan for this pair");
 }
 
@@ -252,4 +252,35 @@ fn oversize_plans_and_separate_books() {
     assert_eq!(flags, [true, false]);
     assert_eq!(decks2[0].main.len(), 60);
     assert_ne!(decks2[0].main, decks2[1].main);
+}
+
+/// A plan under test must not reach the opponent's belief: the searching seat expects the public
+/// plan's list, not the list the variant actually plays.
+#[test]
+fn belief_comes_from_the_public_plan_not_the_played_list() {
+    let (db, names, decks, public) = load();
+    let ai = names.iter().position(|n| n == "alurentell").unwrap();
+    let bi = names.iter().position(|n| n == "ur-cutter").unwrap();
+    let base = [&decks[ai], &decks[bi]];
+    // A variant for Alurentell that differs from the public plan: one more Prismatic Ending, one fewer Stock Up.
+    let dir = std::env::temp_dir().join(format!("mtg-match-variant-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("alurentell.txt"), "vs ur-cutter\n-1 Stock Up\n+1 Prismatic Ending\n").unwrap();
+    let variant = PlanBook::load_dir(&db, &dir).unwrap();
+    std::fs::remove_dir_all(&dir).unwrap();
+    let cfg = MatchConfig::default();
+    let names2 = ["alurentell", "ur-cutter"];
+    let (played, _) = game_decks(&db, names2, base, [Some(&variant), Some(&public)], &cfg, 1, Seat(0)).unwrap();
+    let (pub_decks, _) = game_decks(&db, names2, base, [Some(&public), Some(&public)], &cfg, 1, Seat(0)).unwrap();
+    assert_ne!(played[0].main, pub_decks[0].main, "the variant must differ from the public plan");
+    let m = beliefs(base, &played, &pub_decks, OppView::Plan);
+    let sorted = |v: &Vec<_>| { let mut v = v.clone(); v.sort(); v };
+    // Seat 1 (UR) expects the public Alurentell list, not the played variant; seat 0 knows its own list exactly.
+    assert_eq!(sorted(&m[1].decks[0]), sorted(&pub_decks[0].main));
+    assert_ne!(sorted(&m[1].decks[0]), sorted(&played[0].main));
+    assert_eq!(sorted(&m[0].decks[0]), sorted(&played[0].main));
+    assert!(m[1].exact[1] && !m[1].exact[0]);
+    // Main view: the opponent's game-one list.
+    let mm = beliefs(base, &played, &pub_decks, OppView::Main);
+    assert_eq!(sorted(&mm[1].decks[0]), sorted(&base[0].main));
 }

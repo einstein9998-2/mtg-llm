@@ -23,7 +23,10 @@ Hidden-information rule unchanged: nobody is told the opponent's actual swaps. T
 sees outside that list as a surprise that displaces one random unseen expected card. With no
 surprise it equals the existing uniform model. Two expectations are offered (`OppView`):
 
-- `Plan` (default): the opponent's main deck with the standard plan for this matchup applied. This is
+- `Plan` (default): the opponent's base 75 with the **public** plan for this matchup applied (never the
+  list the opponent actually plays: `play_match` takes a separate `public` book per seat, and
+  `bo3 --public <dir>` / `run_variants.sh` pass the baseline set, so a variant under test cannot reach
+  the other seat's belief; fixed 2026-10-06 after review of PR #4, UR variants rerun). This is
   the prepared-player assumption: the plans are fixed public knowledge, like the decklists
   themselves. It would leak the opponent's choices if sideboarding ever becomes learned or chosen
   per game, so switch to `Main` before that.

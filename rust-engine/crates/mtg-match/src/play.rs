@@ -15,9 +15,10 @@ use std::sync::Arc;
 pub enum OppView {
     /// The opponent's game-one main deck. Cards from their sideboard are surprises when first seen.
     Main,
-    /// The opponent's main deck with the standard plan for this matchup applied: the prepared-player
-    /// assumption (the plans are fixed public knowledge, not something read from the opponent's
-    /// hidden choices). Equal to `Main` for a seat that does not board.
+    /// The opponent's base 75 with the *public* plan for this matchup applied (the `public` books
+    /// given to `play_match`): the prepared-player assumption. The plans are fixed public knowledge;
+    /// the opponent's actual list is never read, so a variant under test is not leaked to the
+    /// searching seat. Equal to `Main` for a seat that does not board.
     Plan,
 }
 
@@ -94,28 +95,35 @@ pub fn game_decks(db: &CardDb, names: [&str; 2], base: [&DeckList; 2], books: [O
     Ok((decks, boarded))
 }
 
+/// Each seat's belief model for a game: its own list exactly, the opponent's list as expected. The
+/// expectation comes from the public plan (`pub_decks`) or the opponent's base main deck, never from
+/// `decks`, the lists actually played, which would leak what a plan under test brought in.
+pub fn beliefs(base: [&DeckList; 2], decks: &[DeckList; 2], pub_decks: &[DeckList; 2], view: OppView) -> [ExpectedModel; 2] {
+    [0usize, 1].map(|s| {
+        let opp = 1 - s;
+        let mut d: [Vec<CardDefId>; 2] = [Vec::new(), Vec::new()];
+        d[s] = decks[s].main.clone();
+        d[opp] = match view {
+            OppView::Plan => pub_decks[opp].main.clone(),
+            OppView::Main => base[opp].main.clone(),
+        };
+        ExpectedModel { decks: d, exact: [s == 0, s == 1] }
+    })
+}
+
 /// Plays one match between `base[0]` (seat 0) and `base[1]` (seat 1). Each seat boards from its own
 /// plan book (the same book for both seats, or two books to play one plan against another).
-pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], books: [Option<&PlanBook>; 2], cfg: &MatchConfig, fac: &mut dyn PlayerFactory) -> Result<MatchResult, String> {
+/// `public` is each seat's *standard* plan book, the one the other seat is assumed to know under
+/// `OppView::Plan`. It is separate from `books` so that a plan under test never reaches the other
+/// seat's belief; pass the same books as `books` when no plan is under test.
+pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], books: [Option<&PlanBook>; 2], public: [Option<&PlanBook>; 2], cfg: &MatchConfig, fac: &mut dyn PlayerFactory) -> Result<MatchResult, String> {
     let mut res = MatchResult { games: Vec::new(), wins: [0, 0] };
     let mut first = cfg.first;
     let mut game_no = 0u32;
     while res.wins[0] < 2 && res.wins[1] < 2 && game_no < cfg.max_games {
         let (decks, boarded) = game_decks(db, names, base, books, cfg, game_no, first)?;
-        // What each seat believes about the other's deck.
-        let expected = |s: usize| -> Vec<CardDefId> {
-            let opp = 1 - s;
-            match cfg.opp_view {
-                OppView::Plan => decks[opp].main.clone(),
-                OppView::Main => base[opp].main.clone(),
-            }
-        };
-        let models = [0usize, 1].map(|s| {
-            let mut d: [Vec<CardDefId>; 2] = [Vec::new(), Vec::new()];
-            d[s] = decks[s].main.clone();
-            d[1 - s] = expected(s);
-            ExpectedModel { decks: d, exact: [s == 0, s == 1] }
-        });
+        let (pub_decks, _) = game_decks(db, names, base, public, cfg, game_no, first)?;
+        let models = beliefs(base, &decks, &pub_decks, cfg.opp_view);
         let seed = cfg.seed.wrapping_mul(1_000_003).wrapping_add(game_no as u64);
         let mut pols = [fac.make(Seat(0), game_no, &models[0], seed ^ 0x51), fac.make(Seat(1), game_no, &models[1], seed ^ 0xA7)];
         let mut g = Game::new(db.clone(), [&decks[0], &decks[1]], seed, GameConfig { first_player: first, ..GameConfig::default() });

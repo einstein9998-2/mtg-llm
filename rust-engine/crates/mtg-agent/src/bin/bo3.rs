@@ -2,8 +2,10 @@
 //!
 //! Usage: bo3 <decks dir> <plans dir> <deck A> <deck B> [matches] [iterations]
 //!        [--net w.bin] [--rollout N] [--board both|a|b|none] [--opp-view plan|main]
-//!        [--threads T] [--seed S] [--csv out.csv] [--trace games.jsonl] [--plans-b <dir>]
+//!        [--threads T] [--seed S] [--csv out.csv] [--trace games.jsonl] [--plans-b <dir>] [--public <dir>]
 //! --plans-b gives deck B its own plan directory (a mirror with two different plans).
+//! --public gives the standard plan directory both seats are assumed to know (default: each seat's own
+//! directory). Always pass it when testing a variant, else the opponent's belief reads the variant.
 //!        bo3 <decks dir> <plans dir> --check      (validate every plan, print the swaps)
 //!
 //! Deck A sits in seat 0. Game one's first player alternates by match; later games the loser plays
@@ -40,6 +42,7 @@ fn main() {
     let db = mtg_cards::legacy::build();
     let (names, decks) = load_deck_dir(&db, &dir);
     let book = PlanBook::load_dir(&db, std::path::Path::new(&plans)).unwrap_or_else(|e| panic!("plans: {e}"));
+    let public_book = flag("--public").map(|d| PlanBook::load_dir(&db, std::path::Path::new(&d)).unwrap_or_else(|e| panic!("public: {e}")));
     let book_b = flag("--plans-b").map(|d| PlanBook::load_dir(&db, std::path::Path::new(&d)).unwrap_or_else(|e| panic!("plans-b: {e}")));
     let cfg0 = MatchConfig::default();
     if a.iter().any(|x| x == "--check") {
@@ -114,7 +117,7 @@ fn main() {
                         break;
                     }
                     let cfg = MatchConfig { board: board_seats, opp_view, first: Seat((i % 2) as u8), seed: seed0 * 7919 + i, ..cfg0.clone() };
-                    let r = play_match(&db, [&na, &nb], [&decks[ia], &decks[ib]], [Some(&book), Some(book_b.as_ref().unwrap_or(&book))], &cfg, &mut fac).unwrap_or_else(|e| panic!("{e}"));
+                    let r = play_match(&db, [&na, &nb], [&decks[ia], &decks[ib]], [Some(&book), Some(book_b.as_ref().unwrap_or(&book))], [Some(public_book.as_ref().unwrap_or(&book)), Some(public_book.as_ref().or(book_b.as_ref()).unwrap_or(&book))], &cfg, &mut fac).unwrap_or_else(|e| panic!("{e}"));
                     results.lock().unwrap().push((i, r));
                 }
             });
