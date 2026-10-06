@@ -135,6 +135,8 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
   var db = null;
   var saving = {};   // id -> {busy, again}
   var timers = {};
+  var localRev = {};  // id -> number of local edits; a snapshot older than this is stale
+  function bump(id) { localRev[id] = Math.max(localRev[id] || 0, (answers[id] && answers[id].rev) || 0) + 1; }
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function letter(i) { return String.fromCharCode(65 + i); }
@@ -226,7 +228,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     if (s.busy) { s.again = true; return; }
     s.busy = true;
     var a = answers[id] || {};
-    var body = { pick: a.pick == null ? null : a.pick, pick_label: a.pick_label || '', flags: a.flags || {}, note: a.note || '', updated: new Date().toISOString() };
+    var body = { pick: a.pick == null ? null : a.pick, pick_label: a.pick_label || '', flags: a.flags || {}, note: a.note || '', rev: localRev[id] || 0, updated: new Date().toISOString() };
     setStatus(id, 'saving…');
     db.collection('answers').doc(id).set(body).then(function () {
       setStatus(id, 'saved');
@@ -250,13 +252,13 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       var parts = t.dataset.pick.split(':'), id = parts[0], i = +parts[1];
       var p = positions.filter(function (x) { return x.id === id; })[0];
       var a = answers[id] || (answers[id] = {});
-      a.pick = i; a.pick_label = p.options[i].label;
+      a.pick = i; a.pick_label = p.options[i].label; bump(id);
       render(); save(id);
     } else if (t.dataset.flag) {
       var q = t.dataset.flag.split(':'), id2 = q[0], k = q[1];
       var a2 = answers[id2] || (answers[id2] = {});
       a2.flags = a2.flags || {};
-      a2.flags[k] = !a2.flags[k];
+      a2.flags[k] = !a2.flags[k]; bump(id2);
       render(); save(id2);
     }
   });
@@ -265,7 +267,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     if (!t.dataset || !t.dataset.note) return;
     var id = t.dataset.note;
     var a = answers[id] || (answers[id] = {});
-    a.note = t.value;
+    a.note = t.value; bump(id);
     clearTimeout(timers[id]);
     setStatus(id, 'typing…');
     timers[id] = setTimeout(function () { delete timers[id]; save(id); }, 900);
@@ -283,9 +285,12 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     }, function () { progText.textContent = 'could not load positions'; });
     d.collection('answers').onSnapshot(function (snap) {
       var next = {};
-      snap.docs.forEach(function (x) { next[x.id] = x.data(); });
-      // Do not clobber text being typed or an unsent edit.
-      Object.keys(answers).forEach(function (id) { if (saving[id] && (saving[id].busy || timers[id])) next[id] = answers[id]; });
+      snap.docs.forEach(function (x) { next[x.id] = JSON.parse(JSON.stringify(x.data())); });  // snapshot data is frozen: edit a copy
+      // Never let a stale snapshot (an echo of an older write) replace what was typed or tapped here.
+      Object.keys(localRev).forEach(function (id) {
+        var r = next[id];
+        if (answers[id] && (!r || (r.rev || 0) < localRev[id])) next[id] = answers[id];
+      });
       answers = next;
       render();
     }, function () {});
