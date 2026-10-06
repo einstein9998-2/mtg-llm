@@ -1,0 +1,12 @@
+diff -ruN a/tools/validate.py b/tools/validate.py
+--- a/tools/validate.py	2026-10-06 05:57:23.079899770 +0000
++++ b/tools/validate.py	2026-10-06 05:57:23.082002083 +0000
+@@ -16,7 +16,7 @@
+ STEP_META = {"label", "note"}
+ PHASES = {"untap","upkeep","draw","main1","begin_combat","declare_attackers","declare_blockers",
+           "first_strike_damage","combat_damage","end_combat","main2","end","cleanup"}
+-ACTION_T = {"pass","play_land","cast","activate","activate_from_hand","declare_attackers","declare_blockers"}
++ACTION_T = {"pass","suspend","play_land","cast","activate","activate_from_hand","declare_attackers","declare_blockers"}
+ DECISIONS = {"choose_cards","order_cards","yes_no","choose_target","choose_dungeon","choose_room","order_triggers",
+              "legend_rule","choose_color","choose_mode","choose_number","surveil","scry","search",
+              "simultaneous_secret_choice","assign_combat_damage","declare_attackers","declare_blockers",

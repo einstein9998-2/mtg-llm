@@ -1,0 +1,51 @@
+id: storm-c-hexing-squelcher-other-creature-ward-counters-opponents-ability-unless-paid
+title: "Another creature p0 controls has Ward-Pay 2 life against abilities too: p1's Goblin Bombardment activation is countered when p1 declines"
+area: card
+cards: [Hexing Squelcher, Ocelot Pride, Goblin Bombardment, "Cat Token (Ocelot Pride)", Lightning Bolt]
+tags: [hexing-squelcher, ward, other-creatures, activated-ability, counter-unless-pay, goblin-bombardment, sacrifice-cost, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: 'Other creatures you control have "Ward—Pay 2 life."', verified: true}
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq", "Ocelot Pride @op"]
+    library_pad: 10
+  p1:
+    battlefield: ["Goblin Bombardment @bomb", {token: "Cat Token (Ocelot Pride)", as: cat}]
+    library_pad: 10
+script:
+  - p1: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@cat"], targets: ["@op"]}
+  - check:
+      stack:
+        - {kind: activated, source: "@bomb", controller: p1, targets: ["@op"]}
+        - {kind: triggered, controller: p0, text_contains: "counter"}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_ward, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: []
+      battlefield: [{card: Hexing Squelcher}, {card: Ocelot Pride, damage: 0}]
+    p1:
+      life: 20
+      graveyard: []
+      battlefield: [{card: Goblin Bombardment}]
+notes: >
+  Ward counters "that spell or ability" (702.21a), so an activated ability of p1's that targets the other creature is
+  countered when p1 declines to pay 2 life. The Cat token was sacrificed as a cost when the ability was activated, so
+  it is gone either way (it ceases to exist). The Ocelot Pride takes no damage. The test is written for the outcome
+  only: it does not use Stifle on the ward trigger (an engine simplification), and it does not look at which object
+  the ward trigger comes from. A wrong engine only wards spells.

@@ -1,0 +1,101 @@
+id: storm-c-gaeas-will-play-land-and-cast-spells-from-graveyard-then-exile-them-with-sorcery-timing
+title: "After a suspended Gaea's Will resolves in the upkeep: instants (not sorceries or lands) can be cast from the graveyard at once; in the main phase one land and a sorcery can be played from the graveyard; spells cast this way are exiled"
+area: card
+cards: ["Gaea's Will", Lightning Bolt, Pyroclasm, Island, Mountain, "Dragon's Rage Channeler"]
+tags: [gaeas-will, graveyard-cast, play-land-from-graveyard, land-drop-limit, exile-instead, sorcery-timing, opponents-graveyard-unaffected, cards-already-in-graveyard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "Until end of turn, you may play lands and cast spells from your graveyard.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "If a card would be put into your graveyard from anywhere this turn, exile that card instead.", verified: true}
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "305.1", text: "A player who has priority may play a land card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "305.2b", text: "A player can’t play a land, for any reason, if the number of lands the player can play this turn is equal to or less than the number of lands they have already played this turn.", verified: true}
+  - {kind: cr, ref: "404.1", text: "Each player’s graveyard starts out empty.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    exile: [{card: "Gaea's Will", as: will, face_up: true, counters: {time: 1}}]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Island @isl"]
+    graveyard: ["Lightning Bolt @gb", "Pyroclasm @pyro", "Island @gi1", "Island @gi2"]
+    library: ["Island @d1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Dragon's Rage Channeler @drc"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - resolve_top: true
+  - resolve_top: true
+  - resolve_top: true
+  - check:
+      stack: []
+      phase: upkeep
+      p0:
+        exile: [{card: "Gaea's Will", face_up: true}]
+        graveyard: [Lightning Bolt, Pyroclasm, Island, Island]
+      legal:
+        p0:
+          include: [{t: cast, card: "@gb"}]
+          exclude: [{t: cast, card: "@pyro"}, {t: play_land, card: "@gi1"}]
+  - expect_illegal: {p0: {t: cast, card: "@pyro", pay: {tap: ["@m1", "@m2"]}}}
+  - expect_illegal: {p0: {t: play_land, card: "@gi1"}}
+  - p0: {t: cast, card: "@gb", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - check:
+      stack: [{kind: spell, card: "@gb", controller: p0}]
+      p0: {graveyard: [Pyroclasm, Island, Island]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p1: {life: 17}
+      p0:
+        exile: [Gaea's Will, Lightning Bolt]
+        graveyard: [Pyroclasm, Island, Island]
+  - advance: {to: main1, of: p0}
+  - check:
+      phase: main1
+      p0: {hand: [Island]}
+      legal: {p0: {include: [{t: play_land, card: "@gi1"}, {t: cast, card: "@pyro"}]}}
+  - p0: {t: play_land, card: "@gi1"}
+  - check:
+      p0: {lands_played: 1, graveyard: [Pyroclasm, Island]}
+  - expect_illegal: {p0: {t: play_land, card: "@gi2"}}
+  - expect_illegal: {p0: {t: play_land, card: "@d1"}}
+  - p0: {t: cast, card: "@pyro", pay: {tap: ["@m2", "@m3"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      lands_played: 1
+      spells_cast_this_turn: 3
+      graveyard: [Island]
+      exile: ["Gaea's Will", Lightning Bolt, Pyroclasm]
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+    p1:
+      life: 17
+      graveyard: ["Dragon's Rage Channeler"]
+      exile: []
+      battlefield: []
+notes: >
+  p0's graveyard already holds Lightning Bolt, Pyroclasm and two Islands when Gaea's Will resolves in p0's upkeep (the
+  cards already there are castable/playable, "from your graveyard"). In the upkeep p0 holds priority with an empty
+  stack but it is not a main phase: the instant (Bolt) is castable, the sorcery (Pyroclasm) and the lands are NOT
+  (307.1, 305.1: the permissions only extend the zone, not the timing). Bolt, cast from the graveyard with an
+  untapped Mountain, resolves (p1 17) and is exiled instead of going back to the graveyard. In the main phase one
+  Island is played from the graveyard (land drop used, so the second graveyard Island and the Island drawn in the draw
+  step cannot be played: 305.2b), and Pyroclasm is cast from the graveyard and exiled; it kills p1's Dragon's Rage
+  Channeler, which goes to p1's graveyard normally because the replacement is only about "your graveyard" (p0's).
+  spells_cast_this_turn is 3: Will (cast at the last-counter trigger), Bolt, Pyroclasm. The Will itself is in exile.
+  Wrong engines: allow sorceries/lands in the upkeep; leave cast spells in the graveyard (re-castable); exile p1's
+  creature; forget the land drop limit for graveyard lands.

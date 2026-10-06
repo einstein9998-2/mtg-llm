@@ -1,0 +1,86 @@
+id: storm-c-gaeas-will-suspend-four-counters-removed-one-per-own-upkeep-cast-on-the-fourth
+title: "Suspended Gaea's Will loses one time counter in each of p0's own upkeeps (not p1's), 4 -> 3 -> 2 -> 1 -> 0, and is cast at the fourth upkeep"
+area: card
+cards: ["Gaea's Will", Forest, Island]
+tags: [gaeas-will, suspend, time-counters, upkeep-trigger, own-upkeep-only, turn-structure, free-cast, advance]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "Suspend 4—{G}", verified: true}
+  - {kind: cr, ref: "702.62a", text: "“At the beginning of your upkeep, if this card is suspended, remove a time counter from it,”", verified: true}
+  - {kind: cr, ref: "702.62a", text: "When the last time counter is removed from this card, if it’s exiled, you may play it without paying its mana cost if able.", verified: true}
+  - {kind: cr, ref: "603.2", text: "Whenever a game event or game state matches a triggered ability’s trigger event, that ability automatically triggers.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gaea's Will @will"]
+    battlefield: ["Forest @f"]
+    library_pad: 20
+  p1:
+    library_pad: 20
+script:
+  - p0: {t: suspend, card: "@will", pay: {tap: ["@f"]}}
+  - advance: {to: upkeep, of: p1}
+  - check:
+      turn: 4
+      stack: []
+      p0: {exile: [{card: "Gaea's Will", face_up: true, counters: {time: 4}}]}
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 5
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "remove"}]
+      p0: {exile: [{card: "Gaea's Will", face_up: true, counters: {time: 4}}]}
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {exile: [{card: "Gaea's Will", face_up: true, counters: {time: 3}}], spells_cast_this_turn: 0}
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 7
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "remove"}]
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {exile: [{card: "Gaea's Will", face_up: true, counters: {time: 2}}], spells_cast_this_turn: 0}
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 9
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "remove"}]
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {exile: [{card: "Gaea's Will", face_up: true, counters: {time: 1}}], spells_cast_this_turn: 0}
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 11
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "remove"}]
+      p0: {exile: [{card: "Gaea's Will", face_up: true, counters: {time: 1}}]}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "without paying"}]
+      p0: {spells_cast_this_turn: 0}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@will", controller: p0}]
+      p0: {spells_cast_this_turn: 1, exile: []}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 11
+    phase: upkeep
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand_count: 3
+      graveyard: []
+      exile: [{card: "Gaea's Will", face_up: true}]
+      spells_cast_this_turn: 1
+notes: >
+  Suspended on turn 3 (p0's main phase) with 4 counters. p1's upkeep (turn 4) does not touch it ("your upkeep" only):
+  the first check shows 4 counters and an empty stack. p0's upkeeps on turns 5, 7, 9 take it to 3, 2, 1; at the turn 11
+  upkeep the last counter is removed, the second ability triggers, and the Will is cast free and resolves, ending in
+  exile (not graveyard). The counter is removed when the trigger RESOLVES, not when it goes on the stack: each upkeep
+  check shows the old value while the trigger is on the stack. p0 draws one card in each of the draw steps of turns 5,
+  7, 9 (three Islands; no draw on turn 11 yet, the draw step comes after upkeep), hence hand_count 3. No creatures, so
+  no attack declarations interrupt the advances.

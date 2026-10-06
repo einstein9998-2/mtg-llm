@@ -1,0 +1,41 @@
+id: storm-b-mox-opal-cast-as-third-artifact-taps-at-once
+title: Mox Opal cast as the third artifact is tappable the turn it resolves
+area: card
+cards: [Mox Opal, Lotus Petal, Mishra's Bauble]
+tags: [mox-opal, metalcraft, zero-cost-spell, summoning-sickness, storm-count]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mox Opal, text: "Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mox Opal @opal"]
+    battlefield: ["Lotus Petal @petal", "Mishra's Bauble @bauble"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@opal", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@opal", controller: p0}]
+      p0: {spells_cast_this_turn: 1}
+  - resolve_top: true
+  - check:
+      stack: []
+      legal: {p0: {include: [{t: activate, source: "@opal", ability: 0, choose_color: R}]}}
+  - p0: {t: activate, source: "@opal", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield: [{card: Mox Opal, tapped: true}, {card: Lotus Petal, tapped: false}, {card: Mishra's Bauble, tapped: false}]
+      mana_pool: {R: 1}
+      spells_cast_this_turn: 1
+notes: >
+  Opal enters with Petal and Bauble already out, so it is itself the third artifact: metalcraft is on the moment it is on
+  the battlefield. It costs {0} (no mana tapped) and counts as one spell; being a noncreature artifact, it taps for mana
+  at once. A wrong engine evaluates metalcraft before the Opal enters, or treats the new Opal as summoning sick.

@@ -1,0 +1,55 @@
+id: storm-c-hexing-squelcher-prismatic-ending-may-target-and-exiles-after-ward-paid
+title: "Can't be countered does not stop Prismatic Ending from targeting the Squelcher: p1 pays 2 life for ward and X=1 with two colors exiles it"
+area: card
+cards: [Hexing Squelcher, Prismatic Ending, Plains, Island]
+tags: [hexing-squelcher, prismatic-ending, ward, pay-life, converge, targeting-still-legal, exile, alurentell-matchup]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Ward—Pay 2 life.", verified: true}
+  - {kind: oracle, card: Hexing Squelcher, text: "This spell can't be countered.", verified: true}
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq"]
+    library_pad: 10
+  p1:
+    hand: ["Prismatic Ending @pe"]
+    battlefield: ["Plains @pl", "Island @isl"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pe", x: 1, targets: ["@sq"], pay: {tap: ["@pl", "@isl"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@pe", controller: p1, targets: ["@sq"]}
+        - {kind: triggered, source: "@sq", controller: p0, text_contains: "counter"}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_ward, answer: true, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@pe", controller: p1}]
+      p1: {life: 18}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      battlefield: []
+      graveyard: []
+      exile: [Hexing Squelcher]
+    p1:
+      life: 18
+      graveyard: [Prismatic Ending]
+notes: >
+  The Squelcher's "can't be countered" text and the ward are independent of whether a spell may target it: Prismatic
+  Ending (X=1, {1}{W} paid with Plains and Island, two colors) targets the 2-mana-value Squelcher. Ward is paid with 2
+  life, Ending resolves, 2 colors >= mana value 2, and the Squelcher is exiled (not destroyed, so it is not in the
+  graveyard). Prismatic Ending is the Alurentell deck's answer to a creature that Force of Will cannot answer.
+  A wrong engine makes the Squelcher untargetable by spells that "exile" or refuses the ward payment prompt.

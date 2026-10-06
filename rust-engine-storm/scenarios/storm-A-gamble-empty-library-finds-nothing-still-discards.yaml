@@ -1,0 +1,40 @@
+id: storm-a-gamble-empty-library-finds-nothing-still-discards
+title: "Gamble with an empty library finds nothing but still discards a card at random from the rest of the hand"
+area: card
+cards: [Gamble, Island, Mountain]
+tags: [gamble, tutor, empty-library, nothing-found, random-discard, search]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Gamble, text: "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.", verified: true}
+  - {kind: cr, ref: "101.3", text: "Any part of an instruction that's impossible to perform is ignored.", verified: true}
+  - {kind: cr, ref: "701.23d", text: "If a player is searching a hidden zone simply for a quantity of cards, such as \"a card\" or \"three cards,\" that player must find that many cards (or as many as possible, if the zone doesn't contain enough cards).", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gamble @gam", "Island @i1", "Island @i2"]
+    battlefield: ["Mountain @m"]
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@gam", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: null}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: [Gamble, Island]
+      library_count: 0
+notes: >
+  p0's library is empty (no library_pad): the search finds nothing (the search decision is still raised with answer
+  found: null, SCHEMA addenda). "Discard a card at random" is a separate instruction and still happens: one of the two
+  identical Islands goes to the graveyard (all outcomes identical). Nothing is drawn, so p0 does not lose (704.5b only
+  applies to a draw).

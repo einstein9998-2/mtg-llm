@@ -1,0 +1,41 @@
+id: storm-a-beseech-bargained-may-decline-free-cast
+title: "Bargained Beseech may decline the free cast, and the declined card then goes to hand"
+area: card
+cards: [Beseech the Mirror, Empty the Warrens, Lotus Petal, Swamp, Island]
+tags: [beseech-the-mirror, bargain, free-cast, optional, decline, put-into-hand]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Lotus Petal @petal"]
+    library: ["Empty the Warrens @ew", "Island"]
+    library_pad: 4
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@ew"}
+  - p0: {decision: yes_no, purpose: cast_exiled_card, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Empty the Warrens]
+      exile: []
+      graveyard: [Beseech the Mirror, Lotus Petal]
+      spells_cast_this_turn: 1
+      battlefield_contains: [{card: Swamp, tapped: true}]
+    p1: {battlefield: []}
+notes: >
+  Empty the Warrens (mana value 4) could be cast free but the "may" is declined: no storm trigger, no Goblins, the card is in
+  hand ("wasn't cast this way"), and only Beseech counts as a spell cast (1).

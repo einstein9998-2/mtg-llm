@@ -1,0 +1,42 @@
+id: storm-b-taiga-under-magus-of-the-moon-is-a-plain-mountain
+title: "Under Magus of the Moon Taiga is just a Mountain: it taps for {R} only and is no longer a Forest"
+area: card
+cards: [Taiga, Magus of the Moon, Mountain]
+tags: [taiga, magus-of-the-moon, layers, type-changing, land-types, intrinsic-mana-ability, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Magus of the Moon, text: "Nonbasic lands are Mountains.", verified: true}
+  - {kind: oracle, card: Taiga, text: "{T}: Add {R} or {G}.", verified: true}
+  - {kind: cr, ref: "305.7", text: "If an effect sets a land’s subtype to one or more of the basic land types, the land no longer has its old land type.", verified: true}
+  - {kind: cr, ref: "613.1d", text: "Layer 4: Type-changing effects are applied.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Taiga @taiga"]
+    library_pad: 10
+  p1:
+    battlefield: ["Magus of the Moon @magus"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: Taiga, types: [Land], subtypes: [Mountain]}]}
+      legal:
+        p0:
+          include: [{t: activate, source: "@taiga", ability: 0, choose_color: R}]
+          exclude: [{t: activate, source: "@taiga", ability: 0, choose_color: G}]
+  - expect_illegal: {p0: {t: activate, source: "@taiga", ability: 0, choose_color: G}}
+  - p0: {t: activate, source: "@taiga", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Taiga, tapped: true}]
+      mana_pool: {R: 1}
+notes: >
+  Magus of the Moon (p1's) makes every nonbasic land a Mountain: Taiga loses Forest (and its old types and rules-text
+  abilities, 305.7) and keeps only the Mountain intrinsic ability, so {G} is no longer available. This is a layer-4 effect
+  that applies to p0's land although p1 controls Magus. The derived subtype check lists only that Mountain is present; the
+  green-mana exclusion is what proves Forest is gone.

@@ -1,0 +1,35 @@
+id: storm-a-peer-countered-by-force-of-will
+title: "A countered Peer into the Abyss draws nothing and costs no life"
+area: card
+cards: [Peer into the Abyss, Force of Will, Brainstorm, Swamp]
+tags: [peer-into-the-abyss, counterspell, force-of-will, no-effect]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Peer into the Abyss, text: "Target player draws cards equal to half the number of cards in their library and loses half their life.", verified: true}
+  - {kind: oracle, card: Peer into the Abyss, text: "Round up each time.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Peer into the Abyss @peer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7"]
+    library_pad: 30
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@peer", targets: [{player: p0}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@peer"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, hand_count: 0, library_count: 30, graveyard: [Peer into the Abyss]}
+    p1: {life: 19, graveyard: [Force of Will], exile: [Brainstorm]}
+notes: >
+  Seven mana was spent (all Swamps tapped) and the spell is countered: no cards drawn, no life lost.

@@ -1,0 +1,72 @@
+id: storm-c-hexing-squelcher-cast-not-countered-by-hard-cast-force-of-will
+title: "Hexing Squelcher can't be countered: a hard-cast Force of Will may be cast targeting it but does nothing, and the creature enters"
+area: card
+cards: [Hexing Squelcher, Mountain, Force of Will, Island]
+tags: [hexing-squelcher, cant-be-countered, force-of-will, hard-cast, counter-spell, targeting-still-legal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "This spell can't be countered.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "101.2", text: "the “can’t” effect takes precedence", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hexing Squelcher @sq"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sq", pay: auto}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      stack: [{kind: spell, card: "@sq", controller: p0}]
+      legal: {p1: {include: [{t: cast, card: "@fow", alt_cost: null, targets: ["@sq"]}]}}
+  - p1: {t: cast, card: "@fow", targets: ["@sq"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@sq", controller: p0}
+        - {kind: spell, card: "@fow", controller: p1, targets: ["@sq"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@sq", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Force of Will]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Hexing Squelcher, controller: p0, pt: [2, 2], sick: true, types: [Creature]}
+    p1:
+      hand: []
+      graveyard: [Force of Will]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+notes: >
+  "This spell can't be countered" only stops the counter effect; it does not stop Force of Will from being cast with
+  the Squelcher spell as its target (601.3 asks only whether casting is prohibited, and nothing prohibits casting a
+  spell that targets an uncounterable spell). The test therefore asserts that the cast IS offered (control), that Force
+  of Will resolves and goes to p1's graveyard with all five Islands tapped, and that the Squelcher spell is still on
+  the stack afterwards and then enters. A wrong engine either hides the Force of Will cast from p1 (treating
+  uncounterable as untargetable) or lets the counter work (Squelcher in p0's graveyard).

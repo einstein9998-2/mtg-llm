@@ -1,0 +1,69 @@
+id: storm-a-warrens-storm-two-tokens-per-resolution
+title: "Empty the Warrens after Dark Ritual and Lotus Petal: two storm copies, three resolutions, six 1/1 red Goblins"
+area: card
+cards: [Empty the Warrens, Dark Ritual, Lotus Petal, Goblin Token, Swamp, Mountain]
+tags: [empty-the-warrens, storm, storm-count, copies, tokens, goblin]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Empty the Warrens, text: "Create two 1/1 red Goblin creature tokens.", verified: true}
+  - {kind: oracle, card: Empty the Warrens, text: "Storm (When you cast this spell, copy it for each spell cast before it this turn.)", verified: true}
+  - {kind: cr, ref: "702.40a", text: "Storm is a triggered ability that functions on the stack.", verified: true}
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Lotus Petal @petal", "Empty the Warrens @ew"]
+    battlefield: ["Swamp @s1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@ew", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@ew", controller: p0}
+        - {kind: triggered, source: "@ew", text_contains: "copy"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@ew", controller: p0}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p0}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p0}
+      p0: {spells_cast_this_turn: 3}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Dark Ritual, Empty the Warrens]
+      spells_cast_this_turn: 3
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Lotus Petal}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+notes: >
+  Two spells (Dark Ritual, Lotus Petal) were cast before Empty the Warrens, so two copies: three resolutions of "create two
+  1/1 red Goblin creature tokens" = six tokens (all summoning sick). The copies have no targets, so no change-targets
+  decision is raised. Empty the Warrens ({3}{R}) is paid with Ritual's BBB and the Mountain. The copies are not casts
+  (spells_cast_this_turn 3). The original card goes to the graveyard; the copies cease to exist.

@@ -1,0 +1,55 @@
+id: storm-c-gaeas-will-only-your-graveyard-opponents-bolt-not-castable-and-not-exiled
+title: "Gaea's Will only opens p0's own graveyard: p1's graveyard Lightning Bolt is not castable by p0, and a Bolt p1 casts goes to p1's graveyard"
+area: card
+cards: ["Gaea's Will", Omniscience, Lightning Bolt, Mountain]
+tags: [gaeas-will, opponents-graveyard, your-graveyard, exile-instead, replacement-effect-scope, negative, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "Until end of turn, you may play lands and cast spells from your graveyard.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "If a card would be put into your graveyard from anywhere this turn, exile that card instead.", verified: true}
+  - {kind: cr, ref: "404.1", text: "A player’s graveyard is their discard pile.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gaea's Will @will"]
+    battlefield: ["Omniscience @omni", "Mountain @m"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @pbolt"]
+    battlefield: ["Mountain @pm"]
+    graveyard: ["Lightning Bolt @pgb"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@will", alt_cost: {free: omniscience}}
+  - resolve_top: true
+  - check:
+      stack: []
+      legal: {p0: {exclude: [{t: cast, card: "@pgb"}]}}
+  - expect_illegal: {p0: {t: cast, card: "@pgb", targets: [{player: p1}], pay: {tap: ["@m"]}}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@pbolt", targets: [{player: p0}], pay: {tap: ["@pm"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      graveyard: []
+      exile: ["Gaea's Will"]
+      battlefield: [{card: Omniscience}, {card: Mountain, tapped: false}]
+    p1:
+      life: 20
+      hand: []
+      graveyard: [Lightning Bolt, Lightning Bolt]
+      exile: []
+notes: >
+  "Your graveyard" in both halves means the Will controller's own graveyard. p1's Lightning Bolt in p1's graveyard
+  cannot be cast by p0 (the cast is not offered although p0 has an untapped Mountain), and when p1 casts a second
+  Bolt from hand (in p0's main phase, after p0 passes priority with an empty stack) it resolves (p0 20 -> 17) and
+  goes to p1's graveyard rather than exile. A wrong engine exiles every card going to any graveyard, or lets the Will
+  controller cast from every graveyard.

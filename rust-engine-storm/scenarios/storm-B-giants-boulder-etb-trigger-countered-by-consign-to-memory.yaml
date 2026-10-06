@@ -1,0 +1,47 @@
+id: storm-b-giants-boulder-etb-trigger-countered-by-consign-to-memory
+title: Consign to Memory counters Giant's Boulder's scry trigger; the Boulder stays and no scry happens
+area: card
+cards: [Giant's Boulder, Island, Ponder, Brainstorm, Thoughtseize, Consign to Memory]
+tags: [giants-boulder, etb-trigger, scry, consign-to-memory, counter-triggered-ability, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Giant's Boulder, text: "When this artifact enters, scry 2.", verified: false, note: "Giant's Boulder text comes from three store pages (engine owner's brief), not Scryfall, so it cannot be verified here"}
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Giant's Boulder @boulder"]
+    battlefield: ["Island @isl"]
+    library: ["Ponder @pon", "Brainstorm @bs", "Thoughtseize @ts"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @cons"]
+    battlefield: ["Island @pisl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@boulder", pay: auto}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@boulder", controller: p0, text_contains: "scry"}]
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@cons", targets: [{trigger_of: "@boulder"}], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Giant's Boulder, tapped: false}, {card: Island, tapped: true}]
+      library_top: [Ponder, Brainstorm, Thoughtseize]
+      library_count: 13
+    p1:
+      hand: []
+      graveyard: [Consign to Memory]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  The scry is a triggered ability on the stack, so Consign to Memory can counter it. No scry decision appears in the
+  script (the script would fail if the engine raised one) and the top three cards are unchanged. The Boulder (a
+  non-colorless-spell, already resolved permanent) is untouched.

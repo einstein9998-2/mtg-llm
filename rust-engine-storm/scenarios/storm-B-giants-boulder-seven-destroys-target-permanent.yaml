@@ -1,0 +1,43 @@
+id: storm-b-giants-boulder-seven-destroys-target-permanent
+title: Giant's Boulder's {7},{T}, sacrifice destroys target permanent; the sacrifice is a cost paid on activation
+area: card
+cards: [Giant's Boulder, Island, Aluren]
+tags: [giants-boulder, destroy, sacrifice-cost, mana-payment, activated-ability, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Giant's Boulder, text: "{7}, {T}, Sacrifice this artifact: Destroy target permanent.", verified: false, note: "Giant's Boulder text from three store pages (engine owner's brief), not Scryfall"}
+  - {kind: cr, ref: "701.8a", text: "To destroy a permanent, move it from the battlefield to its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Giant's Boulder @boulder", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6", "Island @i7"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@boulder", ability: 1, targets: ["@alu"], pay: auto}
+  - check:
+      stack: [{kind: activated, source: "@boulder", controller: p0, targets: ["@alu"]}]
+      p0:
+        graveyard: [Giant's Boulder]
+        battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+      p1: {battlefield: [{card: Aluren}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Giant's Boulder]
+      mana_pool: {}
+    p1:
+      battlefield: []
+      graveyard: [Aluren]
+notes: >
+  With exactly seven Islands the {7} is paid by tapping all of them (the Boulder's own mana cannot help: it is tapped as
+  part of the cost). The Boulder is in the graveyard while the ability is still on the stack (sacrifice is a cost), and
+  Aluren is destroyed on resolution. Ability index 1 is the {7} ability (index 0 is the {1},{T} mana ability).

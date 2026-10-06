@@ -1,0 +1,88 @@
+id: storm-c-song-of-creation-flusterstorm-copy-is-not-cast-only-the-original-draws-two
+title: "A storm copy is put on the stack, not cast: Flusterstorm with one copy draws two cards from Song of Creation, not four, and the opponent's Lightning Bolt cast first draws nothing for p0"
+area: card
+cards: [Song of Creation, Flusterstorm, Lightning Bolt, Island, Mountain, Forest]
+tags: [song-of-creation, storm, copy-not-cast, flusterstorm, trigger-ordering, counter-unless-pay, cast-trigger, storm-count]
+derived_from: cr
+source:
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: oracle, card: Flusterstorm, text: "Counter target instant or sorcery spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast and a copy of an activated ability isn’t activated", verified: true}
+  - {kind: cr, ref: "118.12a", text: "This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Flusterstorm @flu"]
+    battlefield: ["Song of Creation @song", "Island @isl"]
+    library: ["Island @d1", "Mountain @d2", "Forest @d3"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: {tap: ["@pm"]}}
+  - p1: {t: pass}
+  - check:
+      pending: {actor: p0, kind: priority}
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      p0: {hand: [Flusterstorm]}
+  - p0: {t: cast, card: "@flu", targets: ["@bolt"], pay: {tap: ["@isl"]}}
+  - p0: {decision: order_triggers, answer: [{source: "@song", text_contains: "draw"}, {source: "@flu", text_contains: "copy"}]}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@flu", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+        - {kind: triggered, source: "@flu", controller: p0, text_contains: "copy"}
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [], spells_cast_this_turn: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@flu", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+        - {kind: spell, card: Flusterstorm, copy: true, controller: p0, targets: ["@bolt"]}
+      pending: {actor: p0, kind: priority}
+      p0: {spells_cast_this_turn: 1, hand: []}
+  - resolve_top: true
+  - check:
+      stack:
+        - {kind: spell, card: "@flu", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+      p1: {graveyard: [Lightning Bolt], life: 20}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@flu", controller: p0}]
+      p0: {hand: [Island, Mountain]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Mountain]
+      library_top: [Forest]
+      graveyard: [Flusterstorm]
+      spells_cast_this_turn: 1
+    p1:
+      life: 20
+      graveyard: [Lightning Bolt]
+      spells_cast_this_turn: 1
+notes: >
+  p1's Lightning Bolt is the one spell cast before Flusterstorm this turn, so storm makes one copy (702.40a). Casting
+  Flusterstorm triggers two abilities of p0's at once: Song's draw trigger and the storm trigger; p0 orders them with
+  the storm trigger on top (order_triggers lists the one that goes on the stack first first). The storm trigger resolves,
+  p0 declines to change the copy's target (copy targets Bolt), and the copy is put on the stack: a copy of a spell is
+  not cast (707.10), so Song does not trigger again and p0's spells_cast_this_turn stays 1. The copy resolves
+  first and counters Bolt (p1 has no untapped land, so no payment prompt is raised for {1}), then Song's single trigger
+  draws exactly two cards (Island, Mountain; Forest stays on top of the library), then the original Flusterstorm finds
+  its target gone and does not resolve (it goes to the graveyard). p1's Bolt cast gave p0 no draw (the trigger is
+  "you cast"). A wrong engine draws four, or draws for p1's Bolt.

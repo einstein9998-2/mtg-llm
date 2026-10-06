@@ -1,0 +1,46 @@
+id: storm-a-beseech-bargained-prismatic-ending-does-not-exile-mana-value-four
+title: "A free Prismatic Ending (zero colors spent) does nothing to a mana value 4 permanent: Aluren stays"
+area: card
+cards: [Beseech the Mirror, Prismatic Ending, Aluren, Lotus Petal, Swamp, Island]
+tags: [beseech-the-mirror, bargain, free-cast, x-spell, prismatic-ending, converge, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "202.3e", text: "X is treated as 0 while the object is not on the stack", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Lotus Petal @petal"]
+    library: ["Prismatic Ending @pe", "Island"]
+    library_pad: 4
+  p1:
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@pe"}
+  - p0: {decision: yes_no, purpose: cast_exiled_card, answer: true}
+  - p0: {decision: choose_target, slot: 0, answer: "@alu"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Beseech the Mirror, Lotus Petal, Prismatic Ending]
+      hand: []
+    p1:
+      battlefield: [{card: Aluren}]
+      exile: []
+notes: >
+  Aluren has mana value 4 and nothing was paid (zero colors), so the condition "mana value <= colors spent
+  (0)" fails: Prismatic Ending resolves and does nothing. A wrong engine uses X, the mana value of the card or a default
+  of one colour. Prismatic Ending still ends in the graveyard (it resolved).

@@ -1,0 +1,33 @@
+id: storm-a-echo-opponent-short-library-draws-and-loses
+title: "Echo of Eons: shuffling the hand in comes before drawing, but a three-card library still cannot give seven cards and the player loses"
+area: card
+cards: [Echo of Eons, Island]
+tags: [echo-of-eons, wheel, empty-library, draw-from-empty, game-over, shuffle-before-draw]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Echo of Eons, text: "Each player shuffles their hand and graveyard into their library, then draws seven cards.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Echo of Eons @echo"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6"]
+    library_pad: 10
+  p1:
+    hand: ["Island", "Island", "Island"]
+random: any
+script:
+  - p0: {t: cast, card: "@echo", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p0: {hand_count: 7, library_count: 3, graveyard: [Echo of Eons]}
+    p1: {hand_count: 3, library_count: 0, graveyard: []}
+notes: >
+  p1 has an empty library and three cards in hand: the hand is shuffled into the library first (3 cards), then seven are drawn: three cards are
+  drawn and four draws fail, so p1 loses (704.5b). p0 (empty hand and graveyard after casting) just draws seven from 10. A wrong engine draws
+  seven from the old (empty) library without shuffling first, or ignores the failed draws.

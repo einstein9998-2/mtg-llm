@@ -1,0 +1,70 @@
+id: storm-a-beseech-bargained-gaeas-will-free-cast-then-recast-from-graveyard
+title: "Beseech casts Gaea's Will free (no mana cost, mana value 0), then Beseech is recast from the graveyard and exiled instead of going back"
+area: card
+cards: [Beseech the Mirror, "Gaea's Will", Lotus Petal, Swamp, Island]
+tags: [beseech-the-mirror, bargain, free-cast, gaeas-will, no-mana-cost, graveyard-cast, exile-instead, replacement-effect, cast-during-resolution]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "Until end of turn, you may play lands and cast spells from your graveyard.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "If a card would be put into your graveyard from anywhere this turn, exile that card instead.", verified: true}
+  - {kind: cr, ref: "118.6a", text: "If an alternative cost is applied to an unpayable cost, including an effect that allows a player to cast a spell without paying its mana cost, the alternative cost may be paid.", verified: true}
+  - {kind: cr, ref: "614.1a", text: "Effects that use the word “instead” are replacement effects.", verified: true}
+  - {kind: cr, ref: "608.2g", text: "That spell becomes the topmost object on the stack, and the currently resolving spell or ability continues to resolve, which may include casting other spells this way.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7", "Swamp @s8", "Lotus Petal @petal"]
+    library: ["Gaea's Will @gw", "Island @isl"]
+    library_pad: 5
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@gw"}
+  - p0: {decision: yes_no, purpose: cast_exiled_card, answer: true}
+  - check:
+      stack: [{kind: spell, card: "@gw", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: [Beseech the Mirror, Lotus Petal]
+        hand: []
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: [Beseech the Mirror, Lotus Petal]
+        exile: ["Gaea's Will"]
+      legal: {p0: {include: [{t: cast, card: "@bes"}]}}
+  - p0: {t: cast, card: "@bes", bargained: false, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@isl"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: [Lotus Petal]
+      exile: [Beseech the Mirror, "Gaea's Will"]
+      library_count: 5
+      spells_cast_this_turn: 3
+      battlefield: [{card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}, {card: Swamp, tapped: true}]
+    p1: {life: 20}
+notes: >
+  Gaea's Will has no mana cost: mana value 0 (<= 4), and "without paying its mana cost" is an alternative cost that may be applied
+  to an unpayable cost (118.6a), so Beseech can cast it (it could not be hard cast from hand). Beseech finishes resolving and
+  goes to the graveyard BEFORE Gaea's Will resolves (the replacement effect does not exist yet). Gaea's Will then resolves: it
+  lets p0 cast Beseech from the graveyard (offered in `legal`), and Gaea's Will itself is exiled instead of going to the
+  graveyard. Second Beseech (not bargained, {1}{B}{B}{B} from the other four Swamps) searches the Island into hand and is
+  exiled instead of going to the graveyard. The Lotus Petal sacrificed for bargain before Will resolved stays in the
+  graveyard. Three spells cast (Beseech, Gaea's Will, Beseech). Does not depend on suspend or on declining a suspend cast.

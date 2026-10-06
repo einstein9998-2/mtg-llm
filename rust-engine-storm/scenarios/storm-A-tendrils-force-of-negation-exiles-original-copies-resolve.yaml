@@ -1,0 +1,53 @@
+id: storm-a-tendrils-force-of-negation-exiles-original-copies-resolve
+title: "Force of Negation (free on p0's turn) counters Tendrils and exiles it; the copy still resolves"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Force of Negation, Brainstorm, Swamp]
+tags: [tendrils-of-agony, storm, force-of-negation, counterspell, exile-instead, alternative-cost, copies]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "Storm is a triggered ability that functions on the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@tend"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@tend", text_contains: "copy"}]
+      p0: {exile: [Tendrils of Agony], graveyard: [Dark Ritual]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      exile: [Tendrils of Agony]
+      graveyard: [Dark Ritual]
+    p1:
+      life: 18
+      graveyard: [Force of Negation]
+      exile: [Brainstorm]
+notes: >
+  It is p0's turn, so p1 may cast Force of Negation by exiling a blue card (Brainstorm) and paying no mana and no life. The countered
+  Tendrils goes to exile, not the graveyard. The storm trigger is untouched: the single copy resolves (p1 20 -> 18, p0 20 -> 22).

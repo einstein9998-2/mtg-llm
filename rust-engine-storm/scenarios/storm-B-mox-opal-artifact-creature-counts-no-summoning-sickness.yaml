@@ -1,0 +1,39 @@
+id: storm-b-mox-opal-artifact-creature-counts-no-summoning-sickness
+title: An artifact creature (Haywire Mite) counts for metalcraft, and a Mox Opal that entered this turn taps at once
+area: card
+cards: [Mox Opal, Haywire Mite, Lotus Petal]
+tags: [mox-opal, metalcraft, artifact-creature, summoning-sickness, noncreature-artifact]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mox Opal, text: "Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: Mox Opal, as: opal, sick: true}
+      - {card: Haywire Mite, as: mite, sick: true}
+      - {card: Lotus Petal, as: petal, sick: true}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@opal", ability: 0, choose_color: U}]}}
+  - p0: {t: activate, source: "@opal", ability: 0, choose_color: U}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Mox Opal, tapped: true}
+        - {card: Haywire Mite, tapped: false, types: [Artifact, Creature]}
+        - {card: Lotus Petal, tapped: false}
+      mana_pool: {U: 1}
+notes: >
+  The three artifacts are Opal, Lotus Petal and Haywire Mite, an artifact creature (it is still an artifact). Everything
+  came under control this turn (sick: true), but summoning sickness (302.6) applies only to creatures, and Opal is not one,
+  so it can tap at once. A wrong engine counts only noncreature artifacts or applies sickness to any permanent.

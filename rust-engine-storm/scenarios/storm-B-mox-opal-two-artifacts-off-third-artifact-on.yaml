@@ -1,0 +1,46 @@
+id: storm-b-mox-opal-two-artifacts-off-third-artifact-on
+title: Mox Opal with only two artifacts (itself and Lotus Petal) cannot be tapped; casting a third artifact turns metalcraft on
+area: card
+cards: [Mox Opal, Lotus Petal, Mishra's Bauble]
+tags: [mox-opal, metalcraft, activation-restriction, legal-action-mask, zero-cost-spell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mox Opal, text: "Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts.", verified: true}
+  - {kind: cr, ref: "207.2c", text: "Ability words are similar to keywords in that they tie together cards that have similar functionality, but they have no special rules meaning and no individual entries in the Comprehensive Rules.", verified: true, note: "metalcraft is only a label; the restriction is the Oracle clause 'Activate only if you control three or more artifacts'"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mishra's Bauble @bauble"]
+    battlefield: ["Mox Opal @opal", "Lotus Petal @petal"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {exclude: [{t: activate, source: "@opal", ability: 0}]}}
+  - expect_illegal: {p0: {t: activate, source: "@opal", ability: 0, choose_color: G}}
+  - p0: {t: cast, card: "@bauble", pay: auto}
+  - resolve_top: true
+  - check:
+      stack: []
+      legal:
+        p0:
+          include:
+            - {t: activate, source: "@opal", ability: 0, choose_color: G}
+            - {t: activate, source: "@opal", ability: 0, choose_color: W}
+  - p0: {t: activate, source: "@opal", ability: 0, choose_color: G}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield: [{card: Mox Opal, tapped: true}, {card: Lotus Petal, tapped: false}, {card: Mishra's Bauble, tapped: false}]
+      mana_pool: {G: 1}
+      spells_cast_this_turn: 1
+notes: >
+  Opal itself counts toward the three artifacts: Opal + Petal is two, so the activation is not offered. Mishra's Bauble
+  ({0}) is the third artifact; after it resolves the Opal makes one mana of the chosen colour. A wrong engine counts
+  only other artifacts (needing three besides Opal) or ignores the restriction.

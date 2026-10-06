@@ -1,0 +1,38 @@
+id: storm-a-peer-self-library-thirty-life-twenty
+title: "Peer into the Abyss on yourself: 30 cards in library and 20 life means draw 15 and lose 10"
+area: card
+cards: [Peer into the Abyss, Swamp]
+tags: [peer-into-the-abyss, draw, life-loss, half, self-target, large-spell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Peer into the Abyss, text: "Target player draws cards equal to half the number of cards in their library and loses half their life.", verified: true}
+  - {kind: oracle, card: Peer into the Abyss, text: "Round up each time.", verified: true}
+  - {kind: cr, ref: "107.1a", text: "If a spell or ability could generate a fractional number, the spell or ability will tell you whether to round up or down.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Peer into the Abyss @peer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7"]
+    library_pad: 30
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@peer", targets: [{player: p0}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 10
+      hand_count: 15
+      library_count: 15
+      cards_drawn_this_turn: 15
+      graveyard: [Peer into the Abyss]
+    p1: {life: 20, library_count: 10, hand_count: 0}
+notes: >
+  Both halves are computed from the values before the effect: half of 30 cards = 15 draws (not recomputed as the library shrinks, a
+  wrong engine would draw fewer), half of 20 life = 10. Seven Swamps pay {4}{B}{B}{B}. The opponent is untouched.

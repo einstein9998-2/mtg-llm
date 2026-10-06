@@ -1,0 +1,59 @@
+id: storm-b-runehorn-hellkite-activated-at-instant-speed-in-opponents-turn
+title: p0 activates Runehorn Hellkite in response to p1's Lightning Bolt on p1's own turn; the Bolt still resolves afterwards
+area: card
+cards: [Runehorn Hellkite, Taiga, Island, Ponder, Daze, Lightning Bolt, Brainstorm, Mountain]
+tags: [runehorn-hellkite, graveyard-ability, instant-speed, in-response, opponents-turn, discard-hand, draw-seven, lightning-bolt]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Runehorn Hellkite, text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", verified: true}
+  - {kind: cr, ref: "117.1b", text: "A player may activate an activated ability any time they have priority.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Ponder @pon", "Daze @daze"]
+    graveyard: ["Runehorn Hellkite @hk"]
+    battlefield: ["Taiga @taiga", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 20
+  p1:
+    hand: ["Lightning Bolt @bolt", "Island @pisl", "Brainstorm @bs"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 20
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - check:
+      pending: {actor: p0, kind: priority}
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      legal: {p0: {include: [{t: activate, source: "@hk", ability: 0}]}}
+  - p0: {t: activate, source: "@hk", ability: 0, pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: activated, source: "@hk", controller: p0}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      p0: {life: 20, hand_count: 7}
+      p1: {hand_count: 7}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 17
+      hand: [Island, Island, Island, Island, Island, Island, Island]
+      graveyard: [Ponder, Daze]
+      exile: [{card: Runehorn Hellkite, face_up: true}]
+    p1:
+      hand: [Island, Island, Island, Island, Island, Island, Island]
+      graveyard: [Island, Brainstorm, Lightning Bolt]
+      spells_cast_this_turn: 1
+notes: >
+  The ability has no timing restriction (117.1b): p0 uses it on p1's turn with a spell on the stack. It resolves first;
+  p1's hand (Island, Brainstorm, after casting Bolt) is discarded too and both players draw seven. The Bolt then resolves
+  and hits p0 for 3. The Bolt is in p1's graveyard with the discarded cards. After the Bolt resolves the active player (p1)
+  receives priority.

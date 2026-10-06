@@ -1,0 +1,44 @@
+{
+ "_meta": {
+  "group": "C",
+  "note": "Entries to merge into reference/oracle.json cards{}; text from the Storm scenario brief (Scryfall oracle via Savecraft, 2026-10-06). Gaea's Will, Beseech the Mirror and Tendrils of Agony are identical to group A's entries (Beseech and Tendrils are each used by one Song of Creation scenario); merging duplicates is harmless."
+ },
+ "cards": {
+  "Hexing Squelcher": {
+   "name": "Hexing Squelcher",
+   "mana_cost": "{1}{R}",
+   "type_line": "Creature \u2014 Goblin Sorcerer",
+   "oracle_text": "This spell can't be countered.\nWard\u2014Pay 2 life.\nSpells you control can't be countered.\nOther creatures you control have \"Ward\u2014Pay 2 life.\"",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06",
+   "pt": "2/2"
+  },
+  "Gaea's Will": {
+   "name": "Gaea's Will",
+   "mana_cost": "",
+   "type_line": "Sorcery",
+   "oracle_text": "Suspend 4\u2014{G}\nUntil end of turn, you may play lands and cast spells from your graveyard.\nIf a card would be put into your graveyard from anywhere this turn, exile that card instead.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Song of Creation": {
+   "name": "Song of Creation",
+   "mana_cost": "{1}{G}{U}{R}",
+   "type_line": "Enchantment",
+   "oracle_text": "You may play an additional land on each of your turns.\nWhenever you cast a spell, draw two cards.\nAt the beginning of your end step, discard your hand.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Beseech the Mirror": {
+   "name": "Beseech the Mirror",
+   "mana_cost": "{1}{B}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Bargain (You may sacrifice an artifact, enchantment, or token as you cast this spell.)\nSearch your library for a card, exile it face down, then shuffle. If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less. Put the exiled card into your hand if it wasn't cast this way.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Tendrils of Agony": {
+   "name": "Tendrils of Agony",
+   "mana_cost": "{2}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Target player loses 2 life and you gain 2 life.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  }
+ }
+}

@@ -1,0 +1,73 @@
+id: storm-c-song-of-creation-bargained-beseech-the-mirror-and-its-free-cast-each-draw-two
+title: "Beseech the Mirror cast with bargain, and the exiled Lightning Bolt cast free by it, are two casts: Song of Creation draws two cards each time"
+area: card
+cards: [Song of Creation, Beseech the Mirror, Lotus Petal, Lightning Bolt, Swamp, Island]
+tags: [song-of-creation, beseech-the-mirror, bargain, free-cast-from-effect, cast-trigger, draw-two, search, cast-from-exile, stack-order]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Bargain (You may sacrifice an artifact, enchantment, or token as you cast this spell.)", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bm"]
+    battlefield: ["Song of Creation @song", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Island @i1", "Lotus Petal @petal"]
+    library: ["Island @d1", "Island @d2", "Lightning Bolt @lb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bm", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bm", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [], graveyard: [Lotus Petal], spells_cast_this_turn: 1}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@bm", controller: p0}]
+      p0: {hand: [Island, Island]}
+  - resolve_top: true
+  - p0: {decision: search, found: "@lb"}
+  - p0: {decision: yes_no, purpose: cast_exiled_free, answer: true}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack:
+        - {kind: spell, card: "@lb", controller: p0, targets: [{player: p1}]}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+      pending: {actor: p0, kind: priority}
+      p0: {spells_cast_this_turn: 2, hand: [Island, Island]}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@lb", controller: p0}]
+      p0: {hand_count: 4}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Island, Island, Island]
+      graveyard: [Lotus Petal, Beseech the Mirror, Lightning Bolt]
+      exile: []
+      spells_cast_this_turn: 2
+      library_count: 8
+    p1:
+      life: 17
+notes: >
+  Beseech is cast with bargain (sacrificing the Lotus Petal, an artifact, as an additional cost: it is in the graveyard
+  before anyone has priority) and the Song trigger from that cast resolves first (p0 draws two Islands). When Beseech
+  resolves p0 searches the library for Lightning Bolt (the Bolt is in the library, below the two Islands that were
+  drawn), the card is exiled face down, the library is shuffled (all that remains are Islands, so the later draws are
+  Islands whatever the shuffle does), and because Beseech was bargained and the Bolt has mana value 1 p0 may cast it
+  without paying its mana cost: yes, with p1 as the target. That cast is a second cast, and Song draws two more.
+  The trigger is above the Bolt, so the second pair of cards arrives before the Bolt resolves (p1 20 -> 17). New
+  action spellings: cast action key `bargained: true|false`; the "may cast it free" is a yes_no decision, purpose
+  cast_exiled_free, then choose_target (shapes are the runner adapter's). Beseech is group A's card: its oracle entry in
+  oracle-additions-C.json is identical to the one group A ships.

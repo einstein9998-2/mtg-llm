@@ -1,0 +1,65 @@
+id: storm-b-chrome-mox-leaves-battlefield-imprinted-card-stays-exiled
+title: When Haywire Mite exiles Chrome Mox, the imprinted card stays in exile and mana already made stays in the pool
+area: card
+cards: [Chrome Mox, Brainstorm, Haywire Mite, Forest]
+tags: [chrome-mox, imprint, haywire-mite, exile, mana-ability, in-response, linked-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Chrome Mox, text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", verified: true}
+  - {kind: oracle, card: Haywire Mite, text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", verified: true}
+  - {kind: oracle, card: Haywire Mite, text: "When this creature dies, you gain 2 life.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn’t go on the stack, so it can’t be targeted, countered, or otherwise responded to.", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Chrome Mox @mox", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    battlefield: ["Haywire Mite @mite", "Forest @for"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mox", pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: imprint, answer: ["@bs"]}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@mite", ability: 0, targets: ["@mox"], pay: auto}
+  - check:
+      stack:
+        - {kind: activated, source: "@mite", controller: p1, targets: ["@mox"]}
+        - {kind: triggered, source: "@mite", controller: p1, text_contains: "gain 2 life"}
+      p1: {graveyard: [Haywire Mite]}
+  - p1: {t: pass}
+  - check: {pending: {actor: p0, kind: priority}}
+  - p0: {t: activate, source: "@mox", ability: 0}
+  - check:
+      p0: {mana_pool: {U: 1}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: activated, source: "@mite", controller: p1}]
+      p1: {life: 22}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: []
+      exile: [{card: Chrome Mox, face_up: true}, {card: Brainstorm, face_up: true}]
+      hand: []
+      mana_pool: {U: 1}
+    p1:
+      life: 22
+      graveyard: [Haywire Mite]
+      battlefield: [{card: Forest, tapped: true}]
+notes: >
+  p0 imprints Brainstorm, passes with an empty stack, and p1 sacrifices Haywire Mite to exile the Mox. In response p0
+  taps the Mox for {U} (a mana ability: it cannot be responded to and resolves at once). After the Mox is exiled the
+  imprinted Brainstorm is still in exile (nothing returns it) and the {U} is still in the pool (same phase). The Mite's
+  dies trigger (gain 2) is on top of the ability and resolves first, so p1 is at 22 before the Mox is exiled. Both the
+  Mox and Brainstorm end in p0's exile zone. Two passes after p0's mana ability resolve the trigger, then resolve_top
+  resolves the ability (p0 holds priority after a resolution, 117.3b).

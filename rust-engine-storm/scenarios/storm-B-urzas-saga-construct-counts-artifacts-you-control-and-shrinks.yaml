@@ -1,0 +1,49 @@
+id: storm-b-urzas-saga-construct-counts-artifacts-you-control-and-shrinks
+title: The Construct counts only artifacts p0 controls (3/3 with two others), and shrinks to 2/2 when one leaves
+area: card
+cards: [Urza's Saga, Island, Lotus Petal, Mishra's Bauble, Nihil Spellbomb, Grafdigger's Cage]
+tags: [urzas-saga, saga, construct-token, power-toughness, artifact-count, lotus-petal, control]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "II — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "613.4c", text: "Layer 7c: Effects and counters that modify power and/or toughness (but don’t set power and/or toughness to a specific number or value) are applied.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    battlefield: ["Island @is1", "Island @is2", "Lotus Petal @petal", "Mishra's Bauble @bauble"]
+    library_pad: 10
+  p1:
+    battlefield: ["Nihil Spellbomb @bomb", "Grafdigger's Cage @cage"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - p0: {t: activate, source: "@saga", ability: 1, pay: {tap: ["@is1", "@is2"]}}
+  - resolve_top: true
+  - check:
+      p0: {battlefield_contains: [{token: Construct Token, pt: [3, 3], types: [Artifact, Creature]}]}
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lotus Petal]
+      mana_pool: {R: 1}
+      battlefield_contains:
+        - {token: Construct Token, controller: p0, pt: [2, 2]}
+        - {card: Mishra's Bauble}
+    p1:
+      battlefield: [{card: Nihil Spellbomb}, {card: Grafdigger's Cage}]
+notes: >
+  p0's artifacts when the token arrives: Lotus Petal, Mishra's Bauble and the token itself = 3, so 3/3. p1's two
+  artifacts (Nihil Spellbomb, Grafdigger's Cage) do not count ("you control"). Sacrificing the Petal for mana leaves
+  Bauble + token = 2, so 2/2 (continuous, not locked in). A wrong engine counts all artifacts on the battlefield (5/5),
+  forgets the token itself, or locks the size at creation.

@@ -1,0 +1,44 @@
+id: storm-a-boomerang-cannot-target-lands
+title: "Boomerang Basics targets only nonland permanents: neither player's Island is a legal target"
+area: card
+cards: [Boomerang Basics, Lotus Petal, Aluren, Island]
+tags: [boomerang-basics, targeting, nonland, legal-action-mask, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "115.1a", text: "An instant or sorcery spell is targeted if its spell ability identifies something it will affect by using the phrase \"target [something],\" where the \"something\" is a phrase that describes an object and/or player.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @i1", "Island @i2", "Lotus Petal @petal"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @pi", "Aluren @alu"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bb", targets: ["@i2"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@bb", targets: ["@pi"], pay: auto}}
+  - check:
+      legal:
+        p0:
+          include:
+            - {t: cast, card: "@bb", targets: ["@petal"]}
+            - {t: cast, card: "@bb", targets: ["@alu"]}
+          exclude:
+            - {t: cast, card: "@bb", targets: ["@i2"]}
+            - {t: cast, card: "@bb", targets: ["@pi"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Boomerang Basics]
+      battlefield: [{card: Island}, {card: Island}, {card: Lotus Petal}]
+    p1: {battlefield: [{card: Island}, {card: Aluren}]}
+notes: >
+  Nothing changes: only the Lotus Petal and Aluren (nonland permanents) are offered as targets; both Islands, p0's untapped second Island
+  (so mana is not the reason) and p1's, are not.

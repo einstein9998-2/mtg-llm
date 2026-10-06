@@ -1,0 +1,70 @@
+id: storm-b-urzas-saga-chapter-three-finds-zero-or-one-cost-artifact-then-sacrificed
+title: Chapter III searches for an artifact with mana cost {0} or {1} (nothing costing 2, no nonartifacts) and the Saga is sacrificed only after the chapter ability leaves the stack
+area: card
+cards: [Urza's Saga, Island, Mox Opal, Haywire Mite, Aether Vial, Lotus Petal, Chrome Mox, Giant's Boulder, Mishra's Bauble, Lion's Eye Diamond, Null Rod, Cori-Steel Cutter, Disruptor Flute, Defense Grid, Brainstorm, Taiga]
+tags: [urzas-saga, saga, chapter-three, search, mana-cost-filter, sacrifice-sba, state-based-action, put-onto-battlefield, shuffle]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "III — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Urza's Saga, text: "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)", verified: true}
+  - {kind: cr, ref: "714.4", text: "If the number of lore counters on a Saga permanent with one or more chapter abilities is greater than or equal to its final chapter number, and it isn’t the source of a chapter ability that has triggered but not yet left the stack, that Saga’s controller sacrifices it.", verified: true}
+  - {kind: cr, ref: "714.3b", text: "As a player’s precombat main phase begins, that player puts a lore counter on each Saga they control with one or more chapter abilities.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it’s a hidden zone) and find a card that matches the given description.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    library: ["Island", "Island", "Mox Opal @opal", "Haywire Mite @mite", "Aether Vial @vial", "Lotus Petal @petal", "Chrome Mox @cmox", "Giant's Boulder @gb", "Mishra's Bauble @bauble", "Lion's Eye Diamond @led", "Null Rod @rod", "Cori-Steel Cutter @cutter", "Disruptor Flute @flute", "Defense Grid @grid", "Brainstorm @bs", "Taiga @taiga"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - check:
+      turn: 7
+      stack: [{kind: triggered, source: "@saga", controller: p0, text_contains: "Search"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        battlefield: [{card: Urza's Saga, counters: {lore: 3}, tapped: false}]
+        graveyard: []
+  - p0: {t: activate, source: "@saga", ability: 0}
+  - check:
+      stack: [{kind: triggered, source: "@saga"}]
+      p0:
+        mana_pool: {C: 1}
+        battlefield: [{card: Urza's Saga, counters: {lore: 3}, tapped: true}]
+  - resolve_top: true
+  - p0:
+      decision: search
+      found: "@opal"
+      expect_options:
+        include: ["@opal", "@mite", "@vial", "@petal", "@cmox", "@gb", "@bauble", "@led"]
+        exclude: ["@rod", "@cutter", "@flute", "@grid", "@bs", "@taiga"]
+expect:
+  - at: after_script
+    turn: 7
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mox Opal, tapped: false}]
+      graveyard: [Urza's Saga]
+      mana_pool: {C: 1}
+      library_count: 23
+      spells_cast_this_turn: 0
+notes: >
+  Turn 3 the Saga enters (lore 1, chapter I), turn 5 main phase (lore 2, chapter II), turn 7 main phase (lore 3, chapter
+  III): the trigger sits on the stack with the Saga still on the battlefield (714.4 does not sacrifice while it is the
+  source of a chapter ability that has not left the stack), and p0 proves it by tapping it for {C} in response. When the
+  ability resolves p0 searches: artifact cards whose mana cost is {0} or {1} qualify (Mox Opal, Haywire Mite, Aether
+  Vial, Lotus Petal, Chrome Mox, Giant's Boulder, Mishra's Bauble, Lion's Eye Diamond); Null Rod, Defense Grid and
+  Disruptor Flute (mana value 2), Cori-Steel Cutter ({1}{R}), Brainstorm and Taiga do not. The found card is put onto
+  the battlefield (not cast: no spells cast, no cost) and the library is shuffled (counts only: 26 -> 2 draws -> search
+  -> 23). Afterwards the Saga is sacrificed. The pool still holds the {C} made earlier in the same phase.

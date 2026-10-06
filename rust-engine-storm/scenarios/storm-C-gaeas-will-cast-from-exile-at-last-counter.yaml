@@ -1,0 +1,67 @@
+id: storm-c-gaeas-will-last-time-counter-removed-casts-it-free-and-it-exiles-itself
+title: "Gaea's Will with one time counter: in the upkeep the counter-removal trigger, then the cast trigger, then Will is cast free (a cast), resolves, and is exiled instead of going to the graveyard"
+area: card
+cards: ["Gaea's Will", Island]
+tags: [gaeas-will, suspend, time-counters, upkeep-trigger, free-cast, is-a-cast, stack-order, exiles-itself]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "Suspend 4—{G}", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "If a card would be put into your graveyard from anywhere this turn, exile that card instead.", verified: true}
+  - {kind: cr, ref: "702.62a", text: "“At the beginning of your upkeep, if this card is suspended, remove a time counter from it,”", verified: true}
+  - {kind: cr, ref: "702.62a", text: "When the last time counter is removed from this card, if it’s exiled, you may play it without paying its mana cost if able.", verified: true}
+  - {kind: cr, ref: "702.62d", text: "Casting a spell as an effect of its suspend ability follows the rules for paying alternative costs in rules 601.2b and 601.2f–h.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Once the steps described in 601.2a–h are completed, effects that modify the characteristics of the spell as it’s cast are applied, then the spell becomes cast.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    exile: [{card: "Gaea's Will", as: will, face_up: true, counters: {time: 1}}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 5
+      phase: upkeep
+      active: p0
+      pending: {actor: p0, kind: priority}
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "remove"}]
+      p0:
+        exile: [{card: "Gaea's Will", face_up: true, counters: {time: 1}}]
+        spells_cast_this_turn: 0
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "without paying"}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [{card: "Gaea's Will", face_up: true}], spells_cast_this_turn: 0}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@will", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [], spells_cast_this_turn: 1}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 5
+    phase: upkeep
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      exile: [{card: "Gaea's Will", face_up: true}]
+      spells_cast_this_turn: 1
+      mana_pool: {}
+notes: >
+  The setup is the end step of p1's turn 4 (the card was suspended on an earlier turn of p0 and has one counter left);
+  the advance goes to the upkeep of p0's turn 5. At the beginning of p0's upkeep ("your upkeep") the card is suspended, so the first
+  triggered ability goes on the stack; resolving it removes the last counter, which triggers the second ability, whose
+  resolution casts Gaea's Will without paying its mana cost. The cast is a real cast (spells_cast_this_turn goes
+  0 -> 1 only when the Will is put on the stack: the intermediate checks pin it), and the Will spell resolves in the
+  upkeep. Its effect starts to apply during resolution, so when the spell is put into its owner's graveyard as the final
+  part of resolution (608.2n) the replacement applies to the Will itself: it ends in exile, the graveyard is empty.
+  The engine cannot decline the cast (a documented simplification), so no yes_no step is scripted for the "may".
+  Trigger texts are asserted only by fragments ("remove", "without paying").

@@ -1,0 +1,62 @@
+id: storm-b-haywire-mite-targets-noncreature-artifact-or-enchantment-only
+title: Haywire Mite can target noncreature artifacts and enchantments (even Urza's Saga, an Enchantment Land) but not lands, artifact creatures or tokens that are creatures
+area: card
+cards: [Haywire Mite, Forest, Urza's Saga, Taiga, Aluren, Aether Vial, Construct Token]
+tags: [haywire-mite, targeting, legal-action-mask, urzas-saga, enchantment-land, artifact-creature, construct-token]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Haywire Mite, text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", verified: true}
+  - {kind: oracle, card: Urza's Saga, text: "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)", verified: true, note: "Urza's Saga is an Enchantment Land (type line in oracle.json), so it is a noncreature enchantment"}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Haywire Mite @mite", "Forest @for"]
+    library_pad: 10
+  p1:
+    battlefield:
+      - {card: Urza's Saga, as: saga, counters: {lore: 1}}
+      - "Taiga @taiga"
+      - "Haywire Mite @mite2"
+      - "Aluren @alu"
+      - "Aether Vial @vial"
+      - {token: Construct Token, as: con}
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@mite", ability: 0, targets: ["@taiga"]}}
+  - expect_illegal: {p0: {t: activate, source: "@mite", ability: 0, targets: ["@mite2"]}}
+  - expect_illegal: {p0: {t: activate, source: "@mite", ability: 0, targets: ["@con"]}}
+  - expect_illegal: {p0: {t: activate, source: "@mite", ability: 0, targets: ["@mite"]}}
+  - check:
+      legal:
+        p0:
+          include:
+            - {t: activate, source: "@mite", ability: 0, targets: ["@saga"]}
+            - {t: activate, source: "@mite", ability: 0, targets: ["@alu"]}
+            - {t: activate, source: "@mite", ability: 0, targets: ["@vial"]}
+  - p0: {t: activate, source: "@mite", ability: 0, targets: ["@saga"], pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      graveyard: [Haywire Mite]
+    p1:
+      exile: [{card: Urza's Saga, face_up: true}]
+      graveyard: []
+      battlefield:
+        - {card: Taiga}
+        - {card: Haywire Mite}
+        - {card: Aluren}
+        - {card: Aether Vial}
+        - {token: Construct Token}
+notes: >
+  Legal targets: Aether Vial (noncreature artifact), Aluren (noncreature enchantment) and Urza's Saga (Enchantment Land,
+  not a creature, so a noncreature enchantment). Illegal: Taiga (a land that is neither), p1's Haywire Mite (an artifact
+  creature), the Construct token (an artifact creature) and the Mite itself. A wrong engine reads "noncreature artifact or
+  enchantment" as "nonland" or forgets the Enchantment Land. Exiling the Saga puts it in exile, not the graveyard.

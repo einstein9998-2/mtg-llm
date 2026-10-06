@@ -1,0 +1,45 @@
+id: storm-b-urzas-saga-construct-ability-needs-two-other-mana
+title: "The Construct ability costs {2} besides the Saga's own {T}: one other land is not enough, and the Saga's own mana cannot pay it"
+area: card
+cards: [Urza's Saga, Island]
+tags: [urzas-saga, saga, construct-token, cost-payment, tap-cost, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "II — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"", verified: true}
+  - {kind: oracle, card: Urza's Saga, text: 'I — This Saga gains "{T}: Add {C}."', verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true, note: "partial payments are not allowed (same rule text); the Saga cannot both tap for mana and be tapped as the cost"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    battlefield: ["Island @is1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - check:
+      legal: {p0: {exclude: [{t: activate, source: "@saga", ability: 1}]}}
+  - expect_illegal: {p0: {t: activate, source: "@saga", ability: 1, pay: {tap: ["@is1", "@saga"]}}}
+  - p0: {t: activate, source: "@saga", ability: 0}
+  - check:
+      p0: {mana_pool: {C: 1}}
+      legal: {p0: {exclude: [{t: activate, source: "@saga", ability: 1}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 1}
+      battlefield: [{card: Urza's Saga, tapped: true, counters: {lore: 2}}, {card: Island, tapped: false}]
+notes: >
+  After chapter II resolves p0 has the Saga and one Island: only one mana is available besides the Saga, and the Saga's
+  {C} cannot be used for its own ability because {T} is part of that same cost. The activation is not offered, neither
+  with the Island alone nor when the Saga's mana is added to the pool ({C} + Island would be {2} but the Saga is then
+  tapped). Ability 0 (the {C}) is still there after chapter II.

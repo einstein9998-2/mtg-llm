@@ -1,0 +1,49 @@
+id: storm-a-beseech-not-bargained-found-card-goes-to-hand
+title: "Unbargained Beseech the Mirror puts even a cheap found card into hand and offers no free cast"
+area: card
+cards: [Beseech the Mirror, Tendrils of Agony, Swamp, Island]
+tags: [beseech-the-mirror, bargain, tutor, shuffle, exile-face-down, not-bargained]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "Search your library for a card, exile it face down, then shuffle.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+  - {kind: cr, ref: "702.166b", text: "If a spell's controller declares the intention to pay that spell's bargain cost, that spell has been “bargained.” See rule 601.2b.", verified: true}
+  - {kind: cr, ref: "701.24b", text: "In such cases, the found cards aren't included in the shuffle, even though they remain in the library at that time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4"]
+    library: ["Island", "Tendrils of Agony @tend", "Island"]
+    library_pad: 3
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: false, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tend"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Tendrils of Agony]
+      exile: []
+      graveyard: [Beseech the Mirror]
+      library_count: 5
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+    p1: {life: 20}
+notes: >
+  Tendrils has mana value 4, which would be castable free if the spell were bargained, but it is not: no yes_no is raised,
+  the exiled card goes to hand and nothing is on the stack. The full {1}{B}{B}{B} is paid (four Swamps). The found card is
+  exiled (face down) before the shuffle and is not part of it: the library has 6 cards before, 5 after.

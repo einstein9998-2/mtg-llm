@@ -1,0 +1,57 @@
+id: storm-c-gaeas-will-orims-chant-in-upkeep-prevents-suspending-this-turn
+title: "Orim's Chant on p0 in the upkeep: suspend needs the ability to begin casting the card, so p0 cannot suspend Gaea's Will in the main phase"
+area: card
+cards: ["Gaea's Will", "Orim's Chant", Forest, Plains, Island]
+tags: [gaeas-will, suspend, orims-chant, casting-restriction, special-action, legal-action-mask, alurentell-matchup]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "Suspend 4—{G}", verified: true}
+  - {kind: cr, ref: "702.62c", text: "While determining if you could begin to cast a card with suspend, take into consideration any effects that would prohibit that card from being cast.", verified: true}
+  - {kind: cr, ref: "702.62a", text: "If you could begin to cast this card by putting it onto the stack from your hand, you may pay [cost] and exile it with N time counters on it.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  p0:
+    hand: ["Gaea's Will @will"]
+    battlefield: ["Forest @f"]
+    library: ["Island @draw"]
+    library_pad: 10
+  p1:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@chant", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - advance: {to: main1, of: p0}
+  - check:
+      phase: main1
+      stack: []
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: pass}], exclude: [{t: suspend, card: "@will"}]}}
+  - expect_illegal: {p0: {t: suspend, card: "@will", pay: {tap: ["@f"]}}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Gaea's Will", Island]
+      exile: []
+      battlefield: [{card: Forest, tapped: false}]
+    p1:
+      graveyard: ["Orim's Chant"]
+      battlefield: [{card: Plains, tapped: true}]
+notes: >
+  Suspend is available only "if you could begin to cast this card" and effects that prohibit casting it are taken into
+  account (702.62c). Orim's Chant (cast by p1 in p0's upkeep, targeting p0) means p0 can't cast spells this turn
+  (601.3), so p0 cannot suspend Gaea's Will in main phase even though it is a special action that does not use the stack
+  and costs only {G} (an untapped Forest is available). A wrong engine treats suspend as an unrelated special action
+  like playing a land. Chant ends at end of turn, so the card could be suspended next turn (not scripted).

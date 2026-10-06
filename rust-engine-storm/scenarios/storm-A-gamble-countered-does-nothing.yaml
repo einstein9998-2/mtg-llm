@@ -1,0 +1,44 @@
+id: storm-a-gamble-countered-does-nothing
+title: "A countered Gamble searches nothing, discards nothing and does not shuffle"
+area: card
+cards: [Gamble, Tendrils of Agony, Lightning Bolt, Force of Will, Brainstorm, Ponder, Mountain]
+tags: [gamble, counterspell, force-of-will, no-effect, shuffle, scripted-random]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Gamble, text: "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur. A countered spell is put into its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gamble @gam", "Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library: ["Ponder", "Tendrils of Agony"]
+    library_pad: 3
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+random: []
+script:
+  - p0: {t: cast, card: "@gam", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@gam"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Gamble]
+      library_count: 5
+      library_top: [Ponder, Tendrils of Agony]
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  `random: []` means no random event may occur: a countered Gamble does not shuffle (the shuffle is part of the
+  resolution), does not discard the Bolt and raises no search. The library keeps its exact order.

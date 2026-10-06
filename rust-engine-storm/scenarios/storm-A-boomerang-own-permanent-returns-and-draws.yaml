@@ -1,0 +1,37 @@
+id: storm-a-boomerang-own-permanent-returns-and-draws
+title: "Boomerang Basics on your own Lotus Petal returns it to your hand and draws a card"
+area: card
+cards: [Boomerang Basics, Lotus Petal, Ponder, Island]
+tags: [boomerang-basics, bounce, draw, own-permanent, controlled]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @i1", "Lotus Petal @petal"]
+    library: ["Ponder @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lotus Petal, Ponder]
+      graveyard: [Boomerang Basics]
+      battlefield: [{card: Island, tapped: true}]
+      library_count: 10
+notes: >
+  p0 controlled and owns the Petal: it returns to hand and p0 draws the top card (Ponder). The Petal in hand is a new object (a free
+  cast later counts as a new spell).

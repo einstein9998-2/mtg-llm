@@ -1,0 +1,43 @@
+id: storm-a-echo-flashback-offered-only-with-two-generic-and-blue
+title: "Echo of Eons flashback needs {2}{U}: not offered with only two lands; the hand copy cannot be cast with three lands"
+area: card
+cards: [Echo of Eons, Island]
+tags: [echo-of-eons, flashback, cost, legal-action-mask, negative, alternative-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Echo of Eons, text: "Flashback {2}{U}", verified: true}
+  - {kind: cr, ref: "702.34a", text: "“Flashback [cost]” means “You may cast this card from your graveyard if the resulting spell is an instant or sorcery spell by paying [cost] rather than paying its mana cost” and “If the flashback cost was paid, exile this card instead of putting it anywhere else any time it would leave the stack.”", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell’s text, or applied to it from another effect, that its controller may pay rather than paying the spell’s mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Echo of Eons @hand"]
+    battlefield: ["Island @i1", "Island @i2"]
+    graveyard: ["Echo of Eons @gy"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - check:
+      legal:
+        p0:
+          exclude:
+            - {t: cast, card: "@gy", alt_cost: {flashback: true}}
+            - {t: cast, card: "@gy", alt_cost: null}
+            - {t: cast, card: "@hand"}
+  - expect_illegal: {p0: {t: cast, card: "@gy", alt_cost: {flashback: true}, pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@hand", pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Echo of Eons]
+      graveyard: [Echo of Eons]
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: false}]
+notes: >
+  Only two Islands: the flashback cost {2}{U} (3 mana) cannot be paid, the full cost {4}{U}{U} cannot be paid, and a graveyard card cannot be cast
+  for its normal mana cost at all (no permission). Companion scenario storm-a-echo-flashback-needs-blue-mana covers three lands without blue.

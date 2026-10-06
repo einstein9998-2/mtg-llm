@@ -1,0 +1,45 @@
+id: storm-c-song-of-creation-extra-land-drop-does-not-help-the-opponent-or-the-opponents-turn
+title: "Song of Creation gives its controller an extra land only on the controller's own turns: in p1's turn p1 still has one land drop and p0 has none"
+area: card
+cards: [Song of Creation, Island]
+tags: [song-of-creation, additional-land-drop, own-turn-only, opponent-unaffected, negative, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Song of Creation, text: "You may play an additional land on each of your turns.", verified: true}
+  - {kind: cr, ref: "305.1", text: "A player who has priority may play a land card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+  - {kind: cr, ref: "305.2b", text: "A player can’t play a land, for any reason, if the number of lands the player can play this turn is equal to or less than the number of lands they have already played this turn.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Island @h"]
+    battlefield: ["Song of Creation @song"]
+    library_pad: 10
+  p1:
+    hand: ["Island @x", "Island @y"]
+    library_pad: 10
+script:
+  - p1: {t: play_land, card: "@x"}
+  - expect_illegal: {p1: {t: play_land, card: "@y"}}
+  - p1: {t: pass}
+  - check:
+      pending: {actor: p0, kind: priority}
+      stack: []
+      legal: {p0: {exclude: [{t: play_land, card: "@h"}]}}
+  - expect_illegal: {p0: {t: play_land, card: "@h"}}
+expect:
+  - at: after_script
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      lands_played: 0
+    p1:
+      hand: [Island]
+      lands_played: 1
+      battlefield: [{card: Island}]
+notes: >
+  Song's land permission is stated for its controller ("you") and for "your turns" only. p1 (the opponent) gets the
+  normal single land drop even though p0 controls the Song, and p0 cannot play a land in p1's turn: lands are played
+  only in a main phase of the player's own turn (305.1), the extra permission does not change that. A wrong engine
+  counts the Song for every player or for every turn.

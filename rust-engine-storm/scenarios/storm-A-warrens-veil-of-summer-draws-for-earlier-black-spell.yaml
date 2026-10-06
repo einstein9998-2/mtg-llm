@@ -1,0 +1,60 @@
+id: storm-a-warrens-veil-of-summer-draws-for-earlier-black-spell
+title: "Veil of Summer drawn because an earlier Dark Ritual was black; the red Warrens is unaffected and still makes four Goblins"
+area: card
+cards: [Empty the Warrens, Dark Ritual, Veil of Summer, Goblin Token, Swamp, Mountain, Forest, Island]
+tags: [empty-the-warrens, storm, veil-of-summer, draw-condition, spells-cast-this-turn, tokens]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: oracle, card: Empty the Warrens, text: "Create two 1/1 red Goblin creature tokens.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Empty the Warrens @ew"]
+    battlefield: ["Swamp @s1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil"]
+    battlefield: ["Forest @pf"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@ew", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p1: {hand: [Island], graveyard: [Veil of Summer]}
+      stack:
+        - {kind: spell, card: "@ew", controller: p0}
+        - {kind: triggered, source: "@ew", text_contains: "copy"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Dark Ritual, Empty the Warrens]
+      battlefield_contains:
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+    p1:
+      hand: [Island]
+      graveyard: [Veil of Summer]
+notes: >
+  Veil's draw condition looks at all spells an opponent has cast this turn: Dark Ritual is black, so p1 draws (an Island from
+  the padded library) even though the spell on the stack, Empty the Warrens, is red. Veil gives p1's spells protection and p1 hexproof
+  from blue and black; it does nothing to the Warrens (no target, and p0 is the caster). One copy (Ritual was cast before): four Goblins.

@@ -1,0 +1,36 @@
+id: storm-b-runehorn-hellkite-no-red-neither-cast-nor-graveyard-ability
+title: "Six Islands (no red) cannot pay {5}{R}: neither the hard cast nor the graveyard ability is offered"
+area: card
+cards: [Runehorn Hellkite, Island]
+tags: [runehorn-hellkite, mana-payment, colored-cost, legal-action-mask, graveyard-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Runehorn Hellkite, text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true, note: "partial payments are not allowed (same rule text)"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Runehorn Hellkite @hk1"]
+    graveyard: ["Runehorn Hellkite @hk2"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@hk1"}}
+  - expect_illegal: {p0: {t: activate, source: "@hk2", ability: 0}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: cast, card: "@hk1"}, {t: activate, source: "@hk2"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Runehorn Hellkite]
+      graveyard: [Runehorn Hellkite]
+      exile: []
+notes: >
+  Six untapped lands is the right amount of mana but all of it is blue, and {R} cannot be paid with blue: both uses of the
+  card are impossible. Nothing changes.

@@ -1,0 +1,39 @@
+id: storm-b-giants-boulder-destroy-ability-stifled-boulder-already-gone
+title: "Stifle on Giant's Boulder's destroy ability: the target survives and the Boulder is still sacrificed"
+area: card
+cards: [Giant's Boulder, Island, Aluren, Stifle]
+tags: [giants-boulder, destroy, stifle, sacrifice-cost, stack, in-response]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Giant's Boulder, text: "{7}, {T}, Sacrifice this artifact: Destroy target permanent.", verified: false, note: "Giant's Boulder text from three store pages (engine owner's brief), not Scryfall"}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Giant's Boulder @boulder", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6", "Island @i7"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Aluren @alu", "Island @pisl"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@boulder", ability: 1, targets: ["@alu"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@boulder"}], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Giant's Boulder]
+    p1:
+      hand: []
+      graveyard: [Stifle]
+      battlefield: [{card: Aluren}, {card: Island, tapped: true}]
+notes: >
+  The Boulder was sacrificed as a cost, so nothing p1 does can save it; Stifle counters only the ability, and Aluren
+  survives. A wrong engine returns the Boulder or sacrifices on resolution.

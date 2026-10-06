@@ -1,0 +1,48 @@
+id: storm-c-hexing-squelcher-ward-p1-at-one-life-cannot-pay-spell-countered
+title: "Ward-Pay 2 life with only 1 life: p1 cannot pay, no prompt is raised, and Lightning Bolt is countered"
+area: card
+cards: [Hexing Squelcher, Lightning Bolt, Mountain]
+tags: [hexing-squelcher, ward, pay-life, cannot-pay, counter-unless-pay, no-decision-raised]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Ward—Pay 2 life.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+  - {kind: cr, ref: "119.4", text: "the player may do so only if their life total is greater than or equal to the amount of the payment", verified: true}
+  - {kind: cr, ref: "118.12a", text: "This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq"]
+    library_pad: 10
+  p1:
+    life: 1
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: ["@sq"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      game: {over: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    game: {over: false}
+    p0:
+      graveyard: []
+      battlefield: [{card: Hexing Squelcher, damage: 0}]
+    p1:
+      life: 1
+      graveyard: [Lightning Bolt]
+notes: >
+  With 1 life p1 cannot pay 2 life (119.4), so the "unless" clause has only one outcome: the trigger counters Bolt
+  (118.12a). The rules give p1 no choice here, so no yes_no decision is raised (SCHEMA addenda: decisions with no
+  choice are not raised, and the same shape as the "cannot pay" scenarios in the uncounterable report). The script
+  therefore goes straight from the two passes to an empty stack. A wrong engine offers the payment and lets p1 go to
+  -1, or lets the Bolt resolve.

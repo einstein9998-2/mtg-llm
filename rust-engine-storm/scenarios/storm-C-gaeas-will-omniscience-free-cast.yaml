@@ -1,0 +1,49 @@
+id: storm-c-gaeas-will-with-omniscience-free-cast-from-hand-is-legal
+title: "Omniscience makes Gaea's Will castable from hand (an alternative cost may be applied to an unpayable cost); it is a cast, resolves, and exiles itself"
+area: card
+cards: ["Gaea's Will", Omniscience]
+tags: [gaeas-will, omniscience, free-cast, no-mana-cost, is-a-cast, exiles-itself, alternative-cost]
+derived_from: cr
+source:
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "If a card would be put into your graveyard from anywhere this turn, exile that card instead.", verified: true}
+  - {kind: cr, ref: "118.6a", text: "If an alternative cost is applied to an unpayable cost, including an effect that allows a player to cast a spell without paying its mana cost, the alternative cost may be paid.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Once the steps described in 601.2a–h are completed, effects that modify the characteristics of the spell as it’s cast are applied, then the spell becomes cast.", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gaea's Will @will"]
+    battlefield: ["Omniscience @omni"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@will", pay: auto}}
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@will", alt_cost: {free: omniscience}}]}}
+  - p0: {t: cast, card: "@will", alt_cost: {free: omniscience}}
+  - check:
+      stack: [{kind: spell, card: "@will", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [], spells_cast_this_turn: 1, mana_pool: {}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      exile: ["Gaea's Will"]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Omniscience}]
+notes: >
+  Gaea's Will has no mana cost (unpayable, 118.6), so paying its cost is not possible, but "cast without paying its
+  mana cost" is an alternative cost that may be applied to an unpayable cost (118.6a): with Omniscience the cast is
+  offered with alt_cost {free: omniscience} and with no other option. It is a cast (spells_cast_this_turn 1), goes
+  on the stack, and when it resolves its own replacement effect applies to itself (608.2n: it would be put into the
+  graveyard): Gaea's Will is in exile, the graveyard empty.

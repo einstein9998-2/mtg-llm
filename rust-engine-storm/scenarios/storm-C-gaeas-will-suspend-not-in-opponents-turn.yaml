@@ -1,0 +1,42 @@
+id: storm-c-gaeas-will-cannot-be-suspended-in-the-opponents-main-phase
+title: "Gaea's Will cannot be suspended in the opponent's turn, even with an empty stack and priority in a main phase"
+area: card
+cards: ["Gaea's Will", Forest]
+tags: [gaeas-will, suspend, sorcery-timing, opponents-turn, legal-action-mask]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "Suspend 4—{G}", verified: true}
+  - {kind: cr, ref: "702.62a", text: "If you could begin to cast this card by putting it onto the stack from your hand, you may pay [cost] and exile it with N time counters on it.", verified: true}
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  priority: p0
+  p0:
+    hand: ["Gaea's Will @will"]
+    battlefield: ["Forest @f"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      pending: {actor: p0, kind: priority}
+      stack: []
+      legal:
+        p0:
+          include: [{t: pass}]
+          exclude: [{t: suspend, card: "@will"}]
+  - expect_illegal: {p0: {t: suspend, card: "@will", pay: {tap: ["@f"]}}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Gaea's Will"]
+      exile: []
+      battlefield: [{card: Forest, tapped: false}]
+notes: >
+  p1's main phase, empty stack, p0 holds priority (the setup gives priority to the non-active player, as after p1
+  passes). A sorcery cannot be cast here (307.1: only during a main phase of ITS OWNER's turn), so by 702.62a the
+  suspend special action is not available either. The card stays in hand and the Forest untapped.

@@ -1,0 +1,68 @@
+id: storm-a-beseech-bargain-needs-artifact-enchantment-or-token-you-control
+title: "Bargain can only sacrifice your own artifact, enchantment or token: a land, a creature and the opponent's artifact are illegal"
+area: card
+cards: [Beseech the Mirror, Lightning Bolt, Aluren, Faerie Macabre, Lotus Petal, Goblin Token, Swamp, Island]
+tags: [beseech-the-mirror, bargain, additional-cost, sacrifice, legal-action-mask, token, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "Bargain (You may sacrifice an artifact, enchantment, or token as you cast this spell.)", verified: true}
+  - {kind: cr, ref: "702.166a", text: "“Bargain” means “As an additional cost to cast this spell, you may sacrifice an artifact, enchantment, or token.”", verified: true}
+  - {kind: cr, ref: "701.21a", text: "A player can’t sacrifice something that isn’t a permanent, or something that’s a permanent they don’t control.", verified: true}
+  - {kind: cr, ref: "111.7", text: "A token that’s in a zone other than the battlefield ceases to exist.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Island @isl", "Faerie Macabre @fm", "Aluren @alu", {token: Goblin Token, as: gob}]
+    library: ["Lightning Bolt @bolt", "Island"]
+    library_pad: 4
+  p1:
+    battlefield: ["Lotus Petal @ppetal"]
+    library_pad: 10
+random: any
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@isl"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@fm"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@ppetal"], pay: auto}}
+  - check:
+      legal:
+        p0:
+          include:
+            - {t: cast, card: "@bes", bargained: false}
+            - {t: cast, card: "@bes", bargained: true, sacrifice: ["@alu"]}
+            - {t: cast, card: "@bes", bargained: true, sacrifice: ["@gob"]}
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@gob"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@bes", controller: p0}]
+      p0:
+        battlefield_contains: [{card: Aluren}, {card: Faerie Macabre}, {card: Island}]
+        graveyard: []
+        exile: []
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@bolt"}
+  - p0: {decision: yes_no, purpose: cast_exiled_card, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Beseech the Mirror]
+      battlefield:
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Island}
+        - {card: Faerie Macabre}
+        - {card: Aluren}
+    p1: {battlefield: [{card: Lotus Petal}]}
+notes: >
+  Illegal bargain sacrifices: a land, a nonartifact creature (Faerie Macabre is a black creature, not a token), and the
+  opponent's Lotus Petal (you can only sacrifice what you control). Legal: no bargain at all, an Aluren (enchantment), a token.
+  Sacrificing the Goblin token as the bargain cost: it ceases to exist (not in the graveyard) and the spell counts as bargained,
+  so the free-cast choice is offered (declined here: Bolt to hand). The expect_illegal steps are evaluated before anything
+  changes. Does not require the bargained cast to resolve in any particular way.

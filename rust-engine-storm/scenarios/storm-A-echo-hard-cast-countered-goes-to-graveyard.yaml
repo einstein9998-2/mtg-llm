@@ -1,0 +1,41 @@
+id: storm-a-echo-hard-cast-countered-goes-to-graveyard
+title: "A countered hard-cast Echo of Eons goes to the graveyard; no hand or graveyard is shuffled and no cards are drawn"
+area: card
+cards: [Echo of Eons, Force of Will, Brainstorm, Lightning Bolt, Island]
+tags: [echo-of-eons, counterspell, force-of-will, graveyard, no-effect]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Echo of Eons, text: "Each player shuffles their hand and graveyard into their library, then draws seven cards.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Echo of Eons @echo", "Brainstorm"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6"]
+    graveyard: ["Lightning Bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+random: []
+script:
+  - p0: {t: cast, card: "@echo", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@echo"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      graveyard: [Lightning Bolt, Echo of Eons]
+      exile: []
+      library_count: 10
+    p1: {life: 19, graveyard: [Force of Will], exile: [Brainstorm]}
+notes: >
+  Hard-cast Echo is countered: it goes to the graveyard (still castable later by flashback), and since `random: []` no shuffle happens. The Brainstorm in
+  hand and the Bolt in the graveyard are untouched.

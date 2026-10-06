@@ -1,0 +1,35 @@
+id: storm-a-boomerang-stolen-permanent-goes-to-owner-controller-draws
+title: "Boomerang Basics on an opponent's permanent that you control: it returns to its owner's hand and you draw"
+area: card
+cards: [Boomerang Basics, Lotus Petal, Ponder, Island]
+tags: [boomerang-basics, bounce, owner-vs-controller, draw, control-change]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @i1"]
+    library: ["Ponder @top"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Lotus Petal, as: stolen, controller: p0}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@stolen"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Ponder], library_count: 10, graveyard: [Boomerang Basics]}
+    p1: {hand: [Lotus Petal], battlefield: []}
+notes: >
+  Setup convention: the Lotus Petal is listed in p1's zone (p1 owns it) with `controller: p0` (p0 controls it, as if a control-change effect
+  were applied). It returns to its OWNER's hand (p1), but p0 "controlled that permanent", so p0 draws. A wrong engine returns it to the
+  controller's hand or keys the draw on ownership.

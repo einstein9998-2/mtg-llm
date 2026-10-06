@@ -1,0 +1,48 @@
+id: storm-b-chrome-mox-imprint-declined-produces-no-mana
+title: Chrome Mox with nothing imprinted can be tapped but adds no mana
+area: card
+cards: [Chrome Mox, Brainstorm]
+tags: [chrome-mox, imprint, declined-may, no-mana, mana-ability, undefined-mana]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Chrome Mox, text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", verified: true}
+  - {kind: oracle, card: Chrome Mox, text: "{T}: Add one mana of any of the exiled card's colors.", verified: true}
+  - {kind: cr, ref: "106.5", text: "If an ability would produce one or more mana of an undefined type, it produces no mana instead.", verified: true, note: "applied by analogy: with no exiled card there is no colour to name, so the ability produces no mana (the tap cost is still paid)"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Chrome Mox @mox", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mox", pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: imprint, expect_options: {include: ["@bs"]}, answer: []}
+  - check:
+      stack: []
+      p0:
+        hand: [Brainstorm]
+        exile: []
+        mana_pool: {}
+      legal: {p0: {include: [{t: activate, source: "@mox", ability: 0}]}}
+  - p0: {t: activate, source: "@mox", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      exile: []
+      battlefield: [{card: Chrome Mox, tapped: true}]
+      mana_pool: {}
+      spells_cast_this_turn: 1
+notes: >
+  The imprint is a "may": answering with the empty selection declines it, Brainstorm stays in hand and nothing is
+  exiled. The Mox's mana ability has no exiled card to read colours from, so activating it only taps it and adds no mana
+  (CR 106.5 applied by analogy; the Oracle text names no fallback colour). This scenario asserts that the activation is
+  offered (a tap cost can be paid) but yields an empty pool; a wrong engine either produces colourless/any-colour mana
+  or refuses the activation. If the runner's mask hides a useless activation, flag it to the spec-writer.

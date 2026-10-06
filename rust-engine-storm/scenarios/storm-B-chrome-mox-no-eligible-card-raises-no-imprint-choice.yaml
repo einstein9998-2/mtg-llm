@@ -1,0 +1,37 @@
+id: storm-b-chrome-mox-no-eligible-card-raises-no-imprint-choice
+title: With only an artifact and a land in hand, Chrome Mox's imprint trigger resolves without any choice
+area: card
+cards: [Chrome Mox, Lotus Petal, Island]
+tags: [chrome-mox, imprint, no-eligible-card, mask-validity, etb-trigger]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Chrome Mox, text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Chrome Mox @mox", "Lotus Petal @petal", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mox", pay: auto}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@mox", controller: p0, text_contains: "exile"}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lotus Petal, Island]
+      exile: []
+      battlefield: [{card: Chrome Mox, tapped: false}]
+      mana_pool: {}
+notes: >
+  Lotus Petal is an artifact and Island is a land, so neither can be exiled; the trigger resolves, the player has no
+  choice, and the engine raises no decision (the script goes straight from the resolution to the final state: the second
+  resolve_top would fail if a choose_cards decision were pending). The cards stay in hand. Adapter note: some runners
+  raise a "may" yes_no first; the rules give no choice here, so none should appear.

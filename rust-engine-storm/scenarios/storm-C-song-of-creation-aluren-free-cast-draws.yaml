@@ -1,0 +1,48 @@
+id: storm-c-song-of-creation-free-cast-with-aluren-is-still-a-cast-and-draws-two
+title: "Casting Ocelot Pride for free with Aluren is still a cast: Song of Creation draws two cards"
+area: card
+cards: [Song of Creation, Aluren, Ocelot Pride, Island, Mountain]
+tags: [song-of-creation, aluren, free-cast, alternative-cost, cast-trigger, draw-two, no-mana-spent]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @op"]
+    battlefield: ["Song of Creation @song", "Aluren @alu"]
+    library: ["Island @d1", "Mountain @d2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@op", alt_cost: {free: aluren}}
+  - check:
+      stack:
+        - {kind: spell, card: "@op", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+      pending: {actor: p0, kind: priority}
+      p0: {mana_pool: {}, spells_cast_this_turn: 1, hand: []}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@op", controller: p0}]
+      p0: {hand: [Island, Mountain]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Mountain]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Song of Creation}, {card: Aluren}, {card: Ocelot Pride, sick: true}]
+notes: >
+  Aluren's permission is a way of casting without paying the mana cost; the card still goes to the stack and becomes a
+  cast spell (601.2i), so Song of Creation triggers. No mana is available or spent. The trigger resolves before the
+  creature spell (it is above it on the stack): the two cards are in hand while Ocelot Pride is still on the stack.
+  A wrong engine treats an Aluren cast as "putting a permanent onto the battlefield" and draws nothing.

@@ -1,0 +1,53 @@
+id: storm-c-gaeas-will-no-mana-cost-cannot-be-cast-from-hand-for-mana
+title: "Gaea's Will has no mana cost, so it cannot be hard cast from hand even with plenty of mana; suspend is offered instead and a cost-without-green is not enough"
+area: card
+cards: ["Gaea's Will", Island, Mountain, Forest]
+tags: [gaeas-will, no-mana-cost, unpayable-cost, hard-cast-illegal, suspend, mana-payment, legal-action-mask]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "Suspend 4—{G}", verified: true}
+  - {kind: cr, ref: "118.6", text: "Some objects have no mana cost. This represents an unpayable cost.", verified: true}
+  - {kind: cr, ref: "118.6", text: "However, attempting to pay an unpayable cost is an illegal action.", verified: true}
+  - {kind: cr, ref: "702.62a", text: "you may pay [cost] and exile it with N time counters on it", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gaea's Will @will"]
+    battlefield: ["Island @i1", "Island @i2", "Mountain @m1", "Mountain @m2", "Forest @f"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@will", pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@will", pay: {tap: ["@i1", "@i2", "@m1", "@m2", "@f"]}}}
+  - expect_illegal: {p0: {t: suspend, card: "@will", pay: {tap: ["@i1"]}}}
+  - check:
+      pending: {actor: p0, kind: priority}
+      legal:
+        p0:
+          include: [{t: suspend, card: "@will"}]
+          exclude: [{t: cast, card: "@will"}]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: ["Gaea's Will"]
+      exile: []
+      graveyard: []
+      spells_cast_this_turn: 0
+      battlefield:
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+        - {card: Mountain, tapped: false}
+        - {card: Mountain, tapped: false}
+        - {card: Forest, tapped: false}
+notes: >
+  An object with no mana cost has an unpayable cost (118.6): casting it by paying mana is not a legal action however
+  much mana the player controls, so no cast of Gaea's Will from hand is in the legal set, with auto payment or with
+  all five lands named. Suspend is the way to use the card (it costs {G}, an alternative that does not rely on the mana
+  cost): the legal set includes the suspend action, and naming only an Island for the {G} is illegal (the second probe
+  pays with a non-green source). Nothing changes: all lands untapped, the card stays in hand. See the Omniscience
+  scenario for the free-cast path that IS allowed (118.6a).

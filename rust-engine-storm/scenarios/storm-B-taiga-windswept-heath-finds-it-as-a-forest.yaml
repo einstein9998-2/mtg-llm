@@ -1,0 +1,42 @@
+id: storm-b-taiga-windswept-heath-finds-it-as-a-forest
+title: Windswept Heath (Forest or Plains card) can find Taiga because it is a Forest, but not a Mountain, Island or Volcanic Island
+area: card
+cards: [Windswept Heath, Taiga, Savannah, Forest, Plains, Mountain, Island, Volcanic Island]
+tags: [taiga, windswept-heath, fetchland, search, basic-land-types, life-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Windswept Heath, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "305.6", text: "An object with the land card type and a basic land type has the intrinsic ability “{T}: Add [mana symbol],” even if the text box doesn’t actually contain that text or the object has no text box.", verified: true}
+  - {kind: cr, ref: "701.23a", text: "To search for a card in a zone, look at all cards in that zone (even if it’s a hidden zone) and find a card that matches the given description.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    lands_played: 1
+    battlefield: ["Windswept Heath @heath"]
+    library: ["Taiga @taiga", "Savannah @sav", "Forest @for", "Plains @pl", "Mountain @mtn", "Island @isl", "Volcanic Island @vi"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@heath", ability: 0}
+  - resolve_top: true
+  - p0:
+      decision: search
+      found: "@taiga"
+      expect_options:
+        include: ["@taiga", "@sav", "@for", "@pl"]
+        exclude: ["@mtn", "@isl", "@vi"]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      graveyard: [Windswept Heath]
+      battlefield: [{card: Taiga, tapped: false}]
+      library_count: 16
+notes: >
+  The same Taiga is found by a Forest-or-Plains fetch through its Forest type. Mountain, Island and Volcanic Island (Island
+  Mountain) are not Forest or Plains cards.

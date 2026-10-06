@@ -1,0 +1,33 @@
+id: storm-a-echo-empty-hand-and-graveyard-still-draws-seven
+title: "Echo of Eons with nothing to shuffle in still draws seven for each player (the opponent too)"
+area: card
+cards: [Echo of Eons, Island]
+tags: [echo-of-eons, wheel, empty-hand, empty-graveyard, flashback, both-players]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Echo of Eons, text: "Each player shuffles their hand and graveyard into their library, then draws seven cards.", verified: true}
+  - {kind: oracle, card: Echo of Eons, text: "Flashback {2}{U}", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    graveyard: ["Echo of Eons @echo"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@echo", alt_cost: {flashback: true}, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand_count: 7, library_count: 3, graveyard: [], exile: [Echo of Eons]}
+    p1: {hand_count: 7, library_count: 3, graveyard: []}
+notes: >
+  Both hands and p1's graveyard are empty, and Echo is the only graveyard card of p0 (on the stack when it resolves): nothing is shuffled in, each
+  player draws seven from 10 cards (3 left). A wrong engine skips the draw when there is nothing to shuffle, or draws only for the caster.

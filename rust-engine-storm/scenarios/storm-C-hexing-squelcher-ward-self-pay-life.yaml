@@ -1,0 +1,56 @@
+id: storm-c-hexing-squelcher-ward-on-itself-pay-two-life-spell-resolves
+title: "Ward-Pay 2 life on the Squelcher itself: p1 pays 2 life and Lightning Bolt resolves and kills it"
+area: card
+cards: [Hexing Squelcher, Lightning Bolt, Mountain]
+tags: [hexing-squelcher, ward, pay-life, counter-unless-pay, lightning-bolt, yes-no-decision, triggered-ability]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Ward—Pay 2 life.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+  - {kind: cr, ref: "118.12a", text: "This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: ["@sq"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: triggered, source: "@sq", controller: p0, text_contains: "counter"}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_ward, answer: true, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      pending: {actor: p1, kind: priority}
+      p1: {life: 18}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Hexing Squelcher]
+      battlefield: []
+    p1:
+      life: 18
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Mountain, tapped: true}]
+notes: >
+  Targeting the Squelcher makes its ward trigger (702.21a) go on the stack above Lightning Bolt. When it resolves p1
+  (who can afford it) chooses to pay 2 life (119.4: life total 20 >= 2), so Bolt is not countered and deals 3 damage to
+  the 2/2, which dies. The payment is made at the trigger's resolution, not on casting: after the cast p1 is still at
+  20 (the first check does not assert life, the second asserts 18). A wrong engine makes the payment unconditional
+  (no prompt) or checks life when casting. The prompt shape (yes_no) is the runner adapter's business; the outcome is
+  what is fixed.

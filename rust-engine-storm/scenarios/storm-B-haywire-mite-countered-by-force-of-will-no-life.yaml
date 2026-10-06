@@ -1,0 +1,42 @@
+id: storm-b-haywire-mite-countered-by-force-of-will-no-life
+title: A Haywire Mite countered on the stack never dies, so no life is gained
+area: card
+cards: [Haywire Mite, Island, Force of Will, Brainstorm]
+tags: [haywire-mite, force-of-will, pitch-spell, counterspell, dies-trigger, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Haywire Mite, text: "When this creature dies, you gain 2 life.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "700.4", text: "The term dies means \"is put into a graveyard from the battlefield.\"", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Haywire Mite @mite"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mite", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@mite"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Haywire Mite]
+      battlefield: [{card: Island, tapped: true}]
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [{card: Brainstorm, face_up: true}]
+      hand: []
+notes: >
+  "Dies" means put into a graveyard from the battlefield (700.4): a spell countered on the stack goes from the stack to
+  the graveyard, so the Mite's trigger never exists. p0 stays at 20 (p1 paid 1 life for the pitch).

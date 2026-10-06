@@ -1,0 +1,42 @@
+id: storm-a-burning-wish-hidden-sideboard
+title: Opponent learns only the revealed Burning Wish card, never the rest of the sideboard
+area: hidden-info
+cards: [Burning Wish, Tendrils of Agony, Doomsday, "Peer into the Abyss", Echo of Eons, "Gaea's Will", Mountain]
+tags: [hidden-info, burning-wish, sideboard, reveal, outside-the-game]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Burning Wish, text: "You may reveal a sorcery card you own from outside the game and put it into your hand.", verified: true}
+  - {kind: cr, ref: "400.11a", text: "Cards in a player's sideboard are outside the game.", verified: true}
+observer: p1
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Burning Wish @wish"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+    sideboard: [Tendrils of Agony, Doomsday, "Peer into the Abyss", Echo of Eons]
+  p1:
+    library_pad: 10
+world_b:
+  p0:
+    sideboard: [Tendrils of Agony, "Gaea's Will", Echo of Eons, "Peer into the Abyss"]
+script:
+  - p0: {t: cast, card: "@wish", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: reveal_from_sideboard, answer: ["p0:Tendrils of Agony#1"]}
+expect:
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 1, library_count: 10}
+      option_labels_exclude_names: [Doomsday, "Gaea's Will", "Peer into the Abyss", Echo of Eons]
+      events_text_exclude: [Doomsday, "Gaea's Will", "Peer into the Abyss", Echo of Eons]
+assert_streams_identical: {observer: p1}
+notes: >
+  The two worlds differ only in sideboard cards that were not chosen (Doomsday versus Gaea's Will). p1's observation
+  stream must be identical: the revealed card (Tendrils of Agony) is public, everything else about the sideboard is not
+  (and p1 may not even learn how many cards the sideboard has; only p0's own decision options mention names). The
+  fetched card's name is deliberately not in the exclusion list because Burning Wish reveals it.

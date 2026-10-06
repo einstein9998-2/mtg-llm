@@ -1,0 +1,71 @@
+{
+ "_meta": {
+  "group": "A",
+  "note": "Entries to merge into reference/oracle.json cards{}; text from Savecraft card_search (Scryfall oracle), retrieved 2026-10-06. Gaea's Will is also added by group C (identical entry); merging both is harmless."
+ },
+ "cards": {
+  "Burning Wish": {
+   "name": "Burning Wish",
+   "mana_cost": "{1}{R}",
+   "type_line": "Sorcery",
+   "oracle_text": "You may reveal a sorcery card you own from outside the game and put it into your hand. Exile Burning Wish.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Gamble": {
+   "name": "Gamble",
+   "mana_cost": "{R}",
+   "type_line": "Sorcery",
+   "oracle_text": "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Beseech the Mirror": {
+   "name": "Beseech the Mirror",
+   "mana_cost": "{1}{B}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Bargain (You may sacrifice an artifact, enchantment, or token as you cast this spell.)\nSearch your library for a card, exile it face down, then shuffle. If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less. Put the exiled card into your hand if it wasn't cast this way.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Tendrils of Agony": {
+   "name": "Tendrils of Agony",
+   "mana_cost": "{2}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Target player loses 2 life and you gain 2 life.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Empty the Warrens": {
+   "name": "Empty the Warrens",
+   "mana_cost": "{3}{R}",
+   "type_line": "Sorcery",
+   "oracle_text": "Create two 1/1 red Goblin creature tokens.\nStorm (When you cast this spell, copy it for each spell cast before it this turn.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Peer into the Abyss": {
+   "name": "Peer into the Abyss",
+   "mana_cost": "{4}{B}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Target player draws cards equal to half the number of cards in their library and loses half their life. Round up each time.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Boomerang Basics": {
+   "name": "Boomerang Basics",
+   "mana_cost": "{U}",
+   "type_line": "Sorcery — Lesson",
+   "oracle_text": "Return target nonland permanent to its owner's hand. If you controlled that permanent, draw a card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Echo of Eons": {
+   "name": "Echo of Eons",
+   "mana_cost": "{4}{U}{U}",
+   "type_line": "Sorcery",
+   "oracle_text": "Each player shuffles their hand and graveyard into their library, then draws seven cards.\nFlashback {2}{U} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  },
+  "Gaea's Will": {
+   "name": "Gaea's Will",
+   "mana_cost": "",
+   "type_line": "Sorcery",
+   "oracle_text": "Suspend 4—{G}\nUntil end of turn, you may play lands and cast spells from your graveyard.\nIf a card would be put into your graveyard from anywhere this turn, exile that card instead.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-06"
+  }
+ }
+}

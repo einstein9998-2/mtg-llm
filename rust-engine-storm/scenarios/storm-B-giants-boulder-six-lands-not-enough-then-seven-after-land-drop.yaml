@@ -1,0 +1,40 @@
+id: storm-b-giants-boulder-six-lands-not-enough-then-seven-after-land-drop
+title: Six lands cannot pay Giant's Boulder's {7}; after a seventh land is played the destroy ability works on an opponent's artifact
+area: card
+cards: [Giant's Boulder, Island, Aether Vial]
+tags: [giants-boulder, destroy, cost-payment, legal-action-mask, land-drop]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Giant's Boulder, text: "{7}, {T}, Sacrifice this artifact: Destroy target permanent.", verified: false, note: "Giant's Boulder text from three store pages (engine owner's brief), not Scryfall"}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true, note: "partial payments are not allowed (same rule text)"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Island @i7"]
+    battlefield: ["Giant's Boulder @boulder", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aether Vial @vial"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@boulder", ability: 1, targets: ["@vial"]}}
+  - p0: {t: play_land, card: "@i7"}
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@boulder", ability: 1, targets: ["@vial"]}]}}
+  - p0: {t: activate, source: "@boulder", ability: 1, targets: ["@vial"], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Giant's Boulder]
+      lands_played: 1
+    p1:
+      battlefield: []
+      graveyard: [Aether Vial]
+notes: >
+  Six Islands plus the Boulder is six mana of {7}: the activation is not offered. After the land drop there are seven
+  Islands and it is. The Boulder can be pointed at any permanent, including an opponent's artifact (Aether Vial).

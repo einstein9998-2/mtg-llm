@@ -1,0 +1,49 @@
+id: storm-b-urzas-saga-enters-with-lore-counter-mana-only-after-chapter-one
+title: Urza's Saga enters with a lore counter, and it can tap for {C} only after chapter I has resolved
+area: card
+cards: [Urza's Saga]
+tags: [urzas-saga, saga, lore-counter, chapter-ability, etb-trigger, land-drop, granted-ability, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)", verified: true}
+  - {kind: oracle, card: Urza's Saga, text: 'I — This Saga gains "{T}: Add {C}."', verified: true}
+  - {kind: cr, ref: "714.3a", text: "As a Saga without the read ahead ability enters the battlefield, its controller puts a lore counter on it.", verified: true}
+  - {kind: cr, ref: "714.2b", text: "“{rN}—[Effect]” means “When one or more lore counters are put onto this Saga, if the number of lore counters on it was less than N and became at least N, [effect].”", verified: true}
+  - {kind: cr, ref: "305.1", text: "Playing a land is a special action; it doesn’t use the stack (see rule 116).", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - check:
+      stack: [{kind: triggered, source: "@saga", controller: p0, text_contains: "gains"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        lands_played: 1
+        battlefield: [{card: Urza's Saga, counters: {lore: 1}, types: [Enchantment, Land], subtypes: ["Urza's Saga"], tapped: false}]
+      legal: {p0: {exclude: [{t: activate, source: "@saga", ability: 0}]}}
+  - expect_illegal: {p0: {t: activate, source: "@saga", ability: 0}}
+  - resolve_top: true
+  - check:
+      stack: []
+      legal: {p0: {include: [{t: activate, source: "@saga", ability: 0}]}}
+  - p0: {t: activate, source: "@saga", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      lands_played: 1
+      battlefield: [{card: Urza's Saga, counters: {lore: 1}, tapped: true}]
+      mana_pool: {C: 1}
+notes: >
+  The lore counter is put on as the Saga enters (714.3a), which triggers chapter I; the chapter ability goes on the stack
+  and p0 holds priority with it there. Until it resolves the land has no mana ability (the brief: the granted abilities
+  exist once that chapter ability has resolved), so the activation is not offered; after resolution it is, and makes {C}.
+  Ability index 0 is the gained {T}: Add {C}. A wrong engine gives the mana ability at once, or only on the next turn.

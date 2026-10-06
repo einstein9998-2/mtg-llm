@@ -1,0 +1,61 @@
+id: storm-c-hexing-squelcher-daze-still-offers-payment-and-spell-resolves-either-way
+title: "Daze on a spell the Squelcher protects: the {1} payment is still offered, and Lightning Bolt resolves when p0 declines"
+area: card
+cards: [Hexing Squelcher, Lightning Bolt, Daze, Mountain, Island]
+tags: [hexing-squelcher, spells-you-control-cant-be-countered, daze, counter-unless-pay, alternative-cost, yes-no-decision]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Spells you control can't be countered.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "101.2", text: "the “can’t” effect takes precedence", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Hexing Squelcher @sq", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@daze", alt_cost: {return_island: "@i1"}, targets: ["@bolt"]}]}}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@i1"}, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: Mountain, tapped: false}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      battlefield:
+        - {card: Hexing Squelcher}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: false}
+    p1:
+      life: 17
+      hand: [Island]
+      graveyard: [Daze]
+notes: >
+  Daze's effect is "counter target spell unless its controller pays {1}", which means the controller may pay {1} and,
+  if they don't, the spell is countered (118.12a). The Squelcher's static ability stops the counter from happening
+  (101.2) but does not remove the offered choice, so p0 (who holds an untapped Mountain) is still asked; declining
+  costs nothing and Bolt resolves (p1 20 -> 17). The Mountain stays untapped. Daze's own alternative cost (return an
+  Island) is still legal to use. If the engine design decides to skip the prompt when the counter can't happen, the
+  yes_no step would be dropped and the spec thread would have to approve that; the outcome (Bolt resolves, no mana
+  spent) is the same.

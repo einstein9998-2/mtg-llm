@@ -1,0 +1,61 @@
+id: storm-b-urzas-saga-wasteland-in-response-to-chapter-three-search-still-happens
+title: Wasteland destroys the Saga in response to chapter III, but the chapter ability still resolves and fetches the artifact
+area: card
+cards: [Urza's Saga, Island, Mox Opal, Null Rod, Wasteland]
+tags: [urzas-saga, saga, chapter-three, wasteland, destroy-in-response, ability-independent-of-source, search, nonbasic-land]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "III — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+  - {kind: cr, ref: "205.4a", text: "The supertypes are basic, legendary, ongoing, snow, and world.", verified: true, note: "Urza's Saga has no basic supertype, so it is a legal Wasteland target"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    library: ["Island", "Island", "Mox Opal @opal", "Null Rod @rod"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@waste", ability: 1, targets: ["@saga"]}
+  - check:
+      stack:
+        - {kind: triggered, source: "@saga"}
+        - {kind: activated, source: "@waste", controller: p1, targets: ["@saga"]}
+      p1: {graveyard: [Wasteland]}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@saga", text_contains: "Search"}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [], graveyard: [Urza's Saga]}
+  - resolve_top: true
+  - p0: {decision: search, found: "@opal", expect_options: {include: ["@opal"], exclude: ["@rod"]}}
+expect:
+  - at: after_script
+    turn: 7
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mox Opal}]
+      graveyard: [Urza's Saga]
+      library_count: 11
+    p1:
+      graveyard: [Wasteland]
+      battlefield: []
+notes: >
+  Urza's Saga is a nonbasic land, so Wasteland can target it. Once the chapter III ability is on the stack it exists
+  independently of its source (113.7a): after the Saga is destroyed the search still happens and Mox Opal is put onto the
+  battlefield. The Saga is in the graveyard exactly once (it is not also sacrificed). Library: 14 - 2 draws - 1 found = 11
+  (only the count is asserted, the order after the shuffle is not).

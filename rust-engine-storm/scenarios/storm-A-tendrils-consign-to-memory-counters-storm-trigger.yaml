@@ -1,0 +1,51 @@
+id: storm-a-tendrils-consign-to-memory-counters-storm-trigger
+title: "Consign to Memory on the storm trigger: no copies are made and the original Tendrils resolves alone"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Consign to Memory, Swamp, Island]
+tags: [tendrils-of-agony, storm, consign-to-memory, counter-triggered-ability, copies, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: oracle, card: Tendrils of Agony, text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", verified: true}
+  - {kind: cr, ref: "702.40a", text: "Storm is a triggered ability that functions on the stack.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @ctm"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@ctm", targets: [{trigger_of: "@tend"}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@tend", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Consign to Memory]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      graveyard: [Dark Ritual, Tendrils of Agony]
+    p1: {life: 18, graveyard: [Consign to Memory]}
+notes: >
+  Storm is a triggered ability (702.40a), so Consign to Memory (counter target triggered ability) can counter it. The trigger is
+  countered, no copy is created and no change-targets decision is raised; Tendrils resolves once: p1 20 -> 18, p0 20 -> 22. A wrong engine makes the
+  copies when the spell is cast (not as a stack object), so Consign has no valid target or copies appear anyway. Tendrils is black,
+  not colorless, so Consign could not counter the spell itself.

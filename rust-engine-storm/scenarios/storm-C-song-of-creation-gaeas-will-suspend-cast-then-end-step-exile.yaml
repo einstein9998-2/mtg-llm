@@ -1,0 +1,70 @@
+id: storm-c-song-of-creation-with-gaeas-will-suspend-cast-draws-two-and-end-step-discard-is-exiled
+title: "Gaea's Will cast free from suspend is a cast (Song draws two before the Will resolves), and Song's end-step discard then exiles the whole hand instead of binning it"
+area: card
+cards: [Song of Creation, "Gaea's Will", Ponder, Mountain, Forest, Island]
+tags: [song-of-creation, gaeas-will, suspend, free-cast, cast-trigger, draw-two, end-step-discard, exile-instead, stack-order]
+derived_from: cr
+source:
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: oracle, card: Song of Creation, text: "At the beginning of your end step, discard your hand.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "If a card would be put into your graveyard from anywhere this turn, exile that card instead.", verified: true}
+  - {kind: cr, ref: "702.62d", text: "Casting a spell as an effect of its suspend ability follows the rules for paying alternative costs in rules 601.2b and 601.2f–h.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "701.9a", text: "To discard a card, move it from its owner’s hand to that player’s graveyard.", verified: true}
+  - {kind: cr, ref: "614.1a", text: "Effects that use the word “instead” are replacement effects.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    hand: ["Ponder @pd"]
+    battlefield: ["Song of Creation @song"]
+    exile: [{card: "Gaea's Will", as: will, face_up: true, counters: {time: 1}}]
+    library: ["Mountain @d1", "Forest @d2", "Island @d3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - resolve_top: true
+  - resolve_top: true
+  - check:
+      stack:
+        - {kind: spell, card: "@will", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [Ponder], spells_cast_this_turn: 1, exile: []}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@will", controller: p0}]
+      p0: {hand: [Ponder, Mountain, Forest]}
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {exile: ["Gaea's Will"], graveyard: [], hand: [Ponder, Mountain, Forest]}
+  - advance: {to: end, of: p0}
+  - check:
+      turn: 5
+      phase: end
+      stack: [{kind: triggered, source: "@song", controller: p0, text_contains: "discard"}]
+      p0: {hand_count: 4}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 5
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      exile: ["Gaea's Will", Ponder, Mountain, Forest, Island]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Song of Creation}]
+notes: >
+  The suspend cast (702.62d: an alternative-cost cast) is a cast, so Song triggers when the Will is cast in the upkeep:
+  the trigger is above the Will on the stack, p0 draws Mountain and Forest first, then the Will resolves and its
+  replacement effect starts. In the draw step p0 draws the Island (the Will's effect does not change draws). In the end
+  step Song's trigger discards the four cards in hand, and because the Will is in effect those four cards are exiled
+  instead of going to the graveyard (614.1a): the graveyard stays empty. The interaction (storm turn: cast the Will,
+  everything discarded at end of turn is exiled, none can be reused) is why Song and Will are a pair in this deck.

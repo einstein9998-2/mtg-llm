@@ -1,0 +1,50 @@
+id: storm-a-beseech-bargained-prismatic-ending-x-zero-exiles-mana-value-zero
+title: "Beseech free-casts Prismatic Ending (mana value 1 in the library, X = 0): zero colors spent, so it exiles a mana value 0 permanent"
+area: card
+cards: [Beseech the Mirror, Prismatic Ending, Lotus Petal, Swamp, Island]
+tags: [beseech-the-mirror, bargain, free-cast, x-spell, prismatic-ending, converge, mana-value, targets]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Prismatic Ending, text: "Converge — Exile target nonland permanent if its mana value is less than or equal to the number of colors of mana spent to cast this spell.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: cr, ref: "202.3e", text: "When calculating the mana value of an object with an {X} in its mana cost, X is treated as 0 while the object is not on the stack, and X is treated as the number chosen for it while the object is on the stack.", verified: true}
+  - {kind: cr, ref: "107.3b", text: "then the only legal choice for X is 0.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Lotus Petal @petal"]
+    library: ["Prismatic Ending @pe", "Island"]
+    library_pad: 4
+  p1:
+    battlefield: ["Lotus Petal @ppetal"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@pe"}
+  - p0: {decision: yes_no, purpose: cast_exiled_card, answer: true}
+  - p0: {decision: choose_target, slot: 0, answer: "@ppetal", expect_options: {include: ["@ppetal"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      exile: []
+      graveyard: [Beseech the Mirror, Lotus Petal, Prismatic Ending]
+      spells_cast_this_turn: 2
+    p1:
+      battlefield: []
+      exile: [Lotus Petal]
+notes: >
+  Prismatic Ending {X}{W} has mana value 1 in the library (X = 0 off the stack, 202.3e), so it is within the limit of 4. A free
+  cast with an X in the cost has only X = 0 (107.3b), so no choose_number decision is raised. No mana is spent, so converge
+  counts 0 colors; Lotus Petal has mana value 0, and 0 <= 0, so it is exiled. Companion scenario:
+  storm-a-beseech-bargained-prismatic-ending-does-not-exile-mana-value-four.

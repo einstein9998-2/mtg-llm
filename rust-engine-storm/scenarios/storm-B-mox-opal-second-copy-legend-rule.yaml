@@ -1,0 +1,37 @@
+id: storm-b-mox-opal-second-copy-legend-rule
+title: Casting a second Mox Opal triggers the legend rule; keeping the new one lets p0 discard the tapped old one
+area: card
+cards: [Mox Opal]
+tags: [mox-opal, legend-rule, state-based-action, zero-cost-spell, legendary]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mox Opal, text: "{T}: Add one mana of any color.", verified: true, note: "Mox Opal is a Legendary Artifact (type line in oracle.json); legendary is the supertype the legend rule reads"}
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners’ graveyards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mox Opal @opal2"]
+    battlefield: [{card: Mox Opal, as: opal1, tapped: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@opal2", pay: auto}
+  - resolve_top: true
+  - p0: {decision: legend_rule, keep: "@opal2", expect_options: {include: ["@opal1", "@opal2"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield: [{card: Mox Opal, types: [Artifact], supertypes: [Legendary], tapped: false}]
+      graveyard: [Mox Opal]
+      spells_cast_this_turn: 1
+notes: >
+  Mox Opal is legendary, so two copies under one player's control trigger the legend rule as a state-based action
+  before p0 gets priority; p0 chooses which to keep and the other goes to the graveyard. The new copy is untapped and the
+  old one tapped, so keeping the new one nets an untapped Opal. A wrong engine skips the rule (Opal is not
+  supertype-checked) or lets both stay.

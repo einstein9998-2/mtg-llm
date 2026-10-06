@@ -1,0 +1,113 @@
+// Legacy Storm (Brady's Beseech Storm 75, 2026-10-06), RFC 0007. Oracle text per Savecraft card_search (Scryfall); Giant's Boulder from store pages (not in Savecraft).
+// Kept apart from legacy.cards.ron so that the pinned real-pool snapshot and its goldens stay untouched.
+[
+  (name: "Taiga", types: "LAND", subtypes: ["Mountain", "Forest"]),
+  (name: "Burning Wish", cost: "{1}{R}", types: "SORCERY", abilities: [
+    Spell(effect: Seq([Wish(filter: (types_any: "SORCERY")), Exile(One(This))])),
+  ]),
+  // The search and the shuffle are separate instructions: the random discard sits between them.
+  (name: "Gamble", cost: "{R}", types: "SORCERY", abilities: [
+    Spell(effect: Seq([SearchNoShuffle(filter: (zone: Library), dest: Hand), DiscardRandom(who: You, n: Const(1)), Shuffle(You)])),
+  ]),
+  // Bargain is modelled as an alternative way to cast it: {1}{B}{B}{B} plus the sacrifice (RFC 0007).
+  (name: "Beseech the Mirror", cost: "{1}{B}{B}{B}", types: "SORCERY", abilities: [
+    Alt(label: "bargained", key: "bargained", cost: [Mana("{1}{B}{B}{B}"), Sacrifice(types_any: "ARTIFACT | ENCHANTMENT", controller: You, alt: [(token: Some(true), controller: You)])]),
+    Spell(effect: Seq([
+      Search(filter: (zone: Library), dest: Exile),
+      If(cond: WasCast(key: Some("bargained")), then: CastMovedFree(max_cmc: 4)),
+      MoveTo(objs: One(Moved(0)), to: Hand),
+    ])),
+  ]),
+  (name: "Tendrils of Agony", cost: "{2}{B}{B}", types: "SORCERY", abilities: [
+    Triggered(text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", zone: Stack,
+      on: SpellCast(caster: You, filter: (self_only: true)), effect: CopySpell(what: This, n: EventAmount)),
+    Spell(targets: [(players: Any)], effect: Seq([LoseLife(who: Target(0), n: Const(2)), GainLife(who: You, n: Const(2))])),
+  ]),
+  (name: "Empty the Warrens", cost: "{3}{R}", types: "SORCERY", abilities: [
+    Triggered(text: "Storm (When you cast this spell, copy it for each spell cast before it this turn.)", zone: Stack,
+      on: SpellCast(caster: You, filter: (self_only: true)), effect: CopySpell(what: This, n: EventAmount)),
+    Spell(effect: CreateToken(token: "Goblin Token", n: Const(2), who: You)),
+  ]),
+  (name: "Peer into the Abyss", cost: "{4}{B}{B}{B}", types: "SORCERY", abilities: [
+    Spell(targets: [(players: Any)], effect: Seq([
+      Draw(who: Target(0), n: HalfUp(CardsInLibrary(Target(0)))),
+      LoseLife(who: Target(0), n: HalfUp(Life(Target(0)))),
+    ])),
+  ]),
+  (name: "Boomerang Basics", cost: "{U}", types: "SORCERY", subtypes: ["Lesson"], abilities: [
+    Spell(targets: [(objects: (types_not: "LAND"))], effect: If(
+      cond: ControlledBy(Target(0), You),
+      then: Seq([Bounce(One(Target(0))), Draw(who: You, n: Const(1))]),
+      els: Bounce(One(Target(0))))),
+  ]),
+  (name: "Haywire Mite", cost: "{1}", types: "ARTIFACT | CREATURE", subtypes: ["Insect"], pt: (1, 1), abilities: [
+    Triggered(text: "When this creature dies, you gain 2 life.", on: ZoneChange(filter: (self_only: true), from: Battlefield, to: Graveyard), effect: GainLife(who: You, n: Const(2))),
+    Activated(text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", cost: [Mana("{G}"), SacrificeSelf],
+      targets: [(objects: (types_any: "ARTIFACT | ENCHANTMENT", types_not: "CREATURE"))], effect: Exile(One(Target(0)))),
+  ]),
+  (name: "Mox Opal", cost: "{0}", types: "ARTIFACT", supertypes: "LEGENDARY", abilities: [
+    Activated(text: "Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts.", cost: [TapSelf], is_mana: true,
+      cond: Controls(who: You, filter: (types_any: "ARTIFACT"), at_least: 3), effect: AddManaAny(n: Const(1))),
+  ]),
+  (name: "Chrome Mox", cost: "{0}", types: "ARTIFACT", abilities: [
+    Triggered(text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", on: Enters(filter: (self_only: true)),
+      effect: Imprint(filter: (zone: Hand, types_not: "ARTIFACT | LAND"))),
+    Activated(text: "{T}: Add one mana of any of the exiled card's colors.", cost: [TapSelf], is_mana: true, effect: AddManaImprinted),
+  ]),
+  (name: "Giant's Boulder", cost: "{1}", types: "ARTIFACT", abilities: [
+    Triggered(text: "When this artifact enters, scry 2.", on: Enters(filter: (self_only: true)), effect: Scry(Const(2))),
+    Activated(text: "{1}, {T}: Add one mana of any color.", cost: [Mana("{1}"), TapSelf], is_mana: true, effect: AddManaAny(n: Const(1))),
+    Activated(text: "{7}, {T}, Sacrifice this artifact: Destroy target permanent.", cost: [Mana("{7}"), TapSelf, SacrificeSelf],
+      targets: [(objects: ())], effect: Destroy(One(Target(0)))),
+  ]),
+  // The chapter abilities grant their activated abilities by leaving a marker counter (Other(0), Other(1))
+  // that the abilities' activation conditions test (RFC 0007).
+  (name: "Urza's Saga", types: "ENCHANTMENT | LAND", subtypes: ["Saga"], abilities: [
+    Saga(last: 3),
+    Triggered(text: "I — This Saga gains \"{T}: Add {C}.\"", on: Chapter(1), effect: AddCounters(objs: One(This), kind: Other(0), n: Const(1))),
+    Triggered(text: "II — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"", on: Chapter(2),
+      effect: AddCounters(objs: One(This), kind: Other(1), n: Const(1))),
+    Triggered(text: "III — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.", on: Chapter(3),
+      effect: Search(filter: (zone: Library, types_any: "ARTIFACT", types_not: "LAND", cmc: (Le, 1)), dest: Battlefield)),
+    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, cond: HasCounter(This, Other(0)), effect: AddMana(color: C, n: 1)),
+    Activated(text: "{2}, {T}: Create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"", cost: [Mana("{2}"), TapSelf],
+      cond: HasCounter(This, Other(1)), effect: CreateToken(token: "Construct Token", n: Const(1), who: You)),
+  ]),
+  (name: "Construct Token", types: "ARTIFACT | CREATURE", subtypes: ["Construct"], pt: (0, 0), is_token: true, abilities: [
+    Static(layer: L7a, applies_to: (self_only: true), effect: SetPTExpr(x: Count(types_any: "ARTIFACT", controller: You), t_plus: 0)),
+  ]),
+  (name: "Runehorn Hellkite", cost: "{5}{R}", types: "CREATURE", subtypes: ["Dragon"], pt: (5, 5), keywords: "FLYING", abilities: [
+    Activated(text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", cost: [Mana("{5}{R}"), ExileSelf], zone: Graveyard,
+      effect: Seq([ForEachPlayer(body: Discard(who: Each, n: Const(99))), ForEachPlayer(body: Draw(who: Each, n: Const(7)))])),
+  ]),
+  (name: "Echo of Eons", cost: "{4}{U}{U}", types: "SORCERY", abilities: [
+    Alt(label: "flashback", key: "flashback", cost: [Mana("{2}{U}")], zone: Graveyard, exile_after: true),
+    Spell(effect: Seq([
+      MoveTo(objs: All(zone: Hand, owner: You), to: Library), MoveTo(objs: All(zone: Graveyard, owner: You), to: Library), Shuffle(You),
+      MoveTo(objs: All(zone: Hand, owner: Opp), to: Library), MoveTo(objs: All(zone: Graveyard, owner: Opp), to: Library), Shuffle(Opp),
+      Draw(who: You, n: Const(7)), Draw(who: Opp, n: Const(7)),
+    ])),
+  ]),
+  (name: "Hexing Squelcher", cost: "{1}{R}", types: "CREATURE", subtypes: ["Goblin", "Sorcerer"], pt: (2, 2), keywords: "UNCOUNTERABLE", abilities: [
+    Triggered(text: "Ward—Pay 2 life. (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays 2 life.)", on: BecomesTarget(by: Opp), effect: CounterEventUnlessLife(n: 2)),
+    SpellsUncounterable,
+    Triggered(text: "Other creatures you control have \"Ward—Pay 2 life.\" (Whenever such a creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays 2 life.)", on: OtherBecomesTarget(by: Opp, filter: (types_any: "CREATURE", controller: You)), effect: CounterEventUnlessLife(n: 2)),
+  ]),
+  (name: "Gaea's Will", types: "SORCERY", abilities: [
+    Activated(text: "Suspend 4—{G}", cost: [Mana("{G}"), SuspendSelf(4)], zone: Hand, timing: Sorcery),
+    Triggered(text: "At the beginning of your upkeep, if this card is suspended, remove a time counter from it.", zone: Exile,
+      on: BeginStep(step: Upkeep, whose: You), cond: HasCounter(This, Time),
+      effect: AddCounters(objs: One(This), kind: Time, n: Const(-1))),
+    Triggered(text: "When the last is removed, cast it without paying its mana cost.", zone: Exile,
+      on: LastCounterRemoved(Time), effect: CastFree(This)),
+    Spell(effect: Seq([
+      PlayerFx(who: You, fx: PlayFromGraveyard, until: EndOfTurn),
+      PlayerFx(who: You, fx: ExileInsteadOfGraveyard, until: EndOfTurn),
+    ])),
+  ]),
+  (name: "Song of Creation", cost: "{1}{G}{U}{R}", types: "ENCHANTMENT", abilities: [
+    ExtraLandDrop,
+    Triggered(text: "Whenever you cast a spell, draw two cards.", on: SpellCast(caster: You), effect: Draw(who: You, n: Const(2))),
+    Triggered(text: "At the beginning of your end step, discard your hand.", on: BeginStep(step: End, whose: You), effect: Discard(who: You, n: Const(99))),
+  ]),
+]

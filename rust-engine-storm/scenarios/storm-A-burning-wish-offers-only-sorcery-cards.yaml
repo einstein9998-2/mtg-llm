@@ -1,0 +1,45 @@
+id: storm-a-burning-wish-offers-only-sorcery-cards
+title: Burning Wish offers exactly the sorceries in the sideboard (including a Lesson sorcery), not instants, creatures, lands or artifacts
+area: card
+cards: [Burning Wish, Tendrils of Agony, Doomsday, Echo of Eons, Boomerang Basics, Lightning Bolt, Brainstorm, "Atraxa, Grand Unifier", Island, Aluren, Lotus Petal, Mountain]
+tags: [burning-wish, sideboard, card-type, sorcery, legal-action-mask, subtype]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Burning Wish, text: "You may reveal a sorcery card you own from outside the game and put it into your hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "Sorcery — Lesson", verified: false, note: "type line from oracle-additions-A.json (Scryfall data via Savecraft); the validator only verifies oracle_text"}
+  - {kind: cr, ref: "400.11a", text: "Cards in a player's sideboard are outside the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Burning Wish @wish"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+    sideboard: [Tendrils of Agony, Doomsday, Echo of Eons, Boomerang Basics, Lightning Bolt, Brainstorm, "Atraxa, Grand Unifier", Island, Aluren, Lotus Petal]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wish", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_cards
+      purpose: reveal_from_sideboard
+      answer: ["p0:Echo of Eons#1"]
+      expect_options:
+        count: 4
+        include: ["Tendrils of Agony", "Doomsday", "Echo of Eons", "Boomerang Basics"]
+        exclude: ["Lightning Bolt", "Brainstorm", "Atraxa, Grand Unifier", "Island", "Aluren", "Lotus Petal"]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Echo of Eons]
+      exile: [Burning Wish]
+      graveyard: []
+notes: >
+  Only sorcery cards qualify: Tendrils, Doomsday, Echo of Eons and Boomerang Basics (type line "Sorcery - Lesson" is still a
+  sorcery card). Instants (Bolt, Brainstorm), a creature, a land, an enchantment and an artifact in the sideboard are not
+  offered. A wrong engine offers any card, or checks the exact type line "Sorcery". The option count is 4.

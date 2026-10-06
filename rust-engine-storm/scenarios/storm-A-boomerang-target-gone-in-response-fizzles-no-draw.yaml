@@ -1,0 +1,38 @@
+id: storm-a-boomerang-target-gone-in-response-fizzles-no-draw
+title: "Boomerang Basics fizzles if its target left (Lotus Petal sacrificed in response): no draw"
+area: card
+cards: [Boomerang Basics, Lotus Petal, Ponder, Island]
+tags: [boomerang-basics, fizzle, no-draw, lotus-petal, mana-ability, response]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @i1", "Lotus Petal @petal"]
+    library: ["Ponder @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@petal"], pay: auto}
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: U}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Boomerang Basics, Lotus Petal]
+      library_count: 11
+notes: >
+  p0 keeps priority after casting and uses Lotus Petal's mana ability (tap, sacrifice) before the spell resolves. The only target is gone, so
+  Boomerang Basics does not resolve (608.2b) and the "draw a card" part never happens, even though p0 controlled the permanent when the
+  spell was cast. library_count 11 (Ponder plus ten padding cards).

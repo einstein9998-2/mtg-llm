@@ -1,0 +1,46 @@
+id: storm-c-hexing-squelcher-ward-on-itself-decline-spell-countered
+title: "Ward-Pay 2 life on the Squelcher itself: if p1 declines to pay, Lightning Bolt is countered and the Squelcher is undamaged"
+area: card
+cards: [Hexing Squelcher, Lightning Bolt, Mountain]
+tags: [hexing-squelcher, ward, pay-life, counter-unless-pay, lightning-bolt, yes-no-decision, negative]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Ward—Pay 2 life.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+  - {kind: cr, ref: "118.12a", text: "This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: ["@sq"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_ward, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: []
+      battlefield: [{card: Hexing Squelcher, controller: p0, damage: 0}]
+    p1:
+      life: 20
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Mountain, tapped: true}]
+notes: >
+  Declining the payment counters Bolt (it goes to p1's graveyard, 701.6a); p1 loses no life and the Squelcher takes no
+  damage. Hexing Squelcher's "Spells you control can't be countered" protects p0's spells only: it must not protect
+  the opponent's Bolt from the ward counter. A wrong engine lets Bolt resolve anyway (damage 3, Squelcher dead) because
+  of a confused uncounterable flag, or charges the life regardless.

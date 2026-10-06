@@ -1,0 +1,82 @@
+id: storm-a-beseech-bargained-free-tendrils-storm-counts-beseech
+title: "Bargained Beseech casts Tendrils free; storm counts Dark Ritual and Beseech (two copies) and the free cast is a cast"
+area: card
+cards: [Beseech the Mirror, Tendrils of Agony, Dark Ritual, Lotus Petal, Swamp, Island]
+tags: [beseech-the-mirror, bargain, free-cast, storm, tendrils-of-agony, storm-count, cast-during-resolution]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+  - {kind: oracle, card: Tendrils of Agony, text: "Target player loses 2 life and you gain 2 life.", verified: true}
+  - {kind: cr, ref: "608.2g", text: "If an effect specifically instructs or allows a player to cast a spell during resolution, they do so by following the steps in rules 601.2a–i, except no player receives priority after it’s cast.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: cr, ref: "702.166a", text: "“Bargain” means “As an additional cost to cast this spell, you may sacrifice an artifact, enchantment, or token.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Lotus Petal @petal"]
+    library: ["Tendrils of Agony @tend", "Island"]
+    library_pad: 5
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {mana_pool: {B: 3}}
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tend"}
+  - p0: {decision: yes_no, purpose: cast_exiled_card, answer: true}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0, targets: [{player: p1}]}
+        - {kind: triggered, source: "@tend", text_contains: "copy"}
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: [Dark Ritual, Beseech the Mirror, Lotus Petal]
+        hand: []
+        exile: []
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0, targets: [{player: p1}]}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 26
+      hand: []
+      exile: []
+      graveyard: [Dark Ritual, Beseech the Mirror, Lotus Petal, Tendrils of Agony]
+      library_count: 6
+      spells_cast_this_turn: 3
+      mana_pool: {}
+    p1: {life: 14}
+notes: >
+  Dark Ritual (cast #1) gives BBB; Beseech ({1}{B}{B}{B}) is paid with that BBB plus the second Swamp and bargained by
+  sacrificing Lotus Petal (sacrificed as a cost, so it is in the graveyard before Beseech resolves). Beseech resolves: the
+  found Tendrils (mana value 4) is cast free; Tendrils goes on the stack as Beseech finishes resolving (608.2g), and its
+  storm trigger goes on the stack above it. Spells cast before Tendrils this turn: Dark Ritual and Beseech = 2, so two
+  copies. Three resolutions drain 6: p1 20 -> 14, p0 20 -> 26. Tendrils was cast, so it is not put into hand (hand: [],
+  graveyard holds Tendrils). The copies are not casts (spells_cast_this_turn 3). The yes_no/choose_target shapes are the
+  runner adapter's; the rules fix who decides (p0 for the cast, targets chosen while casting).

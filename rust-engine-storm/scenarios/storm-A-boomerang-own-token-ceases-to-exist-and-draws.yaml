@@ -1,0 +1,37 @@
+id: storm-a-boomerang-own-token-ceases-to-exist-and-draws
+title: "Boomerang Basics on your own Goblin token: the token goes to hand and ceases to exist, but you still draw"
+area: card
+cards: [Boomerang Basics, Goblin Token, Ponder, Island]
+tags: [boomerang-basics, bounce, token, ceases-to-exist, draw]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "111.7", text: "A token that’s in a zone other than the battlefield ceases to exist.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @i1", {token: Goblin Token, as: gob}]
+    library: ["Ponder @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@gob"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Boomerang Basics]
+      battlefield: [{card: Island, tapped: true}]
+      library_count: 10
+notes: >
+  The token is returned to its owner's hand and then ceases to exist (state-based action), so the hand holds only the drawn Ponder.
+  The draw still happens because p0 controlled the token.

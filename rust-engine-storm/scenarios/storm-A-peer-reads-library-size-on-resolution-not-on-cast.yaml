@@ -1,0 +1,49 @@
+id: storm-a-peer-reads-library-size-on-resolution-not-on-cast
+title: "Peer into the Abyss counts the library when it resolves: Brainstorm in response shrinks the draw from 16 to 15"
+area: card
+cards: [Peer into the Abyss, Brainstorm, Swamp, Island]
+tags: [peer-into-the-abyss, draw, half, resolution-time, brainstorm, response, library-count]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Peer into the Abyss, text: "Target player draws cards equal to half the number of cards in their library and loses half their life.", verified: true}
+  - {kind: oracle, card: Peer into the Abyss, text: "Round up each time.", verified: true}
+  - {kind: oracle, card: Brainstorm, text: "Draw three cards, then put two cards from your hand on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Peer into the Abyss @peer", "Brainstorm @bs"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7", "Island @isl"]
+    library: ["Island @a", "Island @b", "Island @c"]
+    library_pad: 28
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@peer", targets: [{player: p0}], pay: {tap: ["@s1", "@s2", "@s3", "@s4", "@s5", "@s6", "@s7"]}}
+  - p0: {t: cast, card: "@bs", pay: {tap: ["@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@a", "@b"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@a", "@b"]}
+  - check:
+      stack: [{kind: spell, card: "@peer", controller: p0}]
+      p0: {library_count: 30, hand_count: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 10
+      hand_count: 16
+      library_count: 15
+      graveyard: [Brainstorm, Peer into the Abyss]
+    p1: {life: 20}
+notes: >
+  p0 casts Peer with 31 cards in library, then (holding priority) Brainstorm: draw 3 and put 2 back, so the library is 30 when Peer
+  resolves. "Half the number of cards in their library" is evaluated on resolution: 15 draws (not 16 as it would have been at cast time),
+  library 30 -> 15, hand 1 + 15 = 16. Life 20 -> 10. The Brainstorm decision shapes (choose_cards then order_cards) are the existing
+  ones. The cards drawn by Peer are not asserted by identity (all Islands).

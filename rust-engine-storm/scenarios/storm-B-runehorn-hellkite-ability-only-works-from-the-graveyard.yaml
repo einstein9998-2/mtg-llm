@@ -1,0 +1,39 @@
+id: storm-b-runehorn-hellkite-ability-only-works-from-the-graveyard
+title: The Hellkite's {5}{R} ability is not offered for a Hellkite in hand or on the battlefield (but the hand one can be cast)
+area: card
+cards: [Runehorn Hellkite, Taiga, Island]
+tags: [runehorn-hellkite, graveyard-ability, zone-restriction, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Runehorn Hellkite, text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", verified: true}
+  - {kind: cr, ref: "602.2", text: "To activate an ability is to put it onto the stack and pay its costs, so that it will eventually resolve and have its effect.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Runehorn Hellkite @hk_hand"]
+    battlefield: ["Runehorn Hellkite @hk_bf", "Taiga @taiga", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@hk_bf", ability: 0}}
+  - expect_illegal: {p0: {t: activate_from_hand, source: "@hk_hand", ability: 0}}
+  - check:
+      legal:
+        p0:
+          include: [{t: cast, card: "@hk_hand"}]
+          exclude: [{t: activate, source: "@hk_bf"}, {t: activate_from_hand, source: "@hk_hand"}]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Runehorn Hellkite]
+      battlefield_contains: [{card: Runehorn Hellkite, pt: [5, 5]}]
+      exile: []
+notes: >
+  The ability reads "Exile this card from your graveyard": its cost cannot be paid from any other zone, however much mana
+  is available, so it is offered neither from hand (activate_from_hand) nor from the battlefield. The Hellkite in hand
+  can still be cast for {5}{R}.

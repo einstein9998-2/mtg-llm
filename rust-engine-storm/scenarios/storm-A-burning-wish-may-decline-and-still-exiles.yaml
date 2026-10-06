@@ -1,0 +1,37 @@
+id: storm-a-burning-wish-may-decline-and-still-exiles
+title: "Burning Wish's reveal is a may: declining puts nothing in hand and Burning Wish is still exiled"
+area: card
+cards: [Burning Wish, Tendrils of Agony, Mountain]
+tags: [burning-wish, sideboard, optional, decline, exile-self]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Burning Wish, text: "You may reveal a sorcery card you own from outside the game and put it into your hand.", verified: true}
+  - {kind: oracle, card: Burning Wish, text: "Exile Burning Wish.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Burning Wish @wish"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+    sideboard: [Tendrils of Agony]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wish", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: reveal_from_sideboard, answer: [], expect_options: {include: ["Tendrils of Agony"], count: 1}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      exile: [Burning Wish]
+notes: >
+  "You may reveal" lets the player decline even though a sorcery is available. The empty answer is the decline (same shape
+  as other "may put" choices: choose_cards with an empty answer). Burning Wish is exiled anyway.

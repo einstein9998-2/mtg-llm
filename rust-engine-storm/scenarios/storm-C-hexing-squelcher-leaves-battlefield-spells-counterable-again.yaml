@@ -1,0 +1,60 @@
+id: storm-c-hexing-squelcher-gone-spells-counterable-again
+title: "After the Squelcher dies, p0's spells can be countered again: a pitched Force of Will counters p0's Lightning Bolt"
+area: card
+cards: [Hexing Squelcher, Lightning Bolt, Mountain, Force of Will, Brainstorm]
+tags: [hexing-squelcher, spells-you-control-cant-be-countered, leaves-the-battlefield, force-of-will, ward, pay-life, sequence]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Spells you control can't be countered.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @pbolt"]
+    battlefield: ["Hexing Squelcher @sq", "Mountain @pm"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt", "Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: ["@sq"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_ward, answer: true}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: [Hexing Squelcher], battlefield: [{card: Mountain}]}
+      p1: {life: 18}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@pbolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@pbolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Hexing Squelcher, Lightning Bolt]
+    p1:
+      life: 17
+      hand: []
+      exile: [Brainstorm]
+      graveyard: [Lightning Bolt, Force of Will]
+notes: >
+  Sequence: p1 Bolts the Squelcher, pays 2 life for ward (20 -> 18) and kills it. With the static ability gone, p0's
+  Lightning Bolt (aimed at p1's face) is a normal spell: p1's Force of Will (exile Brainstorm, 1 life: 18 -> 17)
+  counters it, so p1 takes no damage. This is the contrast case to the uncounterable scenarios: the protection ends
+  as soon as the Squelcher leaves the battlefield and must not be remembered from earlier in the turn. A wrong engine
+  keeps a "spells uncounterable this turn" flag after the Squelcher died (Bolt would resolve, p1 at 14). The ward
+  trigger is not Stifled and the Squelcher does not leave the battlefield in the same moment as the targeting.

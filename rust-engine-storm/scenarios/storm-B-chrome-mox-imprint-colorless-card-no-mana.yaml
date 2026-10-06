@@ -1,0 +1,42 @@
+id: storm-b-chrome-mox-imprint-colorless-card-no-mana
+title: A colorless nonartifact nonland card can be imprinted, but then Chrome Mox adds no mana
+area: card
+cards: [Chrome Mox, Kozilek's Command, Brainstorm]
+tags: [chrome-mox, imprint, colorless, no-mana, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Chrome Mox, text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", verified: true}
+  - {kind: oracle, card: Chrome Mox, text: "{T}: Add one mana of any of the exiled card's colors.", verified: true}
+  - {kind: cr, ref: "202.2b", text: "Objects with no colored mana symbols in their mana costs are colorless.", verified: true, note: "Kozilek's Command costs {X}{C}{C}: {C} is a colorless mana symbol, not a colored one"}
+  - {kind: cr, ref: "105.2c", text: "A colorless object has no color.", verified: true}
+  - {kind: cr, ref: "106.1b", text: "There are six types of mana: white, blue, black, red, green, and colorless.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Chrome Mox @mox", "Kozilek's Command @koz", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mox", pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: imprint, expect_options: {include: ["@koz", "@bs"]}, answer: ["@koz"]}
+  - check:
+      p0: {hand: [Brainstorm], exile: [{card: "Kozilek's Command", face_up: true}]}
+  - p0: {t: activate, source: "@mox", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      exile: [{card: "Kozilek's Command", face_up: true}]
+      battlefield: [{card: Chrome Mox, tapped: true}]
+      mana_pool: {}
+notes: >
+  Colorless is not a colour (106.1b lists six mana types but only five colours), so imprinting Kozilek's Command is
+  legal (it is nonartifact and nonland) yet the Mox has no colour to produce: the activation adds no mana, and in
+  particular no {C}. A wrong engine adds colourless mana, or refuses to offer the card as an imprint candidate.

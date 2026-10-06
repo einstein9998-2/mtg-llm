@@ -1,0 +1,54 @@
+id: storm-b-urzas-saga-put-by-show-and-tell-gets-lore-counter-not-a-land-play
+title: "Show and Tell puts Urza's Saga onto the battlefield: it still gets a lore counter and chapter I, and the land drop is still available"
+area: card
+cards: [Urza's Saga, Show and Tell, Island]
+tags: [urzas-saga, saga, show-and-tell, put-onto-battlefield, lore-counter, chapter-ability, land-drop, alurentell, simultaneous-secret-choice]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: Urza's Saga, text: "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)", verified: true}
+  - {kind: oracle, card: Urza's Saga, text: 'I — This Saga gains "{T}: Add {C}."', verified: true}
+  - {kind: cr, ref: "714.3a", text: "As a Saga without the read ahead ability enters the battlefield, its controller puts a lore counter on it.", verified: true}
+  - {kind: cr, ref: "305.4", text: "Effects may also allow players to \"put\" lands onto the battlefield. This isn't the same as \"playing a land\" and doesn't count as a land played during the current turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Urza's Saga @saga", "Island @isl"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - resolve_top: true
+  - p0: {decision: simultaneous_secret_choice, answer: "@saga", expect_options: {include: ["@saga", "@isl"], exclude: ["@snt"]}}
+  - check:
+      stack: [{kind: triggered, source: "@saga", controller: p0, text_contains: "gains"}]
+      p0:
+        lands_played: 0
+        battlefield_contains: [{card: Urza's Saga, counters: {lore: 1}, tapped: false}]
+  - resolve_top: true
+  - p0: {t: play_land, card: "@isl"}
+  - p0: {t: activate, source: "@saga", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Show and Tell]
+      lands_played: 1
+      mana_pool: {C: 1}
+      battlefield:
+        - {card: Urza's Saga, counters: {lore: 1}, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: false}
+notes: >
+  p1 has no card in hand and gets no decision. The Saga enters from Show and Tell, so it gets its lore counter as it
+  enters (714.3a) and chapter I triggers exactly as when played; it does not use p0's land drop (305.4: lands_played stays
+  0), so p0 can still play the Island from hand afterwards. After chapter I resolves the Saga taps for {C}. The
+  Island in hand is also an eligible Show and Tell choice (exclude: only Show and Tell itself is not).

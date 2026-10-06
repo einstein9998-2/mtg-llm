@@ -1,0 +1,56 @@
+id: storm-a-beseech-orims-chant-in-response-bars-the-free-cast
+title: "Orim's Chant resolving before a bargained Beseech: the free cast is a cast, so it is barred and the found card goes to hand"
+area: card
+cards: [Beseech the Mirror, Tendrils of Agony, "Orim's Chant", Lotus Petal, Swamp, Plains, Island]
+tags: [beseech-the-mirror, bargain, free-cast, orims-chant, casting-restriction, cast-during-resolution, put-into-hand]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+  - {kind: cr, ref: "608.2g", text: "If an effect specifically instructs or allows a player to cast a spell during resolution, they do so by following the steps in rules 601.2a–i", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Lotus Petal @petal"]
+    library: ["Tendrils of Agony @tend", "Island"]
+    library_pad: 4
+  p1:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pp"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@chant", kicked: false, targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bes", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tend"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Tendrils of Agony]
+      exile: []
+      graveyard: [Beseech the Mirror, Lotus Petal]
+      spells_cast_this_turn: 1
+    p1:
+      life: 20
+      graveyard: ["Orim's Chant"]
+notes: >
+  p0 casts a bargained Beseech; p1 responds with Orim's Chant on p0, which resolves first. When Beseech resolves, p0 "can't cast spells this
+  turn", so the free cast of Tendrils (mana value 4) is not possible, even though it costs nothing (601.3, 101.2). No yes_no is raised (the
+  script has no step after the search) and the card is put into hand because it "wasn't cast this way". A wrong engine lets the free cast
+  bypass the restriction (Chant's package also tests Aluren free casts).

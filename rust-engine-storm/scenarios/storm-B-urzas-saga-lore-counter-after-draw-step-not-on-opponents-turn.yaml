@@ -1,0 +1,69 @@
+id: storm-b-urzas-saga-lore-counter-after-draw-step-not-on-opponents-turn
+title: Urza's Saga gets its second lore counter as p0's next precombat main phase begins (not on p1's turn, not in p0's draw step), and chapter II triggers
+area: card
+cards: [Urza's Saga, Island]
+tags: [urzas-saga, saga, lore-counter, turn-based-action, draw-step, chapter-ability, granted-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)", verified: true}
+  - {kind: cr, ref: "714.3b", text: "As a player’s precombat main phase begins, that player puts a lore counter on each Saga they control with one or more chapter abilities.", verified: true}
+  - {kind: oracle, card: Urza's Saga, text: "II — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"", verified: true}
+  - {kind: cr, ref: "117.3a", text: "The active player receives priority at the beginning of most steps and phases, after any turn-based actions (such as drawing a card during the draw step; see rule 703) have been dealt with and abilities that trigger at the beginning of that phase or step have been put on the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    battlefield: ["Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - check:
+      turn: 4
+      active: p1
+      stack: []
+      p0: {battlefield_contains: [{card: Urza's Saga, counters: {lore: 1}}]}
+  - advance: {to: draw, of: p0}
+  - check:
+      turn: 5
+      phase: draw
+      stack: []
+      p0:
+        hand_count: 1
+        battlefield_contains: [{card: Urza's Saga, counters: {lore: 1}}]
+  - advance: {to: main1, of: p0}
+  - check:
+      turn: 5
+      phase: main1
+      stack: [{kind: triggered, source: "@saga", controller: p0, text_contains: "gains"}]
+      p0: {battlefield_contains: [{card: Urza's Saga, counters: {lore: 2}}]}
+      legal: {p0: {exclude: [{t: activate, source: "@saga", ability: 1}]}}
+  - expect_illegal: {p0: {t: activate, source: "@saga", ability: 1}}
+  - resolve_top: true
+  - check:
+      legal:
+        p0:
+          include:
+            - {t: activate, source: "@saga", ability: 0}
+            - {t: activate, source: "@saga", ability: 1}
+expect:
+  - at: after_script
+    turn: 5
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand_count: 1
+      battlefield_contains: [{card: Urza's Saga, counters: {lore: 2}, tapped: false}]
+notes: >
+  The lore counter is a turn-based action at the start of the controller's precombat main phase (714.3b): still 1 on p1's
+  turn 4 and still 1 in p0's own draw step (after the draw, hand_count 1), 2 once main phase begins, and the chapter II
+  ability is on the stack when p0 first gets priority. Before chapter II resolves the Construct ability (index 1) is not
+  offered; after, both the {C} ability (index 0, from chapter I, still there) and the Construct ability are. The two
+  Islands pay the {2}. advance stopping with a chapter trigger already on the stack relies on the runner stopping at the
+  moment the active player first has priority (see the notes file).

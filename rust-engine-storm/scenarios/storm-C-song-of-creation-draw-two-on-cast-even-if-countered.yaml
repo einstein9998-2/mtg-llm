@@ -1,0 +1,57 @@
+id: storm-c-song-of-creation-cast-trigger-draws-two-even-though-the-spell-is-countered
+title: "Whenever you cast a spell, draw two: the trigger goes above the spell, a Force of Will on the spell does not stop it, and p0 draws two cards"
+area: card
+cards: [Song of Creation, Lotus Petal, Force of Will, Ponder, Island, Mountain]
+tags: [song-of-creation, cast-trigger, draw-two, force-of-will, countered-spell, stack-order, alurentell-matchup]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lotus Petal @petal"]
+    battlefield: ["Song of Creation @song"]
+    library: ["Island @d1", "Mountain @d2"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Ponder @pp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@petal", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+      pending: {actor: p0, kind: priority}
+      p0: {hand: []}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pp", pay_life: 1}, targets: ["@petal"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@song", controller: p0, text_contains: "draw"}]
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Lotus Petal], hand: []}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Mountain]
+      graveyard: [Lotus Petal]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Song of Creation}]
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Ponder]
+notes: >
+  The cast trigger (601.2i) is put on the stack above the Lotus Petal spell as soon as the Petal is cast, so Force of
+  Will (cast in response to it, targeting the Petal underneath) resolves first and counters the Petal; the trigger is an
+  independent object that does not depend on the spell it came from and still resolves: p0 draws two cards, Island
+  then Mountain. A wrong engine ties the draw to the spell resolving, or draws at cast time without using the stack.

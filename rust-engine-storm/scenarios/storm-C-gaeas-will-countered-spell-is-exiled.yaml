@@ -1,0 +1,55 @@
+id: storm-c-gaeas-will-active-countered-brainstorm-is-exiled-force-of-will-is-not
+title: "With Gaea's Will active, a spell p1 counters goes to exile instead of p0's graveyard, while p1's Force of Will goes to p1's graveyard normally"
+area: card
+cards: ["Gaea's Will", Omniscience, Brainstorm, Island, Force of Will, Ponder]
+tags: [gaeas-will, exile-instead, countered-spell, force-of-will, opponents-graveyard-unaffected, replacement-effect, alurentell-matchup]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "If a card would be put into your graveyard from anywhere this turn, exile that card instead.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "614.1a", text: "Effects that use the word “instead” are replacement effects.", verified: true}
+  - {kind: cr, ref: "404.1", text: "Each player’s graveyard starts out empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gaea's Will @will", "Brainstorm @bs"]
+    battlefield: ["Omniscience @omni", "Island @isl"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Ponder @pp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@will", alt_cost: {free: omniscience}}
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {exile: ["Gaea's Will"], graveyard: [], hand: [Brainstorm]}
+  - p0: {t: cast, card: "@bs", pay: {tap: ["@isl"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pp", pay_life: 1}, targets: ["@bs"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      exile: ["Gaea's Will", Brainstorm]
+      spells_cast_this_turn: 2
+    p1:
+      life: 19
+      hand: []
+      graveyard: [Force of Will]
+      exile: [Ponder]
+notes: >
+  The replacement effect from Gaea's Will (614.1a: "instead") covers every card that would be put into p0's graveyard
+  this turn, including a spell countered by the opponent (701.6a would put it into its owner's graveyard). So the
+  countered Brainstorm ends in p0's exile with the Will. The effect says "your graveyard": p1's Force of Will, which is
+  p1's card, goes to p1's own graveyard normally, and the Ponder p1 exiled to pay Force of Will's cost stays exiled.
+  A wrong engine sends the countered spell to the graveyard (then re-castable with the Will) or exiles p1's
+  Force of Will too.

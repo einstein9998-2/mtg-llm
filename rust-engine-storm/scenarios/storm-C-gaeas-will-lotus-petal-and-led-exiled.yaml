@@ -1,0 +1,66 @@
+id: storm-c-gaeas-will-active-lotus-petal-sacrifice-and-led-discard-exile-everything
+title: "With Gaea's Will active, a sacrificed Lotus Petal, a sacrificed Lion's Eye Diamond and the hand discarded to it are exiled, and the LED mana pays for a spell cast from the graveyard"
+area: card
+cards: ["Gaea's Will", Omniscience, Lotus Petal, "Lion's Eye Diamond", Ponder, Lightning Bolt]
+tags: [gaeas-will, exile-instead, lotus-petal, lions-eye-diamond, sacrifice, discard-as-cost, mana-ability, graveyard-cast, mana-pool]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "If a card would be put into your graveyard from anywhere this turn, exile that card instead.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "Until end of turn, you may play lands and cast spells from your graveyard.", verified: true}
+  - {kind: oracle, card: "Lion's Eye Diamond", text: "Discard your hand, Sacrifice this artifact: Add three mana of any one color.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "701.9a", text: "To discard a card, move it from its owner’s hand to that player’s graveyard.", verified: true}
+  - {kind: cr, ref: "614.1a", text: "Effects that use the word “instead” are replacement effects.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gaea's Will @will", "Ponder @pd"]
+    battlefield: ["Omniscience @omni", "Lotus Petal @petal", "Lion's Eye Diamond @led"]
+    graveyard: ["Lightning Bolt @gb"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@will", alt_cost: {free: omniscience}}
+  - resolve_top: true
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: U}
+  - check:
+      p0:
+        mana_pool: {U: 1}
+        exile: ["Gaea's Will", Lotus Petal]
+        graveyard: [Lightning Bolt]
+  - p0: {t: activate, source: "@led", ability: 0, choose_color: R}
+  - check:
+      p0:
+        mana_pool: {U: 1, R: 3}
+        hand: []
+        exile: ["Gaea's Will", Lotus Petal, "Lion's Eye Diamond", Ponder]
+        graveyard: [Lightning Bolt]
+  - expect_illegal: {p0: {t: cast, card: "@pd", pay: auto}}
+  - p0: {t: cast, card: "@gb", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      exile: ["Gaea's Will", Lotus Petal, "Lion's Eye Diamond", Ponder, Lightning Bolt]
+      mana_pool: {U: 1, R: 2}
+      spells_cast_this_turn: 2
+      battlefield: [{card: Omniscience}]
+    p1:
+      life: 17
+notes: >
+  Sacrifice and discard move a card to its owner's graveyard (701.21a, 701.9a); with the Will's replacement active
+  ("instead") the sacrificed Lotus Petal, the sacrificed LED and the Ponder discarded as LED's cost (the Will itself
+  was cast first, so the hand is just the Ponder) are all exiled and none touches the graveyard, which still holds only
+  the Lightning Bolt from before. The Ponder in exile cannot be cast (Gaea's Will only gives permission for the
+  graveyard). The LED's three red mana is in the pool; the Bolt is cast from the graveyard with it ({R}), resolves
+  (p1 17) and is exiled; the leftover pool is {U}{R}{R}. Both mana abilities are legal on an empty stack. A wrong engine
+  puts the Petal/LED/discards in the graveyard (then they could be recast or played with the Will).

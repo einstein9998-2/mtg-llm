@@ -1,0 +1,38 @@
+id: storm-b-mox-opal-petal-sacrificed-first-turns-metalcraft-off
+title: Sacrificing Lotus Petal for mana first drops p0 to two artifacts, so Mox Opal can no longer be tapped
+area: card
+cards: [Mox Opal, Lotus Petal, Mishra's Bauble]
+tags: [mox-opal, metalcraft, lotus-petal, activation-order, legal-action-mask, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mox Opal, text: "Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mox Opal @opal", "Lotus Petal @petal", "Mishra's Bauble @bauble"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@opal", ability: 0, choose_color: B}]}}
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: R}
+  - check:
+      p0: {mana_pool: {R: 1}, graveyard: [Lotus Petal]}
+      legal: {p0: {exclude: [{t: activate, source: "@opal", ability: 0}]}}
+  - expect_illegal: {p0: {t: activate, source: "@opal", ability: 0, choose_color: B}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mox Opal, tapped: false}, {card: Mishra's Bauble, tapped: false}]
+      graveyard: [Lotus Petal]
+      mana_pool: {R: 1}
+notes: >
+  The restriction is re-evaluated for every activation: with Opal, Petal and Bauble the Opal is offered; after the Petal
+  is sacrificed only two artifacts remain and it is not offered, although it is untapped. Companion scenario:
+  mox-opal-tapped-first-then-petal-gives-both-mana.

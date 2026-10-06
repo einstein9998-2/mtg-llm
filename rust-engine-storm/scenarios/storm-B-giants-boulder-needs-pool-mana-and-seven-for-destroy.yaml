@@ -1,0 +1,39 @@
+id: storm-b-giants-boulder-needs-pool-mana-and-seven-for-destroy
+title: A Giant's Boulder with no mana available cannot activate either ability (no {1}, no {7})
+area: card
+cards: [Giant's Boulder, Aluren]
+tags: [giants-boulder, mana-filter, legal-action-mask, cost-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Giant's Boulder, text: "{1}, {T}: Add one mana of any color.", verified: false, note: "Giant's Boulder text from three store pages (engine owner's brief), not Scryfall"}
+  - {kind: oracle, card: Giant's Boulder, text: "{7}, {T}, Sacrifice this artifact: Destroy target permanent.", verified: false, note: "same source"}
+  - {kind: cr, ref: "602.2b", text: "The remainder of the process for activating an ability is identical to the process for casting a spell", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Giant's Boulder @boulder"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@boulder", ability: 0, choose_color: G}}
+  - expect_illegal: {p0: {t: activate, source: "@boulder", ability: 1, targets: ["@alu"]}}
+  - check:
+      legal: {p0: {include: [{t: pass}], exclude: [{t: activate, source: "@boulder"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Giant's Boulder, tapped: false}]
+      mana_pool: {}
+    p1:
+      battlefield: [{card: Aluren}]
+notes: >
+  p0 controls nothing but the Boulder, so there is no mana anywhere: the filter ability has no {1} to pay (the Boulder
+  cannot pay for itself: it is tapped as part of the same cost) and the destroy ability has no {7}. Neither is in the
+  legal set. The scenario deliberately has no other mana source or floating mana: whether lands could pay the {1} is an
+  engine simplification (see the brief) and is not asserted.
