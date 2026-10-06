@@ -109,7 +109,8 @@ fn play_game(
                 }
                 pending.extend(obs.events.iter().cloned());
                 for e in obs.events.iter() {
-                    let keep = matches!(e, ViewEvent::TurnBegan { .. } | ViewEvent::SpellCast { .. } | ViewEvent::LandPlayed { .. } | ViewEvent::AbilityActivated { .. } | ViewEvent::SpellCountered { .. } | ViewEvent::SpellFizzled { .. } | ViewEvent::LifeChange { .. } | ViewEvent::Damage { .. } | ViewEvent::TokenCreated { .. } | ViewEvent::MulliganTaken { .. } | ViewEvent::HandKept { .. });
+                    let keep = matches!(e, ViewEvent::TurnBegan { .. } | ViewEvent::SpellCast { .. } | ViewEvent::LandPlayed { .. } | ViewEvent::AbilityActivated { .. } | ViewEvent::SpellCountered { .. } | ViewEvent::SpellFizzled { .. } | ViewEvent::LifeChange { .. } | ViewEvent::Damage { .. } | ViewEvent::TokenCreated { .. } | ViewEvent::MulliganTaken { .. } | ViewEvent::HandKept { .. } | ViewEvent::DrewCard { .. })
+                        || matches!(e, ViewEvent::Moved { from: mtg_core::types::ZoneKind::Hand, to: mtg_core::types::ZoneKind::Library, owner_is_me: true, .. });
                     if let (true, Some(s)) = (keep, render::event_str(e)) {
                         if game_log.last() != Some(&s) {
                             game_log.push(s);

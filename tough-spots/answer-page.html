@@ -75,6 +75,7 @@ header { display: flex; flex-direction: column; gap: 10px; }
 .chip { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; font-size: 13px; line-height: 1.4; }
 .chip small { color: var(--muted); font-size: 11px; }
 .chip.tapped { opacity: .6; }
+.chip.known { background: var(--bot-soft); border-color: transparent; }
 .chip.hand { background: var(--accent-soft); border-color: transparent; font-weight: 500; }
 .gy { font-size: 12.5px; color: var(--muted); }
 .stack { background: var(--bot-soft); border-radius: 6px; padding: 8px 12px; margin: 0 16px; font-size: 13.5px; }
@@ -181,6 +182,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     var v = p.view, a = answers[p.id] || {};
     var answered = a.pick != null;
     var lifeLine = '<div class="life"><span class="you">You <b>' + v.my_life + '</b> life · library ' + v.my_lib + '</span>' + landNote(p, v) + '<span class="opp">Opponent <b>' + v.opp_life + '</b> life · ' + v.opp_hand + ' cards in hand · library ' + v.opp_lib + '</span></div>';
+    var extra = p.extra_info ? '<div class="stack"><b>Note</b>' + esc(p.extra_info) + '</div>' : '';
     var stack = v.stack && v.stack.length ? '<div class="stack"><b>On the stack</b>' + esc(v.stack.join(' → ')) + '</div>' : '';
     var log = '';
     if (p.game_log && p.game_log.length > 3) {
@@ -212,10 +214,10 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : 'Turn ' + esc(v.turn) + ', ' + esc(v.step) + ' (' + esc(v.whose) + ' turn)') + '</span><span class="meta">' + esc(p.category) + '</span></div>' +
       lifeLine +
       '<div class="board"><div>' +
-        zone('Your hand', v.hand, 'hand') + zone('Your battlefield', v.my_bf) + gy('Your graveyard', v.my_gy) +
+        zone('Your hand', v.hand, 'hand') + (v.lib_top && v.lib_top.length ? zone('Known top of your library (top first)', v.lib_top, 'known') : '') + (v.lib_bottom && v.lib_bottom.length ? zone('Known bottom of your library', v.lib_bottom, 'known') : '') + zone('Your battlefield', v.my_bf) + gy('Your graveyard', v.my_gy) +
       '</div><div>' +
         zone('Opponent battlefield', v.opp_bf) + gy('Opponent graveyard', v.opp_gy) + (v.opp_exile && v.opp_exile.length ? gy('Opponent exile', v.opp_exile) : '') +
-      '</div></div>' + stack + log +
+      '</div></div>' + extra + stack + log +
       '<div class="q">' + esc(p.question) + '</div><div class="opts">' + opts + '</div>' + reveal +
       '<div class="extras"><div class="flags">' + flag('either', 'Either is fine') + flag('cant_tell', "Can't tell from this view") + flag('rule', 'Make this a rule') + '</div>' +
       '<textarea id="note-' + esc(p.id) + '" data-note="' + esc(p.id) + '" placeholder="Why? (optional, one line is plenty)">' + esc(a.note || '') + '</textarea>' +
