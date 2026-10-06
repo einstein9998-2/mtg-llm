@@ -1,4 +1,4 @@
-# Legacy Storm for the Rust engine (RFC 0007, not applied to the live engine)
+# Legacy Storm for the Rust engine (RFC 0007)
 
 APPLIED to the live engine 2026-10-06 (storm-on-tron.patch, after Tron; MILESTONES M3n). The text below was written before that.
 
