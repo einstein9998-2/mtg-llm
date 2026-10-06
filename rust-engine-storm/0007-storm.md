@@ -39,6 +39,10 @@ CR 106.5, 116.2f, 118.6, 601.2, 614, 702.40 (storm), 702.62 (suspend), 702.21 (w
 - Performance: not measured. The new per-move and per-turn checks are behind `CardDb` flags (`has_saga`, `has_extra_land`, `has_uncounterable_static`), so games without these cards should skip them.
 
 ## Documented limits (simplifications)
+- Beseech the Mirror's bargain is modelled as an alternative way to cast it (key "bargained"), but in the rules it is an additional cost (CR 702.166a). A Beseech that is cast for free (found by another Beseech) therefore can never be bargained, which removes a real chain line (the same shape as the kicker limit of RFC 0005).
+- Urza's Saga lacks the "Urza's" land subtype, and chapter III uses `cmc <= 1` instead of "mana cost {0} or {1}" (identical for this library). The Construct token's +1/+1 is a layer 7a set rather than 7c (same value unless another power/toughness effect applies). "Discard your hand" is discard 99.
+- In a search world the opponent's Burning Wish finds no card (the fork forgets the sideboard), so a searching bot undervalues a Storm opponent's Wish line.
+- Giant's Boulder's Oracle text is from three store pages (not in Savecraft); it is still to be confirmed against the real card.
 - The free cast from suspend cannot be declined (the card has no targets, and a "may" would cost a decision per game). Beseech's free cast keeps its "may".
 - Suspend is "an activated ability that skips the stack", not a separate action kind. Views show it as an activation.
 - Urza's Saga's gained abilities are marker counters, so a copy or a "loses all abilities" effect would not interact correctly (no such effect in the pool).
@@ -48,15 +52,16 @@ CR 106.5, 116.2f, 118.6, 601.2, 614, 702.40 (storm), 702.62 (suspend), 702.21 (w
 - The ability `activate`/`mana` indexes in scenarios count activated abilities in definition order; an intrinsic land mana ability is ability 0 (engine id 255).
 
 ## Test plan and results (scratch copy with the patch)
-- 163 Storm scenarios written by three separate agents (A: Beseech, Gamble, Wish, Tendrils and Empty the Warrens; B: Chrome Mox, Mox Opal, Boulder, Urza's Saga, Mite, Taiga, Hellkite; C: Gaea's Will, Squelcher, Song of Creation). The implementer did not write or edit them: 159 pass, 1 is unsupported until RFC 0008 is applied (Kozilek's Command), 3 fail because of defects in the scenarios themselves (below).
+- 163 Storm scenarios written by three separate agents (A: Beseech, Gamble, Wish, Tendrils and Empty the Warrens; B: Chrome Mox, Mox Opal, Boulder, Urza's Saga, Mite, Taiga, Hellkite; C: Gaea's Will, Squelcher, Song of Creation). The implementer did not write or edit them: 162 pass, 1 is unsupported until RFC 0008 is applied (Kozilek's Command). Three scenario defects found by the implementer were fixed by a separate agent (below); before that fix the count was 159 pass and 3 fail.
 - Visible spec: 838 / 838, unchanged.
 - `cargo test --release --workspace --no-fail-fast`: all green, including both golden suites.
 - Random fuzz over the eight decks plus Storm: see README for the run and its counts.
 
-### The three failing scenarios (not edited, reported to the spec writer)
-1. `storm-b-urzas-saga-chapter-three-trigger-countered-saga-still-sacrificed`: expects p1's hand to be empty at the end, but p1 draws a card on turns 4 and 6 (the pad cards are Islands), so the hand is two Islands. The engine is right.
-2. `storm-b-urzas-saga-wasteland-in-response-to-chapter-one-no-mana-ever`: after p1 activates Wasteland and passes, p0 passes: both players have passed in succession, so the ability resolves and p0 gets priority. The script then has `p1: pass`, which is not p1's turn to act (CR 117.4).
-3. `storm-b-runehorn-hellkite-exiled-as-cost-no-graveyard-hate-response`: the same pattern. After `p1: pass` the ability resolves; the trailing `p0: pass` passes priority with an empty stack, so p1 gets priority and the expectation "pending actor p0" fails.
+### The three scenarios that were wrong (fixed)
+The implementer found three failures that were defects in the scenarios, and an independent reviewer checked each against the CR (PR 6 review). A separate agent (not the implementer) then corrected the scenario files:
+1. `storm-b-urzas-saga-chapter-three-trigger-countered-saga-still-sacrificed`: p1 draws on turns 4 and 6 (CR 504.1), so the hand ends as two Islands, not empty.
+2. `storm-b-urzas-saga-wasteland-in-response-to-chapter-one-no-mana-ever`: once p1 has passed and p0 passes, the top of the stack resolves (117.4) and p0 gets priority (117.3b); the extra `p1: pass` was removed.
+3. `storm-b-runehorn-hellkite-exiled-as-cost-no-graveyard-hate-response`: same priority pattern; the trailing `p0: pass` was removed.
 
 ## Alternatives considered
 - Suspend as a new `Opt` kind (a real special action). It is cleaner in the views but changes the option enum every consumer matches on; the stackless activation behaves the same in every scenario.

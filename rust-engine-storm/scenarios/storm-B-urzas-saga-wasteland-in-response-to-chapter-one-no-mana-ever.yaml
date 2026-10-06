@@ -32,7 +32,6 @@ script:
   - check: {pending: {actor: p0, kind: priority}}
   - expect_illegal: {p0: {t: activate, source: "@saga", ability: 0}}
   - p0: {t: pass}
-  - p1: {t: pass}
   - check:
       stack: [{kind: triggered, source: "@saga"}]
       pending: {actor: p0, kind: priority}

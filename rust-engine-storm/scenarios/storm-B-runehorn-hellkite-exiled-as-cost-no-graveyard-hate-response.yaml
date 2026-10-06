@@ -35,7 +35,6 @@ script:
   - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: [{ability_of: "@hk"}]}}
   - expect_illegal: {p1: {t: cast, card: "@cons", targets: [{ability_of: "@hk"}], pay: auto}}
   - p1: {t: pass}
-  - p0: {t: pass}
 expect:
   - at: after_script
     stack: []

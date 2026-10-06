@@ -50,11 +50,12 @@ expect:
       graveyard: [Urza's Saga]
       library_count: 11
     p1:
-      hand: []
+      hand: [Island, Island]
       graveyard: [Consign to Memory]
       battlefield: [{card: Island, tapped: true}]
 notes: >
   While the countering spell is on the stack the chapter III trigger is still there, so the Saga (lore 3) stays. When
   Consign to Memory resolves the trigger is countered: no search decision (library_count 13 - 2 draws = 11, Mox Opal
   untouched), and with no chapter ability left on the stack, the next state-based action check sacrifices the Saga
-  (714.4). A wrong engine keeps the Saga forever, or still lets the chapter resolve.
+  (714.4). p1's hand is [Island, Island]: Consign to Memory left the hand, and p1 drew a card in each of its own draw
+  steps on turns 4 and 6 (504.1; library_pad cards are Islands). A wrong engine keeps the Saga forever, or still lets the chapter resolve.

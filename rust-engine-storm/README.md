@@ -10,8 +10,8 @@ Made 2026-10-06 on top of the live `/mnt/project-files/rust-engine` (core-frozen
 - `scenarios/`: 163 spec scenarios (A 63 Beseech, Gamble, Wish, Tendrils, Empty the Warrens, Peer into the Abyss; B 58 Chrome Mox, Mox Opal, Giant's Boulder, Urza's Saga, Haywire Mite, Taiga, Runehorn Hellkite; C 42 Gaea's Will, Hexing Squelcher, Song of Creation). Written by three separate agents from Oracle text and the CR, not by the implementer; none was edited. Notes in `SCENARIO-NOTES-*.md`, extra Oracle text in `oracle-additions-*.json`, rule quotes in `cr-excerpts-storm-*.md`, the writers' instructions in `SCENARIO-BRIEF.md`.
 
 ## Results (scratch copy with the patch)
-- Storm scenarios: 159 pass, 1 unsupported (`storm-b-chrome-mox-imprint-colorless-card-no-mana` needs Kozilek's Command from RFC 0008), 3 fail because the scenarios are wrong (RFC section "The three failing scenarios").
-- Visible spec: 838 / 838 (adapter changes did not move any older scenario).
+- Storm scenarios: 162 pass, 1 unsupported (`storm-b-chrome-mox-imprint-colorless-card-no-mana` needs Kozilek's Command from RFC 0008). Three scenarios that were wrong by the CR (found by the implementer, confirmed by the independent review) were fixed by a separate agent; before that: 159 pass, 3 fail.
+- Whole spec (1001 scenarios): 1000 pass, 1 unsupported. Of these the 838 older ones are unchanged (adapter changes did not move any older scenario).
 - `cargo test --release --workspace --no-fail-fast`: green, including the test-pool and real-pool goldens bit-identical (hash additions are conditional), so no `ENGINE_CORE_VERSION` bump.
 - Fuzz: the eight decks plus Storm, 3000 random games, invariants at every decision (check every 1, deep fork/replay checks every 100): 0 violations, every card of the nine decks cast or played at least once, 518 Wish choices and 249 copy-target prompts exercised. (The fuzz plays main decks only; sideboarded games and Wish from a real sideboard are covered by the scenarios.)
 - The patch was also applied to a fresh copy of the live tree, rebuilt and re-run (997 / 1001 scenarios, `mtg-match` tests green).
