@@ -1,0 +1,81 @@
+# Alurentell sideboard plans, for Brady's 75 of 2026-10-06 (decks/alurentell.txt).
+# Sideboard (15): 4 Carpet of Flowers, Force of Negation, 2 Consign to Memory, 2 Faerie Macabre,
+# 2 Orim's Chant, 2 Prismatic Ending, 2 Veil of Summer.
+#
+# [Brady] = locked by Brady in the project chat, 2026-10-06. [draft] = my adaptation, not reviewed.
+
+vs dimir-tempo
+# [Brady] Veil is good because of Force of Will, Force of Negation and Daze, not because of any one
+# sideboard card. Prismatic Ending (always +2) answers their 1-mana 3/3.
+-4 Lotus Petal
+-4 Force of Will
+-2 Omniscience
++2 Veil of Summer
++4 Carpet of Flowers
++2 Orim's Chant
++2 Prismatic Ending
+
+vs ur-cutter
+# [Brady] Baseline. Their clock is faster, so the combo has to fit into one turn: keep 2 Force of
+# Will, cut Boseiju and one Aluren, no Petal (4 Stock Up stay: very good when Carpet is out and they
+# are threat-light but interaction-heavy). Variants are in sideboard-variants/.
+-2 Force of Will
+-2 Omniscience
+-1 Boseiju, Who Endures
+-1 Aluren
+-4 Lotus Petal
++2 Veil of Summer
++4 Carpet of Flowers
++2 Orim's Chant
++2 Prismatic Ending
+
+vs uwx-control
+# [draft] Same shape as Dimir Tempo: Force of Will, Force of Negation and Stifle on the other side.
+-4 Lotus Petal
+-4 Force of Will
+-2 Omniscience
++2 Veil of Summer
++4 Carpet of Flowers
++2 Orim's Chant
++2 Prismatic Ending
+
+vs doomsday
+# [draft] A race between two combos that both fight with Force of Will and Daze: Veil and Force of
+# Negation in, slow cards out. Carpet: Underground Sea x4, Snow-Covered Island.
+-4 Stock Up
+-2 Omniscience
++3 Carpet of Flowers
++2 Veil of Summer
++1 Force of Negation
+
+vs reanimator
+# [draft] Show and Tell hands them Griselbrand, Archon or Koma for free, so cut two of the four.
+# Faerie Macabre (free, instant speed) answers Reanimate and Animate Dead; Veil stops Thoughtseize
+# and Unmask (hexproof from black) and draws; Force of Negation hits Reanimate and Animate Dead.
+-2 Show and Tell
+-2 Stock Up
+-1 Omniscience
++2 Faerie Macabre
++2 Veil of Summer
++1 Force of Negation
+
+vs boros-aggro
+# [draft] A creature race: no blue or black spells for Veil to blank, Stock Up is too slow.
+# Prismatic Ending kills Ocelot, Ajani, Guide and Voice; Faerie Macabre exiles Phlage (escape);
+# Force of Negation counters Swords, Bombardment and Erode.
+-2 Veil of Summer
+-2 Stock Up
++2 Prismatic Ending
++1 Faerie Macabre
++1 Force of Negation
+
+vs alurentell
+# [draft] Mirror. Carpet is huge (Tropical Island x2, Hedge Maze x2, Island and Tundra are Islands),
+# Consign to Memory counters Acererak's and Atraxa's triggers, Force of Negation hits Show and Tell
+# and Aluren.
+-4 Stock Up
+-1 Omniscience
+-1 Ponder
++3 Carpet of Flowers
++2 Consign to Memory
++1 Force of Negation

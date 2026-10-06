@@ -5,6 +5,8 @@
 //! ```text
 //! # comment
 //! vs ur-cutter          # opposing deck stem; `vs *` is the fallback
+//! vs ur-cutter on-draw  # optional: only when this seat is on the draw (`on-play` likewise);
+//!                       # the more specific section wins over the plain one
 //! -4 Stock Up           # N cards of the main deck go to the sideboard
 //! +3 Carpet of Flowers  # N cards of the sideboard come in
 //! ```
@@ -29,7 +31,15 @@ pub struct Plan {
 /// All plans of a directory: own deck stem -> (opposing deck stem or `*`) -> plan.
 #[derive(Clone, Debug, Default)]
 pub struct PlanBook {
-    plans: BTreeMap<String, BTreeMap<String, Plan>>,
+    plans: BTreeMap<String, BTreeMap<(String, Side), Plan>>,
+}
+
+/// Which games a plan section applies to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Side {
+    Any,
+    OnPlay,
+    OnDraw,
 }
 
 impl PlanBook {
@@ -37,14 +47,33 @@ impl PlanBook {
         self.plans.is_empty()
     }
 
+    /// The plan that applies whichever side the seat is on (play/draw sections are ignored).
     pub fn plan(&self, own: &str, opp: &str) -> Option<&Plan> {
-        let m = self.plans.get(own)?;
-        m.get(opp).or_else(|| m.get("*"))
+        self.plan_for(own, opp, None)
     }
 
-    /// Every (own, opposing) pair that has an explicit plan.
+    /// The plan for a game in which this seat is on the play (`Some(true)`), on the draw
+    /// (`Some(false)`) or unknown (`None`): the matching play/draw section, else the plain one,
+    /// else `vs *`.
+    pub fn plan_for(&self, own: &str, opp: &str, on_play: Option<bool>) -> Option<&Plan> {
+        let m = self.plans.get(own)?;
+        let side = on_play.map(|p| if p { Side::OnPlay } else { Side::OnDraw });
+        side.and_then(|s| m.get(&(opp.to_string(), s)))
+            .or_else(|| m.get(&(opp.to_string(), Side::Any)))
+            .or_else(|| side.and_then(|s| m.get(&("*".to_string(), s))))
+            .or_else(|| m.get(&("*".to_string(), Side::Any)))
+    }
+
+    /// Every (own, opposing) pair that has an explicit plan (play/draw sections count once).
     pub fn pairs(&self) -> Vec<(String, String)> {
-        self.plans.iter().flat_map(|(a, m)| m.keys().map(move |b| (a.clone(), b.clone()))).collect()
+        let mut v: Vec<(String, String)> = self.plans.iter().flat_map(|(a, m)| m.keys().map(move |(b, _)| (a.clone(), b.clone()))).collect();
+        v.dedup();
+        v
+    }
+
+    /// Every explicit section: (own, opposing, side, plan).
+    pub fn entries(&self) -> Vec<(String, String, Side, &Plan)> {
+        self.plans.iter().flat_map(|(a, m)| m.iter().map(move |((b, side), p)| (a.clone(), b.clone(), *side, p))).collect()
     }
 
     /// Reads every `*.txt` in `dir`. Unknown card names and malformed lines are errors.
@@ -62,9 +91,9 @@ impl PlanBook {
     }
 }
 
-fn parse_plans(db: &CardDb, text: &str) -> Result<BTreeMap<String, Plan>, String> {
-    let mut out: BTreeMap<String, Plan> = BTreeMap::new();
-    let mut cur: Option<String> = None;
+fn parse_plans(db: &CardDb, text: &str) -> Result<BTreeMap<(String, Side), Plan>, String> {
+    let mut out: BTreeMap<(String, Side), Plan> = BTreeMap::new();
+    let mut cur: Option<(String, Side)> = None;
     for (ln, raw) in text.lines().enumerate() {
         let l = raw.split('#').next().unwrap().trim();
         if l.is_empty() {
@@ -72,12 +101,24 @@ fn parse_plans(db: &CardDb, text: &str) -> Result<BTreeMap<String, Plan>, String
         }
         let err = |m: &str| format!("line {}: {m}: `{raw}`", ln + 1);
         if let Some(rest) = l.strip_prefix("vs ") {
-            let opp = rest.trim().to_string();
-            if opp.is_empty() || out.contains_key(&opp) {
-                return Err(err("empty or repeated `vs` section"));
+            let mut words: Vec<&str> = rest.split_whitespace().collect();
+            let side = match words.last().copied() {
+                Some("on-play") => Side::OnPlay,
+                Some("on-draw") => Side::OnDraw,
+                _ => Side::Any,
+            };
+            if side != Side::Any {
+                words.pop();
             }
-            out.insert(opp.clone(), Plan::default());
-            cur = Some(opp);
+            if words.len() != 1 {
+                return Err(err("expected `vs <deck> [on-play|on-draw]`"));
+            }
+            let key = (words[0].to_string(), side);
+            if out.contains_key(&key) {
+                return Err(err("repeated `vs` section"));
+            }
+            out.insert(key.clone(), Plan::default());
+            cur = Some(key);
             continue;
         }
         let (sign, rest) = l.split_at(1);

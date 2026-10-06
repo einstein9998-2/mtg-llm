@@ -6,7 +6,8 @@ use mtg_core::card::CardDb;
 use mtg_core::decision::GameResult;
 use mtg_core::ids::{CardDefId, Seat};
 use mtg_core::state::GameConfig;
-use mtg_view::{playout, BeliefModel, DeckList, Game, Policy};
+use mtg_core::decision::Status;
+use mtg_view::{BeliefModel, DeckList, Game, Policy};
 use std::sync::Arc;
 
 /// What a player believes about the opponent's 60 cards in games after the first.
@@ -45,6 +46,11 @@ impl Default for MatchConfig {
 pub struct GameLog {
     pub first: Seat,
     pub boarded: [bool; 2],
+    /// Everything needed to replay the game bit for bit (harness use): the engine seed, the two
+    /// 60-card lists as played, and the (decision id, option index) of every action.
+    pub seed: u64,
+    pub decks: [DeckList; 2],
+    pub actions: Vec<(u32, u32)>,
     /// `None`: drawn or truncated.
     pub winner: Option<Seat>,
     pub panicked: bool,
@@ -70,7 +76,7 @@ pub trait PlayerFactory {
 }
 
 /// The two decklists played in game `game_no` (0-based) and which seats actually boarded.
-pub fn game_decks(db: &CardDb, names: [&str; 2], base: [&DeckList; 2], book: Option<&PlanBook>, cfg: &MatchConfig, game_no: u32) -> Result<([DeckList; 2], [bool; 2]), String> {
+pub fn game_decks(db: &CardDb, names: [&str; 2], base: [&DeckList; 2], book: Option<&PlanBook>, cfg: &MatchConfig, game_no: u32, first: Seat) -> Result<([DeckList; 2], [bool; 2]), String> {
     let mut decks = [base[0].clone(), base[1].clone()];
     let mut boarded = [false; 2];
     if game_no > 0 && book.is_some() {
@@ -78,7 +84,7 @@ pub fn game_decks(db: &CardDb, names: [&str; 2], base: [&DeckList; 2], book: Opt
             if !cfg.board[s] {
                 continue;
             }
-            if let Some(plan) = book.unwrap().plan(names[s], names[1 - s]) {
+            if let Some(plan) = book.unwrap().plan_for(names[s], names[1 - s], Some(first.idx() == s)) {
                 decks[s] = board(db, base[s], plan).map_err(|e| format!("{} vs {}: {e}", names[s], names[1 - s]))?;
                 boarded[s] = true;
             }
@@ -93,7 +99,7 @@ pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], book
     let mut first = cfg.first;
     let mut game_no = 0u32;
     while res.wins[0] < 2 && res.wins[1] < 2 && game_no < cfg.max_games {
-        let (decks, boarded) = game_decks(db, names, base, book, cfg, game_no)?;
+        let (decks, boarded) = game_decks(db, names, base, book, cfg, game_no, first)?;
         // What each seat believes about the other's deck.
         let expected = |s: usize| -> Vec<CardDefId> {
             let opp = 1 - s;
@@ -112,9 +118,26 @@ pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], book
         let mut pols = [fac.make(Seat(0), game_no, &models[0], seed ^ 0x51), fac.make(Seat(1), game_no, &models[1], seed ^ 0xA7)];
         let mut g = Game::new(db.clone(), [&decks[0], &decks[1]], seed, GameConfig { first_player: first, ..GameConfig::default() });
         let [p0, p1] = &mut pols;
+        let mut actions: Vec<(u32, u32)> = Vec::new();
         // A runaway engine state (a panic) ends the game as a draw instead of the process.
         let out = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            playout(&mut g, &mut [&mut **p0, &mut **p1], cfg.max_decisions)
+            for _ in 0..cfg.max_decisions {
+                match g.advance() {
+                    Status::GameOver(r) => return Some(r),
+                    Status::NeedDecision(seat) => {
+                        let sv = g.seat_view(seat);
+                        let d = sv.decision().expect("decision pending");
+                        let k = d.options.len();
+                        let i = if seat.0 == 0 { p0.choose(&sv, k) } else { p1.choose(&sv, k) };
+                        actions.push((d.id.0, i as u32));
+                        g.apply(d.id, i).expect("policy chose an in-range index");
+                    }
+                }
+            }
+            match g.advance() {
+                Status::GameOver(r) => Some(r),
+                _ => None,
+            }
         }));
         let (result, panicked) = match out {
             Ok(r) => (r, false),
@@ -124,7 +147,7 @@ pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], book
             Some(GameResult::Win(s)) => Some(s),
             _ => None,
         };
-        res.games.push(GameLog { first, boarded, winner, panicked });
+        res.games.push(GameLog { first, boarded, seed, decks: decks.clone(), actions, winner, panicked });
         if let Some(w) = winner {
             res.wins[w.idx()] += 1;
             first = w.other(); // the loser chooses to play first

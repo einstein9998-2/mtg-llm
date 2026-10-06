@@ -11,6 +11,7 @@ mtg-core.workspace = true
 mtg-view.workspace = true
 mtg-cards.workspace = true
 mtg-match.workspace = true
+mtg-dsl.workspace = true
 serde_json.workspace = true
 
 [[bin]]
@@ -32,3 +33,7 @@ path = "src/bin/mctsdata.rs"
 [[bin]]
 name = "bo3"
 path = "src/bin/bo3.rs"
+
+[[bin]]
+name = "netremap"
+path = "src/bin/netremap.rs"

@@ -32,18 +32,22 @@ fn main() {
     let mut sb_cards: Vec<String> = Vec::new();
     let t = std::time::Instant::now();
     let mut n_pairs = 0;
-    for (own, opp) in book.pairs() {
-        if own == opp {
-            // The mirror: both seats board with the same plan.
-        }
+    for (own, opp, side, plan) in book.entries() {
         let (a, b) = (idx(&own), idx(&opp));
-        let mine = board(&pool.db, &decks[a], book.plan(&own, &opp).unwrap()).unwrap_or_else(|e| panic!("{own} vs {opp}: {e}"));
-        let theirs = match book.plan(&opp, &own) {
+        let mine = board(&pool.db, &decks[a], plan).unwrap_or_else(|e| panic!("{own} vs {opp}: {e}"));
+        // The opponent is on the draw when this seat is on the play.
+        let their_side = match side {
+            Side::Any => None,
+            Side::OnPlay => Some(false),
+            Side::OnDraw => Some(true),
+        };
+        let their_plan = book.plan_for(&opp, &own, their_side);
+        let theirs = match their_plan {
             Some(p) => board(&pool.db, &decks[b], p).unwrap_or_else(|e| panic!("{opp} vs {own}: {e}")),
             None => decks[b].clone(),
         };
         // Cards that came in from the sideboard.
-        for c in book.plan(&own, &opp).unwrap().inn.iter().chain(book.plan(&opp, &own).map(|p| p.inn.iter()).into_iter().flatten()) {
+        for c in plan.inn.iter().chain(their_plan.map(|p| p.inn.iter()).into_iter().flatten()) {
             let n = pool.db.def(*c).name.clone();
             if !sb_cards.contains(&n) {
                 sb_cards.push(n);

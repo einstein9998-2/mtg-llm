@@ -2,7 +2,7 @@
 //!
 //! Usage: bo3 <decks dir> <plans dir> <deck A> <deck B> [matches] [iterations]
 //!        [--net w.bin] [--rollout N] [--board both|a|b|none] [--opp-view plan|main]
-//!        [--threads T] [--seed S] [--csv out.csv]
+//!        [--threads T] [--seed S] [--csv out.csv] [--trace games.jsonl]
 //!        bo3 <decks dir> <plans dir> --check      (validate every plan, print the swaps)
 //!
 //! Deck A sits in seat 0. Game one's first player alternates by match; later games the loser plays
@@ -42,13 +42,13 @@ fn main() {
     let cfg0 = MatchConfig::default();
     if a.iter().any(|x| x == "--check") {
         let mut bad = 0;
-        for (own, opp) in book.pairs() {
+        for (own, opp, side, plan) in book.entries() {
             let Some(i) = names.iter().position(|n| *n == own) else {
                 println!("{own} vs {opp}: no deck named {own}");
                 bad += 1;
                 continue;
             };
-            let plan = book.plan(&own, &opp).unwrap();
+            let opp = if side == Side::Any { opp } else { format!("{opp} {}", if side == Side::OnPlay { "on-play" } else { "on-draw" }) };
             match board(&db, &decks[i], plan) {
                 Ok(d) => {
                     let nm = |v: &[mtg_core::ids::CardDefId]| {
@@ -73,7 +73,7 @@ fn main() {
                 }
             }
         }
-        println!("{} plans, {bad} invalid", book.pairs().len());
+        println!("{} plans, {bad} invalid", book.entries().len());
         std::process::exit((bad > 0) as i32);
     }
     let find = |n: &str| names.iter().position(|x| x == n).unwrap_or_else(|| panic!("no deck {n} in {dir} (have {names:?})"));
@@ -161,6 +161,24 @@ fn main() {
         pct(gbw, gbn),
         t0.elapsed().as_secs_f64()
     );
+    // One JSON line per game with everything `sbtrace` needs to replay it.
+    if let Some(p) = flag("--trace") {
+        let nm = |v: &[mtg_core::ids::CardDefId]| -> Vec<String> { v.iter().map(|&c| db.def(c).name.clone()).collect() };
+        let mut out = String::new();
+        for (i, r) in &results {
+            for (k, g) in r.games.iter().enumerate() {
+                let line = serde_json::json!({
+                    "match": i, "game": k + 1, "first": g.first.0, "seed": g.seed,
+                    "winner": g.winner.map(|w| w.0), "boarded": [g.boarded[0], g.boarded[1]],
+                    "decks": [{"main": nm(&g.decks[0].main), "side": nm(&g.decks[0].side)}, {"main": nm(&g.decks[1].main), "side": nm(&g.decks[1].side)}],
+                    "actions": g.actions,
+                });
+                out += &line.to_string();
+                out.push('\n');
+            }
+        }
+        std::fs::write(p, out).unwrap();
+    }
     if let Some(p) = flag("--csv") {
         std::fs::write(p, csv).unwrap();
     }

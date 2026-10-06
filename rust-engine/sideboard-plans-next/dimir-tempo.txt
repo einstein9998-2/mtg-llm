@@ -1,0 +1,12 @@
+# Dimir Tempo sideboard plans.
+# Sideboard (15): 2 Barrowgoyf, 3 Consign to Memory, 1 Fatal Push, 2 Force of Negation, Hydroblast,
+# 2 Massacre, 2 Nihil Spellbomb, Null Rod, Snuff Out.
+
+vs alurentell
+# Consign to Memory counters Acererak's bounce trigger and Atraxa's trigger (and Lotus Petal);
+# Force of Negation on their Show and Tell and Aluren. Fatal Push barely hits anything (Acererak
+# with revolt) and Snuff Out cannot target black Acererak or Atraxa.
+-3 Fatal Push
+-1 Snuff Out
++3 Consign to Memory
++1 Force of Negation

@@ -48,10 +48,10 @@ fn load_deck(db: &mtg_core::card::CardDb, p: &Path) -> DeckList {
 fn shipped_plans_are_legal_and_keep_60_15() {
     let (db, names, decks, book) = load();
     assert!(!book.is_empty());
-    for (own, opp) in book.pairs() {
+    for (own, opp, _side, plan) in book.entries() {
         let i = names.iter().position(|n| *n == own).unwrap_or_else(|| panic!("plan for unknown deck {own}"));
         assert!(names.contains(&opp) || opp == "*", "{own}: unknown opponent {opp}");
-        let d = board(&db, &decks[i], book.plan(&own, &opp).unwrap()).unwrap_or_else(|e| panic!("{own} vs {opp}: {e}"));
+        let d = board(&db, &decks[i], plan).unwrap_or_else(|e| panic!("{own} vs {opp}: {e}"));
         assert_eq!((d.main.len(), d.side.len()), (60, 15), "{own} vs {opp}");
         // The 75 cards are the same cards.
         let mut a: Vec<_> = d.main.iter().chain(d.side.iter()).copied().collect();
@@ -181,7 +181,7 @@ fn forks_work_in_boarded_games_under_both_opponent_views() {
         let a = names.iter().position(|n| n == "alurentell").unwrap();
         let b = names.iter().position(|n| n == pair).unwrap();
         let cfg = MatchConfig::default();
-        let (boarded, flags) = game_decks(&db, ["alurentell", pair], [&decks[a], &decks[b]], Some(&book), &cfg, 1).unwrap();
+        let (boarded, flags) = game_decks(&db, ["alurentell", pair], [&decks[a], &decks[b]], Some(&book), &cfg, 1, Seat(0)).unwrap();
         assert_eq!(flags, [true, true]);
         for seed in 0..6u64 {
             let mut g = mtg_view::Game::new(db.clone(), [&boarded[0], &boarded[1]], seed, mtg_core::state::GameConfig::default());
@@ -214,4 +214,20 @@ fn forks_work_in_boarded_games_under_both_opponent_views() {
             assert!(forks > 20);
         }
     }
+}
+
+#[test]
+fn play_draw_sections_win_over_plain_and_star() {
+    let (db, _, decks, _) = load();
+    let dir = std::env::temp_dir().join(format!("mtg-match-pd-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("alurentell.txt"), "vs ur-cutter\n-1 Stock Up\n+1 Dismember\nvs ur-cutter on-draw\n-1 Ponder\n+1 Dismember\nvs *\n-1 Brainstorm\n+1 Dismember\n").unwrap();
+    let book = PlanBook::load_dir(&db, &dir).unwrap();
+    std::fs::remove_dir_all(&dir).unwrap();
+    let out = |p: Option<&Plan>| db.def(p.unwrap().out[0]).name.clone();
+    assert_eq!(out(book.plan_for("alurentell", "ur-cutter", Some(true))), "Stock Up");
+    assert_eq!(out(book.plan_for("alurentell", "ur-cutter", Some(false))), "Ponder");
+    assert_eq!(out(book.plan_for("alurentell", "ur-cutter", None)), "Stock Up");
+    assert_eq!(out(book.plan_for("alurentell", "doomsday", Some(false))), "Brainstorm");
+    let _ = decks;
 }

@@ -1,0 +1,12 @@
+# Doomsday sideboard plans.
+# Sideboard (15): 4 Barrowgoyf, Bitter Triumph, Duress, 2 Fatal Push, Flusterstorm, 2 Force of
+# Negation, Hide on the Ceiling, 3 Murktide Regent.
+
+vs alurentell
+# Interact: Duress and Force of Negation take Show and Tell, Aluren and Brainstorm; Flusterstorm
+# counters Show and Tell (and Brainstorm, Ponder). Two Edge of Autumn and a Daze come out.
+-2 Edge of Autumn
+-1 Daze
++1 Duress
++1 Flusterstorm
++1 Force of Negation
