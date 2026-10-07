@@ -1,0 +1,73 @@
+id: orims-chant-blocks-pitch-and-free-alternative-cost-casts
+title: "Orim's Chant stops a spell cast by any means: Force of Will (pitch or mana), Daze (return an Island) and a hard-cast Brainstorm; the Chant caster can still cast Lightning Bolt"
+area: card
+cards: ["Orim's Chant", Plains, Mountain, Lightning Bolt, Force of Will, Brainstorm, Daze, Island]
+tags: [orims-chant, casting-restriction, alternative-cost, force-of-will, daze, caster-unaffected, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orim's Chant @chant", "Lightning Bolt @bolt"]
+    battlefield: ["Plains @pl", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs", "Daze @daze"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@chant", targets: [{player: p1}], pay: {tap: ["@pl"]}}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal:
+        p1:
+          include:
+            - {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@chant"]}
+            - {t: cast, card: "@daze", alt_cost: {return_island: "@i1"}, targets: ["@chant"]}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@mtn"]}}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: null, targets: ["@bolt"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: {return_island: "@i1"}, targets: ["@bolt"]}}
+  - expect_illegal: {p1: {t: cast, card: "@daze", alt_cost: null, targets: ["@bolt"], pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@bs", pay: auto}}
+  - check:
+      legal: {p1: {include: [{t: pass}], exclude: [{t: cast, card: "@fow"}, {t: cast, card: "@daze"}, {t: cast, card: "@bs"}]}}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: ["Orim's Chant", Lightning Bolt]
+      spells_cast_this_turn: 2
+    p1:
+      life: 17
+      hand: [Force of Will, Brainstorm, Daze]
+      exile: []
+      graveyard: []
+      spells_cast_this_turn: 0
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: false}, {card: Island, tapped: false}, {card: Island, tapped: false}, {card: Island, tapped: false}]
+notes: >
+  Control: while Chant is on the stack both the Force of Will pitch cast and the Daze return-Island cast targeting Chant
+  are offered. After Chant resolves, p0 (the Chant caster) casts Bolt normally, and p1, holding five untapped Islands and
+  every kind of counterspell, is offered no cast at all: not Force of Will for its alternative cost, not Force of Will
+  for {3}{U}{U}, not Daze for either cost, not Brainstorm. An alternative cost changes what is paid, never whether the
+  spell may be cast (601.3 asks first whether anything prohibits casting). Bolt resolves: p1 life 20 - 3 = 17 (no pitch
+  life was paid). A wrong engine checks the prohibition only on the mana-cost path and lets free alternative costs slip
+  through, which would counter Bolt.

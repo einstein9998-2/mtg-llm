@@ -264,17 +264,23 @@ impl<'a> Cx<'a> {
                     _ => return false,
                 };
                 let o = self.s.obj(r);
-                if o.cast_from == ZoneKind::Gone {
+                // A spell still on the stack (an instant or sorcery resolving: Orim's Chant's kicker,
+                // RFC 0005) keeps how it was cast on its stack entry; a permanent keeps it on itself.
+                let (cast_from, cast_way) = match self.s.stack.iter().find(|e| e.obj == r) {
+                    Some(e) => (e.cast.from, e.cast.way),
+                    None => (o.cast_from, o.cast_way),
+                };
+                if cast_from == ZoneKind::Gone {
                     return false;
                 }
-                if from.map(|z| z != o.cast_from).unwrap_or(false) {
+                if from.map(|z| z != cast_from).unwrap_or(false) {
                     return false;
                 }
                 match key {
                     None => true,
                     Some(k) => {
                         let def = self.db.def(o.def);
-                        match crate::cost::alt_of(def, o.cast_way) {
+                        match crate::cost::alt_of(def, cast_way) {
                             None => k.is_empty(),
                             Some(a) => &a.key == k,
                         }

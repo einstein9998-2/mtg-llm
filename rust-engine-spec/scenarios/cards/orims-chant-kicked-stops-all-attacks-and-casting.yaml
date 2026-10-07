@@ -1,0 +1,68 @@
+id: orims-chant-kicked-no-attack-declaration-and-opponent-cannot-cast
+title: "Kicked Orim's Chant on the opponent: the caster's untapped creature gets no attack declaration this turn and the opponent cannot cast Lightning Bolt"
+area: card
+cards: ["Orim's Chant", Plains, Ocelot Pride, Lightning Bolt, Mountain]
+tags: [orims-chant, kicker, kicked, declare-attackers, creatures-cant-attack, casting-restriction, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "If this spell was kicked, creatures can't attack this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: oracle, card: "Orim's Chant", text: "Kicker {W} (You may pay an additional {W} as you cast this spell.)", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "508.1c", text: "The active player checks each creature they control to see whether it’s affected by any restrictions (effects that say a creature can’t attack, or that it can’t attack unless some condition is met). If any restrictions are being disobeyed, the declaration of attackers is illegal.", verified: true}
+  - {kind: cr, ref: "508.1a", text: "The chosen creatures must be untapped, they can’t also be battles, and each one must either have haste or have been controlled by the active player continuously since the turn began.", verified: true}
+  - {kind: cr, ref: "702.33d", text: "If a spell’s controller declares the intention to pay any of that spell’s kicker costs, that spell has been “kicked.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl1", "Plains @pl2", "Ocelot Pride @op"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - check:
+      legal:
+        p0:
+          include:
+            - {t: cast, card: "@chant", kicked: true, targets: [{player: p1}]}
+            - {t: cast, card: "@chant", kicked: false, targets: [{player: p1}]}
+  - p0: {t: cast, card: "@chant", kicked: true, targets: [{player: p1}], pay: {tap: ["@pl1", "@pl2"]}}
+  - check:
+      stack: [{kind: spell, card: "@chant", controller: p0, targets: [{player: p1}]}]
+      p0: {battlefield_contains: [{card: Plains, tapped: true}, {card: Plains, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: pass}], exclude: [{t: cast, card: "@bolt"}]}}
+  - p1: {t: pass}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main2
+    active: p0
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Orim's Chant"]
+      battlefield_contains: [{card: Ocelot Pride, tapped: false, attacking: false}]
+    p1:
+      life: 20
+      hand: [Lightning Bolt]
+notes: >
+  The kicked spell costs {W}{W}, both Plains tap. After it resolves p0's untapped, non-sick Ocelot Pride has no legal
+  attack, so no declare_attackers decision is raised (SCHEMA addenda: no decision for a declaration with no legal
+  creature) and `advance` runs from the beginning of combat through to p0's second main phase; if the engine raised a
+  declaration decision the advance step would fail. p1 also remains barred from casting (the first, unkicked half of
+  the spell still applies when kicked). Wrong engines: kicker only costs mana and has no effect, the restriction is
+  applied only if the creature entered this turn, or the attack is allowed with an empty-attack declaration only.

@@ -1,0 +1,46 @@
+id: orims-chant-unkicked-does-not-stop-attacks
+title: "Unkicked Orim's Chant does not stop creatures from attacking: the Chant caster's creature is offered and declared as an attacker"
+area: card
+cards: ["Orim's Chant", Plains, Ocelot Pride]
+tags: [orims-chant, kicker, unkicked, declare-attackers, control-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "If this spell was kicked, creatures can't attack this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "508.1a", text: "The chosen creatures must be untapped, they can’t also be battles, and each one must either have haste or have been controlled by the active player continuously since the turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl", "Ocelot Pride @op"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@chant", kicked: false, targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: ["Orim's Chant"]}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@op", target: {player: p1}}], expect_options: {include: ["@op"]}}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    active: p0
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains:
+        - {card: Ocelot Pride, tapped: true, attacking: true}
+    p1: {life: 20}
+notes: >
+  The attack restriction exists only "if this spell was kicked". The cast declines the kicker, so p0's Ocelot Pride is
+  offered as an attacker at the declare attackers step and attacks p1 (no blockers exist, so no block decision). The
+  scenario stops at the declare attackers priority, before damage. Control for the kicked scenarios; a wrong engine
+  applies the creature restriction whether or not the spell was kicked.

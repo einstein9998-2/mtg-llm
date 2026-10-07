@@ -1,0 +1,68 @@
+id: orims-chant-allows-lands-mana-abilities-and-cycling
+title: "Orim's Chant stops only casting: the opponent can still play a land, sacrifice Lotus Petal for mana (without being able to cast Brainstorm with it) and cycle Street Wraith"
+area: card
+cards: ["Orim's Chant", Plains, Brainstorm, Island, Street Wraith, Lotus Petal]
+tags: [orims-chant, casting-restriction, special-action, play-land, mana-ability, cycling, activated-abilities, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "305.1", text: "Playing a land is a special action; it doesn’t use the stack (see rule 116). Rather, the player simply puts the land onto the battlefield. Since the land doesn’t go on the stack, it is never a spell, and players can’t respond to it with instants or activated abilities.", verified: true}
+  - {kind: cr, ref: "116.2a", text: "Playing a land is a special action.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "702.29a", text: "Cycling is an activated ability that functions only while the card with cycling is in a player’s hand. “Cycling [cost]” means “[Cost], Discard this card: Draw a card.”", verified: true}
+  - {kind: cr, ref: "602.1", text: "Activated abilities have a cost and an effect.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: upkeep
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Island @isl", "Street Wraith @sw"]
+    battlefield: ["Lotus Petal @lp"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@chant", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: main1, of: p1}
+  - p1: {t: play_land, card: "@isl"}
+  - check:
+      p1: {lands_played: 1, battlefield_contains: [{card: Island}]}
+  - p1: {t: activate, source: "@lp", ability: 0, choose_color: U}
+  - check:
+      p1: {mana_pool: {U: 1}, graveyard: [Lotus Petal]}
+  - expect_illegal: {p1: {t: cast, card: "@bs", pay: auto}}
+  - check:
+      legal:
+        p1:
+          include: [{t: pass}, {t: activate_from_hand, source: "@sw", ability: 0}]
+          exclude: [{t: cast, card: "@bs"}]
+  - p1: {t: activate_from_hand, source: "@sw", ability: 0}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {graveyard: ["Orim's Chant"], spells_cast_this_turn: 1}
+    p1:
+      life: 18
+      hand: [Brainstorm, Island, Island]
+      graveyard: [Street Wraith, Lotus Petal]
+      lands_played: 1
+      spells_cast_this_turn: 0
+      battlefield: [{card: Island}]
+notes: >
+  Playing a land is a special action and never a spell (305.1), Lotus Petal's sacrifice ability is a mana ability, and
+  cycling is an activated ability (702.29a): none of them is casting a spell, so Orim's Chant leaves them alone. With
+  {U} floating in p1's pool (and Brainstorm castable by cost) the Brainstorm cast is still not offered, which proves the
+  restriction is not about mana. Cycling Street Wraith costs 2 life (20 -> 18) and draws an Island (the library is all
+  Islands; the draw step also drew one). p1's hand ends as Brainstorm and two Islands (hand 3: Brainstorm, Wraith, Island;
+  +1 draw step; -1 land; -1 Wraith; +1 cycling draw). No decisions other than priority are raised. A wrong engine
+  blocks "playing" lands and abilities together with casting, or lets Brainstorm through once mana is available.

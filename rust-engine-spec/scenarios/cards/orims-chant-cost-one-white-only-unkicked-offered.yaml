@@ -1,0 +1,46 @@
+id: orims-chant-with-one-white-source-only-the-unkicked-cast-is-offered
+title: "With one Plains and one Mountain only the unkicked Orim's Chant is offered (the kicker needs a second {W}); the unkicked cast costs exactly {W}"
+area: card
+cards: ["Orim's Chant", Plains, Mountain]
+tags: [orims-chant, kicker, mana-payment, legal-action-mask, additional-cost, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Kicker {W} (You may pay an additional {W} as you cast this spell.)", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "702.33a", text: "“Kicker [cost]” means “You may pay an additional [cost] as you cast this spell.”", verified: true}
+  - {kind: cr, ref: "601.2b", text: "If the spell has alternative or additional costs that will be paid as it’s being cast such as buyback or kicker costs (see rules 118.8 and 118.9), the player announces their intentions to pay any or all of those costs (see rule 601.2f).", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal:
+        p0:
+          include: [{t: cast, card: "@chant", kicked: false, targets: [{player: p0}]}, {t: cast, card: "@chant", kicked: false, targets: [{player: p1}]}]
+          exclude: [{t: cast, card: "@chant", kicked: true}]
+  - expect_illegal: {p0: {t: cast, card: "@chant", kicked: true, targets: [{player: p1}], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@chant", kicked: true, targets: [{player: p1}], pay: {tap: ["@pl", "@mtn"]}}}
+  - p0: {t: cast, card: "@chant", kicked: false, targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Orim's Chant"]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Plains, tapped: true}, {card: Mountain, tapped: false}]
+notes: >
+  The kicker is an additional cost of {W} (702.33a), so the kicked spell's total cost is {W}{W} (601.2f). A Mountain
+  cannot produce {W}, so with two lands but one white source only the unkicked cast is legal, whether the engine
+  chooses the payment or p0 names both lands. The unkicked cast taps exactly the Plains and leaves the Mountain untapped
+  (pay: auto must not tap the Mountain, it cannot pay {W}). A wrong engine counts total mana (2) instead of colored
+  mana, or offers the kicked cast and then fails to pay.

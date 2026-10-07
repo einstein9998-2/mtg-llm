@@ -1,0 +1,59 @@
+id: orims-chant-in-upkeep-stops-a-sorcery-in-the-opponents-own-main-phase
+title: "Orim's Chant cast in the opponent's upkeep stops the opponent from casting Ponder (a sorcery) in their own main phase, even with an empty stack and untapped lands"
+area: card
+cards: ["Orim's Chant", Plains, Ponder, Island]
+tags: [orims-chant, casting-restriction, sorcery, own-turn, upkeep, legal-action-mask, negative-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+  - {kind: cr, ref: "117.3a", text: "The active player receives priority at the beginning of most steps and phases, after any turn-based actions (such as drawing a card during the draw step; see rule 703) have been dealt with", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: upkeep
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Ponder @pond"]
+    battlefield: ["Island @i1", "Island @i2"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@chant", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      phase: upkeep
+      pending: {actor: p1, kind: priority}
+  - advance: {to: main1, of: p1}
+  - expect_illegal: {p1: {t: cast, card: "@pond", pay: auto}}
+  - expect_illegal: {p1: {t: cast, card: "@pond", pay: {tap: ["@i1"]}}}
+  - check:
+      turn: 4
+      phase: main1
+      stack: []
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: pass}], exclude: [{t: cast, card: "@pond"}]}}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main1
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {graveyard: ["Orim's Chant"]}
+    p1:
+      life: 20
+      hand: [Ponder, Island]
+      battlefield: [{card: Island, tapped: false}, {card: Island, tapped: false}]
+      spells_cast_this_turn: 0
+notes: >
+  The restriction covers the whole turn in which Chant resolved, including steps that come later in the same turn than
+  the cast (here upkeep to main phase 1), and including sorcery-speed spells on the player's own turn. p1 has priority in
+  main phase 1 with an empty stack and two untapped Islands, but
+  Ponder is not offered. Wrong engines clear the restriction at a step boundary or only block instant-speed casts.

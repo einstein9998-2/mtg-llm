@@ -1,0 +1,50 @@
+id: orims-chant-kicked-at-opponents-beginning-of-combat-stops-the-attack
+title: "Kicked Orim's Chant cast in the opponent's beginning of combat step: the opponent's untapped creature gets no attack declaration"
+area: card
+cards: ["Orim's Chant", Plains, Ocelot Pride, Mountain]
+tags: [orims-chant, kicker, kicked, fog-effect, declare-attackers, creatures-cant-attack, opponents-turn, beginning-of-combat]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "If this spell was kicked, creatures can't attack this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: oracle, card: "Orim's Chant", text: "Kicker {W} (You may pay an additional {W} as you cast this spell.)", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "508.1c", text: "The active player checks each creature they control to see whether it’s affected by any restrictions (effects that say a creature can’t attack, or that it can’t attack unless some condition is met). If any restrictions are being disobeyed, the declaration of attackers is illegal.", verified: true}
+  - {kind: cr, ref: "117.3a", text: "The active player receives priority at the beginning of most steps and phases, after any turn-based actions (such as drawing a card during the draw step; see rule 703) have been dealt with", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: begin_combat
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl1", "Plains @pl2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Ocelot Pride @op", "Mountain @m"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@chant", kicked: true, targets: [{player: p1}], pay: {tap: ["@pl1", "@pl2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      phase: begin_combat
+      pending: {actor: p1, kind: priority}
+      p0: {graveyard: ["Orim's Chant"]}
+  - advance: {to: main2, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main2
+    active: p1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0: {life: 20}
+    p1:
+      life: 20
+      battlefield_contains: [{card: Ocelot Pride, tapped: false, attacking: false}]
+notes: >
+  The classic Fog-like use. p1 (active) passes priority in its beginning of combat step with an untapped, non-sick
+  Ocelot Pride; p0 casts kicked Chant, it resolves, and p1 gets priority back. The declare attackers step then offers no
+  declaration (no legal attacker, so no decision is raised and `advance` passes through to p1's second main phase; if the
+  engine raised a declare_attackers decision the advance step fails). p0 has no creatures, so no blockers either way.
+  The restriction must apply to creatures of the opponent, not only to the Chant caster's creatures.

@@ -1,0 +1,49 @@
+id: orims-chant-kicked-but-countered-does-not-stop-attacks
+title: "A kicked Orim's Chant that is countered by Force of Will has no effect: the caster's creature is still offered as an attacker"
+area: card
+cards: ["Orim's Chant", Plains, Ocelot Pride, Force of Will, Brainstorm]
+tags: [orims-chant, kicker, kicked, counterspell, force-of-will, declare-attackers, no-effect, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "If this spell was kicked, creatures can't attack this turn.", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: oracle, card: "Orim's Chant", text: "Kicker {W} (You may pay an additional {W} as you cast this spell.)", verified: true, note: "Orim's Chant Oracle text supplied by the engine owner from Scryfall data; the card is not yet in reference/oracle.json (an entry is provided in NOTES.md)"}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "508.1a", text: "The chosen creatures must be untapped, they can’t also be battles, and each one must either have haste or have been controlled by the active player continuously since the turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl1", "Plains @pl2", "Ocelot Pride @op"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@chant", kicked: true, targets: [{player: p1}], pay: {tap: ["@pl1", "@pl2"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@chant"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: ["Orim's Chant"]}
+      p1: {life: 19, graveyard: [Force of Will], exile: [Brainstorm]}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@op", target: {player: p1}}], expect_options: {include: ["@op"]}}
+expect:
+  - at: after_script
+    phase: declare_attackers
+    active: p0
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: Ocelot Pride, tapped: true, attacking: true}]
+    p1: {life: 19}
+notes: >
+  The kicker was paid ({W}{W} both tapped), but the spell is countered and does nothing (701.6a): p0's Ocelot Pride is
+  offered and attacks. A wrong engine records "kicked" at cast time and applies the attack restriction, or applies it
+  even though the spell never resolved. The scenario stops at the declare attackers priority, before damage.

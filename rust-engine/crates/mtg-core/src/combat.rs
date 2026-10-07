@@ -17,6 +17,9 @@ impl<'a> Cx<'a> {
     pub fn attack_candidates(&mut self, seat: Seat) -> SmallVec<[ObjRef; 8]> {
         self.refresh();
         let mut v: SmallVec<[ObjRef; 8]> = SmallVec::new();
+        if self.s.player_fx.iter().any(|f| f.player == seat && f.fx == PlayerFx::CreaturesCantAttack) {
+            return v;
+        }
         for &r in self.s.battlefield.iter() {
             let o = &self.s.objs[r.slot as usize];
             let c = self.s.derived[r.slot as usize];
