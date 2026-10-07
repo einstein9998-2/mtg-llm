@@ -27,3 +27,6 @@ Result on 40 games vs UR Cutter with the m1 net (seed 51): guard off 27 wins, gu
 Result on 36 labeled positions (batches 1 to 3): LLM agrees with Brady on 21 (58%); bot quick search 10 (28%), bot deep search 12 (33%). Alurentell only (23): LLM 14, bot 7. Other decks (13): LLM 7, bot 3.
 Where the LLM and the bot give the same answer (10), Brady agrees on 7. Where they differ (26), Brady sides with the LLM 14 times, with the bot 3 times, with neither 9.
 Caveat: the positions were flagged because the bot found them hard, so the bot's rate is biased low; 36 positions is a small sample.
+
+## Batch 4 (2026-10-07): Alurentell + X on the current engine
+26 positions, orders 41-66, ids s7-*: Alurentell vs UR Cutter, Boros, UWx, Dimir (UB), Reanimator, Doomsday (the Storm stand-in) and the mirror, and the same decks on the other side. Built on the CURRENT engine (176 defs, Orim's Chant, Brady's 75 of 2026-10-06) with the matching per-matchup nets (`*-m5chant-*net*.bin`), 20 games per matchup, the guard on for the Alurentell bot. Build: `CARGO_TARGET_DIR=... cargo build --release` in tough-spots against main's rust-engine; `build_multi_batch.py <runs> batch4 s7 4 41`. Storm and Tron have no engine on main and no net, so they are not in this batch. `rescore`/`replay` still assume the old engine and the Alurentell vs UR Cutter pair.
