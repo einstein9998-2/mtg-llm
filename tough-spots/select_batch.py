@@ -212,7 +212,10 @@ def main():
         by[c].sort(key=lambda p: -p['score'])
     print({c: len(v) for c, v in sorted(by.items(), key=lambda kv: -len(kv[1]))})
     nk = int(sys.argv[sys.argv.index('--keeps') + 1]) if '--keeps' in sys.argv else 2
-    quotas = [('keep', nk), ('cast-or-wait', 2), ('cast-which', 2), ('cards:RevealPick', 1), ('cards:PutBack', 1), ('cards:DiscardToHandSize', 1), ('cards:LookTake', 1), ('land-or-fetch', 1)]
+    if '--cats' in sys.argv:
+        quotas = [(c, 1) for c in sys.argv[sys.argv.index('--cats') + 1].split(',')]
+    else:
+        quotas = [('keep', nk), ('cast-or-wait', 2), ('cast-which', 2), ('cards:RevealPick', 1), ('cards:PutBack', 1), ('cards:DiscardToHandSize', 1), ('cards:LookTake', 1), ('land-or-fetch', 1)]
     chosen, games = [], set()
 
     def take(c, k):

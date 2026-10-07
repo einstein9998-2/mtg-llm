@@ -273,7 +273,7 @@ fn main() {
         deep: flag("--deep").and_then(|s| s.parse().ok()).unwrap_or(400),
         opp_iters: flag("--opp-iters").and_then(|s| s.parse().ok()).unwrap_or(32),
         seed: base,
-        rules: a.iter().any(|x| x == "--rules"),
+        rules: a.iter().any(|x| x == "--rules") && me_name == "alurentell", // the guard is Alurentell-specific
     };
     let out_dir = std::path::PathBuf::from(flag("--out").expect("--out"));
     std::fs::create_dir_all(&out_dir).unwrap();
