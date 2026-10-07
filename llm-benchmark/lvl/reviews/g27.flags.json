@@ -1,0 +1,6 @@
+[
+  {"seat": "b", "seq": 14, "kind": "likely-mistake", "note": "T2 with Wasteland, 2 Volcanic, Falls in hand: played Thundering Falls while Alurentell (on 6 cards) had only Tropical Island. Wasteland on the Tropical leaves them on Petal alone (Aluren needs 4 mana with GG); B's own development could wait. B won anyway by Wasting Ancient Tomb on T4."},
+  {"seat": "b", "seq": 63, "kind": "likely-mistake", "note": "T10 played Volcanic Island before Brainstorm; Brainstorm then drew Wasteland with no land drop left to kill the opponent's last land (Tropical). Cantrip first, then choose the land. Harmless here (lethal that turn) but a general sequencing rule."},
+  {"seat": "a", "seq": 37, "kind": "close", "note": "T5 on one land, no land in hand: cast Ponder with the only Lotus Petal (the 4th mana for Aluren) when its top two cards were the known Brainstorm put-backs. Alternative: keep Petal and Ponder next turn off Tropical. Only right if paired with a shuffle when no land shows (A then did not shuffle at 40)."},
+  {"seat": "a", "seq": 49, "kind": "close", "note": "T7 one land, opp has Volcanic Island (Daze live) and 3 cards: cast Brainstorm main phase (Dazed) vs holding it. Daze works on a tapped Island so waiting does not dodge it; the question is whether to cantrip into Daze when stuck on one land or hold Brainstorm until a second mana allows a Daze tax."}
+]

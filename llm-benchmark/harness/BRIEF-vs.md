@@ -38,7 +38,7 @@ Use them where a decision turns on a number (keep or mulligan, Brainstorm put-ba
 ## Loop macro (`auto`): do not click a combo loop 600 times
 When a free loop is running (Aluren or Omniscience with Acererak, or Aluren with a creature that gives value), use `auto` instead of one `pick` per cast.
 `lg.sh auto TAG SEQ N LIFEMIN "rule;rule;..."` answers the current prompt SEQ and then up to N-1 more of your prompts with the FIRST rule that matches an option label (a rule is plain text found inside the label). Prefixes: `last:` picks the last matching option (the free Aluren cast is the later duplicate of "Cast X"), `stack:` makes the rule apply only while something is on the stack, `=` needs the whole label to match. It stops by itself (and shows you the prompt with `AUTO MACRO STOPPED ... why`) when no rule matches, N is used up, or your life is at or below LIFEMIN. The first rule list must match something on the current prompt or the command is refused.
-Typical Lost Mine loop with Aluren in play, opponent tapped out: `lg.sh auto TAG SEQ 40 6 "last:Cast Acererak the Archlich;stack:Pass priority;Lost Mine;Cave Entrance;Goblin Lair;Dark Pool;Temple;Done"` (about 10 laps' worth of picks; look at the result and the opponent's life, then repeat). To finish with Tomb of Annihilation instead, put `Tomb of Annihilation` before `Lost Mine`.
+Typical Lost Mine loop with Aluren in play, opponent tapped out: `lg.sh auto TAG SEQ 40 6 "stack:Pass priority;last:Cast Acererak the Archlich;Lost Mine;Cave Entrance;Goblin Lair;Dark Pool;Temple;Done"` (about 10 laps' worth of picks; look at the result and the opponent's life, then repeat). To finish with Tomb of Annihilation instead, put `Tomb of Annihilation` before `Lost Mine`.
 Care: the macro passes priority while the opponent has a spell on the stack (the `stack:Pass priority` rule), so it cannot respond for you with Force of Will or Veil. Start it when the opponent is tapped out or cannot interact, or when you accept that risk, and keep N modest (20 to 60) so you re-check. Only the options named in your rules are ever picked.
 
 ## Flag your tough spots (for Brady, a Legacy expert who will review them)
@@ -52,3 +52,14 @@ Whenever you answer a prompt and were genuinely unsure (two or more options look
 ## Menu tips
 - When Aluren is out and you also have mana for a hard cast, a creature can appear twice as `Cast X` (same label). The first entry is the hard cast (taps mana), the later one is the free Aluren cast. Check mana and life afterwards.
 - Tomb of Annihilation rooms ask "Do it?": Yes means pay the cost to avoid the life loss, No means take it. Scry/surveil: `Choose <card>` sends it to the bottom/graveyard; `Done` keeps it on top. Atraxa's reveal keeps listing types you already picked: re-read the menu each pick.
+
+## Costs players have misread (check with `get_card` if unsure)
+- Show and Tell is {2}{U} (one blue source plus two other mana, e.g. Ancient Tomb counts as two). Aluren is {2}{G}{G} (two green sources). A lap of the Lost Mine loop is FOUR Acererak casts per Dark Pool drain (Cave Entrance, Goblin Lair, Dark Pool, Temple of Dumathoin).
+- Macro budgets: a 20-life kill is about 18 picks per point, so use N of 120 to 150 when the opponent is tapped out and cannot interact.
+
+## Shared-machine warning
+Other players run on this machine at the same time and share /tmp. Never write helper scripts or output files into /tmp or any shared path (they get overwritten by others and can show another game's prompts). Use only `lg.sh` directly, always with your own TAG and the SEQ you just read.
+Use ONLY your own TAG in every lg.sh command. A command with the other player's tag (for example `show` of their game) prints THEIR hidden hand and voids the game. If a command fails, re-read the error and retry with your own tag only.
+- Decking check before a long Lost Mine loop: each lap (4 casts) drains 1 but also draws 1 card (Temple of Dumathoin), so the loop only kills if the opponent's life is at most your library size + 1. Count both first and launch the macro in chunks, re-checking library vs their life.
+- Daze (their free counter) needs any land with the Island type, tapped or untapped (Volcanic Island, Thundering Falls, Underground Sea, Tropical Island). Only a board with no Island-typed land makes Daze impossible.
+- Planeswalker abilities are labelled only "ability 1, 2, 3" in printed order, with no loyalty cost shown and index 0 never used for an ability. Check `get_card` for the printed order and which one is the 0 or minus ability before picking (Ajani, Nacatl Avenger: 1 = +2, 2 = 0).

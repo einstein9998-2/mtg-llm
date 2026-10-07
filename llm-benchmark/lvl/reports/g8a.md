@@ -1,0 +1,8 @@
+RESULT: LOST
+Turns: died during opponent's turn 7 (I took 3 turns: game turns 2, 4, 6). Prompts: 97 (engine count). odds/opp calls: 3 (1 odds, 2 opp). sim calls: 0. Flags: 3.
+- Plan: keep 2 lands (Maze, Tomb) + Brainstorm, Stock Up, 2 Force of Will, Aluren; dig with Stock Up for Show and Tell plus a payoff. Opponent was on the play: Cori-Steel Cutter turn 1 then Baubles/cantrips, Monks growing to 4/4 and 3/3.
+- Key plays: T2 Maze, T4 Tomb + Stock Up (-2 life, took Show and Tell + Misty). T5 (their turn) I Force of Will'd a face Lightning Bolt by pitching a second FoW; they Dazed it (my lands were tapped, no payment), so I lost 2 FoW, the Bolt resolved and two Monks hit: I went 15 -> 2 life. Then Ancient Tomb became unusable (2 damage) so I could not cast Show and Tell/Aluren on turn 6.
+- Mistakes: (1) T4 spending 2 life on Tomb for Stock Up with Monks on board, I should have valued life more (Brainstorm with Maze only, keep Tomb untapped). (2) Casting FoW with all lands tapped into an open Daze (they had Island untapped-returnable): 2 cards and 1 life for nothing; I should have either left it or kept a mana up. (3) Never cast a blocker/stabilizer: hand had Aluren/Show and Tell but no payoff creature until too late.
+- Surprises: Cutter + Bauble engine made a Monk army on turn 3-5 and the opponent used Bolt to face at 15; Daze used on my Force of Will on their own turn.
+- Engine oddity: at 2 life Show and Tell was still listed as castable (Ancient Tomb would have killed me); Stock Up bottom order prompts and "Done" in surveil were fine. Nothing else broken.
+- Tools: opp odds (39% FoW/Daze) did not change the Stock Up decision; Daze on FoW was in the 16% range and I ignored it. No sim used.

@@ -1,0 +1,5 @@
+[
+  {"seat": "b", "seq": 49, "kind": "likely-mistake", "note": "T8 (A's turn), A at 1 life, A's Aluren in play, Acererak on the stack: passed with 'Cast Phlage' offered. Aluren lets any player cast creatures of mana value 3 or less free at instant speed, so Phlage's 3 damage on entry wins on the spot. B passed 33 such windows (through seq 135) and lost to the drain loop."},
+  {"seat": "b", "seq": 36, "kind": "likely-mistake", "note": "T7, A at 12 with no creatures, B on 2 lands: cast Sand Scout precombat. Alternative: attack first (9 damage, A to 3), then in main 2 Erode its own Cat token, flipping Ajani; Avenger's 0 ability with the red mobilize Warriors out deals 7 (creature count) to A, which is lethal. Please confirm the card text and line. B's own flag on this turn is mis-numbered 682."},
+  {"seat": "a", "seq": 9, "kind": "close", "note": "T2 Misty search: took basic Island over Tropical Island (hand: Savannah, Boseiju, City of Traitors). After an Island, three land drops cannot make Aluren's {2}{G}{G}. Trop plus Maze or Savannah plus Tomb or City casts Aluren on turn 6 at 10 life instead of turn 8 at 1. Cost: Trop exposed to a 4-Wasteland Boros deck."}
+]

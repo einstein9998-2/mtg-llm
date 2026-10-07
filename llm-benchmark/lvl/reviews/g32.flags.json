@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 17, "kind": "likely-mistake", "note": "T4 Show and Tell put-in: chose Atraxa while holding Aluren + Acererak, opp tapped out (lands tapped on its own turn), 3 small creatures. Aluren then free Acererak loops and wins this turn (Bombardment = 3 dmg vs a 5/5); Atraxa died to Erode and the win came 2 turns later. Is Aluren the default here, and does symmetric Aluren vs Boros (free Amped Raptor into Swords) change it?"},
+  {"seat": "a", "seq": 23, "kind": "close", "note": "Atraxa reveal: after Strand/Petal/Ponder chose Done, leaving Acererak #2 and Aluren #2 on the bottom to avoid discards. Alternative: take Acererak #2 (backup vs Erode/Swords on the first copy) and discard Boseiju plus Stock Up at cleanup. No impact here (drew another Acererak)."}
+]

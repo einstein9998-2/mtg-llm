@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 4, "kind": "likely-mistake", "note": "After keeping 1-land Tundra/Petal/Stock Up/FoW/Omniscience/Veil/S&T vs Boros, bottomed Omniscience (only S&T payoff) instead of Veil of Summer (blank vs Boros); keeping Omni gives S&T-Omniscience on T8 (Island + 2 Petals) instead of a T14 win at 5 life."},
+  {"seat": "b", "seq": 84, "kind": "likely-mistake", "note": "Elegant Parlor surveil binned Wasteland while knowing A held Omniscience/Acererak/Stock Up on Island + Ancient Tomb; keeping it to Waste Tomb on T11 leaves A unable to Stock Up or Show and Tell before B's board kills."}
+]

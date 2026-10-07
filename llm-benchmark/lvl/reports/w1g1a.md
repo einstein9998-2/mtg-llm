@@ -1,0 +1,9 @@
+RESULT: WON
+Turns: 15 (game turn counter; my 8th turn). Prompts: 212 (engine sequence; roughly 105 were mine). Tool calls: 1 opp (odds/opp/sim total 1; no sim).
+
+- Plan: kept a 7 with 5 lands, Petal, Aluren (no creature, no cantrip). Surveil/Brainstorm/Stock Up found Acererak, Veil, Show and Tell, Omniscience; plan was Veil as protection, then Show and Tell for Omniscience.
+- Key plays: T7 Brainstorm then Stock Up (Daze-proof with an uncracked spare) found Veil plus Misty. T9: Show and Tell with Veil held in reserve; they Forced (pitching Daze), I answered with Veil, it resolved and drew a card. Omniscience in, free Aluren and Acererak. Free Stock Up found Atraxa and Acererak, Atraxa's reveal took Force, Omniscience, Atraxa, Boseiju, Show and Tell. Atraxa hit for 7 lifelink plus a Goblin, then lethal the next attack.
+- Mistakes: T3 Stock Up into Daze with "a spare Petal" that was still in hand (never cast it first), so Daze resolved with no payment prompt; and I let the engine skip my first venture (Acererak was Bolt + Unholy Heated in response to the trigger, so no loop that turn). Spent about 60 prompts on Acererak laps for only 3 drain; Atraxa did the work.
+- Opponent surprises: held Force/Daze until the first real spell (Brainstorm, Ponder, Petal went unchallenged), Wastelanded Ancient Tomb on their own turn, killed Acererak in response to its ETB trigger, and never played around Omniscience/Aluren after that.
+- Odd things: Flooded Strand and Atraxa showed up as put options for Show and Tell (harmless); cast menus show 1 to 3 identical "Cast X" entries that change with stack state; lg.sh printed a harmless `onsult.tmp` syntax error once after a pick. Fetch/hand-size and Force alt-cost entries were clear.
+- Tools: only one opp check (early, 67% Force/Daze), which confirmed holding a spare for Daze; it did not change the line.

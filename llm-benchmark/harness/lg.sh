@@ -6,9 +6,9 @@
 #        lg.sh launch2 <game> <seed> <seat-of-A> <first>   (two-LLM game: starts the engine only; players use tags <game>a and <game>b)
 #        lg.sh auto <tag> <seq> <N> <lifemin> "rule;rule"   (macro: answer by label rules for up to N picks)
 #        lg.sh sim  <tag> <seq> "<script>"   (Monte Carlo what-if over your unknown cards, see BRIEF)
-W=${LLM_W:-/home/claude/work/llm}
-BIN=${LLM_BIN:-/home/claude/target-mtg/release/llmgame}
-DECKS=${LLM_DECKS:-/home/claude/work/rust-engine/decks}
+W=${LLM_W:-/home/claude/work/llm2}
+BIN=${LLM_BIN:-/home/claude/target-live-new/release/llmgame}
+DECKS=${LLM_DECKS:-/home/claude/work/live/engine/decks}
 MYDECK=${LLM_DECK:-alurentell}; OPPDECK=${LLM_OPP:-ur-cutter}   # override to play another matchup
 cmd=$1; tag=$2
 P=$W/runs/$tag/prompt   # player-visible

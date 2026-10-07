@@ -1,0 +1,11 @@
+RESULT: LOST
+Turns: game ended on turn 15 (opponent's turn; I never got to attack meaningfully)
+Prompts: 212 (the engine's final line said odds calls 1, sim 0; I made 0 odds/opp/sim calls myself, so that 1 is likely engine-side)
+Odds/opp/sim calls: 0 / 0 / 0
+
+- Plan: UR tempo/control. Counter their Show and Tell or Aluren with Daze or Force of Will, Wasteland Ancient Tomb to slow their mana, and cast DRC or Murktide once they were stalled. I kept a 2-lander with Brainstorm, 2 Daze, FoW, Bolt and Heat.
+- Key plays: Daze on turn-1 Stock Up (cost me a land drop). Wasteland on Ancient Tomb. FoW pitching Daze on Show and Tell. They answered with Veil of Summer, so the FoW did nothing, and Show and Tell resolved into Omniscience, then a free Aluren. Bolt and Heat killed Acererak, but they just had more.
+- Mistakes (my view): (1) Turn 4: I used Brainstorm put-backs to bin Dazes and kept a hand with no blue card to pitch beyond the second FoW. When Show and Tell came I had exactly one FoW pitch (Daze) and no way to beat Veil. Holding a second counter or a blue card was needed. (2) Turn 2: I drew 3 Dazes and a FoW but no threats and never added pressure, so the combo deck got to untap with everything. (3) I put a land in with Show and Tell, which was free value, but I could not stop the Omniscience, Aluren and Acererak loop that followed.
+- Surprises: the opponent used Omniscience plus Aluren with Acererak to loop Lost Mine of Phandelver ventures. It gained card advantage from Goblins, Treasure and scry, and each Acererak recast drained me by 1. It then Stock Up-ed into Atraxa for free and swung with the 7/7 lifelink flyer. Veil of Summer made my FoW dead.
+- Possible engine bug: "Tomb of Annihilation is not in the card pool", so Acererak's "haven't completed Tomb" condition is never satisfied. It returns to hand on every cast, and venturing only enters Lost Mine, so the loop is unbounded. The battlefield display also once showed a duplicate or missing Omniscience #70 and Aluren #74 (looked cosmetic). My first Daze on Stock Up bounced a tapped Island correctly.
+- Tools: I made no odds, opp or sim calls, so the tools did not change any decision. Nothing in this game turned on a draw-odds number; the loss came from the matchup, with no threats and no way past Veil plus Omniscience.

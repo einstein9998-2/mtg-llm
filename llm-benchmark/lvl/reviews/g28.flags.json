@@ -1,0 +1,5 @@
+[
+  {"seat": "b", "seq": 11, "kind": "close", "note": "T3 (B's 2nd turn), 2 Plateaus, Ocelot out, opp showed only an uncracked Misty: cast Ajani and tapped out. Alternative: cast nothing and hold W for Swords; that would have exiled Acererak (A's only copy) with its ETB trigger on the stack and stopped the T4 Aluren loop that won. Right only if the opponent is known to be Aluren/Acererak?"},
+  {"seat": "a", "seq": 16, "kind": "likely-mistake", "note": "Misty cracked at B's end step: fetched Savannah instead of Hedge Maze. Maze enters tapped but untaps for my turn, still pays G for Aluren (Maze + City + Petal), adds blue for Show and Tell and surveils 1 before the draw. No impact here, but it is free value the playbook already describes."},
+  {"seat": "b", "seq": 23, "kind": "likely-mistake", "note": "Opp's Acererak on the battlefield with its ETB trigger on the stack, B tapped out under opp's Aluren: passed. This was the first window for a free Amped Raptor to discover Swords/Erode and exile Acererak; B waited until p27 (same window one loop later). Cost only one room here."}
+]

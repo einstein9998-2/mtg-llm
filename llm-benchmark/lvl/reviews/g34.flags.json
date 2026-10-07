@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 4, "kind": "close", "note": "Bottomed Aluren from Trop/Brainstorm/FoW/Aluren/Veil/S&T/Atraxa vs Boros; alternative bottom Veil of Summer, a near-blank in game 1 vs Boros (no blue/black spells, no counters), keeping Aluren as a second route with Acererak (drawn turn 2)."},
+  {"seat": "a", "seq": 9, "kind": "close", "note": "Only land Tropical Island in play, opponent has untapped Wasteland: cast Brainstorm main phase now (it got Wastelanded in response) vs hold it to their end step or to respond to Wasteland; tests 'wait if waiting is free'."},
+  {"seat": "a", "seq": 54, "kind": "close", "note": "Stuck on 1 land vs Boros (2 of 4 Wastelands used), Misty at their end step: fetched Hedge Maze (surveil, raises next-draw land odds ~33% to ~56%; binned Stock Up, drew Tropical) vs basic Island (Wasteland-proof); player's report called Maze a mistake, I think it was right."}
+]

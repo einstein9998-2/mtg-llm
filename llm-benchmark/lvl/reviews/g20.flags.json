@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 14, "kind": "close", "note": "T4 with Hedge Maze + Ancient Tomb (one green source, no creature, opp Boros with Wasteland): cast Stock Up. Alternative: Show and Tell for Aluren (2U, no GG needed, Wasteland-proof), after which any Acererak loops for the win; cost is a free Boros creature and Aluren making all their creatures free. Tomb was Wastelanded next turn and A never cast another spell."},
+  {"seat": "a", "seq": 9, "kind": "close", "note": "T3 Voice of Victory on the stack, A holding 2 Force of Will, Stock Up, Show and Tell, Aluren: passed. Alternative: Force it pitching the second Force; once Voice resolves A can never cast Force on Boros's turn, so both Forces became near-dead and Voice + Mobilize tokens dealt 3+ per turn."},
+  {"seat": "b", "seq": 23, "kind": "close", "note": "T5 Wasteland target: Ancient Tomb (fast mana) over Hedge Maze (A's only green/blue source). Chose Tomb; A held Island, so Tomb was right in hindsight (A stuck on 2 mana), but Maze would have cut A's colours."}
+]
