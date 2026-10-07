@@ -1,0 +1,4 @@
+[
+  {"seat": "b", "seq": 14, "kind": "likely-mistake", "note": "T3 (B's 2nd turn) cast Voice of Victory with Plateau+Quarry, tapping out with Swords in hand after seeing Tundra+Brainstorm; alternative: land and pass with W up to Swords the first Acererak on its ETB trigger (A held only one Acererak, had no 3rd land and a known Aluren draw). Voice cannot stop a combo on A's own turn."},
+  {"seat": "a", "seq": 8, "kind": "close", "note": "T2 Brainstorm (no fetch to shuffle) put back duplicate Aluren and Show and Tell, so the next two draws were known spells and Petal was the only 3rd mana; a Wasteland on Tundra on B's turn would have stalled A two turns. Alternatives (Atraxa back, or hold Brainstorm) were worse or blocked by Voice; worth Brady's confirmation that duplicates-back is right with exactly two lands."}
+]

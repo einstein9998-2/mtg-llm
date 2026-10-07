@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 8, "kind": "close", "note": "T2 vs Boros with one Island: held Brainstorm for B's turn instead of casting Ponder in main 1. Voice of Victory shuts A out of B's turns once it resolves; here B cast Voice and A Brainstormed in response (found Atraxa, Tomb, Petal), but is holding the instant right when Voice can end the window?"},
+  {"seat": "a", "seq": 17, "kind": "close", "note": "T4 Island + Ancient Tomb, B tapped out: cast Show and Tell (Atraxa) at once and kept Lotus Petal. Alternative: Ponder off Island, then Tomb + Petal for Show and Tell. Keeping the Petal is what made the T6 Aluren castable after Wasteland on Tomb."},
+  {"seat": "a", "seq": 20, "kind": "close", "note": "Atraxa reveal vs Boros (Karakas in play, Wasteland possible): took Savannah over Misty Rainforest/City of Traitors, and later skipped Veil of Summer. Savannah is a Wasteland target, and Misty could be held uncracked as a decoy. Which land is right when the reveal also hands you Aluren + Petal for next turn?"},
+  {"seat": "b", "seq": 19, "kind": "close", "note": "Show and Tell put-in with 2 lands: chose Spider-Woman (2/2 flier, Petals enter tapped) over Wasteland (a free extra land, so the T5 land drop could be Lazotep Quarry for a third mana) or Sand Scout. A cast both Petals at once, which dodged the tap effect."}
+]

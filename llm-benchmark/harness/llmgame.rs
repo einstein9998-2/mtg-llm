@@ -1021,22 +1021,60 @@ struct Auto {
     left: u32,
     lifemin: i32,
     done: u32,
+    last_label: Option<String>,
 }
 
-/// Rules are tried in order; a rule is `[last:][stack:][=]<label text>`. `last:` picks the last matching option
-/// (the free Aluren cast is the later duplicate), `stack:` applies only while something is on the stack, `=` needs the
-/// whole label to match. Returns None when no rule matches, which ends the macro.
-fn auto_pick(rules: &[String], labels: &[String], stack_nonempty: bool) -> Option<usize> {
-    for r in rules {
+/// What a macro rule may look at besides the option labels.
+struct AutoCtx {
+    stack_nonempty: bool,
+    top_name: Option<String>,
+    top_mine: bool,
+    last_label: Option<String>,
+}
+
+fn auto_ctx(obs: &Observation, last_label: Option<String>) -> AutoCtx {
+    let top = obs.stack.last();
+    AutoCtx { stack_nonempty: top.is_some(), top_name: top.map(|i| i.name.clone()), top_mine: top.map(|i| i.controlled_by_me).unwrap_or(false), last_label }
+}
+
+/// Rules are tried in order; a rule is `[conditions][=]<label text>`. Conditions, in any order, each ending in `:`:
+/// `last:` picks the last matching option (the free Aluren cast is the later duplicate), `stack:` only while
+/// something is on the stack, `empty:` only while the stack is empty, `mytop:` only while the top stack item is
+/// yours, `top[TEXT]:` only while the top stack item's name contains TEXT, `after[TEXT]:` only if this macro's
+/// previous pick had a label containing TEXT. `=` needs the whole label to match. Returns None when no rule
+/// matches, which ends the macro.
+fn auto_pick(rules: &[String], labels: &[String], cx: &AutoCtx) -> Option<usize> {
+    'rules: for r in rules {
         let mut t = r.trim();
-        let (mut last, mut stack_only, mut exact) = (false, false, false);
+        let (mut last, mut exact) = (false, false);
         loop {
             if let Some(x) = t.strip_prefix("last:") {
                 last = true;
                 t = x;
             } else if let Some(x) = t.strip_prefix("stack:") {
-                stack_only = true;
+                if !cx.stack_nonempty {
+                    continue 'rules;
+                }
                 t = x;
+            } else if let Some(x) = t.strip_prefix("empty:") {
+                if cx.stack_nonempty {
+                    continue 'rules;
+                }
+                t = x;
+            } else if let Some(x) = t.strip_prefix("mytop:") {
+                if !cx.top_mine {
+                    continue 'rules;
+                }
+                t = x;
+            } else if let Some(x) = t.strip_prefix("top[").or_else(|| t.strip_prefix("after[")) {
+                let is_top = t.starts_with("top[");
+                let Some(close) = x.find("]:") else { continue 'rules };
+                let want = &x[..close];
+                let have = if is_top { cx.top_name.as_deref() } else { cx.last_label.as_deref() };
+                if !have.map(|h| h.contains(want)).unwrap_or(false) {
+                    continue 'rules;
+                }
+                t = &x[close + 2..];
             } else if let Some(x) = t.strip_prefix('=') {
                 exact = true;
                 t = x;
@@ -1044,7 +1082,7 @@ fn auto_pick(rules: &[String], labels: &[String], stack_nonempty: bool) -> Optio
                 break;
             }
         }
-        if t.is_empty() || (stack_only && !stack_nonempty) {
+        if t.is_empty() {
             continue;
         }
         let hits: Vec<usize> = labels.iter().enumerate().filter(|(_, l)| if exact { l.as_str() == t } else { l.contains(t) }).map(|(i, _)| i).collect();
@@ -1191,13 +1229,14 @@ fn main() {
                 // Macro in progress for this seat: answer by the player's rules until they stop matching.
                 if let Some(st) = autos[seat.0 as usize].as_mut() {
                     let labels: Vec<String> = d.options.iter().map(|o| o.label.clone()).collect();
-                    let hit = auto_pick(&st.rules, &labels, !obs.stack.is_empty());
+                    let hit = auto_pick(&st.rules, &labels, &auto_ctx(&obs, st.last_label.clone()));
                     let why = if st.left == 0 { Some("pick budget used up".to_string()) } else if obs.me.life <= st.lifemin { Some(format!("your life is {} (lifemin {})", obs.me.life, st.lifemin)) } else if hit.is_none() { Some("no rule matches this prompt".to_string()) } else { None };
                     match (why, hit) {
                         (None, Some(idx)) => {
                             st.left -= 1;
                             st.done += 1;
                             auto_total += 1;
+                            st.last_label = Some(d.options[idx].label.clone());
                             let _ = writeln!(log, "  auto[{}] -> {} {}", seat.0, idx, d.options[idx].label);
                             { actions.push((seat.0, idx)); g.apply(d.id, idx).unwrap(); }
                             continue;
@@ -1262,10 +1301,10 @@ fn main() {
                         let (rs, n, lm, rules) = (it.next().and_then(|x| x.parse::<u32>().ok()), it.next().and_then(|x| x.parse::<u32>().ok()), it.next().and_then(|x| x.parse::<i32>().ok()), it.next().unwrap_or(""));
                         let rules: Vec<String> = rules.split(';').map(|x| x.trim().to_string()).filter(|x| !x.is_empty()).collect();
                         let labels: Vec<String> = d.options.iter().map(|o| o.label.clone()).collect();
-                        let first = if rs == Some(seq) && n.unwrap_or(0) >= 1 && lm.is_some() && !rules.is_empty() { auto_pick(&rules, &labels, !obs.stack.is_empty()) } else { None };
+                        let first = if rs == Some(seq) && n.unwrap_or(0) >= 1 && lm.is_some() && !rules.is_empty() { auto_pick(&rules, &labels, &auto_ctx(&obs, None)) } else { None };
                         match first {
                             Some(i) => {
-                                autos[seat.0 as usize] = Some(Auto { rules, left: n.unwrap() - 1, lifemin: lm.unwrap(), done: 1 });
+                                autos[seat.0 as usize] = Some(Auto { rules, left: n.unwrap() - 1, lifemin: lm.unwrap(), done: 1, last_label: Some(labels[i].clone()) });
                                 auto_total += 1;
                                 let _ = writeln!(log, "  auto macro started at prompt {seq}");
                                 break i;

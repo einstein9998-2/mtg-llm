@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 58, "kind": "close", "note": "Show and Tell put-in vs Boros with 2 Plateaus open and 3 cards: chose Aluren (then free Acererak, met by Erode + Swords). Alternative: Atraxa to draw the removal and find cards, then hard-cast Aluren on turn 10 with Petal and Tomb; but Atraxa leaves Force of Will with no blue card to pitch. Makes 'weigh Swords first' concrete."},
+  {"seat": "b", "seq": 63, "kind": "close", "note": "Two answers for Acererak, opponent holding cards that could be Force: led with Erode (Forced), Swords resolved and gave A 5 life. Alternative: lead with Swords so Erode resolves; its basic-land search is near-empty for Alurentell (one Island already in play)."},
+  {"seat": "b", "seq": 42, "kind": "close", "note": "Elegant Parlor surveil binned Karakas with Arid Mesa as the next land drop. Alternative: keep it on top; Karakas bounces a Show-and-Tell Atraxa, and A had Atraxa in hand."},
+  {"seat": "b", "seq": 3, "kind": "close", "note": "Turn 1 with no 1-drop: played Arid Mesa for Plateau rather than Wasteland (note: Wasteland as the turn-1 land). A's first land was a basic, so no cost here; asks whether the note should depend on wanting the fetch's thinning or a second white source."}
+]

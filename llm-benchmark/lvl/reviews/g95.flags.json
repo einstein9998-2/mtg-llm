@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 47, "kind": "likely-mistake", "note": "T7 Brainstorm in response to B's Force on Show and Tell (hand Force, Veil, S&T, Atraxa, 2 Acererak, no mana left): put back S&T + Acererak, leaving Atraxa as the only blue pitch. Better: put back Veil + Acererak, Force pitching the spare S&T, S&T resolves into Atraxa (B had no second counter)."},
+  {"seat": "a", "seq": 50, "kind": "likely-mistake", "note": "Cast Force of Will on B's Force with Atraxa the only blue card (auto-pitched), so S&T resolved with just Acererak and B got a free DRC. Alternative: let S&T be countered, keep Force + Atraxa + Veil, S&T known on top for a T9 Veil + S&T."},
+  {"seat": "b", "seq": 29, "kind": "close", "note": "T6 with 2 Wastelands in hand and A's 3 duals tapped: played Volcanic for Preordain + Ponder (flurry Monk) instead of Wasteland on Tundra/Tropical, which keeps A off the 4th mana (S&T plus spare/Brainstorm) next turn."}
+]

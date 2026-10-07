@@ -1,0 +1,5 @@
+[
+  {"seat": "b", "seq": 24, "kind": "likely-mistake", "note": "Under A's Aluren, with Acererak (5/5, A's only copy) on the battlefield and his enter trigger on the stack, B passed. Better: cast Phlage free (3 to Acererak), then sacrifice Phlage, Ocelot, Cat and Voice to Goblin Bombardment (4 more). Acererak dies, the loop ends, and A is tapped out holding two Stock Ups."},
+  {"seat": "a", "seq": 11, "kind": "likely-mistake", "note": "Cast Lotus Petal before Brainstorm with Boseiju untapped; the engine then paid Brainstorm with the Petal. Better: Brainstorm off Boseiju, Petal kept in hand. No cost this game (all 4 mana used), but on a Brainstorm miss the Petal is lost for next turn."},
+  {"seat": "a", "seq": 22, "kind": "close", "note": "Aluren in, ONE Acererak in hand, Boros had Bombardment + 3 creatures + 3 unknown cards (Phlage castable free under A's Aluren). Cast Acererak now, or pass and dig with two Stock Ups next turn? Cast it (passing gives Boros a free turn under A's Aluren), but did A have any line that plays around it?"}
+]

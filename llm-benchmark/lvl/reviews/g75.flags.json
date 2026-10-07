@@ -1,0 +1,6 @@
+[
+  {"seat": "b", "seq": 49, "kind": "likely-mistake", "note": "T5 Force of Will on Aluren with both Volcanics tapped: pitched Daze, keeping uncastable Brainstorm and Preordain. Pitching a cantrip keeps 2 Daze against A's 1 spare Petal: Daze A's Force-back twice (or the free Acererak twice) and the turn-5 kill fails."},
+  {"seat": "b", "seq": 33, "kind": "close", "note": "T4, 2 lands, A passed T3 with 7 cards and Aluren colours: tapped out for a sorcery-speed Preordain (found Wasteland) instead of holding a Volcanic for Brainstorm at A's end step or in response to Aluren to dig for Force, Charm or more Daze."},
+  {"seat": "a", "seq": 8, "kind": "close", "note": "T1 Brainstorm put-back with no shuffle coming: put back Omniscience and Force (redrawn T3 and T5) instead of Savannah (top) and Boseiju, which arrive on curve anyway and keep Force plus its pitch live from turn 1."},
+  {"seat": "a", "seq": 6, "kind": "close", "note": "T1 Brainstorm in own main phase with nothing else to do; holding Strand and casting it at B's end step was free and shows B's colours (Daze) before choosing put-backs (Brady: wait if waiting is free)."}
+]

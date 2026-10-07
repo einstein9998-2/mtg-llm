@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 18, "kind": "close", "note": "T3, stuck on one land, hand Stock Up, 2 FoW, Aluren, 2 Show and Tell: passed on Ocelot Pride. Alternative: Force it pitching the spare Show and Tell, which kills the token and lifegain engine and still keeps one Force for Swords on Acererak. Against Boros, is a second Force best spent on their 2-drop engine?"},
+  {"seat": "b", "seq": 68, "kind": "likely-mistake", "note": "T7, opp at 13 with only an untapped Atraxa and a known Acererak/Boseiju: attacked with Ocelot alone and stacked 4 Guide triggers on it (Atraxa blocked, A stayed at 13). Better: attack with all 5 able creatures (no blockers needed at 35 life), so Atraxa must still block the 9/9 and A falls to 8, or spread the counters for about 11 damage."}
+]

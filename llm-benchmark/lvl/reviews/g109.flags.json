@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 26, "kind": "likely-mistake", "note": "T5 cast Ponder off Hedge Maze (only untapped land) before the land drop with opp's Volcanic untapped (Daze live); Daze countered it. Ancient Tomb in hand, played first, pays Daze's 1, and the land choice did not depend on the Ponder. Tests Brady's cantrip-before-land rule against Daze."},
+  {"seat": "b", "seq": 35, "kind": "likely-mistake", "note": "T7 Force of Will on Aluren pitched Prismari Charm (only copy) over Murktide Regent. Charm is UR's only answer to a resolved Aluren (bounce it in response to Acererak's trigger); without it the T9 Aluren + Acererak loop was unanswerable."},
+  {"seat": "b", "seq": 37, "kind": "likely-mistake", "note": "T8 tapped both lands for a delve-5 Murktide against Alurentell (Aluren seen, 4 cards in hand) while holding Bolt + Heat; the delve also removed delirium (land/sorcery/instant/artifact) so Heat would have dealt 6. Holding R open breaks the existing 'do not tap out for Murktide' note; A won next turn."},
+  {"seat": "b", "seq": 12, "kind": "close", "note": "T2 Ponder on 1 land (Wasteland in hand) shuffled away a known Brainstorm, Bolt, Force of Will to look for a land; keeping Brainstorm on top digs for lands next turn and keeps Force of Will, which the opponent-deck note says not to throw away against combo."}
+]

@@ -1,0 +1,5 @@
+[
+  {"seat": "b", "seq": 24, "kind": "likely-mistake", "note": "T5 with 2 lands vs Alurentell (A showed Brainstorm, Ponder, Tundra, Maze): cast Amped Raptor with 2 Goblin Bombardments in hand. Better: Bombardment, since it must be on the battlefield before A's 3-land Aluren turn; Guide, Ajani and Cat plus free Guide and Scout under Aluren make 5 pings on the 5/5 Acererak (A's Force on one free creature still saves it)."},
+  {"seat": "a", "seq": 36, "kind": "close", "note": "T6 with Petal + 3 lands, Aluren, Show and Tell, Acererak, Force, against a tapped-out Boros: hard-cast Aluren rather than Show and Tell into Aluren. Show and Tell would let B put in Goblin Bombardment (it held two), 6 pings on Acererak. Tests Brady's 'what the opponent is doing barely matters'."},
+  {"seat": "a", "seq": 25, "kind": "close", "note": "B's T5 Amped Raptor on the stack, A holding Force of Will plus Show and Tell and Atraxa as pitch cards: passed. Raptor's discover could flip Bombardment or Swords; A kept Force for the combo turn instead (it was not needed)."}
+]

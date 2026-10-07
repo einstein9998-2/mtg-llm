@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 2, "kind": "close", "note": "Keep: Tropical, 2 Ancient Tomb, Ponder, Stock Up, Force of Will, Show and Tell on the draw vs unknown (Boros). No payoff and a single blue/green source against 4 Wasteland, two Tombs costing life vs aggro; kept and won turn 6. Looks a clear keep (route via S&T + Stock Up), confirm."},
+  {"seat": "a", "seq": 41, "kind": "close", "note": "Omniscience in play, Acererak in hand, Boros tapped out at 28: cast free Stock Ups to find Aluren, then looped with triggers stacked, instead of looping now under Omniscience with triggers resolving (library 47 > 28 life). Playbook says loop now; Aluren also let Boros cast MV<=3 creatures free (Raptor could discover Swords). Which line does Brady want?"},
+  {"seat": "b", "seq": 26, "kind": "close", "note": "Boros turn 5 (3 lands): cast Guide then Raptor and tapped out, letting A Show and Tell into Omniscience unopposed. Alternative: Raptor only, Plateau up for Erode on Acererak/Atraxa. Tap-out looks right (more damage, and Erode loses to free Force under Omniscience), but the existing note says keep W open."}
+]

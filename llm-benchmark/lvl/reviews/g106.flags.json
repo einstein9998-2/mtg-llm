@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 16, "kind": "close", "note": "B T2 Voice of Victory on the stack; A passed with Force of Will and a duplicate Show and Tell as pitch. Forcing it halves the mobilize Warriors that Ocelot later doubled (12 of 19 tokens) and keeps A's spells live on B's turn; A won by one turn, so is Force on Voice right when the pitch is a spare Show and Tell?"},
+  {"seat": "a", "seq": 28, "kind": "close", "note": "Atraxa first pick: City of Traitors over Tropical Island (playbook default). With Hedge Maze + Savannah giving GG and one land drop left, City gives exactly 4 for Aluren while Tropical gives 3; worth confirming as the rule."},
+  {"seat": "b", "seq": 41, "kind": "close", "note": "B tapped out for Amped Raptor (hit Ocelot Pride #2) instead of holding W and the second Swords for the Acererak it knew A held. A also had Force of Will shown; the second Ocelot made 19 tokens and next-turn lethal, holding Swords would likely just trade with Force."}
+]

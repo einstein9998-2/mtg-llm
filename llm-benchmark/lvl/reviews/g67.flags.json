@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 5, "kind": "close", "note": "T1 on the play, hand with no green source but Veil + Aluren (GG): Strand fetched basic Island (Wasteland-safe) over Tropical Island (G for Veil and Aluren). Hedge Maze from Brainstorm bailed it out; which fetch target is right against UR with 4 Wasteland?"},
+  {"seat": "a", "seq": 26, "kind": "close", "note": "T3 Hedge Maze surveil binned a known second Force of Will (Brainstorm put-back) to dig, holding Force + Veil + 2 Stock Up but no payoff; keeping Force gives double protection. The dig hit Show and Tell."},
+  {"seat": "b", "seq": 34, "kind": "likely-mistake", "note": "T4: cracked Flooded Strand after Ponder had left Murktide and Force of Will on top, shuffling both away. Better: crack Strand first, then Ponder (same mana). That Force would have been in hand on the combo turn."},
+  {"seat": "b", "seq": 49, "kind": "likely-mistake", "note": "T6: tapped out for Cori-Steel Cutter + Ponder against a 7-card combo opponent on 3 lands. Better: hold Bolt + Unholy Heat (3 mana, 7 damage) to kill Acererak with his trigger on the stack and force out A's Force of Will. A won next turn without any response from B."}
+]

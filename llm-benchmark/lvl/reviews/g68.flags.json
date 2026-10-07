@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 63, "kind": "close", "note": "T6 under Omniscience with 3 Aluren in hand: cast Acererak and looped Lost Mine with Omniscience alone (every room resolves, about 20 Temple draws from a 42-card library) instead of casting free Aluren first so rooms stay on the stack. Chosen to deny Boros free instant-speed creatures (Guide, Voice in hand, Bombardment with 5 creatures, A at 12). Is 'Omniscience-only when library > their life + margin' the right rule?"},
+  {"seat": "a", "seq": 6, "kind": "close", "note": "T2 Misty search: basic Island over Tropical Island (hand Strand, City, 2 Aluren, Omniscience). Island dodges Wasteland (B held one) but after it Aluren's GG needs two more green sources; Tropical + Strand-Savannah + City casts Aluren or Show and Tell on turn 6. Same question as g10 seq 9."},
+  {"seat": "a", "seq": 58, "kind": "likely-mistake", "note": "Atraxa reveal vs Boros: took Veil of Summer for the instant slot over Brainstorm. Veil is a blank vs Boros (playbook); Brainstorm under Omniscience is 3 free cards. No impact this game."}
+]

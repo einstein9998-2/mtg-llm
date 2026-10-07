@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 72, "kind": "likely-mistake", "note": "T6 under Omniscience: cast the first Acererak holding one Force of Will while B had 4 cards and 4 untapped W; Swords drew the Force and Erode killed him. A third Atraxa and Brainstorm (both free) were in hand with library 39 vs 18 life: recast Atraxa first to find a second Force or backup Acererak."},
+  {"seat": "b", "seq": 6, "kind": "likely-mistake", "note": "T1 Elegant Parlor surveil put Wasteland in the graveyard vs Alurentell (opponent had no land yet). Keeping it: T3 Wasteland + Parlor still casts Raptor and kills A's only land (Tundra), or holds for Ancient Tomb."},
+  {"seat": "a", "seq": 71, "kind": "close", "note": "Third Atraxa reveal: took Force of Will and Atraxa, then Done, leaving a land, Lotus Petal and Aluren/Omniscience. Playbook says take every card on the combo turn; under the Omniscience-only loop (one draw per lap) leaving cards keeps library, so is Done right when library vs life is tight?"}
+]

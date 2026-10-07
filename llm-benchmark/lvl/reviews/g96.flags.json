@@ -1,0 +1,5 @@
+[
+  {"seat": "b", "seq": 22, "kind": "likely-mistake", "note": "T5 vs Alurentell (opp 7 cards, 2 lands): cast Sand Scout #2 tapping both Plateaus, leaving only Quarry (one W). Holding W, W plus Quarry keeps Swords and Erode both live against one Force of Will for the first Acererak; Scout is free under their Aluren anyway. A jammed into the single answer and won that turn."},
+  {"seat": "b", "seq": 1, "kind": "close", "note": "On the play kept Quarry, Plateau, Mesa, Flats, 2 Sand Scout, Erode: 4 lands, no 1-drop, a slow clock against combo but with interaction. Kept; a mulligan to find a faster curve or more removal is the alternative."},
+  {"seat": "a", "seq": 9, "kind": "close", "note": "T2 Ponder with Aluren and Acererak in hand saw Petal, Force of Will, Aluren: ordered Petal, Force, Aluren, kept, and left Strand uncracked so Force was the T3 draw. The alternative was Brainstorm plus a Strand crack to shuffle. The chosen line kept Brainstorm and a Wasteland decoy and set up the 4-mana Aluren with Force backup."}
+]

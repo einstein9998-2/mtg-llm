@@ -1,0 +1,7 @@
+[
+  {"seat": "a", "seq": 86, "kind": "likely-mistake", "note": "T9 Brainstorm put-back: put back the second Acererak (with Omniscience) and kept Misty + Boseiju; better put back a land to redraw and keep both Acererak. T11 Heat killed the lone Acererak under Aluren; a spare would have looped and won (B had only Delta left)."},
+  {"seat": "a", "seq": 63, "kind": "close", "note": "T7: Show and Tell (for Aluren, Acererak in hand) off Tomb + Maze with Petal held for Veil, B tapped out with 5 cards; alternative wait a turn for more protection. B had two Forces and won the exchange, but Tomb was about to be Wastelanded and B would untap Heat/Charm."},
+  {"seat": "a", "seq": 68, "kind": "close", "note": "T7: Veil of Summer in response to B's Force on Show and Tell; B Forced the Veil too (pitching Murktide). Alternative: let Show die and keep Veil + Petal for the next attempt. Cost B 4 cards for 2, but A had no second combo spell left."},
+  {"seat": "a", "seq": 6, "kind": "close", "note": "T1 main: cracked the only fetch and cast Brainstorm at once, putting back Strand + Boseiju with no shuffle left (redrew Strand T3); alternative Brainstorm at B's T2 end step off the Island, then crack the T3 Strand to shuffle the put-backs."},
+  {"seat": "b", "seq": 66, "kind": "close", "note": "T7 first Force on Show and Tell: pitched Prismari Charm, kept Murktide; alternative pitch Murktide and keep Charm, the instant answer that bounces Aluren in response to a free Acererak. Moot here because the second Force took the other blue card."}
+]

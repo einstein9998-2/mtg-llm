@@ -1,0 +1,8 @@
+[
+  {"seat": "a", "seq": 1, "kind": "close", "note": "Kept Island, Tundra, Ancient Tomb, Ponder, Force of Will, Aluren, Veil: no green land (Aluren needs GG), no creature, one cantrip, Ponder the only Force pitch; mulligan vs keep for three lands plus Force."},
+  {"seat": "a", "seq": 36, "kind": "close", "note": "Turn 7, Island/Tundra/Tropical plus Petal could cast Aluren while B's only Volcanic was tapped (B held no counter then); passed for lack of a creature, then cast the same payoff-less Aluren on turn 9 into a freshly drawn Force. Cast it now or never?"},
+  {"seat": "b", "seq": 18, "kind": "close", "note": "Turn 4 with zero lands after Daze: played Wasteland and killed Ancient Tomb (B left with no mana that turn) vs replaying Volcanic to cantrip; chose mana denial and A stalled on 3 lands."},
+  {"seat": "b", "seq": 49, "kind": "close", "note": "Brainstorm put back Flooded Strand and Prismari Charm, then cracked Delta to shuffle them away; Charm is the answer to a resolved Aluren with Acererak on the stack, vs putting back Strand plus a Bolt."},
+  {"seat": "b", "seq": 57, "kind": "close", "note": "Preordain bottomed Daze (kept Force of Will on top) against a combo deck; the note says never bottom Daze vs combo, but A had shown Veil and had a green source open."},
+  {"seat": "b", "seq": 69, "kind": "close", "note": "Murktide (delve 5, 8/8) into A's tapped lands but 4 cards (free Force possible) vs Cutter plus Bolt first; A Forced it pitching Omniscience, which stripped A's last counter, so the trade was fine."}
+]

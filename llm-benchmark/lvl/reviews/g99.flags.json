@@ -1,0 +1,7 @@
+[
+  {"seat": "b", "seq": 104, "kind": "likely-mistake", "note": "Forced back (pitching Daze) to save Murktide after A's Force, leaving Force of Will + 2 red Cutters (no pitch): the last Force was dead for A's Aluren turn. Letting Murktide die kept Force + Daze vs an A with no Force left."},
+  {"seat": "b", "seq": 94, "kind": "likely-mistake", "note": "Turn 8 Main 2: tapped both Volcanics for delve Murktide with A at 6 cards and 3 lands (Aluren next turn). Passing with 2 Force + Daze and the DRC clock (A at 8) was better; breaks the existing tap-out note."},
+  {"seat": "a", "seq": 101, "kind": "close", "note": "Forced B's tapped-out Murktide (pitching 2nd Force, keeping Brainstorm) vs saving Force for own Aluren next turn. DRC+Murktide was lethal on 8 life; the Force baited B's Force+Daze and won the game."},
+  {"seat": "a", "seq": 27, "kind": "close", "note": "Turn-2 end step Strand: fetched Hedge Maze vs basic Island with only 2 fetches as lands vs a Wasteland deck; B Wastelanded the Maze on turn 4 (A's only mana land), costing about a turn."},
+  {"seat": "b", "seq": 71, "kind": "likely-mistake", "note": "DRC surveil (from end-step Bolt) binned Daze against a combo deck; Bolt was adding the instant type anyway, so keeping Daze on top was better (existing note: never surveil away Daze)."}
+]

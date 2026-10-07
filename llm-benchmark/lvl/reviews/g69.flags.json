@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 84, "kind": "likely-mistake", "note": "Brainstorm put back Tundra then Tropical (both lands in hand) keeping dead Omniscience and Misty, vs a deck that showed Wasteland; put back Omniscience + Misty and keep a land, so t9 Aluren (Island+Maze+Tundra+Petal, GG) is live after the double Wasteland"},
+  {"seat": "a", "seq": 88, "kind": "close", "note": "Cracked Misty for the put-back Tropical on top, shuffling away the known Tundra (left 0 lands in hand); alternative play Tropical/keep Misty uncracked as decoy and keep the known land draws"},
+  {"seat": "a", "seq": 47, "kind": "close", "note": "Hedge Maze surveil binned a second Lotus Petal with 4 lands in hand; Petals are the spare/GG mana for Aluren when Wasteland hits, and this one would have been the t9 Aluren mana"},
+  {"seat": "b", "seq": 74, "kind": "close", "note": "Forced back A's Force on Murktide pitching Daze (last blue card) while A had Hedge Maze open for Veil; Veil cost B FoW+Daze+Murktide; alternative let Murktide go and keep Force and Daze for the combo"}
+]

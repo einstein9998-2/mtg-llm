@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 59, "kind": "likely-mistake", "note": "T7 at 15 vs Cutter+Monk+DRC: played Misty and cracked it (1 life) to shuffle a known City off the top while holding Tropical Island and Ponder; Ponder first, then Tropical from hand, is free. A later died at exactly 2 life to a Tomb tap, so that point was the margin."},
+  {"seat": "a", "seq": 28, "kind": "close", "note": "T5 land: Ancient Tomb (2 life, Stock Up with a spare vs Daze, plus Brainstorm) vs Tropical Island (Stock Up with no spare, no life). Against a Cutter deck that later dealt 9 in one turn, how much is a Daze spare worth in life?"},
+  {"seat": "b", "seq": 51, "kind": "likely-mistake", "note": "Brainstorm put back Ponder (the only blue card) and Bolt, then Delta shuffled them away, leaving Force of Will with no pitch card from T6 on; B had no answer to A's T9 Show and Tell and survived only because A's Tomb tap killed A. Put back Volcanic Island + Bolt instead."},
+  {"seat": "b", "seq": 92, "kind": "likely-mistake", "note": "Declined to move Cori-Steel Cutter #47 from the non-sick Monk onto the new Monk token: Yes gives the token haste and trample and raises the attack from 9 to 10 (A to 1 instead of 2)."}
+]

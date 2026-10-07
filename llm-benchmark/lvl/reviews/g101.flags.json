@@ -1,0 +1,5 @@
+[
+  {"seat": "b", "seq": 42, "kind": "likely-mistake", "note": "Played Scalding Tarn with two Wastelands in hand while A's only mana land was Tropical Island (fetches uncracked); Wasteland on Tropical before A untapped (second one on turn 6) delays Aluren 1-2 turns into B's two Daze. B never used either Wasteland and lost on turn 7."},
+  {"seat": "b", "seq": 55, "kind": "likely-mistake", "note": "Brainstorm put back Daze (and Ponder) while keeping a second Wasteland and Bolt; against a combo deck put back Wasteland #2 or Bolt and keep both Daze. Not decisive here (A had exactly 2 spare mana on the combo turn)."},
+  {"seat": "a", "seq": 3, "kind": "close", "note": "Mulligan to 6 (Strand, Misty, Tomb, Brainstorm, Ponder, Aluren, Stock Up): bottomed Stock Up. Alternative: keep Stock Up (sees 5 for Acererak) and bottom Ponder; Stock Up costs 3 mana that competes with building a Daze-proof Aluren turn."}
+]

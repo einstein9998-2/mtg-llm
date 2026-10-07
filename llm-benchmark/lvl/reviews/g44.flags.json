@@ -1,0 +1,6 @@
+[
+  {"seat": "b", "seq": 21, "kind": "likely-mistake", "note": "T4, A cast Show and Tell off Island + Ancient Tomb: Wastelanded the already-tapped Tomb in response vs holding to A's end step (same mana denial, keeps the option); harmless here, but it breaks the 'before they untap, not after a spell' habit."},
+  {"seat": "b", "seq": 36, "kind": "likely-mistake", "note": "T5, Ajani + Cat Warrior token vs untapped 7/7 deathtouch Atraxa: no attack vs sending the token alone; a block kills a Cat and flips Ajani to Avenger for free, no block deals 2."},
+  {"seat": "a", "seq": 46, "kind": "likely-mistake", "note": "T6, Omniscience resolved, two Acererak and two Force in hand: attacked with Atraxa before looping vs looping at once (signed-off rule: 'Do not cantrip, attack or take Tomb first'); harmless only because B had no white mana."},
+  {"seat": "a", "seq": 5, "kind": "close", "note": "T2 vs Boros with Wasteland: cracked Misty for Island in main 1 vs holding it to B's end step (Wasteland decoy, no info given, Brainstorm still castable); no effect here."}
+]

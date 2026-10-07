@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 85, "kind": "close", "note": "Show and Tell put-in with Aluren, Aluren, Acererak, Omniscience in hand: chose Omniscience then cast Aluren (counterable); putting in Aluren directly is uncounterable and Acererak is then free; Omniscience only adds resilience to a bounce."},
+  {"seat": "a", "seq": 43, "kind": "close", "note": "T5 after Atraxa, 9 cards and Petal on board: passed and discarded Strand and Ponder at cleanup; alternative was Brainstorm with the Petal's U (see 3 more, put back the two discards) at the cost of the Petal as a spare mana for the T7 combo turn."},
+  {"seat": "a", "seq": 3, "kind": "close", "note": "Mulligan to 6 from Strand, Misty, Boseiju, Ponder, Show and Tell, Atraxa, Acererak: bottomed Acererak (kept 3 lands); alternative bottom Misty and keep a second payoff on 2 lands plus Ponder."},
+  {"seat": "b", "seq": 4, "kind": "close", "note": "Kept 7 of 4 fetches, Force of Will, DRC, Cutter: Force has no pitch card and no cantrip or Daze, so no interaction until a second blue card; it let A resolve Show and Tell for Atraxa on T5 uncontested. Keep vs mulligan blind."}
+]

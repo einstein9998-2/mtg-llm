@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 36, "kind": "likely-mistake", "note": "Atraxa reveal (no creature in the 10, Karakas had just entered on B's side): took Ponder as the sorcery over Show and Tell. Show and Tell re-deploys Atraxa after the Karakas bounce; Ponder found only lands and a 3rd Aluren. A survived only by drawing Show and Tell (~8%) on turn 8 at 5 life."},
+  {"seat": "a", "seq": 99, "kind": "close", "note": "At 5 life facing 8 power (Raptor first strike, Cat, Ajani, Voice, 2 Warriors), Atraxa blocked Amped Raptor (to 6). A Cat block flips Ajani with Raptor (red) alive for a lethal Avenger 0; Warrior/Voice blocks lose to a Quarry sacrifice of the Cat. Only Raptor or Ajani blocks were safe: confirm the reasoning."}
+]

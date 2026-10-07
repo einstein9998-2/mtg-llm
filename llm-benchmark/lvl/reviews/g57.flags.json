@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 3, "kind": "close", "note": "One-land six after mulligan: bottomed Veil of Summer and kept 2 Stock Up. Alternative: bottom the second Stock Up (uncastable duplicate 3-drop) and keep Veil, the 1-mana protection for the Show and Tell turn; cost is one fewer Force pitch (the spare Stock Up was pitched on turn 8)."},
+  {"seat": "a", "seq": 65, "kind": "close", "note": "T8 at 11 life, 2 lands, opp has 4 cards: Forced the 7/7 Murktide pitching the spare Stock Up (B Forced back). Alternative: keep Force for the eventual Show and Tell and take 8 a turn; Forcing the clock looks right since A was 2 attacks from dead with no third mana."},
+  {"seat": "b", "seq": 47, "kind": "close", "note": "DRC surveil off Brainstorm: binned Daze (Daze and Force already in hand) to fuel Murktide delve, against the note 'never surveil away Daze against a combo deck'. Alternative: keep it on top and draw it with Brainstorm as a second Daze."},
+  {"seat": "b", "seq": 76, "kind": "close", "note": "T10 Scalding Tarn: fetched Thundering Falls (tapped, surveil) over Volcanic Island (untapped). Volcanic left an extra mana for the Cutter equip or open mana on A's turn; Falls added a surveil. Opponent was at 10 and the equip was not lethal, so low impact."}
+]

@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 16, "kind": "likely-mistake", "note": "Passed B's turn-4 end step with Misty uncracked; a hand with no enabler and no cantrip could fetch Hedge Maze #2 (enters tapped, surveil 1) for 1 life, the only extra look the deck offered. A never did, and drew Tomb, Strand, Tomb before Aluren on t9."},
+  {"seat": "a", "seq": 84, "kind": "likely-mistake", "note": "At 5 life facing exactly 5 power, hardcast Acererak for one Lost Mine scry; it cost the Petal (only black source) and 2 life to Tomb auto-pay (Petal+Maze+Trop was painless). Holding was better; outcome unchanged."},
+  {"seat": "b", "seq": 53, "kind": "close", "note": "Murktide tapping out into A's 6-card hand (possible Force) while holding own Force + Murktide #2; alternative hold up mana. It drew A's Force and only pitch (Omniscience), and B's kept Force then countered Aluren: game-deciding."},
+  {"seat": "b", "seq": 76, "kind": "close", "note": "DRC surveil: Wasteland to graveyard for delirium (DRC 3/3 flier) vs keeping it to hit A's Tropical (GG for a future Aluren). Aluren was already countered; delirium supplied the lethal damage."}
+]

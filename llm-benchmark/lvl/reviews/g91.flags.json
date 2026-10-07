@@ -1,0 +1,4 @@
+[
+  {"seat": "b", "seq": 29, "kind": "likely-mistake", "note": "T5, A's Veil of Summer on the stack, A left with exactly Island + Ancient Tomb (Show and Tell's cost): passed, then wasted Daze and Force (pitching Prismari Charm) into the resolved Veil. Daze on Veil (A pays 1 and loses the Show and Tell turn) or Force on Veil plus Daze on Show and Tell was better."},
+  {"seat": "a", "seq": 5, "kind": "close", "note": "T1 Strand with Veil and Aluren in hand and no other green source: fetched basic Island (Wasteland-proof vs 4 Wasteland) over Tropical Island (green for Veil/Aluren). Ponder found a Tropical, so it worked; is the basic right when the hand's only green must come from the fetch?"}
+]

@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 89, "kind": "likely-mistake", "note": "T9 main 2, dead to the board but planning Show and Tell + Omniscience next turn: channelled Boseiju on a Volcanic Island, and B just fetched another Volcanic. A spent a card for nothing. Better: keep Boseiju as the next land drop, or hold it at instant speed for an artifact (Cori-Steel Cutter came down next turn)."},
+  {"seat": "b", "seq": 31, "kind": "close", "note": "T4 Brainstorm put-back vs Alurentell: put back Prismari Charm + Preordain, keeping 2 Brainstorm, 2 FoW, Murktide, then cracked Strand to shuffle them away. The Charm is the mana answer to a resolved Aluren (bounce it in response to Acererak); the alternative was putting back a Brainstorm + Preordain and keeping Charm with two Forces."}
+]

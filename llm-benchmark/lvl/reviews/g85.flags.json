@@ -1,0 +1,5 @@
+[
+  {"seat": "b", "seq": 16, "kind": "likely-mistake", "note": "T2 played Volcanic Island and tapped it for DRC (with Wasteland, Island, FoW, Bolt in hand) while A had 0 lands and an uncracked Misty. Alternative: Wasteland as the land drop, Bauble, hold it untapped and destroy whatever Misty fetches (Hedge Maze was A's only GG source with Petal), which denies the turn-3 Aluren that killed B."},
+  {"seat": "b", "seq": 17, "kind": "likely-mistake", "note": "Cast Mishra's Bauble before Dragon's Rage Channeler, missing the DRC surveil trigger; cast DRC first, then the Bauble (minor)."},
+  {"seat": "a", "seq": 28, "kind": "close", "note": "Hedge Maze surveil binned Veil of Summer with City, Petal, FoW, Aluren in hand and no creature. Veil plus Aluren needed 5 mana including GG and A had 4 on turn 3, so it dug toward Acererak (and drew it). Alternative: keep Veil to protect a turn-4 Aluren."}
+]
