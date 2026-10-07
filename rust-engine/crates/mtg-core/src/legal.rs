@@ -146,6 +146,8 @@ impl<'a> Cx<'a> {
     }
 
     fn sac_candidates(&mut self, seat: Seat, srcs: &[SrcInfo]) -> Vec<ObjRef> {
+        // Reads derived characteristics (types, subtypes) of permanents; make sure they are current.
+        self.refresh();
         let Some(src) = srcs.iter().find(|s| s.sac) else { return Vec::new() };
         let def = self.db.def(self.s.obj(src.obj).def);
         let Some(item) = def.activated(src.ability).and_then(|ad| ad.cost.iter().find(|x| matches!(x, CostItem::Sacrifice(_)))) else { return Vec::new() };
@@ -569,6 +571,9 @@ impl<'a> Cx<'a> {
         }
     }
 
+    /// Canonical option order key. Note: for permanents on the battlefield the per-seat view ids
+    /// are assigned in entry order for both seats, so this order is the same whichever seat asks;
+    /// `sac_pick`, `attack_candidates` and `target_key` rely on it (RFC 0004 documents it).
     pub fn obj_key(&self, viewer: Seat, r: ObjRef) -> (u32, u32) {
         if crate::canary::on(crate::canary::OPTION_ORDER_BY_CARDID) {
             return (self.s.obj(r).card.map(|c| c.0 as u32).unwrap_or(0), 0);

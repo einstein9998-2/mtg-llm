@@ -1,0 +1,14 @@
+# UWx Control sideboard plans.
+# Sideboard (15): 2 Consign to Memory, 2 Containment Priest, 2 Erode, Hydroblast, 2 Lavinia,
+# 2 Pyroblast, 2 Triumph of Saint Katherine, 2 Wrath of the Skies.
+
+vs alurentell
+# Containment Priest exiles whatever Show and Tell puts in (and Atraxa); Pyroblast kills Atraxa
+# and Omniscience and counters their blue spells. Prismatic Ending barely hits their permanents,
+# Murktide is slow, Phelia is the weakest body here.
+-2 Prismatic Ending
+-2 Murktide Regent
+-1 Phelia, Exuberant Shepherd
++2 Containment Priest
++2 Pyroblast
++1 Consign to Memory

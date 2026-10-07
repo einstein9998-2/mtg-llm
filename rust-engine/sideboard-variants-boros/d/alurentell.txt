@@ -1,0 +1,4 @@
+# Alurentell vs Boros variant d: no Chant: only -2 Veil +2 Ending, 4 Stock Up and 4 Aluren stay
+vs boros-aggro
+-2 Veil of Summer
++2 Prismatic Ending

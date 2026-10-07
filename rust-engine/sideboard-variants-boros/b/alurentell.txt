@@ -1,0 +1,6 @@
+# Alurentell vs Boros variant b: keep 4 Stock Up, cut a second Aluren
+vs boros-aggro
+-2 Veil of Summer
+-2 Aluren
++2 Prismatic Ending
++2 Orim's Chant

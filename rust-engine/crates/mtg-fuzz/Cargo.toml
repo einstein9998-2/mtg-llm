@@ -9,3 +9,5 @@ mtg-cards.workspace = true
 mtg-view = { workspace = true, features = ["diff-harness"] }
 mtg-debug.workspace = true
 mtg-dsl.workspace = true
+mtg-match.workspace = true
+serde_json.workspace = true

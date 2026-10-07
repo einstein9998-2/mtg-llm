@@ -1,0 +1,9 @@
+# Alurentell vs UWx variant p2: keep 2 Petal, no Orim's Chant
+vs uwx-control
+-2 Lotus Petal
+-2 Force of Will
+-2 Omniscience
+-2 Aluren
++2 Veil of Summer
++4 Carpet of Flowers
++2 Prismatic Ending

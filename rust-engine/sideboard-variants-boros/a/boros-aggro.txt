@@ -1,0 +1,14 @@
+# Boros Aggro sideboard plans.
+# Sideboard (15): 2 Abrade, 2 Containment Priest, 3 Deafening Silence, 3 Faerie Macabre, 2 Gaddock
+# Teeg, 3 Pyroblast.
+
+vs alurentell
+# [draft, not reviewed] Brady expects all 3 Pyroblast. The usual hate against a combo deck:
+# Deafening Silence (one noncreature spell per turn), Containment Priest (exiles Show and Tell's
+# creature). Goblin Bombardment and the weakest beaters come out.
+-3 Goblin Bombardment
+-2 Sand Scout
+-1 Spider-Woman, Stunning Savior
++3 Pyroblast
++2 Deafening Silence
++1 Containment Priest

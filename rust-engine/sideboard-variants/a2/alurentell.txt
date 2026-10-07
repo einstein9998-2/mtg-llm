@@ -1,0 +1,12 @@
+# UR Cutter variant a2: 2 Petal in for 2 Stock Up
+vs ur-cutter
+-2 Force of Will
+-2 Omniscience
+-1 Boseiju, Who Endures
+-1 Aluren
+-2 Lotus Petal
+-2 Stock Up
++2 Veil of Summer
++4 Carpet of Flowers
++2 Orim's Chant
++2 Prismatic Ending

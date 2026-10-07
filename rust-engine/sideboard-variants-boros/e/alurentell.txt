@@ -1,0 +1,7 @@
+# Alurentell vs Boros variant e: baseline with 3 Petal and 4 Stock Up: -1 Petal -1 Aluren
+vs boros-aggro
+-2 Veil of Summer
+-1 Lotus Petal
+-1 Aluren
++2 Prismatic Ending
++2 Orim's Chant

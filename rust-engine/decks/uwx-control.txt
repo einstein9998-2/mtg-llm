@@ -1,4 +1,4 @@
-# UWx Control (Phelia / Riddler / Stifle) | Control-tempo (non-combo)
+# UW Phelia (Phelia / Riddler / Stifle) | Control-tempo (non-combo) [formerly "UWx Control"; file stem stays uwx-control]
 # Source: HJ_Kaiser, 5th-8th, MTGO Challenge 32, 2026-09-27 (65 players)
 # https://mtgtop8.com/event?e=91385&d=894042&f=LE
 # Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.

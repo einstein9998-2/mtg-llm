@@ -95,6 +95,45 @@ impl Net {
         Ok(Net { state_len, hidden, emb, n_kind, n_dec, n_def, n_zone, scale, w1, b1, w2, b2, wv, bv: bv[0], wp, bp, e_kind, e_dec, e_def, e_zone, w_val })
     }
 
+    /// The same net for a card database with different `defs` (cards added or reordered): `map[old]`
+    /// is the new index of old def `old` (every old def must still exist). Weights of cards the net
+    /// has never seen start at zero, so the net ignores them until it is trained. State layout is
+    /// 11 blocks of `n_defs` then the scalars; option subject defs are `def + 1` (0 = none).
+    pub fn remap_defs(&self, map: &[usize], new_n_defs: usize) -> Result<Net, String> {
+        let old_n = map.len();
+        const BLOCKS: usize = 11;
+        if self.state_len < BLOCKS * old_n || self.n_def != old_n + 1 {
+            return Err(format!("net does not match {old_n} defs (state_len {}, n_def {})", self.state_len, self.n_def));
+        }
+        if map.iter().any(|&n| n >= new_n_defs) {
+            return Err("map points outside the new database".into());
+        }
+        let scalars = self.state_len - BLOCKS * old_n;
+        let new_len = BLOCKS * new_n_defs + scalars;
+        let (h, e) = (self.hidden, self.emb);
+        let mut scale = vec![1.0f32; new_len];
+        let mut w1 = vec![0.0f32; new_len * h];
+        let row = |b: usize, d: usize, n: usize| b * n + d;
+        for b in 0..BLOCKS {
+            for (od, &nd) in map.iter().enumerate() {
+                let (o, n) = (row(b, od, old_n), row(b, nd, new_n_defs));
+                scale[n] = self.scale[o];
+                w1[n * h..(n + 1) * h].copy_from_slice(&self.w1[o * h..(o + 1) * h]);
+            }
+        }
+        for k in 0..scalars {
+            let (o, n) = (BLOCKS * old_n + k, BLOCKS * new_n_defs + k);
+            scale[n] = self.scale[o];
+            w1[n * h..(n + 1) * h].copy_from_slice(&self.w1[o * h..(o + 1) * h]);
+        }
+        let mut e_def = vec![0.0f32; (new_n_defs + 1) * e];
+        e_def[..e].copy_from_slice(&self.e_def[..e]);
+        for (od, &nd) in map.iter().enumerate() {
+            e_def[(nd + 1) * e..(nd + 2) * e].copy_from_slice(&self.e_def[(od + 1) * e..(od + 2) * e]);
+        }
+        Ok(Net { state_len: new_len, n_def: new_n_defs + 1, scale, w1, e_def, ..self.clone() })
+    }
+
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = MAGIC.to_vec();
         for v in [self.state_len, self.hidden, self.emb, self.n_kind, self.n_dec, self.n_def, self.n_zone] {
@@ -197,5 +236,40 @@ impl Evaluator for NetEvaluator {
         debug_assert_eq!(opts.len(), n);
         let (value, priors) = self.net.forward(&state, &opts);
         Eval { priors, value }
+    }
+}
+
+#[cfg(test)]
+mod remap_tests {
+    use super::*;
+    use mtg_view::OptionFeat;
+
+    /// Moving every def to a new index (and adding unseen defs) must not change the forward pass.
+    #[test]
+    fn remap_defs_preserves_forward_pass() {
+        let (old_n, new_n) = (5usize, 9usize);
+        let state_len = 11 * old_n + 4;
+        let net = Net::random(state_len, 8, 4, 6, 6, old_n + 1, 9, 7);
+        let map = [3usize, 0, 7, 8, 1];
+        let re = net.remap_defs(&map, new_n).unwrap();
+        assert_eq!(re.state_len, 11 * new_n + 4);
+        let old_state = [(0u32, 1.0f32), (old_n as u32 + 2, 2.0), (3 * old_n as u32 + 4, 1.0), (11 * old_n as u32 + 1, 0.5)];
+        let new_state: Vec<(u32, f32)> = old_state
+            .iter()
+            .map(|&(i, v)| {
+                let i = i as usize;
+                if i >= 11 * old_n { ((11 * new_n + i - 11 * old_n) as u32, v) } else { (((i / old_n) * new_n + map[i % old_n]) as u32, v) }
+            })
+            .collect();
+        let opt = |d: usize| OptionFeat { kind: 1, decision: 2, subject_def: if d == 0 { 0 } else { d as u16 }, subject_zone: 3, value: 2 };
+        let old_opts: Vec<OptionFeat> = (0..=old_n).map(opt).collect();
+        let new_opts: Vec<OptionFeat> = (0..=old_n).map(|d| opt(if d == 0 { 0 } else { map[d - 1] + 1 })).collect();
+        let (v0, p0) = net.forward(&old_state, &old_opts);
+        let (v1, p1) = re.forward(&new_state, &new_opts);
+        assert!((v0 - v1).abs() < 1e-6);
+        for (a, b) in p0.iter().zip(&p1) {
+            assert!((a - b).abs() < 1e-6);
+        }
+        assert!(net.remap_defs(&[0, 1, 2], new_n).is_err());
     }
 }

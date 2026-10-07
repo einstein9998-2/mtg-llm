@@ -1,0 +1,7 @@
+# Alurentell vs Boros variant a: Brady's weekend config: -1 Force -1 Stock Up, +2 Consign instead of Chant
+vs boros-aggro
+-2 Veil of Summer
+-1 Force of Will
+-1 Stock Up
++2 Prismatic Ending
++2 Consign to Memory

@@ -1,0 +1,7 @@
+# Alurentell vs Boros variant c: -1 Force of Will in place of -1 Aluren
+vs boros-aggro
+-2 Veil of Summer
+-1 Stock Up
+-1 Force of Will
++2 Prismatic Ending
++2 Orim's Chant

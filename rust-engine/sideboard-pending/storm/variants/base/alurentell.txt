@@ -1,0 +1,11 @@
+# Alurentell vs Storm variant base: baseline, 7 for 7
+vs storm
+-2 Veil of Summer
+-2 Stock Up
+-1 Island
+-1 Atraxa, Grand Unifier
+-1 Acererak the Archlich
++2 Consign to Memory
++2 Orim's Chant
++2 Prismatic Ending
++1 Force of Negation

@@ -299,6 +299,10 @@ fn show_and_tell_fork_independent_of_true_pick() {
     let (db, d) = decks();
     let (mut n_none, mut n_some) = (0u32, 0u32);
     let (mut fs_none, mut ft_none, mut fs_some, mut ft_some) = (0u32, 0u32, 0u32, 0u32);
+    // Per opponent hand size (what the observer can see): (states, forks that enter something,
+    // forks) for truth-nothing and truth-something. Hand size drives both the truth and the
+    // fork rate, so the unstratified rates differ without any leak.
+    let mut strata: std::collections::BTreeMap<usize, [(u32, u32, u32); 2]> = std::collections::BTreeMap::new();
     let bf_count = |g: &Game, who: Seat| -> usize { g.observe(who).battlefield.iter().filter(|p| !p.controlled_by_me).count() };
     for seed in 0..500u64 {
         let (a, b) = (&d[0], &d[(seed % 8) as usize]);
@@ -328,6 +332,9 @@ fn show_and_tell_fork_independent_of_true_pick() {
                             tot += 1;
                             some += (bf_count(&f, seat) > bf0) as u32;
                         }
+                        let hand = g.observe(seat).opp.hand_count as usize;
+                        let cell = &mut strata.entry(hand).or_insert([(0, 0, 0); 2])[truth_entered as usize];
+                        *cell = (cell.0 + 1, cell.1 + some, cell.2 + tot);
                         if truth_entered {
                             n_some += 1;
                             fs_some += some;
@@ -347,7 +354,21 @@ fn show_and_tell_fork_independent_of_true_pick() {
     eprintln!("S&T second-chooser states: truth nothing {n_none}, something {n_some}; fork enters-something rate | nothing {fs_none}/{ft_none}, | something {fs_some}/{ft_some}");
     assert!(n_none >= 5 && n_some >= 5, "need both truths represented ({n_none}/{n_some})");
     let (r0, r1) = (fs_none as f64 / ft_none as f64, fs_some as f64 / ft_some as f64);
-    assert!((r0 - r1).abs() < 0.15, "fork pick depends on the truth: {r0:.2} vs {r1:.2}");
+    eprintln!("unstratified rates {r0:.2} vs {r1:.2} (differ because hand size drives both)");
+    // Compare within each hand size, weighting each stratum by its smaller group.
+    let (mut num, mut den) = (0f64, 0f64);
+    for (hand, c) in &strata {
+        let (a, b) = (c[0], c[1]);
+        if a.0 >= 3 && b.0 >= 3 {
+            let w = a.0.min(b.0) as f64;
+            let d = (a.1 as f64 / a.2 as f64 - b.1 as f64 / b.2 as f64).abs();
+            eprintln!("  opponent hand {hand}: nothing {}/{} states, something {}/{} states, rate diff {d:.2}", a.1, a.2, b.1, b.2);
+            num += w * d;
+            den += w;
+        }
+    }
+    assert!(den > 0.0, "no hand size has both truths represented");
+    assert!(num / den < 0.15, "fork pick depends on the truth within hand-size strata: {:.2}", num / den);
 }
 
 /// Thassa's Oracle puts the rest on the bottom in random order: the owner must not be left with a

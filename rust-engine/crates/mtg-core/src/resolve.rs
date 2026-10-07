@@ -77,7 +77,7 @@ pub fn mode_slot_counts(db: &CardDb, e: &StackEntry) -> SmallVec<[u8; 4]> {
 }
 
 /// Instructions one resolution may execute before the game is declared a draw (a legal script
-/// loops at most over the 60,000 objects `RUNAWAY_OBJECTS` allows, a few instructions each).
+/// loops at most over the `RUNAWAY_OBJECTS` objects allowed, a few instructions each).
 pub const RESOLVE_STEP_CAP: u32 = 4_000_000;
 
 pub fn run(cx: &mut Cx, f: &mut ResolveFrame) -> Next {

@@ -77,3 +77,26 @@ Deviation list additions (spec thread review of RFC 0003, 2026-10-02): (1) the 4
 
 ## Sign-off on core-frozen-m5 (2026-10-03)
 Brady confirmed `core-frozen-m5` (ENGINE_CORE_VERSION 5, HASH_SCHEMA 4) as the frozen engine after the spec, differential and hidden-information/determinism reviews were clean. Changes from here go through `rfcs/`; the four small follow-ups at the end of RFC 0003 are queued for the next one.
+
+Post-freeze (RFC 0004, 2026-10-03): `RUNAWAY_OBJECTS` lowered from 60,000 to 1,000 live objects (draw) after the self-play run met 2,063 Ocelot Pride tokens; the card text was checked and the engine is correct (four Prides with the city's blessing make 30 tokens per end step, older tokens are not recopied), so this is a performance/degenerate-play guard, not a rules fix. Review follow-ups of RFC 0003 applied (stale-cache refresh and wider avoid list in the Quarry victim choice, view-id ordering documented, Show and Tell fork test stratified). `ENGINE_CORE_VERSION` 6, `HASH_SCHEMA` 4.
+
+## Re-read of core-frozen-m6 (RFC 0004): hidden information and determinism (independent reviewer, 2026-10-03)
+
+**Verdict: no finding. `core-frozen-m6` can be signed off from the hidden-information and determinism side.** All four items of the m5 review are addressed as intended.
+
+Diff read: the mirror has no git history, so the reviewer diffed the m6 mirror against the scratch copy of m5 made for the previous review. Core changes are exactly: `cost.rs` (`avoid` gains `ctx.picks` and `source`), `legal.rs` (`refresh()` at the top of `sac_candidates`; a comment on `obj_key`), `state.rs` (`RUNAWAY_OBJECTS` 60,000 to 1,000), `lib.rs` (`ENGINE_CORE_VERSION` 6), and a comment in `resolve.rs`. The only test change is the Show and Tell fork test. The 36 goldens differ only in the `engine` header line (5 to 6); no checkpoint hash changed.
+
+Per change:
+- **`avoid` with picks and source** (`cost.rs`): both are public battlefield objects; the victim order is unchanged except that these are tried last, so the choice still depends only on public state and `obj_key`. No RNG, no hidden read.
+- **`refresh()` in `sac_candidates`** (`legal.rs`): closes the stale-cache read. The derived cache is not hashed, and a refresh at that point is idempotent, so hash-equal states now behave alike whatever the cache state was.
+- **Object cap 1,000** (`state.rs`, checked in `create_token_with`): `live_objects()` is `objs.len() - free.len()`, a count of every object including cards in both hands and libraries. Those counts are public and the same in any two worlds the observer cannot tell apart (a fork keeps them), so the point where the game is declared a draw cannot depend on hidden state. It is a public result, determined by hashed state (`objs`, `free`). Headroom: in 6,000 random-play games involving Boros Aggro the arena never exceeded 201 slots (the deck with Ocelot Pride; other decks were not measured). The draw is a rules deviation, already recorded; it is also a scoring consequence for search (a draw scores 0.5), which the engine owner should keep in mind for degenerate token lines.
+- **Show and Tell test**: now compares per opponent hand size (public), weighted by the smaller group, bound 0.15. On the run, per-stratum differences are 0.00 to 0.02 in every hand size 1 to 7, against 0.67 for the leak it guards against, so the bound is loose but the test would still fail on a regression. No leak.
+- **`obj_key` comment**: accurate (checked against `commit_move`, which assigns fresh view ids to both seats at battlefield entry). The invariant test suggested in the m5 review (view-id order agrees for both seats on the battlefield) was not added; optional.
+
+Evidence (release build of the m6 mirror, pinned rustc 1.97.0, scratch copy):
+- `hidden_info` suite with `NI_GAMES=1500`: 10 of 10 pass. Real-pool non-interference: 6,000 pairs, 408,202 steps, 0 failures, step count identical to m5. Arena test: 185 draws in 400 games (as m5).
+- `fork` 6, `agent_api` 2, `goldens` and `goldens_real` (36 records) pass.
+- Quarry-focused non-interference (`m5_probe`): 1,200 pairs, 169,082 steps, 0 failures, 585 Quarry taps, 508 with a sacrifice; identical to m5.
+- m5 versus m6 digests (`det_probe`; hash, both view hashes, decider, id and option count at every decision): identical on 300 default-matchup games (`daa6d5fa21b41e00`, 217,727 decisions) and on 2,500 games with Boros Aggro in a fixed matchup (Boros mirror, Boros against two other decks, both seat orders; 2.4 million decisions): the cap and the wider `avoid` change nothing in these games. A debug build (overflow checks and debug assertions) of m6 gives the same digests for the default set and for the Boros mirror (`b7f222c7b9563816`, 570,092 decisions), with no panic.
+
+Limits: the token-explosion behavior itself (the game that hit the cap on m5) is covered only by the engine owner's own scenarios (`own-ocelot-token-explosion-ends-as-a-draw`); random play never reached 1,000 objects in these runs, so the cap's behavior in a search-driven game was not exercised here. The derived-state refresh is still quadratic in permanent count, as RFC 0004 says.

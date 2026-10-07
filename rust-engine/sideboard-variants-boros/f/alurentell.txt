@@ -1,0 +1,8 @@
+# Alurentell vs Boros variant f: one Chant and one Faerie Macabre (Phlage escape, Ocelot)
+vs boros-aggro
+-2 Veil of Summer
+-1 Stock Up
+-1 Aluren
++2 Prismatic Ending
++1 Orim's Chant
++1 Faerie Macabre
