@@ -30,3 +30,12 @@ Caveat: the positions were flagged because the bot found them hard, so the bot's
 
 ## Batch 4 (2026-10-07): Alurentell + X on the current engine
 26 positions, orders 41-66, ids s7-*: Alurentell vs UR Cutter, Boros, UWx, Dimir (UB), Reanimator, Doomsday (the Storm stand-in) and the mirror, and the same decks on the other side. Built on the CURRENT engine (176 defs, Orim's Chant, Brady's 75 of 2026-10-06) with the matching per-matchup nets (`*-m5chant-*net*.bin`), 20 games per matchup, the guard on for the Alurentell bot. Build: `CARGO_TARGET_DIR=... cargo build --release` in tough-spots against main's rust-engine; `build_multi_batch.py <runs> batch4 s7 4 41`. Storm and Tron have no engine on main and no net, so they are not in this batch. `rescore`/`replay` still assume the old engine and the Alurentell vs UR Cutter pair.
+
+## LLM-game positions (page orders 67 and up)
+
+Source: the overnight LLM-vs-LLM games (Alurentell vs UR Cutter and Boros, both sides, live engine, main deck only) from the "LLM player with net tool" thread. `seed_llm_games.py` turns that thread's `batch.json` and `batch-priority.json` into page cards: reviewer notes and game results are removed from the cards (hindsight would bias the answer) and kept in `llm-games/review-private.jsonl` with the replay seeds.
+
+- `llm-games/batch.json`: all 268 flagged positions, priority first (orders 67..113 are the 47 reviewer likely-mistake spots, 114..334 the player-unsure and reviewer-close ones).
+- Seeded on the page so far: orders 67..113 (the 47). The other 221 are staged in `batch.json`; to add them, write those cards to the `positions` collection.
+- Cards show "LLM game" instead of a batch number. After answering, the page shows which option the LLM played; there are no bot numbers.
+- To re-run: `seed_llm_games.py <src> <out> 67 --all`.
