@@ -1,0 +1,54 @@
+id: storm-c-song-of-creation-discards-hand-at-own-end-step-not-at-opponents
+title: "Song of Creation discards the whole hand at the beginning of p0's end step (a trigger), and does nothing in p1's end step"
+area: card
+cards: [Song of Creation, Ponder, Island]
+tags: [song-of-creation, end-step-trigger, discard-hand, own-end-step-only, trigger-on-stack, turn-structure, advance]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Song of Creation, text: "At the beginning of your end step, discard your hand.", verified: true}
+  - {kind: cr, ref: "603.2", text: "Whenever a game event or game state matches a triggered ability’s trigger event, that ability automatically triggers.", verified: true}
+  - {kind: cr, ref: "513.1", text: "The end step has no turn-based actions. Once it begins, the active player gets priority.", verified: true}
+  - {kind: cr, ref: "701.9a", text: "To discard a card, move it from its owner’s hand to that player’s graveyard.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Ponder @pd"]
+    battlefield: ["Song of Creation @song"]
+    library: ["Island @d1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: end, of: p1}
+  - check:
+      turn: 4
+      phase: end
+      stack: []
+      p0: {hand: [Ponder], graveyard: []}
+  - advance: {to: end, of: p0}
+  - check:
+      turn: 5
+      phase: end
+      stack: [{kind: triggered, source: "@song", controller: p0, text_contains: "discard"}]
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [Ponder, Island], graveyard: []}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 5
+    phase: end
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Ponder, Island]
+      battlefield: [{card: Song of Creation}]
+notes: >
+  "Your end step" is p0's only: in p1's end step (turn 4) the hand still holds the Ponder and nothing is on the stack.
+  In p0's own end step (turn 5, after p0 drew an Island in its draw step and did nothing else) the trigger goes on the
+  stack (513.1: the end step has no turn-based actions; the trigger is put on the stack before p0 receives priority) and resolving it
+  discards the whole hand, both cards, to the graveyard (no Gaea's Will in play, so the graveyard is where they go).
+  A wrong engine discards in the opponent's end step too or discards during the cleanup step (hand size) instead of
+  with a trigger the opponent could respond to.

@@ -1,0 +1,33 @@
+id: storm-a-boomerang-opponents-permanent-returns-no-draw
+title: "Boomerang Basics on the opponent's Aluren returns it to their hand and does not draw"
+area: card
+cards: [Boomerang Basics, Aluren, Island]
+tags: [boomerang-basics, bounce, no-draw, opponent-permanent, aluren]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @i1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@alu"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [], library_count: 10, graveyard: [Boomerang Basics]}
+    p1: {hand: [Aluren], battlefield: [], library_count: 10}
+notes: >
+  p0 did not control Aluren: it goes to p1's hand (its owner) and p0 draws nothing. A wrong engine always draws, or puts the permanent
+  into the caster's hand.

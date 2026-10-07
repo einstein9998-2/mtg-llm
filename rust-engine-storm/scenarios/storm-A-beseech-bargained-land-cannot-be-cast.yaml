@@ -1,0 +1,40 @@
+id: storm-a-beseech-bargained-land-cannot-be-cast
+title: "Bargained Beseech that finds a land cannot cast it (a land is never a spell) so it goes to hand"
+area: card
+cards: [Beseech the Mirror, Island, Lotus Petal, Swamp]
+tags: [beseech-the-mirror, bargain, land, not-a-spell, free-cast-not-allowed]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+  - {kind: cr, ref: "305.1", text: "Rather, the player simply puts the land onto the battlefield. Since the land doesn't go on the stack, it is never a spell, and players can't respond to it with instants or activated abilities.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Lotus Petal @petal"]
+    library: ["Island @isl", "Swamp"]
+    library_pad: 4
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@isl"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      exile: []
+      lands_played: 0
+      graveyard: [Beseech the Mirror, Lotus Petal]
+notes: >
+  An Island has mana value 0 (<= 4) but cannot be cast; "cast the exiled card" is impossible so the card is put into
+  hand (it "wasn't cast this way"). No cast choice is raised and the land is not put onto the battlefield (it is not played
+  either; lands_played stays 0).

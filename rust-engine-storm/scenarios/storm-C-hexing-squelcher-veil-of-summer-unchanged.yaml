@@ -1,0 +1,75 @@
+id: storm-c-hexing-squelcher-veil-of-summer-still-draws-and-gives-hexproof-from-blue
+title: "Veil of Summer next to the Squelcher still draws a card and still gives hexproof from blue: Hydroblast cannot target the Squelcher, Lightning Bolt still can and meets ward"
+area: card
+cards: [Hexing Squelcher, Veil of Summer, Forest, "Bilbo, Thief in the Night", Lightning Bolt, Hydroblast, Island, Mountain]
+tags: [hexing-squelcher, veil-of-summer, hexproof-from-blue, ward, pay-life, draw-condition, alurentell-matchup, stack-ordering]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: oracle, card: Hexing Squelcher, text: "Ward—Pay 2 life.", verified: true}
+  - {kind: oracle, card: Hydroblast, text: "Destroy target permanent if it's red.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil"]
+    battlefield: ["Hexing Squelcher @sq", "Forest @f"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    hand: ["Bilbo, Thief in the Night @bilbo", "Lightning Bolt @bolt", "Hydroblast @hb"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Mountain @m"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bilbo", pay: {tap: ["@i1", "@i2"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+  - p1: {t: cast, card: "@bolt", targets: ["@sq"], pay: {tap: ["@m"]}}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: triggered, source: "@sq", controller: p0, text_contains: "counter"}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: triggered, source: "@sq", controller: p0, text_contains: "counter"}
+      pending: {actor: p1, kind: priority}
+      p0: {hand: [Island]}
+  - expect_illegal: {p1: {t: cast, card: "@hb", modes: [2], targets: ["@sq"], pay: {tap: ["@i3"]}}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_ward, answer: true, expect_options: {include: [true, false]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: [Veil of Summer, Hexing Squelcher]
+      battlefield: [{card: Forest, tapped: true}]
+    p1:
+      life: 18
+      hand: [Hydroblast]
+      graveyard: [Lightning Bolt]
+notes: >
+  The Squelcher's "spells you control can't be countered" overlaps with half of Veil of Summer, but Veil's other two
+  halves still work: p1 cast the blue Bilbo this turn, so Veil draws p0 a card (Island), and Veil gives p0's permanents
+  hexproof from blue and from black, so p1's blue Hydroblast cannot target the Squelcher (the cast is not offered)
+  while the red Lightning Bolt already targeting it is unaffected (hexproof from a color does not remove an existing
+  target of another color). Veil is cast in response to the ward trigger, above Bolt and the trigger on the stack.
+  The ward trigger still resolves: p1 pays 2 life (18) and Bolt resolves and kills the Squelcher. A wrong engine
+  skips Veil's draw because the uncounterable clause is already "covered", or fails to give hexproof, or lets the
+  Squelcher's ward interact with it.

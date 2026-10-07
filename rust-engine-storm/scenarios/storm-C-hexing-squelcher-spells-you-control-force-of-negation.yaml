@@ -1,0 +1,63 @@
+id: storm-c-hexing-squelcher-on-battlefield-brainstorm-not-countered-by-force-of-negation
+title: "With Hexing Squelcher on the battlefield, a pitched Force of Negation on Brainstorm does nothing: Brainstorm resolves and goes to the graveyard, not exile"
+area: card
+cards: [Hexing Squelcher, Island, Brainstorm, Force of Negation, Ponder, Mountain]
+tags: [hexing-squelcher, spells-you-control-cant-be-countered, force-of-negation, brainstorm, alternative-cost, exile-clause-not-applied]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Spells you control can't be countered.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: cr, ref: "101.2", text: "the “can’t” effect takes precedence", verified: true}
+  - {kind: cr, ref: "608.2n", text: "As the final part of an instant or sorcery spell’s resolution, the spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Hexing Squelcher @sq", "Island @isl"]
+    library: ["Mountain @a", "Island @b", "Ponder @c"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Ponder @pp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@fon", alt_cost: {exile_blue_card: "@pp"}, targets: ["@bs"]}]}}
+  - p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@pp"}, targets: ["@bs"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@bs", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Force of Negation], exile: [Ponder], hand: []}
+      p0: {graveyard: [], exile: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: put_back, answer: ["@a", "@b"]}
+  - p0: {decision: order_cards, purpose: put_back, answer: ["@a", "@b"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      library_top: [Mountain, Island]
+      graveyard: [Brainstorm]
+      exile: []
+      spells_cast_this_turn: 1
+    p1:
+      hand: []
+      graveyard: [Force of Negation]
+      exile: [Ponder]
+notes: >
+  Squelcher's "Spells you control can't be countered" is a static ability that works while the Squelcher is on the
+  battlefield (it covers every spell p0 casts, including noncreature ones like Brainstorm). Force of Negation is cast on
+  p0's turn for its free alternative cost (exile a blue card), targets Brainstorm, and resolves without countering it
+  (101.2); because Brainstorm was not countered, the "exile it instead" clause never applies and Brainstorm finishes
+  resolving into the graveyard (608.2n). p0 draws Mountain, Island, Ponder then puts Mountain and Island back (Mountain
+  on top). Wrong engines: counter Brainstorm anyway, or exile it without countering it.

@@ -1,0 +1,83 @@
+id: storm-c-song-of-creation-tendrils-of-agony-with-storm-one-draw-two-for-the-cast-none-for-the-copy
+title: "Tendrils of Agony after a Lotus Petal: the Song draw triggers for the Petal and for Tendrils, but not for Tendrils' storm copy; both resolutions drain 2"
+area: card
+cards: [Song of Creation, Lotus Petal, Tendrils of Agony, Swamp, Island, Mountain, Forest]
+tags: [song-of-creation, tendrils-of-agony, storm, copy-not-cast, trigger-ordering, cast-trigger, draw-two, drain, storm-count]
+derived_from: cr
+source:
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: oracle, card: Tendrils of Agony, text: "Target player loses 2 life and you gain 2 life.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast and a copy of an activated ability isn’t activated", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lotus Petal @petal", "Tendrils of Agony @tend"]
+    battlefield: ["Song of Creation @song", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4"]
+    library: ["Island @d1", "Island @d2", "Mountain @d3", "Forest @d4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {hand: [Tendrils of Agony, Island, Island], spells_cast_this_turn: 1}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: {tap: ["@s1", "@s2", "@s3", "@s4"]}}
+  - p0: {decision: order_triggers, answer: [{source: "@song", text_contains: "draw"}, {source: "@tend", text_contains: "copy"}]}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+        - {kind: triggered, source: "@tend", controller: p0, text_contains: "copy"}
+      p0: {spells_cast_this_turn: 2}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0, targets: [{player: p1}]}
+      p0: {spells_cast_this_turn: 2, hand: [Island, Island]}
+  - resolve_top: true
+  - check:
+      p0: {life: 22}
+      p1: {life: 18}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@tend", controller: p0}]
+      p0: {hand: [Island, Island, Mountain, Forest]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 24
+      hand: [Island, Island, Mountain, Forest]
+      graveyard: [Tendrils of Agony]
+      spells_cast_this_turn: 2
+      library_count: 10
+      battlefield:
+        - {card: Song of Creation}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Lotus Petal, tapped: false}
+    p1:
+      life: 16
+notes: >
+  The Petal is cast (storm count 1 afterwards, Song draws Island, Island) and resolves. Tendrils is cast with four
+  Swamps: two triggers of p0's, Song's draw and storm. p0 puts the storm trigger on top (storm: copy it for each other
+  spell cast before it this turn = 1 copy, Lotus Petal only). The copy is not cast (707.10), so Song triggers only
+  once for Tendrils: spells_cast_this_turn is 2, not 3, and p0 draws two (Mountain, Forest) rather than four.
+  The copy drains first (20 -> 22 for p0, 20 -> 18 for p1), the Song trigger draws, and the original drains again
+  (24 and 16). The copy ceases to exist, so only one Tendrils is in the graveyard. library_count: 14 - 2 - 2 = 10.
+  A wrong engine counts the copy as a cast (a second draw trigger and spells_cast 3) or lets the draw trigger ride on
+  the copy's resolution.

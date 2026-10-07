@@ -1,0 +1,61 @@
+id: storm-b-urzas-saga-chapter-three-trigger-countered-saga-still-sacrificed
+title: "Consign to Memory on the chapter III trigger: no search happens, but the Saga is sacrificed once the trigger has left the stack"
+area: card
+cards: [Urza's Saga, Island, Mox Opal, Consign to Memory]
+tags: [urzas-saga, saga, chapter-three, consign-to-memory, counter-triggered-ability, sacrifice-sba, state-based-action]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "III — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: cr, ref: "714.4", text: "If the number of lore counters on a Saga permanent with one or more chapter abilities is greater than or equal to its final chapter number, and it isn’t the source of a chapter ability that has triggered but not yet left the stack, that Saga’s controller sacrifices it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    library: ["Island", "Island", "Mox Opal @opal"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @cons"]
+    battlefield: ["Island @pisl"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - check:
+      turn: 7
+      stack: [{kind: triggered, source: "@saga", controller: p0, text_contains: "Search"}]
+      p0: {battlefield: [{card: Urza's Saga, counters: {lore: 3}}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@cons", targets: [{trigger_of: "@saga"}], pay: auto}
+  - check:
+      stack:
+        - {kind: triggered, source: "@saga"}
+        - {kind: spell, card: "@cons", controller: p1}
+      p0: {battlefield: [{card: Urza's Saga}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 7
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: []
+      graveyard: [Urza's Saga]
+      library_count: 11
+    p1:
+      hand: [Island, Island]
+      graveyard: [Consign to Memory]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  While the countering spell is on the stack the chapter III trigger is still there, so the Saga (lore 3) stays. When
+  Consign to Memory resolves the trigger is countered: no search decision (library_count 13 - 2 draws = 11, Mox Opal
+  untouched), and with no chapter ability left on the stack, the next state-based action check sacrifices the Saga
+  (714.4). p1's hand is [Island, Island]: Consign to Memory left the hand, and p1 drew a card in each of its own draw
+  steps on turns 4 and 6 (504.1; library_pad cards are Islands). A wrong engine keeps the Saga forever, or still lets the chapter resolve.

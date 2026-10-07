@@ -1,0 +1,56 @@
+id: storm-b-urzas-saga-wasteland-in-response-to-chapter-one-no-mana-ever
+title: "Wasteland destroys the just-played Urza's Saga with chapter I on the stack: p0 cannot tap it in response and the chapter ability does nothing"
+area: card
+cards: [Urza's Saga, Wasteland]
+tags: [urzas-saga, saga, chapter-one, wasteland, destroy-in-response, granted-ability, nonbasic-land, land-drop]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: 'I — This Saga gains "{T}: Add {C}."', verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "714.3a", text: "As a Saga without the read ahead ability enters the battlefield, its controller puts a lore counter on it.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@waste", ability: 1, targets: ["@saga"]}
+  - check:
+      stack:
+        - {kind: triggered, source: "@saga", controller: p0}
+        - {kind: activated, source: "@waste", controller: p1, targets: ["@saga"]}
+      p1: {graveyard: [Wasteland]}
+  - p1: {t: pass}
+  - check: {pending: {actor: p0, kind: priority}}
+  - expect_illegal: {p0: {t: activate, source: "@saga", ability: 0}}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@saga"}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [], graveyard: [Urza's Saga]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: []
+      graveyard: [Urza's Saga]
+      lands_played: 1
+      mana_pool: {}
+    p1:
+      graveyard: [Wasteland]
+      battlefield: []
+notes: >
+  Wasteland (p1's only permanent) is sacrificed as a cost and destroys the Saga while chapter I is still on the stack. In
+  response p0 cannot tap the Saga for {C}: the mana ability exists only after chapter I has resolved (the engine models
+  the granted ability that way, per the brief). The chapter ability then resolves with no Saga to give an ability to and
+  nothing happens; no mana, no extra card. The land play stays counted (lands_played 1).

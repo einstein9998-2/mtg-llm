@@ -1,0 +1,45 @@
+id: storm-a-gamble-fetch-then-random-discard-other-card
+title: "Gamble puts the found card in hand, then discards a random card (the other one), then shuffles without the found card"
+area: card
+cards: [Gamble, Tendrils of Agony, Lightning Bolt, Ponder, Brainstorm, Island, Mountain]
+tags: [gamble, tutor, random-discard, shuffle, library, scripted-random]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Gamble, text: "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.9b", text: "By default, effects that cause a player to discard a card allow the affected player to choose which card to discard. Some effects, however, require a random discard or allow another player to choose which card is discarded.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gamble @gam", "Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library: ["Ponder @pon", "Tendrils of Agony @tend", "Brainstorm @bs"]
+    library_pad: 3
+  p1:
+    library_pad: 10
+random:
+  - {kind: random_discard, player: p0, result: "@bolt"}
+  - {kind: shuffle, player: p0, result: [Brainstorm, Island, Ponder, Island, Island]}
+script:
+  - p0: {t: cast, card: "@gam", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tend", expect_options: {include: ["@pon", "@tend", "@bs"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Tendrils of Agony]
+      graveyard: [Gamble, Lightning Bolt]
+      library_count: 5
+      library_top: [Brainstorm, Island, Ponder]
+      spells_cast_this_turn: 1
+notes: >
+  Order of events: search, found card to hand, one random discard among BOTH cards in hand (the Bolt and the new Tendrils),
+  then shuffle. The scripted random queue fixes the discard to the Bolt (new spelling random_discard, see notes file) and the
+  shuffle result; the queue must be consumed exactly in that order. The found card is no longer in the library when it is
+  shuffled (library_count 5: Ponder, Brainstorm, three Islands). The discard is NOT the player's choice: no
+  choose_cards decision is raised for it (701.9b).

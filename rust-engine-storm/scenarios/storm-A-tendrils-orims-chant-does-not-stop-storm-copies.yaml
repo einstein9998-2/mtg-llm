@@ -1,0 +1,66 @@
+id: storm-a-tendrils-orims-chant-does-not-stop-storm-copies
+title: "Orim's Chant on the Storm player in response to the storm trigger: copies are not cast, so they still go on the stack and resolve"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, "Orim's Chant", Swamp, Plains]
+tags: [tendrils-of-agony, storm, orims-chant, casting-restriction, copies-not-cast, legal-action-mask]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true}
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Dark Ritual @rit2", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3"]
+    library_pad: 10
+  p1:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pp"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: {tap: ["@s2"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@chant", kicked: false, targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - check:
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: cast, card: "@rit2"}]}}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p0, kind: priority}
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: triggered, source: "@tend", text_contains: "copy"}
+      legal: {p0: {exclude: [{t: cast, card: "@rit2"}]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 24
+      hand: [Dark Ritual]
+      graveyard: [Dark Ritual, Tendrils of Agony]
+    p1: {life: 16, graveyard: ["Orim's Chant"]}
+notes: >
+  Tendrils is cast with the storm trigger on the stack; p1 answers with Orim's Chant on p0 (p1's Chant is cast after Tendrils, so it is
+  not counted). While the Chant resolves p0 can still cast the second Dark Ritual (control, offered while Chant is on the stack) and
+  cannot afterwards (the spare Swamp is untapped, so mana is not the reason). The storm trigger still creates its one copy
+  (a copy is put on the stack, not cast, so the casting restriction does not apply) and both resolve: p1 20 -> 16, p0 20 -> 24.
+  A wrong engine suppresses copies because the controller "can't cast spells". `kicked: false` is the Orim's Chant package spelling.

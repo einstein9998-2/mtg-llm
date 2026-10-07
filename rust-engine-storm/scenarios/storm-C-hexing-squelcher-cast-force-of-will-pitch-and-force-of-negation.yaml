@@ -1,0 +1,67 @@
+id: storm-c-hexing-squelcher-cast-pitch-force-of-will-wasted-force-of-negation-cannot-target-creature
+title: "A pitched Force of Will on the Squelcher spell still costs p1 its life and card for nothing; Force of Negation cannot target a creature spell at all"
+area: card
+cards: [Hexing Squelcher, Mountain, Force of Will, Force of Negation, Brainstorm]
+tags: [hexing-squelcher, cant-be-countered, force-of-will, force-of-negation, alternative-cost, pitch, cost-not-refunded, noncreature-only]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "This spell can't be countered.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast.", verified: true}
+  - {kind: cr, ref: "101.2", text: "the “can’t” effect takes precedence", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Hexing Squelcher @sq"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Force of Negation @fon", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sq", pay: auto}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      stack: [{kind: spell, card: "@sq", controller: p0}]
+      legal:
+        p1:
+          include: [{t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@sq"]}]
+          exclude: [{t: cast, card: "@fon", targets: ["@sq"]}]
+  - expect_illegal: {p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@sq"]}}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@sq"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@sq", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {life: 19, exile: [Brainstorm], graveyard: [Force of Will], hand: [Force of Negation]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Hexing Squelcher, controller: p0, sick: true}
+    p1:
+      life: 19
+      hand: [Force of Negation]
+      exile: [Brainstorm]
+      graveyard: [Force of Will]
+notes: >
+  p1 has no lands, so only alternative costs are available. Force of Will is cast by exiling Brainstorm and paying 1
+  life (118.9a: one alternative cost); it resolves, the "counter" instruction does nothing to a spell that can't be
+  countered, and the cost is NOT refunded (p1 stays at 19, Brainstorm stays exiled, Force of Will is in the
+  graveyard). Separately, Force of Negation says "noncreature spell": the Squelcher spell is a creature spell, so it is
+  not a legal target and the cast is never offered (this holds with or without the "can't be countered" text; it
+  stops a lazy engine from confusing "cannot be countered" with "cannot be targeted" in either direction).
+  The Force of Negation stays in p1's hand.

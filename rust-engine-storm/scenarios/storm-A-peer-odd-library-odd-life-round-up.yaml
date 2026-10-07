@@ -1,0 +1,38 @@
+id: storm-a-peer-odd-library-odd-life-round-up
+title: "Peer into the Abyss rounds up twice: 31 cards draws 16, 7 life loses 4 and leaves 3"
+area: card
+cards: [Peer into the Abyss, Swamp]
+tags: [peer-into-the-abyss, draw, life-loss, round-up, odd, self-target]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Peer into the Abyss, text: "Target player draws cards equal to half the number of cards in their library and loses half their life.", verified: true}
+  - {kind: oracle, card: Peer into the Abyss, text: "Round up each time.", verified: true}
+  - {kind: cr, ref: "107.1a", text: "If a spell or ability could generate a fractional number, the spell or ability will tell you whether to round up or down.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 7
+    hand: ["Peer into the Abyss @peer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7"]
+    library_pad: 31
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@peer", targets: [{player: p0}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 3
+      hand_count: 16
+      library_count: 15
+      graveyard: [Peer into the Abyss]
+notes: >
+  Half of 31 is 15.5, rounded up to 16 draws (library 15 left). Half of 7 life is 3.5, rounded up to 4 life lost (7 -> 3). "Round up
+  each time" applies to both. A wrong engine rounds down (15 draws, 3 life lost, life 4).

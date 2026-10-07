@@ -1,0 +1,48 @@
+id: storm-b-runehorn-hellkite-ability-stifled-hellkite-still-exiled
+title: Stifling the graveyard ability leaves both hands alone, but the Hellkite stays exiled (cost already paid)
+area: card
+cards: [Runehorn Hellkite, Taiga, Island, Brainstorm, Ponder, Stifle, Daze]
+tags: [runehorn-hellkite, graveyard-ability, stifle, exile-cost, stack, in-response]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Runehorn Hellkite, text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Ponder @pon"]
+    graveyard: ["Runehorn Hellkite @hk"]
+    battlefield: ["Taiga @taiga", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 20
+  p1:
+    hand: ["Stifle @stifle", "Daze @daze"]
+    battlefield: ["Island @pisl"]
+    library_pad: 20
+script:
+  - p0: {t: activate, source: "@hk", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@hk"}], pay: auto}
+  - check:
+      stack:
+        - {kind: activated, source: "@hk"}
+        - {kind: spell, card: "@stifle", controller: p1}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm, Ponder]
+      graveyard: []
+      exile: [{card: Runehorn Hellkite, face_up: true}]
+      library_count: 20
+    p1:
+      hand: [Daze]
+      graveyard: [Stifle]
+      library_count: 20
+notes: >
+  Counter the ability and nothing happens: no discard, no draw (library counts unchanged), and the Hellkite is not returned
+  to the graveyard.

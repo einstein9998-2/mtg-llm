@@ -1,0 +1,50 @@
+id: storm-a-tendrils-copy-retargeted-to-self-original-unaffected
+title: "A storm copy of Tendrils may be retargeted to its controller; the original still drains the opponent"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Swamp]
+tags: [tendrils-of-agony, storm, copy, retarget, new-targets, drain]
+derived_from: cr
+source:
+  - {kind: oracle, card: Tendrils of Agony, text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", verified: true}
+  - {kind: cr, ref: "707.10c", text: "The player may leave any number of the targets unchanged, even if those targets would be illegal. If the player chooses to change some or all of the targets, the new targets must be legal.", verified: true}
+  - {kind: cr, ref: "707.10", text: "A copy of a spell or ability copies both the characteristics of the spell or ability and all decisions made for it, including modes, targets, the value of X, and additional or alternative costs.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: true}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p0}}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0, targets: [{player: p1}]}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0, targets: [{player: p0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {life: 20}
+      p1: {life: 20}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 22, graveyard: [Dark Ritual, Tendrils of Agony]}
+    p1: {life: 18}
+notes: >
+  The copy (controlled by p0) is retargeted at p0: it resolves first and p0 loses 2 and gains 2 (net 0, life 20 is asserted
+  after it resolves while p1 is still at 20). The original keeps its target: p1 20 -> 18, p0 20 -> 22. A wrong engine retargets
+  the original too, or lets both share one target slot.

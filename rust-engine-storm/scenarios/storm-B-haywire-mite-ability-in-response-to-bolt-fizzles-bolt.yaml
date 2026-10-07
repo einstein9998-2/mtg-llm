@@ -1,0 +1,56 @@
+id: storm-b-haywire-mite-ability-in-response-to-bolt-fizzles-bolt
+title: In response to Lightning Bolt on Haywire Mite, sacrificing it exiles Lotus Petal, gains 2 life once, and Bolt is countered on resolution
+area: card
+cards: [Haywire Mite, Forest, Lightning Bolt, Mountain, Lotus Petal]
+tags: [haywire-mite, sacrifice-cost, in-response, fizzle, dies-trigger, lightning-bolt, stack]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Haywire Mite, text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", verified: true}
+  - {kind: oracle, card: Haywire Mite, text: "When this creature dies, you gain 2 life.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If the spell or ability specifies targets, it checks whether the targets are still legal.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Haywire Mite @mite", "Forest @for"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm", "Lotus Petal @petal"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: ["@mite"], pay: auto}
+  - p1: {t: pass}
+  - check: {pending: {actor: p0, kind: priority}, stack: [{kind: spell, card: "@bolt", controller: p1, targets: ["@mite"]}]}
+  - p0: {t: activate, source: "@mite", ability: 0, targets: ["@petal"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: activated, source: "@mite", controller: p0, targets: ["@petal"]}
+        - {kind: triggered, source: "@mite", controller: p0, text_contains: "gain 2 life"}
+  - resolve_top: true
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      p1: {exile: [{card: Lotus Petal, face_up: true}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      graveyard: [Haywire Mite]
+    p1:
+      graveyard: [Lightning Bolt]
+      exile: [{card: Lotus Petal, face_up: true}]
+      battlefield: [{card: Mountain, tapped: true}]
+      life: 20
+notes: >
+  The Mite is the only target of Bolt. p0 sacrifices it in response (cost), so the Bolt's target is gone and Bolt does
+  nothing on resolution (608.2b: its only target is illegal, so it is countered) and goes to the graveyard. The Mite died
+  once, so exactly 2 life is gained (22). The ability's own target, p1's Lotus Petal, ends up exiled. Stack order: trigger on top, then the
+  ability, then Bolt.

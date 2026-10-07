@@ -1,0 +1,35 @@
+id: storm-b-giants-boulder-etb-scry-two-keep-and-reorder
+title: Giant's Boulder's scry 2 may keep both cards on top and reorder them
+area: card
+cards: [Giant's Boulder, Island, Ponder, Brainstorm, Thoughtseize]
+tags: [giants-boulder, etb-trigger, scry, library-order, reorder]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Giant's Boulder, text: "When this artifact enters, scry 2.", verified: false, note: "Giant's Boulder text comes from three store pages (engine owner's brief), not Scryfall, so it cannot be verified here"}
+  - {kind: cr, ref: "701.22a", text: "To “scry N” means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Giant's Boulder @boulder"]
+    battlefield: ["Island @isl"]
+    library: ["Ponder @pon", "Brainstorm @bs", "Thoughtseize @ts"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@boulder", pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: scry, to_bottom: [], on_top_order: ["@bs", "@pon"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      library_top: [Brainstorm, Ponder, Thoughtseize]
+      library_count: 13
+notes: >
+  "Any number" includes none: both cards stay on top and the new order is Brainstorm, Ponder (the answer lists top first),
+  Thoughtseize third. Nothing is drawn or discarded, so the library keeps 13 cards.

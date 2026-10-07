@@ -1,0 +1,32 @@
+id: storm-a-boomerang-own-card-controlled-by-opponent-returns-no-draw
+title: "Boomerang Basics on your own card that the opponent controls: it returns to your hand but you do not draw"
+area: card
+cards: [Boomerang Basics, Lotus Petal, Island]
+tags: [boomerang-basics, bounce, owner-vs-controller, no-draw, control-change]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @i1", {card: Lotus Petal, as: lent, controller: p1}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@lent"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {hand: [Lotus Petal], library_count: 10, graveyard: [Boomerang Basics]}
+    p1: {battlefield: [], hand: []}
+notes: >
+  Mirror of the previous scenario: the Petal is listed in p0's zone (owner p0) with `controller: p1`. It goes to p0's hand, and p0 did NOT
+  control it, so no card is drawn (library_count stays 10).

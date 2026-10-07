@@ -1,0 +1,54 @@
+id: storm-b-runehorn-hellkite-graveyard-ability-discards-hands-draws-seven
+title: Runehorn Hellkite's graveyard ability exiles it as a cost, then both players discard their hands and draw seven
+area: card
+cards: [Runehorn Hellkite, Taiga, Island, Brainstorm, Lightning Bolt, Ponder, Daze]
+tags: [runehorn-hellkite, graveyard-ability, exile-cost, discard-hand, draw-seven, wheel, hand-size, both-players]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Runehorn Hellkite, text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", verified: true}
+  - {kind: cr, ref: "602.2", text: "To activate an ability is to put it onto the stack and pay its costs, so that it will eventually resolve and have its effect.", verified: true}
+  - {kind: cr, ref: "701.9a", text: "To discard a card, move it from its owner’s hand to that player’s graveyard.", verified: true}
+  - {kind: cr, ref: "121.2", text: "Cards may only be drawn one at a time. If a player is instructed to draw multiple cards, that player performs that many individual card draws.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs", "Lightning Bolt @bolt", "Ponder @pon"]
+    graveyard: ["Runehorn Hellkite @hk"]
+    battlefield: ["Taiga @taiga", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 20
+  p1:
+    hand: ["Daze @daze", "Island @pisl"]
+    library_pad: 20
+script:
+  - p0: {t: activate, source: "@hk", ability: 0, pay: auto}
+  - check:
+      stack: [{kind: activated, source: "@hk", controller: p0}]
+      p0:
+        hand: [Brainstorm, Lightning Bolt, Ponder]
+        graveyard: []
+        exile: [{card: Runehorn Hellkite, face_up: true}]
+        battlefield: [{card: Taiga, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+      p1: {hand: [Daze, Island]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Island, Island, Island, Island, Island, Island]
+      graveyard: [Brainstorm, Lightning Bolt, Ponder]
+      exile: [{card: Runehorn Hellkite, face_up: true}]
+      library_count: 13
+    p1:
+      hand: [Island, Island, Island, Island, Island, Island, Island]
+      graveyard: [Daze, Island]
+      library_count: 13
+notes: >
+  The Hellkite is exiled as part of the cost, so while the ability is on the stack it is already in exile, p0's hand is
+  untouched and the graveyard empty. On resolution each player discards the whole hand (p0's three spells and p1's Daze
+  and Island go to graveyards) and then draws seven: both end with seven cards and a library 7 smaller. The libraries are
+  padded with Islands so the assertion does not depend on any shuffling (hands are all Islands, as the discarded cards are
+  all in graveyards). A wrong engine draws before discarding, discards only the activating player, or keeps the Hellkite
+  in the graveyard.

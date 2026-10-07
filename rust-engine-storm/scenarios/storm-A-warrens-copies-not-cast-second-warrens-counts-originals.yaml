@@ -1,0 +1,78 @@
+id: storm-a-warrens-copies-not-cast-second-warrens-counts-originals
+title: "Two Empty the Warrens: storm 1 (four Goblins) then storm 2 (six more), copies never count as spells"
+area: card
+cards: [Empty the Warrens, Dark Ritual, Goblin Token, Swamp, Mountain]
+tags: [empty-the-warrens, storm, storm-count, copies-not-cast, two-storm-spells, tokens]
+derived_from: cr
+source:
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: oracle, card: Empty the Warrens, text: "Create two 1/1 red Goblin creature tokens.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Empty the Warrens @w1", "Empty the Warrens @w2"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@w1", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {spells_cast_this_turn: 2}
+  - p0: {t: cast, card: "@w2", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@w2", controller: p0}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p0}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p0}
+      p0: {spells_cast_this_turn: 3}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Dark Ritual, Empty the Warrens, Empty the Warrens]
+      spells_cast_this_turn: 3
+      battlefield:
+        - {card: Swamp}
+        - {card: Swamp}
+        - {card: Swamp}
+        - {card: Swamp}
+        - {card: Mountain}
+        - {card: Mountain}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+notes: >
+  First Warrens: spells before it = Dark Ritual = 1, so one copy, 2 resolutions = 4 Goblins. Second Warrens: Dark Ritual and the
+  first Warrens = 2, so two copies (the first Warrens' copy was not cast), 3 resolutions = 6 more Goblins. Total 10 tokens. The first
+  Warrens is paid with Ritual's BBB and a Mountain; the second with the remaining Mountain and three Swamps (tapped state is not asserted
+  because the payment split is the engine's).

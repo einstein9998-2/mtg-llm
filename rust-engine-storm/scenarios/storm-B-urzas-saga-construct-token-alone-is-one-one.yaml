@@ -1,0 +1,48 @@
+id: storm-b-urzas-saga-construct-token-alone-is-one-one
+title: "Urza's Saga's chapter II ability makes a Construct that counts itself: 1/1 when it is the only artifact"
+area: card
+cards: [Urza's Saga, Island]
+tags: [urzas-saga, saga, construct-token, token, artifact-creature, power-toughness, granted-ability, cost-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "II — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"", verified: true}
+  - {kind: cr, ref: "613.4c", text: "Layer 7c: Effects and counters that modify power and/or toughness (but don’t set power and/or toughness to a specific number or value) are applied.", verified: true}
+  - {kind: cr, ref: "714.3b", text: "As a player’s precombat main phase begins, that player puts a lore counter on each Saga they control with one or more chapter abilities.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    battlefield: ["Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - p0: {t: activate, source: "@saga", ability: 1, pay: {tap: ["@is1", "@is2"]}}
+  - check:
+      stack: [{kind: activated, source: "@saga", controller: p0}]
+      p0:
+        mana_pool: {}
+        battlefield_contains: [{card: Urza's Saga, tapped: true}, {card: Island, tapped: true}]
+  - resolve_top: true
+  - bind: {as: con, find: {name: "Construct Token", controller: p0}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Urza's Saga, tapped: true, counters: {lore: 2}}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {token: Construct Token, alias: con, controller: p0, types: [Artifact, Creature], subtypes: [Construct], pt: [1, 1], sick: true}
+notes: >
+  The token is 0/0 with +1/+1 for each artifact p0 controls; the only artifact is the token itself, so it is 1/1 and
+  survives state-based actions. The ability costs {2} (two Islands) and {T} of the Saga itself. It was made this turn
+  (sick: true). A wrong engine counts only other artifacts (token dies as 0/0) or double-counts.

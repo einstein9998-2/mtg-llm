@@ -1,0 +1,53 @@
+id: storm-c-hexing-squelcher-other-creature-has-ward-spell-paid-resolves
+title: "Another creature p0 controls has Ward-Pay 2 life: p1 pays 2 life to Lightning Bolt the Ocelot Pride and it dies"
+area: card
+cards: [Hexing Squelcher, Ocelot Pride, Lightning Bolt, Mountain]
+tags: [hexing-squelcher, ward, other-creatures, pay-life, counter-unless-pay, lightning-bolt, yes-no-decision]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: 'Other creatures you control have "Ward—Pay 2 life."', verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+  - {kind: cr, ref: "118.12a", text: "This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq", "Ocelot Pride @op"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: ["@op"], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1, targets: ["@op"]}
+        - {kind: triggered, controller: p0, text_contains: "counter"}
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_ward, answer: true, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      p1: {life: 18}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Ocelot Pride]
+      battlefield: [{card: Hexing Squelcher, damage: 0}]
+    p1:
+      life: 18
+      graveyard: [Lightning Bolt]
+notes: >
+  The Squelcher gives its other creatures ward-pay-2-life, so targeting the Ocelot Pride (not the Squelcher) puts a
+  ward trigger on the stack. The engine models it as a trigger of the Squelcher itself; the test does not look at the
+  trigger's source, only that a trigger exists and that the outcome is "pay 2 life or the spell is countered". p1
+  pays, Bolt resolves and kills the 1/1 Ocelot Pride (first strike does not matter, it is not in combat). The
+  Squelcher is not damaged.

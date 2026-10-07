@@ -1,0 +1,1766 @@
+diff -ruN a/crates/mtg-cards/cards/storm.cards.ron b/crates/mtg-cards/cards/storm.cards.ron
+--- a/crates/mtg-cards/cards/storm.cards.ron	1970-01-01 00:00:00.000000000 +0000
++++ b/crates/mtg-cards/cards/storm.cards.ron	2026-10-06 12:31:30.000000000 +0000
+@@ -0,0 +1,111 @@
++// Legacy Storm (Brady's Beseech Storm 75, 2026-10-06), RFC 0007. Oracle text per Savecraft card_search (Scryfall); Giant's Boulder from store pages (not in Savecraft).
++// "Construct Token" is defined in tron.cards.ron (identical definition).
++// Kept apart from legacy.cards.ron so that the pinned real-pool snapshot and its goldens stay untouched.
++[
++  (name: "Taiga", types: "LAND", subtypes: ["Mountain", "Forest"]),
++  (name: "Burning Wish", cost: "{1}{R}", types: "SORCERY", abilities: [
++    Spell(effect: Seq([Wish(filter: (types_any: "SORCERY")), Exile(One(This))])),
++  ]),
++  // The search and the shuffle are separate instructions: the random discard sits between them.
++  (name: "Gamble", cost: "{R}", types: "SORCERY", abilities: [
++    Spell(effect: Seq([SearchNoShuffle(filter: (zone: Library), dest: Hand), DiscardRandom(who: You, n: Const(1)), Shuffle(You)])),
++  ]),
++  // Bargain is modelled as an alternative way to cast it: {1}{B}{B}{B} plus the sacrifice (RFC 0007).
++  (name: "Beseech the Mirror", cost: "{1}{B}{B}{B}", types: "SORCERY", abilities: [
++    Alt(label: "bargained", key: "bargained", cost: [Mana("{1}{B}{B}{B}"), Sacrifice(types_any: "ARTIFACT | ENCHANTMENT", controller: You, alt: [(token: Some(true), controller: You)])]),
++    Spell(effect: Seq([
++      Search(filter: (zone: Library), dest: Exile),
++      If(cond: WasCast(key: Some("bargained")), then: CastMovedFree(max_cmc: 4)),
++      MoveTo(objs: One(Moved(0)), to: Hand),
++    ])),
++  ]),
++  (name: "Tendrils of Agony", cost: "{2}{B}{B}", types: "SORCERY", abilities: [
++    Triggered(text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", zone: Stack,
++      on: SpellCast(caster: You, filter: (self_only: true)), effect: CopySpell(what: This, n: EventAmount)),
++    Spell(targets: [(players: Any)], effect: Seq([LoseLife(who: Target(0), n: Const(2)), GainLife(who: You, n: Const(2))])),
++  ]),
++  (name: "Empty the Warrens", cost: "{3}{R}", types: "SORCERY", abilities: [
++    Triggered(text: "Storm (When you cast this spell, copy it for each spell cast before it this turn.)", zone: Stack,
++      on: SpellCast(caster: You, filter: (self_only: true)), effect: CopySpell(what: This, n: EventAmount)),
++    Spell(effect: CreateToken(token: "Goblin Token", n: Const(2), who: You)),
++  ]),
++  (name: "Peer into the Abyss", cost: "{4}{B}{B}{B}", types: "SORCERY", abilities: [
++    Spell(targets: [(players: Any)], effect: Seq([
++      Draw(who: Target(0), n: HalfUp(CardsInLibrary(Target(0)))),
++      LoseLife(who: Target(0), n: HalfUp(Life(Target(0)))),
++    ])),
++  ]),
++  (name: "Boomerang Basics", cost: "{U}", types: "SORCERY", subtypes: ["Lesson"], abilities: [
++    Spell(targets: [(objects: (types_not: "LAND"))], effect: If(
++      cond: ControlledBy(Target(0), You),
++      then: Seq([Bounce(One(Target(0))), Draw(who: You, n: Const(1))]),
++      els: Bounce(One(Target(0))))),
++  ]),
++  (name: "Haywire Mite", cost: "{1}", types: "ARTIFACT | CREATURE", subtypes: ["Insect"], pt: (1, 1), abilities: [
++    Triggered(text: "When this creature dies, you gain 2 life.", on: ZoneChange(filter: (self_only: true), from: Battlefield, to: Graveyard), effect: GainLife(who: You, n: Const(2))),
++    Activated(text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", cost: [Mana("{G}"), SacrificeSelf],
++      targets: [(objects: (types_any: "ARTIFACT | ENCHANTMENT", types_not: "CREATURE"))], effect: Exile(One(Target(0)))),
++  ]),
++  (name: "Mox Opal", cost: "{0}", types: "ARTIFACT", supertypes: "LEGENDARY", abilities: [
++    Activated(text: "Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts.", cost: [TapSelf], is_mana: true,
++      cond: Controls(who: You, filter: (types_any: "ARTIFACT"), at_least: 3), effect: AddManaAny(n: Const(1))),
++  ]),
++  (name: "Chrome Mox", cost: "{0}", types: "ARTIFACT", abilities: [
++    Triggered(text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", on: Enters(filter: (self_only: true)),
++      effect: Imprint(filter: (zone: Hand, types_not: "ARTIFACT | LAND"))),
++    Activated(text: "{T}: Add one mana of any of the exiled card's colors.", cost: [TapSelf], is_mana: true, effect: AddManaImprinted),
++  ]),
++  (name: "Giant's Boulder", cost: "{1}", types: "ARTIFACT", abilities: [
++    Triggered(text: "When this artifact enters, scry 2.", on: Enters(filter: (self_only: true)), effect: Scry(Const(2))),
++    Activated(text: "{1}, {T}: Add one mana of any color.", cost: [Mana("{1}"), TapSelf], is_mana: true, effect: AddManaAny(n: Const(1))),
++    Activated(text: "{7}, {T}, Sacrifice this artifact: Destroy target permanent.", cost: [Mana("{7}"), TapSelf, SacrificeSelf],
++      targets: [(objects: ())], effect: Destroy(One(Target(0)))),
++  ]),
++  // The chapter abilities grant their activated abilities by leaving a marker counter (Other(0), Other(1))
++  // that the abilities' activation conditions test (RFC 0007).
++  (name: "Urza's Saga", types: "ENCHANTMENT | LAND", subtypes: ["Saga"], abilities: [
++    Saga(last: 3),
++    Triggered(text: "I — This Saga gains \"{T}: Add {C}.\"", on: Chapter(1), effect: AddCounters(objs: One(This), kind: Other(0), n: Const(1))),
++    Triggered(text: "II — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"", on: Chapter(2),
++      effect: AddCounters(objs: One(This), kind: Other(1), n: Const(1))),
++    Triggered(text: "III — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.", on: Chapter(3),
++      effect: Search(filter: (zone: Library, types_any: "ARTIFACT", types_not: "LAND", cmc: (Le, 1)), dest: Battlefield)),
++    Activated(text: "{T}: Add {C}.", cost: [TapSelf], is_mana: true, cond: HasCounter(This, Other(0)), effect: AddMana(color: C, n: 1)),
++    Activated(text: "{2}, {T}: Create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"", cost: [Mana("{2}"), TapSelf],
++      cond: HasCounter(This, Other(1)), effect: CreateToken(token: "Construct Token", n: Const(1), who: You)),
++  ]),
++  (name: "Runehorn Hellkite", cost: "{5}{R}", types: "CREATURE", subtypes: ["Dragon"], pt: (5, 5), keywords: "FLYING", abilities: [
++    Activated(text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", cost: [Mana("{5}{R}"), ExileSelf], zone: Graveyard,
++      effect: Seq([ForEachPlayer(body: Discard(who: Each, n: Const(99))), ForEachPlayer(body: Draw(who: Each, n: Const(7)))])),
++  ]),
++  (name: "Echo of Eons", cost: "{4}{U}{U}", types: "SORCERY", abilities: [
++    Alt(label: "flashback", key: "flashback", cost: [Mana("{2}{U}")], zone: Graveyard, exile_after: true),
++    Spell(effect: Seq([
++      MoveTo(objs: All(zone: Hand, owner: You), to: Library), MoveTo(objs: All(zone: Graveyard, owner: You), to: Library), Shuffle(You),
++      MoveTo(objs: All(zone: Hand, owner: Opp), to: Library), MoveTo(objs: All(zone: Graveyard, owner: Opp), to: Library), Shuffle(Opp),
++      Draw(who: You, n: Const(7)), Draw(who: Opp, n: Const(7)),
++    ])),
++  ]),
++  (name: "Hexing Squelcher", cost: "{1}{R}", types: "CREATURE", subtypes: ["Goblin", "Sorcerer"], pt: (2, 2), keywords: "UNCOUNTERABLE", abilities: [
++    Triggered(text: "Ward—Pay 2 life. (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays 2 life.)", on: BecomesTarget(by: Opp), effect: CounterEventUnlessLife(n: 2)),
++    SpellsUncounterable,
++    Triggered(text: "Other creatures you control have \"Ward—Pay 2 life.\" (Whenever such a creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays 2 life.)", on: OtherBecomesTarget(by: Opp, filter: (types_any: "CREATURE", controller: You)), effect: CounterEventUnlessLife(n: 2)),
++  ]),
++  (name: "Gaea's Will", types: "SORCERY", abilities: [
++    Activated(text: "Suspend 4—{G}", cost: [Mana("{G}"), SuspendSelf(4)], zone: Hand, timing: Sorcery),
++    Triggered(text: "At the beginning of your upkeep, if this card is suspended, remove a time counter from it.", zone: Exile,
++      on: BeginStep(step: Upkeep, whose: You), cond: HasCounter(This, Time),
++      effect: AddCounters(objs: One(This), kind: Time, n: Const(-1))),
++    Triggered(text: "When the last is removed, cast it without paying its mana cost.", zone: Exile,
++      on: LastCounterRemoved(Time), effect: CastFree(This)),
++    Spell(effect: Seq([
++      PlayerFx(who: You, fx: PlayFromGraveyard, until: EndOfTurn),
++      PlayerFx(who: You, fx: ExileInsteadOfGraveyard, until: EndOfTurn),
++    ])),
++  ]),
++  (name: "Song of Creation", cost: "{1}{G}{U}{R}", types: "ENCHANTMENT", abilities: [
++    ExtraLandDrop,
++    Triggered(text: "Whenever you cast a spell, draw two cards.", on: SpellCast(caster: You), effect: Draw(who: You, n: Const(2))),
++    Triggered(text: "At the beginning of your end step, discard your hand.", on: BeginStep(step: End, whose: You), effect: Discard(who: You, n: Const(99))),
++  ]),
++]
+diff -ruN a/crates/mtg-cards/src/legacy.rs b/crates/mtg-cards/src/legacy.rs
+--- a/crates/mtg-cards/src/legacy.rs	2026-10-06 12:30:35.198727944 +0000
++++ b/crates/mtg-cards/src/legacy.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -7,7 +7,9 @@
+ 
+ pub const TRON_CARDS: &str = include_str!("../cards/tron.cards.ron");
+ 
++pub const STORM_CARDS: &str = include_str!("../cards/storm.cards.ron");
++
+ pub fn build() -> Arc<CardDb> {
+-    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
++    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS), ("storm.cards.ron", STORM_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
+     Arc::new(db)
+ }
+diff -ruN a/crates/mtg-cards/tests/storm_load.rs b/crates/mtg-cards/tests/storm_load.rs
+--- a/crates/mtg-cards/tests/storm_load.rs	1970-01-01 00:00:00.000000000 +0000
++++ b/crates/mtg-cards/tests/storm_load.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -0,0 +1,7 @@
++#[test]
++fn storm_loads() {
++    let db = mtg_cards::legacy::build();
++    for n in ["Taiga", "Burning Wish", "Gamble", "Beseech the Mirror", "Tendrils of Agony", "Urza's Saga", "Gaea's Will", "Hexing Squelcher", "Song of Creation"] {
++        assert!(db.id(n).is_some(), "{n}");
++    }
++}
+diff -ruN a/crates/mtg-core/src/card.rs b/crates/mtg-core/src/card.rs
+--- a/crates/mtg-core/src/card.rs	2026-10-06 12:30:35.199013782 +0000
++++ b/crates/mtg-core/src/card.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -197,7 +197,7 @@
+                         None => Vec::new(),
+                     }
+                 }
+-                AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) => Vec::new(),
++                AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) | AbilityDef::Saga { .. } | AbilityDef::ExtraLandDrop | AbilityDef::SpellsUncounterable => Vec::new(),
+             };
+             self.code.push(code);
+         }
+@@ -233,6 +233,12 @@
+     pub has_ascend: bool,
+     /// Some card has a `CostFloor` ability (lets `cost_floor` skip the battlefield scan).
+     pub has_cost_floor: bool,
++    /// Some card has an extra land drop (RFC 0007).
++    pub has_extra_land: bool,
++    /// Some card has the static "spells you control can't be countered" (RFC 0007).
++    pub has_uncounterable_static: bool,
++    /// Some card is a Saga (RFC 0007).
++    pub has_saga: bool,
+     /// The dungeon cards, in definition order (the choices of a fresh venture).
+     pub dungeons: Vec<CardDefId>,
+ }
+@@ -258,6 +264,9 @@
+                 AbilityDef::Restrict(_) => self.has_restrict = true,
+                 AbilityDef::Ascend => self.has_ascend = true,
+                 AbilityDef::CostFloor(_) => self.has_cost_floor = true,
++                AbilityDef::ExtraLandDrop => self.has_extra_land = true,
++                AbilityDef::SpellsUncounterable => self.has_uncounterable_static = true,
++                AbilityDef::Saga { .. } => self.has_saga = true,
+                 _ => {}
+             }
+         }
+@@ -316,7 +325,7 @@
+                     AbilityDef::Spell(s) => s.modes.iter().filter_map(|m| m.effect.as_ref()).for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+                     AbilityDef::Activated(ad) => ad.effect.iter().for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+                     AbilityDef::Triggered(t) => t.effect.iter().for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+-                    AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) => {}
++                    AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) | AbilityDef::Saga { .. } | AbilityDef::ExtraLandDrop | AbilityDef::SpellsUncounterable => {}
+                 }
+                 for t in toks {
+                     match self.id(t) {
+diff -ruN a/crates/mtg-core/src/cast.rs b/crates/mtg-core/src/cast.rs
+--- a/crates/mtg-core/src/cast.rs	2026-10-06 12:30:35.199434627 +0000
++++ b/crates/mtg-core/src/cast.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -504,6 +504,11 @@
+             cx.emit(Event::SpellCast { obj: f.obj, def: d, controller: seat, vid });
+             emit_targeted(cx, f.obj, seat);
+         }
++        // Suspend is a special action (CR 116.2f, 702.62a): the cost is all there is, nothing goes on the stack.
++        Some(_) if plan.suspend_self > 0 => {
++            cx.s.stack.retain(|x| x.obj != f.obj);
++            cx.commit_move(f.obj, ZoneKind::Gone, MoveOpts { quiet: true, ..Default::default() }, None);
++        }
+         Some((src, _)) => {
+             entry_mut(cx, f.obj).x = ctx.x;
+             cx.emit(Event::AbilityActivated { source: src, controller: seat });
+diff -ruN a/crates/mtg-core/src/cost.rs b/crates/mtg-core/src/cost.rs
+--- a/crates/mtg-core/src/cost.rs	2026-10-06 12:30:35.199844148 +0000
++++ b/crates/mtg-core/src/cost.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -50,6 +50,10 @@
+     pub loyalty: Option<i8>,
+     pub sac_self: bool,
+     pub discard_self: bool,
++    /// Exile the source from hand with this many time counters (0 = no).
++    pub suspend_self: u8,
++    /// Exile the source from where it is.
++    pub exile_self: bool,
+     /// The plan is for casting a spell (restricted mana may apply).
+     pub is_spell: bool,
+     /// Escape-style collective exile: other graveyard cards with at least this many card types.
+@@ -110,6 +114,8 @@
+             CostItem::Loyalty(n) => plan.loyalty = Some(*n),
+             CostItem::SacrificeSelf => plan.sac_self = true,
+             CostItem::DiscardSelf => plan.discard_self = true,
++            CostItem::SuspendSelf(n) => plan.suspend_self = *n,
++            CostItem::ExileSelf => plan.exile_self = true,
+             CostItem::ExileTypes(n) => plan.collective = Some(*n),
+             other => plan.picks.push(other.clone()),
+         }
+@@ -384,10 +390,10 @@
+                 return false;
+             }
+         }
+-        if plan.sac_self && !self.s.is_live(source) {
++        if (plan.sac_self || plan.exile_self) && !self.s.is_live(source) {
+             return false;
+         }
+-        if plan.discard_self && !(self.s.is_live(source) && self.s.obj(source).zone == ZoneKind::Hand) {
++        if (plan.discard_self || plan.suspend_self > 0) && !(self.s.is_live(source) && self.s.obj(source).zone == ZoneKind::Hand) {
+             return false;
+         }
+         if !plan.mana.is_zero() {
+@@ -471,6 +477,16 @@
+         if plan.discard_self && self.s.is_live(source) {
+             self.move_zone(source, ZoneKind::Graveyard, MoveOpts::default());
+         }
++        if plan.exile_self && self.s.is_live(source) {
++            self.move_zone(source, ZoneKind::Exile, MoveOpts::default());
++        }
++        if plan.suspend_self > 0 && self.s.is_live(source) {
++            if let Some(nr) = self.move_zone(source, ZoneKind::Exile, MoveOpts::default()) {
++                self.add_counters(nr, CounterKind::Time, plan.suspend_self as i32);
++                // Suspended cards are exiled face up.
++                self.s.knowledge[nr.slot as usize].known_to = 3;
++            }
++        }
+         let _ = Event::GameEnded;
+         (spent, colors, restricted)
+     }
+@@ -526,6 +542,8 @@
+             CostItem::ExileTypes(n) => format!("exile cards with {n} card types from your graveyard"),
+             CostItem::DiscardHand => "discard your hand".into(),
+             CostItem::DiscardSelf => "discard this card".into(),
++            CostItem::SuspendSelf(n) => format!("suspend {n}"),
++            CostItem::ExileSelf => "exile this card".into(),
+             CostItem::Loyalty(n) => format!("loyalty {n:+}"),
+         });
+     }
+diff -ruN a/crates/mtg-core/src/decision.rs b/crates/mtg-core/src/decision.rs
+--- a/crates/mtg-core/src/decision.rs	2026-10-06 12:30:35.200077326 +0000
++++ b/crates/mtg-core/src/decision.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -114,6 +114,9 @@
+     Delve,
+     /// Mishra's Research Desk: the exiled card the controller may play.
+     PlayChosen,
++    // RFC 0007 (Storm)
++    /// Imprint (Chrome Mox): the card exiled from hand; `Done` declines.
++    Imprint,
+ }
+ 
+ impl CardsPurpose {
+@@ -162,6 +165,8 @@
+     PayPhyrexian { color: u8 },
+     /// Combat damage division: assign this many points to `blocker` (value chosen from the mask).
+     AssignDamage { attacker: ObjRef, blocker: ObjRef, remaining: u16 },
++    /// Burning Wish (RFC 0007): choose a card of the sideboard (`Opt::Name` = card definition); `Done` declines.
++    ChooseSideboard,
+ }
+ 
+ impl DecisionKind {
+diff -ruN a/crates/mtg-core/src/derive.rs b/crates/mtg-core/src/derive.rs
+--- a/crates/mtg-core/src/derive.rs	2026-10-06 12:30:35.200278355 +0000
++++ b/crates/mtg-core/src/derive.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -246,6 +246,17 @@
+             Expr::CardsInGraveyard(p) => self.eval_p(env, *p).map(|s| self.s.players[s.idx()].graveyard.len() as i32).unwrap_or(0),
+             Expr::CardsInHand(p) => self.eval_p(env, *p).map(|s| self.s.players[s.idx()].hand.len() as i32).unwrap_or(0),
+             Expr::Plus(a, b) => self.static_expr(env, a) + self.static_expr(env, b),
++            // Battlefield counts read the characteristics derived so far (types are base by this point).
++            Expr::Count(f) if f.zone == ZoneKind::Battlefield => {
++                let src = env.source;
++                let bf = self.s.battlefield.clone();
++                bf.into_iter()
++                    .filter(|&t| {
++                        let c = self.s.derived[t.slot as usize];
++                        self.filter_match(f, t, &c, Some(t) == src, env.controller)
++                    })
++                    .count() as i32
++            }
+             other => panic!("expression {other:?} is not allowed in a static ability"),
+         }
+     }
+diff -ruN a/crates/mtg-core/src/ir.rs b/crates/mtg-core/src/ir.rs
+--- a/crates/mtg-core/src/ir.rs	2026-10-06 12:30:35.200513308 +0000
++++ b/crates/mtg-core/src/ir.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -604,6 +604,35 @@
+     ExileChoosePlay { n: Expr },
+     /// `n` mana of one color, with `n` evaluated when the ability is used (Urza's Tower, Workshop).
+     AddManaExpr { color: ManaColor, n: Expr },
++    // ---- RFC 0007 (Storm) ----
++    /// Burning Wish: the controller may reveal a card matching the filter that they own from outside
++    /// the game (their sideboard) and put it into their hand.
++    Wish { filter: ObjFilter },
++    /// `who` discards `n` cards chosen at random from their hand (Gamble).
++    DiscardRandom { who: PRef, n: Expr },
++    /// The controller may cast, without paying its mana cost, one of the cards the previous instruction
++    /// moved to exile (Beseech the Mirror) whose mana value is at most `max_cmc`.
++    CastMovedFree { max_cmc: u8 },
++    /// The controller may cast the card the reference names (it is in exile, a suspended card) without
++    /// paying its mana cost. Nothing happens if it can't be cast.
++    CastFree(ORef),
++    /// Imprint (Chrome Mox): the controller may exile a card matching the filter from their hand;
++    /// the source remembers the colors of that card.
++    Imprint { filter: ObjFilter },
++    /// A mana ability: one mana of any color among those of the card imprinted on the source (nothing
++    /// if there is none or it is colorless).
++    AddManaImprinted,
++    /// Ward-style: counter the spell or ability that caused this trigger unless its controller pays
++    /// this much life (Hexing Squelcher).
++    CounterEventUnlessLife { n: u8 },
++    /// `Search` without the shuffle: the card's own `Shuffle` instruction follows later (Gamble
++    /// discards at random between the search and the shuffle).
++    SearchNoShuffle {
++        #[serde(default = "pref_you")]
++        who: PRef,
++        filter: ObjFilter,
++        dest: ZoneKind,
++    },
+ }
+ 
+ fn pref_you() -> PRef {
+@@ -647,6 +676,12 @@
+     /// A loyalty cost (CR 606): add (positive) or remove (negative, at most the loyalty there is)
+     /// loyalty counters. Only one loyalty ability per permanent per turn, at sorcery speed.
+     Loyalty(i8),
++    /// Suspend N (RFC 0007): exile this card from hand with `n` time counters on it. Only on an
++    /// ability activated from hand; the ability itself does nothing (CR 702.62a is a special action,
++    /// here it uses the stack, which no card in the pool can exploit).
++    SuspendSelf(u8),
++    /// Exile this card (activated from the graveyard: Runehorn Hellkite).
++    ExileSelf,
+ }
+ 
+ impl CostItem {
+@@ -770,7 +805,7 @@
+     }
+ }
+ 
+-#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
++#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+ pub struct ActivatedDef {
+     /// The Oracle sentence of this ability (shown to players, matched by scenario `text_contains`).
+     #[serde(default)]
+@@ -788,11 +823,33 @@
+     /// The zone the source must be in to activate (hand for cycling and channel).
+     #[serde(default = "zone_bf")]
+     pub zone: ZoneKind,
++    /// "Activate only if ..." (RFC 0007): evaluated with the source's controller as `You` and the
++    /// source as `This`, when the ability is offered.
++    #[serde(default)]
++    pub cond: Option<Cond>,
+     /// "This ability costs {1} less to activate for each <permanent> you control."
+     #[serde(default)]
+     pub cost_reduce: Option<ObjFilter>,
+ }
+ 
++// `cond` (RFC 0007) is hashed only when present, so the card-database hash of every pool that does
++// not use it stays what it was.
++impl std::hash::Hash for ActivatedDef {
++    fn hash<H: std::hash::Hasher>(&self, h: &mut H) {
++        self.text.hash(h);
++        self.cost.hash(h);
++        self.targets.hash(h);
++        self.effect.hash(h);
++        self.is_mana.hash(h);
++        self.timing.hash(h);
++        self.zone.hash(h);
++        if let Some(c) = &self.cond {
++            c.hash(h);
++        }
++        self.cost_reduce.hash(h);
++    }
++}
++
+ fn timing_instant() -> Timing {
+     Timing::Instant
+ }
+@@ -843,6 +900,10 @@
+     /// The player has protection from everything (The One Ring): damage dealt to them is
+     /// prevented and they can't be the target of spells or abilities.
+     ProtectionFromEverything,
++    /// The player may play lands and cast spells from their graveyard (Gaea's Will, RFC 0007).
++    PlayFromGraveyard,
++    /// A card that would be put into the player's graveyard from anywhere is exiled instead (RFC 0007).
++    ExileInsteadOfGraveyard,
+ }
+ 
+ #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+@@ -914,6 +975,14 @@
+     YouAttack,
+     /// Never matches an event: the body of a delayed trigger created by `Delay`/`ExileUntil`.
+     Delayed,
++    // ---- RFC 0007 (Storm) ----
++    /// A lore counter brought this Saga's lore count to at least `n` from below `n` (chapter `n`, CR 714.2b).
++    Chapter(u8),
++    /// A permanent other than the source matching `filter` becomes the target of a spell or ability
++    /// controlled by a player matching `by` (ward granted to other creatures; `EventObj` = that spell or ability).
++    OtherBecomesTarget { by: Rel, filter: ObjFilter },
++    /// The last counter of this kind was removed from the source ("when the last is removed", suspend).
++    LastCounterRemoved(CounterKind),
+ }
+ 
+ #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+@@ -980,6 +1049,15 @@
+     NoHandLimit,
+     /// A cost floor (Trinisphere): each spell that would cost less than `min` mana costs `min`.
+     CostFloor(CostFloorDef),
++    // ---- RFC 0007 (Storm) ----
++    /// A Saga (CR 714): enters with a lore counter, gets another after its controller's draw step,
++    /// and is sacrificed once the chapter `last` has resolved. Chapters are `Triggered` abilities
++    /// on `EventPat::Chapter`.
++    Saga { last: u8 },
++    /// "You may play an additional land on each of your turns." (Song of Creation)
++    ExtraLandDrop,
++    /// "Spells you control can't be countered." (Hexing Squelcher, while it is on the battlefield)
++    SpellsUncounterable,
+ }
+ 
+ /// "As long as <cond>, each spell that would cost less than `min` mana to cast costs `min` mana
+diff -ruN a/crates/mtg-core/src/legal.rs b/crates/mtg-core/src/legal.rs
+--- a/crates/mtg-core/src/legal.rs	2026-10-06 12:30:35.200814773 +0000
++++ b/crates/mtg-core/src/legal.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -92,7 +92,20 @@
+             for (i, a) in def.abilities.iter().enumerate().filter(|_| !c.lost) {
+                 if let AbilityDef::Activated(ad) = a {
+                     if ad.is_mana {
+-                        if let Some(m) = simple_mana_ability(ad) {
++                        if let Some(c) = &ad.cond {
++                            if !self.activation_cond_holds(seat, r, c) {
++                                continue;
++                            }
++                        }
++                        if is_imprint_mana(ad) {
++                            let m = self.imprint_colors(r);
++                            if m != 0 {
++                                mask |= m;
++                                if ability == 255 {
++                                    ability = i as u8;
++                                }
++                            }
++                        } else if let Some(m) = simple_mana_ability(ad) {
+                             mask |= m.colors;
+                             let mn = match ad.effect.as_ref().and_then(dyn_mana_expr) {
+                                 Some(ex) => self.dyn_mana_n(seat, r, ex),
+@@ -403,6 +416,11 @@
+                     self.add_mana(seat, ManaColor::ALL[color as usize], *n as u8);
+                 }
+             }
++            Effect::AddManaImprinted => {
++                if add && self.imprint_colors(src) != 0 {
++                    self.add_mana(seat, ManaColor::ALL[color as usize], 1);
++                }
++            }
+             Effect::AddManaRestricted => {
+                 if add {
+                     let t = self.s.obj(src).chosen.saturating_sub(1) as u8;
+@@ -472,10 +490,16 @@
+                         continue;
+                     }
+                 }
+-                let simple = simple_mana_ability(ad).is_some();
++                let imprint = is_imprint_mana(ad);
++                let simple = simple_mana_ability(ad).is_some() || imprint;
+                 if simple && !explicit {
+                     continue;
+                 }
++                if let Some(c) = &ad.cond {
++                    if !self.activation_cond_holds(seat, r, c) {
++                        continue;
++                    }
++                }
+                 // A dynamic mana ability that would add nothing right now (Urza's Workshop's metalcraft
+                 // ability without three artifacts) is not offered.
+                 if let Some(ex) = ad.effect.as_ref().and_then(dyn_mana_expr) {
+@@ -494,7 +518,8 @@
+                 if !life_ok {
+                     continue;
+                 }
+-                let (colors, _) = ad.effect.as_ref().and_then(mana_leaf).unwrap_or((0, 0));
++                // Nothing imprinted: the tap is still offered, it adds no mana (bit 5 stands for "no color").
++                let (colors, _) = if imprint { (Some(self.imprint_colors(r)).filter(|&m| m != 0).unwrap_or(1 << 5), 1) } else { ad.effect.as_ref().and_then(mana_leaf).unwrap_or((0, 0)) };
+                 // A sacrifice cost needs a chosen permanent: one option per candidate.
+                 let mut picks: Vec<Option<ObjRef>> = vec![None];
+                 if let Some(item) = ad.cost.iter().find(|x| matches!(x, CostItem::Sacrifice(_))) {
+@@ -524,6 +549,11 @@
+         out
+     }
+ 
++    /// The colors (bit per color, W U B R G) of the cards exiled by `src`'s imprint.
++    pub(crate) fn imprint_colors(&self, src: ObjRef) -> u8 {
++        self.s.links.iter().filter(|l| l.src == src).fold(0, |a, l| a | l.colors)
++    }
++
+     /// Activates a mana ability (CR 605): costs, then its effect, no stack.
+     pub fn run_mana_ability(&mut self, seat: Seat, src: ObjRef, ability: u8, color: u8, pick: Option<ObjRef>) {
+         if ability == 255 {
+@@ -611,7 +641,12 @@
+         let ctrl = self.s.obj(r).controller;
+         let own = self.chars(r).keywords.contains(Keywords::UNCOUNTERABLE);
+         let by_mana = self.s.stack.iter().any(|e| e.obj == r && e.cast.uncounterable);
+-        !own && !by_mana && !self.s.player_fx.iter().any(|f| f.player == ctrl && f.fx == PlayerFx::SpellsUncounterable)
++        let by_static = self.db.has_uncounterable_static
++            && self.s.battlefield.iter().any(|&b| {
++                let o = self.s.obj(b);
++                o.controller == ctrl && !o.phased && self.db.def(o.def).abilities.iter().any(|a| matches!(a, AbilityDef::SpellsUncounterable))
++            });
++        !own && !by_mana && !by_static && !self.s.player_fx.iter().any(|f| f.player == ctrl && f.fx == PlayerFx::SpellsUncounterable)
+     }
+ 
+     /// All legal targets for a spec, in canonical order (built from info visible to `ctrl`).
+@@ -722,6 +757,11 @@
+ }
+ 
+ 
++/// Chrome Mox's "{T}: Add one mana of any of the imprinted card's colors" (RFC 0007).
++pub fn is_imprint_mana(ad: &ActivatedDef) -> bool {
++    matches!(ad.effect, Some(Effect::AddManaImprinted)) && ad.cost.iter().all(|c| matches!(c, CostItem::TapSelf))
++}
++
+ /// A mana ability that automatic payment can use: it costs only a tap (and maybe a sacrifice of
+ /// itself) and its effect adds mana (plus fixed side effects such as Ancient Tomb's damage).
+ pub struct SimpleMana {
+diff -ruN a/crates/mtg-core/src/libfx.rs b/crates/mtg-core/src/libfx.rs
+--- a/crates/mtg-core/src/libfx.rs	2026-10-03 21:41:57.000000000 +0000
++++ b/crates/mtg-core/src/libfx.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -412,7 +412,7 @@
+ }
+ 
+ /// Handles the answers of the library-effect decisions. Returns None if `p` is not one of ours.
+-pub(crate) fn feed(cx: &mut Cx, f: &mut ResolveFrame, p: &Pending, opt: Opt, dest: Option<(ZoneKind, bool)>) -> Option<Next> {
++pub(crate) fn feed(cx: &mut Cx, f: &mut ResolveFrame, p: &Pending, opt: Opt, dest: Option<(ZoneKind, bool, bool)>) -> Option<Next> {
+     let seat = p.seat;
+     let purpose = match p.kind {
+         DecisionKind::ChooseCards { purpose, .. } => purpose,
+@@ -491,8 +491,8 @@
+             f.sc[0] = 0;
+         }
+         (CardsPurpose::Search, o) => {
++            let (z, tapped, shuffle) = dest.unwrap_or((ZoneKind::Hand, false, true));
+             if let Opt::Card(r) = o {
+-                let (z, tapped) = dest.unwrap_or((ZoneKind::Hand, false));
+                 if z == ZoneKind::Library {
+                     // Tutor to the top: shuffle first, then the revealed card goes on top.
+                     cx.shuffle_library(seat);
+@@ -502,9 +502,19 @@
+                     cx.know(Seat::P1, r, true);
+                     return Some(Next::Stay);
+                 }
+-                cx.move_zone(r, z, MoveOpts { tapped, ..Default::default() });
++                if let Some(nr) = cx.move_zone(r, z, MoveOpts { tapped, face_down_to: if z == ZoneKind::Exile { Some(seat) } else { None }, ..Default::default() }) {
++                    if z == ZoneKind::Exile {
++                        // Exiled face down (Beseech the Mirror): only the searcher knows what it is. The
++                        // card is what the next instruction may cast.
++                        let slot = nr.slot as usize;
++                        cx.s.moved.clear();
++                        cx.s.moved.push(nr);
++                    }
++                }
++            }
++            if shuffle {
++                cx.shuffle_library(seat);
+             }
+-            cx.shuffle_library(seat);
+         }
+         _ => return None,
+     }
+diff -ruN a/crates/mtg-core/src/lint.rs b/crates/mtg-core/src/lint.rs
+--- a/crates/mtg-core/src/lint.rs	2026-10-06 12:30:35.201102152 +0000
++++ b/crates/mtg-core/src/lint.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -88,7 +88,7 @@
+         Effect::AddManaAny { n } => expr(n),
+         Effect::Scry(e) | Effect::Surveil(e) | Effect::PutBack(e) | Effect::Reorder(e) => expr(e),
+         Effect::LookTake { look, .. } => expr(look),
+-        Effect::Search { .. } => -1,
++        Effect::Search { .. } | Effect::SearchNoShuffle { .. } => -1,
+         Effect::Shuffle(w) => p(w),
+         Effect::Sacrifice(o) => objs(o),
+         Effect::CounterSpellExile(i) => *i as i32,
+@@ -128,6 +128,9 @@
+         Effect::Amass { n, .. } => expr(n),
+         Effect::TakeMoved { .. } => -1,
+         Effect::SetPTX { objs: o, x, .. } => tmax(objs(o), expr(x)),
++        Effect::Wish { .. } | Effect::CastMovedFree { .. } | Effect::Imprint { .. } | Effect::AddManaImprinted | Effect::CounterEventUnlessLife { .. } => -1,
++        Effect::DiscardRandom { who, n } => tmax(p(who), expr(n)),
++        Effect::CastFree(o) => o_(o),
+         Effect::ExileTargetUntilLeaves { target } => *target as i32,
+         Effect::ExileChoosePlay { n } => expr(n),
+     }
+diff -ruN a/crates/mtg-core/src/ops.rs b/crates/mtg-core/src/ops.rs
+--- a/crates/mtg-core/src/ops.rs	2026-10-06 12:30:35.201278394 +0000
++++ b/crates/mtg-core/src/ops.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -6,7 +6,7 @@
+ use crate::cx::Cx;
+ use crate::event::*;
+ use crate::ids::*;
+-use crate::ir::AbilityDef;
++use crate::ir::{AbilityDef, PlayerFx};
+ use crate::state::*;
+ use crate::types::*;
+ 
+@@ -34,6 +34,8 @@
+     /// Enter the battlefield or the stack as the card's second face (transformed, a modal
+     /// double-faced card's back, an Adventure). Any other move shows the front face again.
+     pub face: bool,
++    /// Exiled face down: only this seat learns which card moved (Beseech the Mirror).
++    pub face_down_to: Option<Seat>,
+ }
+ 
+ /// What is about to happen, before replacement effects (doc 01 section 7.1).
+@@ -151,8 +153,14 @@
+             ZoneKind::Exile => rm(&mut self.s.exile, r),
+             ZoneKind::Stack => {
+                 if let Some(pos) = self.s.stack.iter().rposition(|e| e.obj == r) {
+-                    self.s.stack.remove(pos);
++                    let e = self.s.stack.remove(pos);
++                    // A spell that leaves while its storm/replicate trigger is on the stack is still copied (702.40a).
++                    if e.kind == StackKind::Spell && self.s.stack.iter().any(|t| matches!(t.kind, StackKind::Ability { source, .. } if source == r)) {
++                        self.s.spell_lki.push(e);
++                    }
+                 }
++                let stack = &self.s.stack;
++                self.s.spell_lki.retain(|l| stack.iter().any(|t| matches!(t.kind, StackKind::Ability { source, .. } if source == l.obj)));
+             }
+             ZoneKind::Command | ZoneKind::Gone => {}
+         }
+@@ -166,6 +174,12 @@
+             let o = self.s.obj(r);
+             (o.zone, o.kind, o.owner, o.def)
+         };
++        // Gaea's Will: a card that would go to the owner's graveyard from anywhere is exiled instead.
++        let to = if to == ZoneKind::Graveyard && kind == ObjKind::Card && self.s.player_fx.iter().any(|f| f.player == owner && f.fx == PlayerFx::ExileInsteadOfGraveyard) {
++            ZoneKind::Exile
++        } else {
++            to
++        };
+         let lki = match lki {
+             Some(l) => Some(l),
+             None if from == ZoneKind::Battlefield && self.s.batch.depth > 0 && self.s.batch.lki.iter().any(|(x, _)| *x == r) => self.s.batch.lki.iter().find(|(x, _)| *x == r).map(|(_, l)| l.clone()),
+@@ -263,7 +277,7 @@
+         // View ids and knowledge (doc 02 sections 4.2, 6).
+         let mut vid_new = [ViewId::NONE; 2];
+         for v in 0..2usize {
+-            if !ceases && zone_visible_to(to, owner, Seat(v as u8)) {
++            if !ceases && zone_visible_to(to, owner, Seat(v as u8)) && opts.face_down_to.map_or(true, |s| s.idx() == v) {
+                 vid_new[v] = ViewId(self.s.next_vid[v]);
+                 self.s.next_vid[v] += 1;
+                 if crate::canary::on(crate::canary::VIEWID_FROM_CARDID) {
+@@ -284,6 +298,10 @@
+         if !opts.quiet {
+             self.emit(Event::ZoneChange { obj: nr, def, from, to, owner, controller, vid_old, vid_new, lki });
+         }
++        // A Saga enters with a lore counter (CR 714.3a); the counter event triggers chapter I.
++        if to == ZoneKind::Battlefield && !ceases && self.db.has_saga && self.db.def(def).abilities.iter().any(|a| matches!(a, AbilityDef::Saga { .. })) {
++            self.add_counters(nr, CounterKind::Lore, 1);
++        }
+         if to == ZoneKind::Battlefield && !ceases && self.db.def(def).abilities.iter().any(|a| matches!(a, AbilityDef::EntersChoice(_))) {
+             self.s.enter_choices.push(nr);
+         }
+@@ -651,3 +669,47 @@
+         nr
+     }
+ }
++
++// ---- RFC 0007 (Storm) --------------------------------------------------------------------------
++
++impl<'a> Cx<'a> {
++    /// A card from outside the game (Burning Wish's sideboard card) joins `owner`'s hand, revealed
++    /// to both players. It is an ordinary card object from then on.
++    pub(crate) fn put_outside_card_in_hand(&mut self, def: CardDefId, owner: Seat) -> ObjRef {
++        let r = self.s.alloc_outside_card(def, owner);
++        let slot = r.slot as usize;
++        {
++            let o = &mut self.s.objs[slot];
++            o.zone = ZoneKind::Hand;
++            o.card = Some(CardId(r.slot));
++        }
++        self.s.players[owner.idx()].hand.push(r);
++        let mut vid = [ViewId::NONE; 2];
++        for v in 0..2usize {
++            vid[v] = ViewId(self.s.next_vid[v]);
++            self.s.next_vid[v] += 1;
++        }
++        self.s.vids[slot] = vid;
++        self.s.knowledge[slot].known_to = 3;
++        self.s.knowledge[slot].pos_known_to = 0;
++        r
++    }
++
++    /// Picks one of `from` at random (the discard of Gamble); a scenario can script which one, by
++    /// card definition.
++    pub(crate) fn pick_random_card(&mut self, p: Seat, from: &[ObjRef]) -> ObjRef {
++        if let Some(sc) = self.s.scripted.as_mut() {
++            match sc.queue.pop_front() {
++                Some((seat, RandKind::DiscardAtRandom, order)) if seat == p => {
++                    let objs = &self.s.objs;
++                    if let Some(r) = order.first().and_then(|d| from.iter().copied().find(|r| objs[r.slot as usize].def == *d)) {
++                        return r;
++                    }
++                    sc.violations += 1;
++                }
++                _ => sc.violations += 1,
++            }
++        }
++        from[self.s.rng.below(from.len() as u64) as usize]
++    }
++}
+diff -ruN a/crates/mtg-core/src/priority.rs b/crates/mtg-core/src/priority.rs
+--- a/crates/mtg-core/src/priority.rs	2026-10-06 12:30:35.201469890 +0000
++++ b/crates/mtg-core/src/priority.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -17,6 +17,23 @@
+ use crate::types::*;
+ 
+ impl<'a> Cx<'a> {
++    /// Lands `seat` may play this turn: one, plus one for each permanent with an extra land drop.
++    pub(crate) fn land_drops(&self, seat: Seat) -> u8 {
++        if !self.db.has_extra_land {
++            return 1;
++        }
++        let extra = self.s.battlefield.iter().filter(|&&r| {
++            let o = self.s.obj(r);
++            o.controller == seat && !o.phased && self.db.def(o.def).abilities.iter().any(|a| matches!(a, AbilityDef::ExtraLandDrop))
++        });
++        1 + extra.count() as u8
++    }
++
++    /// May `seat` play lands and cast spells from their graveyard right now (Gaea's Will)?
++    pub(crate) fn may_play_from_graveyard(&self, seat: Seat) -> bool {
++        self.s.player_fx.iter().any(|f| f.player == seat && f.fx == PlayerFx::PlayFromGraveyard)
++    }
++
+     fn can_play_sorcery_speed(&self, seat: Seat) -> bool {
+         self.s.turn.active == seat && self.s.turn.step.is_main() && self.s.stack.is_empty()
+     }
+@@ -47,14 +64,14 @@
+                 }
+             }
+             if def.types.contains(Types::LAND) {
+-                if sorcery_ok && self.s.players[seat.idx()].turn.lands_played < 1 {
++                if sorcery_ok && self.s.players[seat.idx()].turn.lands_played < self.land_drops(seat) {
+                     let k = self.obj_key(seat, r);
+                     opts.push((1, k.0, k.1 as u64, Opt::PlayLand(r)));
+                 }
+                 continue;
+             }
+             // A modal double-faced card whose back face is a land (pay 3 life or enter tapped).
+-            if def.back_kind == Some(FaceKind::Modal) && sorcery_ok && self.s.players[seat.idx()].turn.lands_played < 1 {
++            if def.back_kind == Some(FaceKind::Modal) && sorcery_ok && self.s.players[seat.idx()].turn.lands_played < self.land_drops(seat) {
+                 if let Some(b) = def.back_id {
+                     if self.db.def(b).types.contains(Types::LAND) {
+                         let k = self.obj_key(seat, r);
+@@ -70,6 +87,27 @@
+                 opts.push((2, k.0, k.1 as u64 * 256 + way as u64, Opt::Cast(r, way)));
+             }
+         }
++        // Abilities activated from the graveyard (Runehorn Hellkite), collapsed by definition.
++        {
++            let mut gy: Vec<ObjRef> = self.s.players[seat.idx()].graveyard.clone();
++            gy.sort_by_key(|&r| self.obj_key(seat, r));
++            let mut last: Option<CardDefId> = None;
++            for r in gy {
++                let d = self.s.obj(r).def;
++                if last == Some(d) {
++                    continue;
++                }
++                last = Some(d);
++                for (i, a) in self.db.def(d).abilities.iter().enumerate() {
++                    if let AbilityDef::Activated(ad) = a {
++                        if !ad.is_mana && ad.zone == ZoneKind::Graveyard && self.can_activate(seat, r, i as u8) {
++                            let k = self.obj_key(seat, r);
++                            opts.push((3, k.0, k.1 as u64 * 256 + i as u64, Opt::Activate { src: r, ability: i as u8 }));
++                        }
++                    }
++                }
++            }
++        }
+         // Cards in other zones that have an alternative cost usable from there (flashback,
+         // escape, warp recasts), collapsed by definition.
+         for zone in [ZoneKind::Graveyard, ZoneKind::Exile] {
+@@ -86,7 +124,15 @@
+                     continue;
+                 }
+                 last = Some(d);
+-                if !self.db.def(d).abilities.iter().any(|a| matches!(a, AbilityDef::Alt(x) if x.zone == zone)) {
++                let gy_play = zone == ZoneKind::Graveyard && self.may_play_from_graveyard(seat);
++                if gy_play && self.db.def(d).types.contains(Types::LAND) {
++                    if sorcery_ok && self.s.players[seat.idx()].turn.lands_played < self.land_drops(seat) {
++                        let k = self.obj_key(seat, r);
++                        opts.push((1, k.0, k.1 as u64, Opt::PlayLand(r)));
++                    }
++                    continue;
++                }
++                if !gy_play && !self.db.def(d).abilities.iter().any(|a| matches!(a, AbilityDef::Alt(x) if x.zone == zone)) {
+                     continue;
+                 }
+                 for way in self.castable_ways(seat, r) {
+@@ -102,7 +148,7 @@
+             let def = self.db.def(self.s.obj(r).def);
+             let k = self.obj_key(seat, r);
+             if def.types.contains(Types::LAND) {
+-                if sorcery_ok && self.s.players[seat.idx()].turn.lands_played < 1 {
++                if sorcery_ok && self.s.players[seat.idx()].turn.lands_played < self.land_drops(seat) {
+                     opts.push((1, k.0, k.1 as u64, Opt::PlayLand(r)));
+                 }
+                 continue;
+@@ -165,7 +211,8 @@
+         }
+         let db = self.db;
+         let def = db.def(def_id);
+-        if def.types.contains(Types::LAND) || (def.cost.is_none() && alt_count(def) == 0) {
++        // A card with no mana cost (Gaea's Will) has no normal way to be cast, but a free-cast permission still applies.
++        if def.types.contains(Types::LAND) {
+             return Vec::new();
+         }
+         let mut ways = Vec::new();
+@@ -174,7 +221,7 @@
+         }
+         for way in 0..=alt_count(def) {
+             let ok = match alt_of(def, way) {
+-                None => (zone == ZoneKind::Hand || (zone == ZoneKind::Exile && self.has_exile_play(seat, card))) && def.cost.is_some(),
++                None => (zone == ZoneKind::Hand || (zone == ZoneKind::Exile && self.has_exile_play(seat, card)) || (zone == ZoneKind::Graveyard && self.may_play_from_graveyard(seat))) && def.cost.is_some(),
+                 Some(a) => zone == a.zone,
+             };
+             if ok && self.way_feasible(seat, card, way) {
+@@ -257,6 +304,13 @@
+         }
+     }
+ 
++    /// "Activate only if ..." conditions, with the controller as `You` and the source as `This`.
++    pub(crate) fn activation_cond_holds(&mut self, seat: Seat, src: ObjRef, c: &Cond) -> bool {
++        let cap = Captured::default();
++        let env = crate::eval::Env { controller: seat, source: Some(src), source_lki: None, targets: &[], legal: &[], base: 0, x: 0, cap: &cap, each: [None, None], tlki: &[] };
++        self.eval_cond(&env, c)
++    }
++
+     pub fn can_activate(&mut self, seat: Seat, src: ObjRef, idx: u8) -> bool {
+         let db = self.db;
+         let def = db.def(self.s.obj(src).def);
+@@ -279,6 +333,15 @@
+         if self.s.obj(src).zone != ad.zone {
+             return false;
+         }
++        if let Some(c) = &ad.cond {
++            if !self.activation_cond_holds(seat, src, c) {
++                return false;
++            }
++        }
++        // Suspend is only possible if the card could be cast (Orim's Chant stops it, CR 702.62a).
++        if ad.cost.iter().any(|c| matches!(c, CostItem::SuspendSelf(_))) && self.cast_restricted(seat, src) {
++            return false;
++        }
+         let tap = ad.cost.iter().any(|c| matches!(c, CostItem::TapSelf));
+         if tap && (self.s.obj(src).tapped || self.is_summoning_sick(src)) {
+             return false;
+diff -ruN a/crates/mtg-core/src/read.rs b/crates/mtg-core/src/read.rs
+--- a/crates/mtg-core/src/read.rs	2026-10-03 21:41:56.000000000 +0000
++++ b/crates/mtg-core/src/read.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -178,6 +178,15 @@
+             _ => Vec::new(),
+         }
+     }
++    pub fn cards_drawn(&self, s: Seat) -> u8 {
++        self.players[s.idx()].turn.cards_drawn
++    }
++
++    /// Cards of `s` outside the game (their sideboard), by definition.
++    pub fn sideboard(&self, s: Seat) -> &[CardDefId] {
++        &self.players[s.idx()].sideboard
++    }
++
+     pub fn spells_cast(&self, s: Seat) -> u8 {
+         self.players[s.idx()].turn.spells_cast
+     }
+@@ -395,7 +404,7 @@
+         let State {
+             objs, free, players, battlefield, stack, pending_triggers, delayed, attack_watch, links, until_links, cur_x, each_player, scripted, used,
+             exile_plays, moved, name_choice, enter_choices, batch, effects, player_fx, exile, turn, combat, frames, pending, next_decision,
+-            ts_counter, result, cfg, pay_hint,
++            ts_counter, result, cfg, pay_hint, spell_lki,
+             // Not rules state: caches, knowledge (own hash), RNG (own hash), bookkeeping.
+             derived: _, derived_dirty: _, knowledge: _, vids: _, next_vid: _, rng: _, n_cards: _, events: _, steps: _,
+         } = self;
+@@ -437,6 +446,9 @@
+         cur_x.hash(&mut h);
+         each_player.hash(&mut h);
+         pay_hint.hash(&mut h);
++        if !spell_lki.is_empty() {
++            spell_lki.hash(&mut h);
++        }
+         scripted.as_ref().map(|s| (s.queue.len(), s.violations)).hash(&mut h);
+         (cfg.first_player, cfg.starting_life, cfg.hand_size, cfg.explicit_mana).hash(&mut h);
+         h.finish()
+diff -ruN a/crates/mtg-core/src/resolve.rs b/crates/mtg-core/src/resolve.rs
+--- a/crates/mtg-core/src/resolve.rs	2026-10-06 12:30:35.201766320 +0000
++++ b/crates/mtg-core/src/resolve.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -161,6 +161,11 @@
+                             f.aux = 0;
+                         }
+                         Flow::Await => return Next::Await,
++                        Flow::CastFree(r, seat) => {
++                            f.pc += 1;
++                            f.aux = 0;
++                            return Next::Push(Frame::Cast(CastFrame::spell(r, seat, crate::restrict::FREE_WAY, ZoneKind::Exile)));
++                        }
+                     }
+                     if cx.s.result.is_some() {
+                         return Next::Done;
+@@ -187,6 +192,8 @@
+     Next,
+     Jump(u16),
+     Await,
++    /// Cast this exiled card without paying its mana cost, then continue after this instruction.
++    CastFree(ObjRef, Seat),
+ }
+ 
+ fn source_of(e: &StackEntry) -> Option<ObjRef> {
+@@ -350,6 +357,18 @@
+     }
+ }
+ 
++/// Does the card definition satisfy the type, supertype, mana value and name parts of the filter?
++/// (A card outside the game has no object to match, Burning Wish.)
++fn def_matches_filter(cx: &Cx, d: CardDefId, f: &ObjFilter) -> bool {
++    let def = cx.db.def(d);
++    (f.types_any.is_empty() || def.types.intersects(f.types_any))
++        && !def.types.intersects(f.types_not)
++        && (f.supertypes_any.is_empty() || def.supertypes.intersects(f.supertypes_any))
++        && !def.supertypes.intersects(f.supertypes_not)
++        && f.cmc.map_or(true, |(c, v)| c.test(def.mana_value() as i32, v))
++        && (f.names.is_empty() || f.names.iter().any(|n| *n == def.name))
++}
++
+ /// Destroys every permanent matching `filter` whose mana value is at most `paid`.
+ fn energy_wrath_destroy(cx: &mut Cx, env: &Env, filter: &ObjFilter, paid: u16) {
+     let mut f = filter.clone();
+@@ -422,8 +441,9 @@
+             Flow::Next
+         }
+         Effect::Exile(o) => {
+-            cx.s.moved.clear();
++            // The objects may be named through `Moved` (Beseech the Mirror): read them before the list is reset.
+             let objs = objs_of(cx, env, o);
++            cx.s.moved.clear();
+             cx.begin_batch(&objs);
+             for r in objs {
+                 if cx.s.is_live(r) {
+@@ -658,14 +678,15 @@
+                     sc[2] = 0;
+                     return Flow::Next;
+                 }
+-                let orig = match cx.eval_o(env, *what) {
++                // The spell may be gone (countered in response to its own storm trigger): its last-known entry is kept.
++                let orig = match if *what == ORef::This { env.source } else { cx.eval_o(env, *what) } {
+                     Some(r) => r,
+                     None => {
+                         sc[2] = 0;
+                         return Flow::Next;
+                     }
+                 };
+-                let e = match cx.s.stack.iter().find(|e| e.obj == orig) {
++                let e = match cx.s.stack.iter().chain(cx.s.spell_lki.iter()).find(|e| e.obj == orig) {
+                     Some(e) => e.clone(),
+                     None => {
+                         sc[2] = 0;
+@@ -1137,7 +1158,7 @@
+         Effect::PutBack(n) => wait(cx.fx_put_back(env, n, aux, sc)),
+         Effect::Reorder(n) => wait(cx.fx_reorder(env, n, aux, sc)),
+         Effect::LookTake { look, take } => wait(cx.fx_look_take(env, look, *take, aux, sc)),
+-        Effect::Search { who, filter, .. } => wait(cx.fx_search(env, *who, filter, aux)),
++        Effect::Search { who, filter, .. } | Effect::SearchNoShuffle { who, filter, .. } => wait(cx.fx_search(env, *who, filter, aux)),
+         Effect::Shuffle(who) => {
+             if let Some(p) = cx.eval_p(env, *who) {
+                 cx.shuffle_library(p);
+@@ -1155,8 +1176,8 @@
+         }
+         Effect::MoveTo { objs: o, to, ctrl, tapped } => {
+             let c = ctrl.and_then(|p| cx.eval_p(env, p));
+-            cx.s.moved.clear();
+             let objs = objs_of(cx, env, o);
++            cx.s.moved.clear();
+             cx.begin_batch(&objs);
+             for r in objs {
+                 if cx.s.is_live(r) {
+@@ -1481,7 +1502,7 @@
+                         let (owner, cmc) = (cx.s.obj(r).owner, cx.db.def(cx.s.obj(r).def).mana_value() as u8);
+                         if let Some(nr) = cx.move_zone(r, ZoneKind::Exile, MoveOpts::default()) {
+                             cx.s.moved.push(nr);
+-                            cx.s.links.push(Link { src, owner, cmc });
++                            cx.s.links.push(Link { src, owner, cmc, colors: 0 });
+                         }
+                     }
+                 }
+@@ -1714,6 +1735,131 @@
+                 }
+             }
+         }
++        // ---- RFC 0007 (Storm) ----
++        Effect::Wish { filter } => {
++            let p = env.controller;
++            match *aux {
++                0 => {
++                    let mut defs: Vec<CardDefId> = cx.s.players[p.idx()].sideboard.iter().copied().filter(|&d| def_matches_filter(cx, d, filter)).collect();
++                    defs.sort();
++                    defs.dedup();
++                    if defs.is_empty() {
++                        return Flow::Next;
++                    }
++                    let mut opts: Vec<Opt> = defs.iter().map(|d| Opt::Name(d.0)).collect();
++                    opts.push(Opt::Done);
++                    ask(cx, p, DecisionKind::ChooseSideboard, opts);
++                    Flow::Await
++                }
++                _ => {
++                    // sc[0] = the chosen definition + 1 (0 = declined).
++                    cx.s.moved.clear();
++                    if sc[0] != 0 {
++                        let d = CardDefId(sc[0] - 1);
++                        if let Some(i) = cx.s.players[p.idx()].sideboard.iter().position(|&x| x == d) {
++                            cx.s.players[p.idx()].sideboard.remove(i);
++                            let nr = cx.put_outside_card_in_hand(d, p);
++                            cx.s.moved.push(nr);
++                        }
++                    }
++                    Flow::Next
++                }
++            }
++        }
++        Effect::DiscardRandom { who, n } => {
++            if let Some(p) = cx.eval_p(env, *who) {
++                for _ in 0..cx.eval_expr(env, n).max(0) {
++                    let hand: Vec<ObjRef> = cx.s.players[p.idx()].hand.clone();
++                    if hand.is_empty() {
++                        break;
++                    }
++                    let pick = cx.pick_random_card(p, &hand);
++                    cx.move_zone(pick, ZoneKind::Graveyard, MoveOpts::default());
++                }
++            }
++            Flow::Next
++        }
++        Effect::CastMovedFree { max_cmc } => {
++            let p = env.controller;
++            if *aux != 0 {
++                return Flow::Next;
++            }
++            let cands: Vec<ObjRef> = cx.s.moved.clone().into_iter().filter(|&r| cx.s.is_live(r) && cx.s.obj(r).zone == ZoneKind::Exile).collect();
++            let mut ok = Vec::new();
++            for r in cands {
++                let def = cx.db.def(cx.s.obj(r).def);
++                if !def.types.contains(Types::LAND) && def.mana_value() <= *max_cmc as u32 && !cx.cast_restricted(p, r) && cx.way_feasible_x(p, r, crate::restrict::FREE_WAY, false) {
++                    ok.push(r);
++                }
++            }
++            if ok.is_empty() {
++                return Flow::Next;
++            }
++            // One card was exiled, so one candidate: "may cast it?" (the answer decides the cast).
++            sc[0] = ok[0].slot + 1;
++            ask(cx, p, DecisionKind::May, vec![Opt::Yes, Opt::No]);
++            Flow::Await
++        }
++        Effect::CastFree(o) => {
++            let p = env.controller;
++            if *aux != 0 {
++                return Flow::Next;
++            }
++            // The suspended card is cast now, or stays exiled for good if it cannot be (Orim's Chant). Declining
++            // is not offered: the engine always casts (a documented simplification).
++            match objs_of(cx, env, &Objs::One(*o)).first().copied() {
++                Some(r) if cx.s.is_live(r) && cx.s.obj(r).zone == ZoneKind::Exile && !cx.cast_restricted(p, r) && cx.way_feasible_x(p, r, crate::restrict::FREE_WAY, false) => Flow::CastFree(r, p),
++                _ => Flow::Next,
++            }
++        }
++        Effect::Imprint { filter } => {
++            let p = env.controller;
++            if *aux != 0 {
++                return Flow::Next;
++            }
++            let hand: Vec<ObjRef> = cx.s.players[p.idx()].hand.clone();
++            let mut ok = Vec::new();
++            for r in hand {
++                let c = cx.chars(r);
++                if cx.filter_match(filter, r, &c, false, p) {
++                    ok.push(r);
++                }
++            }
++            if ok.is_empty() {
++                return Flow::Next;
++            }
++            let mut opts = card_options(cx, p, &ok);
++            opts.push(Opt::Done);
++            ask(cx, p, DecisionKind::ChooseCards { purpose: CardsPurpose::Imprint, remaining: 1 }, opts);
++            Flow::Await
++        }
++        Effect::AddManaImprinted => Flow::Next, // only meaningful inside a mana ability (legal.rs)
++        Effect::CounterEventUnlessLife { n } => {
++            let victim = match env.cap.obj {
++                Some(r) if cx.s.is_live(r) && cx.s.obj(r).zone == ZoneKind::Stack => r,
++                _ => return Flow::Next,
++            };
++            let payer = cx.s.stack.iter().find(|e| e.obj == victim).map(|e| e.controller).unwrap_or(cx.s.obj(victim).controller);
++            match *aux {
++                0 => {
++                    if cx.s.players[payer.idx()].life >= *n as i32 {
++                        ask(cx, payer, DecisionKind::PayUnless, vec![Opt::Yes, Opt::No]);
++                        Flow::Await
++                    } else {
++                        counter_stack_obj(cx, victim);
++                        Flow::Next
++                    }
++                }
++                1 => {
++                    cx.lose_life(payer, *n as u32);
++                    Flow::Next
++                }
++                _ => {
++                    counter_stack_obj(cx, victim);
++                    Flow::Next
++                }
++            }
++        }
+         Effect::MayPay { .. } | Effect::MayElse { .. } | Effect::ForEachPlayer { .. } => unreachable!("control flow is compiled away"),
+         Effect::Seq(_) | Effect::If { .. } | Effect::May { .. } | Effect::ForEach { .. } | Effect::Repeat { .. } => unreachable!("control flow is compiled away"),
+     }
+@@ -1772,7 +1918,8 @@
+     let (dest, put_to) = {
+         let code = entry_code(cx.db, &f.entry);
+         match code.get(f.pc as usize) {
+-            Some(Instr::Leaf(Effect::Search { dest, tapped, .. })) => (Some((*dest, *tapped)), None),
++            Some(Instr::Leaf(Effect::Search { dest, tapped, .. })) => (Some((*dest, *tapped, true)), None),
++            Some(Instr::Leaf(Effect::SearchNoShuffle { dest, .. })) => (Some((*dest, false, false)), None),
+             Some(Instr::Leaf(Effect::PutChosen { to, tapped, .. })) => (None, Some((*to, *tapped))),
+             Some(Instr::Leaf(Effect::TakeMoved { to, .. })) => (None, Some((*to, false))),
+             _ => (None, None),
+@@ -1895,6 +2042,22 @@
+                 _ => Next::Stay,
+             }
+         }
++        (DecisionKind::ChooseSideboard, o) => {
++            f.sc[0] = if let Opt::Name(d) = o { d + 1 } else { 0 };
++            f.aux = 1;
++            Next::Stay
++        }
++        (DecisionKind::ChooseCards { purpose: CardsPurpose::Imprint, .. }, o) => {
++            f.aux = 1;
++            if let (Opt::Card(r), Some(src)) = (o, source_of(&f.entry)) {
++                let colors = cx.chars(r).colors.bits() as u8;
++                let (owner, cmc) = (cx.s.obj(r).owner, cx.db.def(cx.s.obj(r).def).mana_value() as u8);
++                if cx.move_zone(r, ZoneKind::Exile, MoveOpts::default()).is_some() {
++                    cx.s.links.push(Link { src, owner, cmc, colors });
++                }
++            }
++            Next::Stay
++        }
+         (DecisionKind::ChooseCards { purpose: CardsPurpose::CastFree, .. }, o) => {
+             f.aux = 1;
+             match o {
+@@ -1953,6 +2116,15 @@
+         }
+         (DecisionKind::May, Opt::Yes) => {
+             f.aux = 1;
++            // "You may cast it without paying its mana cost" (Beseech the Mirror, suspend): the card
++            // the leaf found is in `sc[0]`.
++            let free_cast = matches!(entry_code(cx.db, &f.entry).get(f.pc as usize), Some(Instr::Leaf(Effect::CastMovedFree { .. } | Effect::CastFree(_))));
++            if free_cast && f.sc[0] != 0 {
++                let r = cx.s.cur_ref(f.sc[0] - 1);
++                if cx.s.is_live(r) && cx.s.obj(r).zone == ZoneKind::Exile {
++                    return Next::Push(Frame::Cast(CastFrame::spell(r, p.seat, crate::restrict::FREE_WAY, ZoneKind::Exile)));
++                }
++            }
+             Next::Stay
+         }
+         (DecisionKind::May, Opt::No) => {
+diff -ruN a/crates/mtg-core/src/sba.rs b/crates/mtg-core/src/sba.rs
+--- a/crates/mtg-core/src/sba.rs	2026-10-03 21:41:56.000000000 +0000
++++ b/crates/mtg-core/src/sba.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -115,6 +115,31 @@
+             changed = true;
+         }
+         self.end_batch();
++        // A Saga whose last chapter ability has left the stack is sacrificed (CR 714.4).
++        if self.db.has_saga {
++            let mut done: SmallVec<[ObjRef; 2]> = SmallVec::new();
++            let n = self.s.battlefield.len();
++            for i in 0..n {
++                let r = self.s.battlefield[i];
++                let o = &self.s.objs[r.slot as usize];
++                let last = self.db.def(o.def).abilities.iter().find_map(|a| if let crate::ir::AbilityDef::Saga { last } = a { Some(*last) } else { None });
++                if let Some(last) = last {
++                    if !o.phased
++                        && o.counter(CounterKind::Lore) >= last as u16
++                        && !self.s.pending_triggers.iter().any(|p| p.source == r)
++                        && !self.s.stack.iter().any(|e| matches!(e.kind, crate::state::StackKind::Ability { source, .. } if source == r))
++                    {
++                        done.push(r);
++                    }
++                }
++            }
++            self.begin_batch(&[]);
++            for r in done {
++                self.move_zone(r, ZoneKind::Graveyard, MoveOpts::default());
++                changed = true;
++            }
++            self.end_batch();
++        }
+         // Equipment whose creature is gone or no longer a creature becomes unattached (704.5n).
+         let n = self.s.battlefield.len();
+         for i in 0..n {
+diff -ruN a/crates/mtg-core/src/scenario.rs b/crates/mtg-core/src/scenario.rs
+--- a/crates/mtg-core/src/scenario.rs	2026-10-03 21:41:57.000000000 +0000
++++ b/crates/mtg-core/src/scenario.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -37,6 +37,8 @@
+     pub battlefield: Vec<PermSetup>,
+     pub graveyard: Vec<String>,
+     pub exile: Vec<String>,
++    /// Cards outside the game (Burning Wish).
++    pub sideboard: Vec<String>,
+     /// Top first.
+     pub library: Vec<String>,
+     pub lands_played: u8,
+@@ -70,7 +72,8 @@
+             decks[s].extend(p.library.iter().rev().map(|n| id(n)));
+         }
+         let cfg = GameConfig { first_player: sc.active, ..GameConfig::default() };
+-        let mut st = State::new(db, [&decks[0], &decks[1]], [&[], &[]], sc.seed, cfg);
++        let side: [Vec<CardDefId>; 2] = [sc.players[0].sideboard.iter().map(|n| id(n)).collect(), sc.players[1].sideboard.iter().map(|n| id(n)).collect()];
++        let mut st = State::new(db, [&decks[0], &decks[1]], [&side[0], &side[1]], sc.seed, cfg);
+         st.frames = vec![Frame::Turn];
+         st.turn.number = sc.turn;
+         st.turn.active = sc.active;
+diff -ruN a/crates/mtg-core/src/state.rs b/crates/mtg-core/src/state.rs
+--- a/crates/mtg-core/src/state.rs	2026-10-03 21:41:56.000000000 +0000
++++ b/crates/mtg-core/src/state.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -154,6 +154,8 @@
+     Shuffle,
+     /// Cards "put on the bottom of the library in a random order": their order, top first.
+     BottomOrder,
++    /// A card discarded at random (Gamble): the one card (by definition) that is discarded.
++    DiscardAtRandom,
+ }
+ 
+ /// Random outcomes a scenario fixes in advance: (player, kind, order top first).
+@@ -166,11 +168,25 @@
+ 
+ /// An exiled card remembered by the permanent that exiled it: the owner and mana value are
+ /// those the card had when it was exiled.
+-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
++#[derive(Clone, Debug, PartialEq, Eq)]
+ pub struct Link {
+     pub src: ObjRef,
+     pub owner: Seat,
+     pub cmc: u8,
++    /// The colors the card had when it was exiled (bit per color, W U B R G; Chrome Mox imprint).
++    pub colors: u8,
++}
++
++// `colors` (RFC 0007) is hashed only when set, so hashes of states without an imprint do not move.
++impl std::hash::Hash for Link {
++    fn hash<H: std::hash::Hasher>(&self, h: &mut H) {
++        self.src.hash(h);
++        self.owner.hash(h);
++        self.cmc.hash(h);
++        if self.colors != 0 {
++            self.colors.hash(h);
++        }
++    }
+ }
+ 
+ /// "Exiled until this leaves the battlefield" (610.3): when `src` leaves, `card` returns to `from`.
+@@ -394,6 +410,9 @@
+     pub(crate) steps: u64,
+     /// Scenario runs only: sources automatic payment should use first (`pay: {tap: [...]}`).
+     pub(crate) pay_hint: Vec<ObjRef>,
++    /// Last-known stack entries of spells that left the stack while one of their triggers (storm,
++    /// replicate) is still on it; the trigger copies the spell from here. Empty almost always.
++    pub(crate) spell_lki: Vec<StackEntry>,
+ }
+ 
+ impl std::fmt::Debug for State {
+@@ -534,6 +553,7 @@
+             events: Vec::new(),
+             steps: 0,
+             pay_hint: Vec::new(),
++            spell_lki: Vec::new(),
+         }
+     }
+ 
+@@ -595,6 +615,16 @@
+     /// Allocates a non-card object slot (token, ability object, spell copy).
+     pub(crate) fn alloc_slot(&mut self, kind: ObjKind, def: CardDefId, owner: Seat) -> ObjRef {
+         debug_assert!(kind != ObjKind::Card);
++        self.alloc_obj(kind, def, owner)
++    }
++
++    /// Allocates the object of a card that comes from outside the game (Burning Wish): a `Card`
++    /// object with no `CardId`, in no zone yet.
++    pub(crate) fn alloc_outside_card(&mut self, def: CardDefId, owner: Seat) -> ObjRef {
++        self.alloc_obj(ObjKind::Card, def, owner)
++    }
++
++    fn alloc_obj(&mut self, kind: ObjKind, def: CardDefId, owner: Seat) -> ObjRef {
+         let ts = self.next_ts();
+         let o = Obj {
+             kind,
+diff -ruN a/crates/mtg-core/src/trigger.rs b/crates/mtg-core/src/trigger.rs
+--- a/crates/mtg-core/src/trigger.rs	2026-10-06 12:30:35.202498028 +0000
++++ b/crates/mtg-core/src/trigger.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -61,7 +61,7 @@
+                 }
+             }
+         }
+-        let relevant = matches!(e, Event::ZoneChange { .. } | Event::SpellCast { .. } | Event::Drew { .. } | Event::StepBegan { .. } | Event::LandPlayed { .. } | Event::BecameTarget { .. } | Event::Blocked { .. } | Event::Attacks { .. } | Event::AttackersDeclared { .. } | Event::Damage { combat: true, .. });
++        let relevant = matches!(e, Event::ZoneChange { .. } | Event::SpellCast { .. } | Event::Drew { .. } | Event::StepBegan { .. } | Event::LandPlayed { .. } | Event::BecameTarget { .. } | Event::CountersChanged { kind: CounterKind::Lore | CounterKind::Time, .. } | Event::Blocked { .. } | Event::Attacks { .. } | Event::AttackersDeclared { .. } | Event::Damage { combat: true, .. });
+         if !relevant || self.db.trig_zones == 0 {
+             return;
+         }
+@@ -254,6 +254,28 @@
+                 cap.obj = Some(*spell);
+                 cap.player = Some(*by_ctrl);
+             }
++            (EventPat::OtherBecomesTarget { by, filter }, Event::BecameTarget { obj, by: spell, by_ctrl }) => {
++                if *obj == src || !Self::rel_ok(*by, *by_ctrl, ctrl) || !self.s.is_live(*obj) || self.s.obj(*obj).zone != ZoneKind::Battlefield {
++                    return None;
++                }
++                let c = self.chars(*obj);
++                if !self.filter_match(filter, *obj, &c, false, ctrl) {
++                    return None;
++                }
++                cap.obj = Some(*spell);
++                cap.player = Some(*by_ctrl);
++            }
++            (EventPat::Chapter(n), Event::CountersChanged { obj, kind: CounterKind::Lore, delta }) => {
++                let now = if *obj == src { self.s.obj(src).counter(CounterKind::Lore) as i32 } else { return None };
++                if *delta <= 0 || now < *n as i32 || now - *delta >= *n as i32 {
++                    return None;
++                }
++            }
++            (EventPat::LastCounterRemoved(k), Event::CountersChanged { obj, kind, delta }) => {
++                if *obj != src || kind != k || *delta >= 0 || self.s.obj(src).counter(*k) != 0 {
++                    return None;
++                }
++            }
+             (EventPat::YouAttack, Event::AttackersDeclared { count }) => {
+                 if *count == 0 || self.s.turn.active != ctrl {
+                     return None;
+diff -ruN a/crates/mtg-core/src/turn.rs b/crates/mtg-core/src/turn.rs
+--- a/crates/mtg-core/src/turn.rs	2026-10-06 12:30:35.202712670 +0000
++++ b/crates/mtg-core/src/turn.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -6,7 +6,7 @@
+ use crate::event::Event;
+ use crate::frame::*;
+ use crate::ids::*;
+-use crate::ir::Until;
++use crate::ir::{AbilityDef, Until};
+ use crate::state::*;
+ use crate::types::*;
+ 
+@@ -102,7 +102,17 @@
+         }
+         Step::CombatDamage => Next::Push(crate::combat::damage_frame(false)),
+         Step::Cleanup => Next::Push(Frame::Cleanup(CleanupFrame { stage: CleanupStage::Discard })),
+-        Step::Upkeep | Step::Main1 | Step::EndCombat | Step::Main2 | Step::End => Next::Stay,
++        Step::Main1 => {
++            // CR 714.3b: as the precombat main phase begins, the active player puts a lore counter on each Saga they control.
++            if cx.db.has_saga {
++                let sagas: Vec<ObjRef> = cx.s.battlefield.iter().copied().filter(|&r| cx.s.obj(r).controller == active && cx.db.def(cx.s.obj(r).def).abilities.iter().any(|a| matches!(a, AbilityDef::Saga { .. }))).collect();
++                for r in sagas {
++                    cx.add_counters(r, CounterKind::Lore, 1);
++                }
++            }
++            Next::Stay
++        }
++        Step::Upkeep | Step::EndCombat | Step::Main2 | Step::End => Next::Stay,
+     }
+ }
+ 
+diff -ruN a/crates/mtg-core/src/types.rs b/crates/mtg-core/src/types.rs
+--- a/crates/mtg-core/src/types.rs	2026-10-06 12:30:35.202861880 +0000
++++ b/crates/mtg-core/src/types.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -185,6 +185,8 @@
+     /// A flying counter (grants flying).
+     Flying,
+     Other(u8),
++    /// A lore counter (Sagas, CR 714). Appended last so no existing discriminant moves.
++    Lore,
+ }
+ 
+ /// The closed table of subtypes in the pool. Index = bit position in `SubtypeSet`. The five basic
+@@ -198,6 +200,8 @@
+     "God", "Archer", "Bard", "Halfling", "Kithkin", "Wraith", "Serpent", "Dog", "Elder", "Incarnation", "Dinosaur", "Jace", "Kaito", "Sand",
+     "Ajani", "Tamiyo", "Moonfolk", "Warlock",
+     "Karn", "Ugin", "Tezzeret", "Saga", "Tower", "Mine", "Power-Plant", "Spawn", "Scion", "Masticore", "Spacecraft", "Robot", "Cave", "Gate", "Lair", "Locus", "Sphere",
++    // RFC 0007 (Storm): after Tron's names ("Saga" is already above).
++    "Lesson", "Sorcerer",
+ ];
+ 
+ /// Subtype set; bit `i` = `SUBTYPE_NAMES[i]`.
+diff -ruN a/crates/mtg-spec/src/expect.rs b/crates/mtg-spec/src/expect.rs
+--- a/crates/mtg-spec/src/expect.rs	2026-10-06 12:30:35.203074530 +0000
++++ b/crates/mtg-spec/src/expect.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -26,6 +26,7 @@
+         DecisionKind::ChooseRoom => "choose_room",
+         DecisionKind::LegendRule => "legend_rule",
+         DecisionKind::ChooseName { .. } | DecisionKind::ChooseType => "choose_name",
++        DecisionKind::ChooseSideboard => "choose_sideboard",
+         DecisionKind::ChooseAddCost { .. } => "choose_additional_cost",
+         DecisionKind::PayPhyrexian { .. } => "pay_phyrexian",
+         DecisionKind::AssignDamage { .. } => "assign_combat_damage",
+@@ -439,6 +440,19 @@
+                     if have != want {
+                         fail!("{who} exile is {have:?}, expected {want:?}");
+                     }
++                    // Descriptors may name counters (a suspended card's time counters).
++                    for e in x.as_array().cloned().unwrap_or_default() {
++                        if let (Some(c), Some(name), Some(cs)) = (e.as_object(), e.get("card").and_then(|n| n.as_str()), e.get("counters").and_then(|c| c.as_object())) {
++                            let _ = c;
++                            for (k, n) in cs {
++                                let kind = counter_kind(k)?;
++                                let ok = mine.iter().any(|&r| self.def_name(r) == name && st.obj_data(&self.db, r).counters.iter().any(|&(ck, cn)| ck == kind && Some(cn as u64) == n.as_u64()));
++                                if !ok {
++                                    fail!("{who} exile: {name} does not have {n} {k} counters");
++                                }
++                            }
++                        }
++                    }
+                 }
+                 "battlefield" => self.check_battlefield(seat, x, true)?,
+                 "battlefield_contains" => self.check_battlefield(seat, x, false)?,
+@@ -460,6 +474,11 @@
+                         fail!("{who} lands played is {}, expected {x}", st.lands_played(seat));
+                     }
+                 }
++                "cards_drawn_this_turn" => {
++                    if x.as_u64() != Some(st.cards_drawn(seat) as u64) {
++                        fail!("{who} cards drawn this turn is {}, expected {x}", st.cards_drawn(seat));
++                    }
++                }
+                 "spells_cast_this_turn" => {
+                     if x.as_u64() != Some(st.spells_cast(seat) as u64) {
+                         fail!("{who} spells cast this turn is {}, expected {x}", st.spells_cast(seat));
+@@ -577,7 +596,7 @@
+                 "attacking" => self.st().combat().map(|c| c.attackers.iter().any(|a| a.obj == r)).unwrap_or(false) == v.as_bool().unwrap_or(true),
+                 "keywords" => v.as_array().cloned().unwrap_or_default().iter().all(|t| Keywords::from_name(&t.as_str().unwrap_or("").to_uppercase().replace(' ', "_")).map(|t| od.chars.keywords.contains(t)).unwrap_or(false)),
+                 "keywords_exclude" => v.as_array().cloned().unwrap_or_default().iter().all(|t| Keywords::from_name(&t.as_str().unwrap_or("").to_uppercase().replace(' ', "_")).map(|t| !od.chars.keywords.contains(t)).unwrap_or(true)),
+-                "subtypes" => v.as_array().cloned().unwrap_or_default().iter().all(|t| subtype_index(t.as_str().unwrap_or("")).map(|i| od.chars.subtypes.has(i)).unwrap_or(false)),
++                "subtypes" => v.as_array().cloned().unwrap_or_default().iter().all(|t| subtype_index(sub_alias(t.as_str().unwrap_or(""))).map(|i| od.chars.subtypes.has(i)).unwrap_or(false)),
+                 "attached_to" => match v {
+                     J::Null => od.attached_to.is_none(),
+                     J::String(s) => match od.attached_to {
+@@ -614,7 +633,7 @@
+                 for pat in x.get(key).and_then(|y| y.as_array()).cloned().unwrap_or_default() {
+                     let found = self.pattern_offered(&p, &pat)?;
+                     if found != want {
+-                        fail!("legal {k}: pattern {pat} is {} but the scenario says {key}", if found { "offered" } else { "not offered" });
++                        fail!("legal {k}: pattern {pat} is {} but the scenario says {key}; offers {}", if found { "offered" } else { "not offered" }, self.describe_opts(&p));
+                     }
+                 }
+             }
+@@ -649,8 +668,15 @@
+                 };
+                 p.options.iter().any(|o| matches!(o, Opt::Cast(r, w) if self.same_obj(*r, want) && way.map(|x| x == *w).unwrap_or(true)))
+             }
++            "suspend" => {
++                let want = self.obj_alias(pat["card"].as_str().unwrap_or(""))?;
++                let ab = self.suspend_ability(want);
++                p.options.iter().any(|o| matches!(o, Opt::Activate { src, ability } if self.same_obj(*src, want) && Some(*ability) == ab))
++            }
+             "activate" | "activate_from_hand" => {
+                 let want = self.obj_alias(pat["source"].as_str().unwrap_or(""))?;
++                // `choose_color` names the mana color of a mana ability.
++                let color: Option<u8> = pat.get("choose_color").and_then(|x| x.as_str()).and_then(|c| ["W", "U", "B", "R", "G", "C"].iter().position(|x| *x == c)).map(|i| i as u8);
+                 // `ability` (when given) counts the source's activated abilities in card order, as `activate` does;
+                 // a pattern without it matches any ability of the source.
+                 let want_ab: Option<u8> = match pat.get("ability").and_then(|v| v.as_u64()) {
+@@ -665,7 +691,8 @@
+                     }
+                 };
+                 p.options.iter().any(|o| match o {
+-                    Opt::Activate { src, ability } | Opt::Mana { src, ability, .. } => self.same_obj(*src, want) && want_ab.map_or(true, |w| w == *ability),
++                    Opt::Activate { src, ability } => self.same_obj(*src, want) && want_ab.map_or(true, |w| w == *ability) && color.is_none(),
++                    Opt::Mana { src, ability, color: c, .. } => self.same_obj(*src, want) && want_ab.map_or(true, |w| w == *ability) && color.map_or(true, |x| x == *c),
+                     _ => false,
+                 })
+             }
+@@ -676,3 +703,12 @@
+ 
+ #[allow(dead_code)]
+ fn _e(_: Err) {}
++
++/// The scenarios name Urza's Saga's subtype with its printed-era spelling; the engine models the Saga rules subtype only.
++fn sub_alias(n: &str) -> &str {
++    if n == "Urza's Saga" {
++        "Saga"
++    } else {
++        n
++    }
++}
+diff -ruN a/crates/mtg-spec/src/runner.rs b/crates/mtg-spec/src/runner.rs
+--- a/crates/mtg-spec/src/runner.rs	2026-10-06 12:30:35.203409798 +0000
++++ b/crates/mtg-spec/src/runner.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -133,10 +133,16 @@
+             let kind = match e.get("kind").and_then(|k| k.as_str()) {
+                 Some("shuffle") => RandKind::Shuffle,
+                 Some("bottom_order") => RandKind::BottomOrder,
++                Some("random_discard") => RandKind::DiscardAtRandom,
+                 _ => unsupported!("scripted random event {e}"),
+             };
+             let seat = seat_of(e.get("player").and_then(|x| x.as_str()).unwrap_or("p0"))?;
+             let mut order = Vec::new();
++            // A random discard names the one card (an alias) that is discarded.
++            if let (RandKind::DiscardAtRandom, Some(al)) = (kind, e.get("result").and_then(|x| x.as_str())) {
++                let o = r.obj_alias(al)?;
++                order.push(r.st().def_of(o));
++            }
+             for n in e.get("result").and_then(|x| x.as_array()).cloned().unwrap_or_default() {
+                 match r.db.id(n.as_str().unwrap_or("")) {
+                     Some(d) => order.push(d),
+@@ -231,6 +237,7 @@
+         "flying" => CounterKind::Flying,
+         // The One Ring's burden counters are `Other(0)` (RFC 0008).
+         "burden" => CounterKind::Other(0),
++        "lore" => CounterKind::Lore,
+         other => unsupported!("counter kind {other:?}"),
+     })
+ }
+@@ -375,9 +382,11 @@
+             ps.graveyard = ents[si][2].iter().map(|e| e.name.clone()).collect();
+             ps.exile = ents[si][3].iter().map(|e| e.name.clone()).collect();
+             ps.library = ents[si][4].iter().map(|e| e.name.clone()).collect();
++            // Cards outside the game (Burning Wish); the sideboard entries are plain names.
++            ps.sideboard = p.get("sideboard").and_then(|x| x.as_array()).map(|a| a.iter().filter_map(|x| x.as_str()).map(|s| s.split(" @").next().unwrap_or(s).trim().to_string()).collect()).unwrap_or_default();
+         }
+         for pl in players.iter() {
+-            for n in pl.hand.iter().chain(pl.graveyard.iter()).chain(pl.exile.iter()).chain(pl.library.iter()).chain(pl.battlefield.iter().map(|b| &b.name)) {
++            for n in pl.hand.iter().chain(pl.graveyard.iter()).chain(pl.exile.iter()).chain(pl.library.iter()).chain(pl.sideboard.iter()).chain(pl.battlefield.iter().map(|b| &b.name)) {
+                 if db.id(n).is_none() {
+                     unsupported!("card not in pool: {n}");
+                 }
+@@ -415,6 +424,16 @@
+             }
+             by_handle.push((seat.idx(), zone_rank(*zone), *i, k as u16, e.name.clone()));
+         }
++        // Counters on exiled cards (suspended cards carry time counters).
++        for (k, (seat, zone, i)) in order.iter().enumerate() {
++            if *zone == ZoneKind::Exile {
++                let e = &ents[seat.idx()][3][*i];
++                if !e.counters.is_empty() {
++                    let r = game.raw_state_mut().cur_ref_of_slot(k as u16);
++                    game.raw_state_mut().scenario_set_counters_damage(r, &e.counters, 0);
++                }
++            }
++        }
+         by_handle.sort();
+         for (seat, _, _, slot, name) in by_handle {
+             let c = counts.entry((seat, name.clone())).or_insert(0);
+@@ -539,6 +558,38 @@
+         fail!("unknown alias {s:?}")
+     }
+ 
++    /// Slots of every alias and handle the script has (to tell a card that entered later from them).
++    fn known_slots(&self) -> Vec<u16> {
++        self.aliases.values().chain(self.handles.values()).map(|a| self.resolve_alias(*a).slot).collect()
++    }
++
++    /// A card from outside the game just entered `seat`'s hand: bind the handle the script used for it.
++    fn register_new_card(&mut self, seat: Seat, name: &str, before: &[u16], handle: &J) {
++        let Some(h) = handle.as_str() else { return };
++        let found = self.st().hand(seat).iter().copied().find(|&r| self.def_name(r) == name && !before.contains(&r.slot));
++        if let Some(r) = found {
++            self.handles.insert(h.to_string(), Alias::Obj(r));
++        }
++    }
++
++    /// Maps a scenario's ability number (activated abilities in Oracle order; an intrinsic basic-land
++    /// mana ability is 0 when the card has none of its own) to the engine's ability index.
++    pub(crate) fn activated_index(&self, src: ObjRef, idx: usize) -> Option<u8> {
++        let def = self.db.def(self.st().def_of(src));
++        let acts: Vec<usize> = def.abilities.iter().enumerate().filter_map(|(i, x)| if matches!(x, AbilityDef::Activated(_)) { Some(i) } else { None }).collect();
++        match acts.get(idx) {
++            Some(i) => Some(*i as u8),
++            None if idx == 0 => Some(255),
++            None => None,
++        }
++    }
++
++    /// The index of the ability that suspends the card (its cost has `SuspendSelf`).
++    pub(crate) fn suspend_ability(&self, r: ObjRef) -> Option<u8> {
++        let def = self.db.def(self.st().def_of(r));
++        def.abilities.iter().position(|a| matches!(a, AbilityDef::Activated(ad) if ad.cost.iter().any(|c| matches!(c, CostItem::SuspendSelf(_))))).map(|i| i as u8)
++    }
++
+     pub(crate) fn def_name(&self, r: ObjRef) -> String {
+         self.db.def(self.st().def_of(r)).name.clone()
+     }
+@@ -822,6 +873,34 @@
+                 self.choose_obj("play_land", want, |o| if let Opt::PlayLand(r) = o { Some(*r) } else { None })
+             }
+             "cast" => self.do_cast(seat, a),
++            "suspend" => {
++                self.expect_priority(seat)?;
++                let src = self.obj_alias(a["card"].as_str().unwrap_or(""))?;
++                let ab = match self.suspend_ability(src) {
++                    Some(i) => i,
++                    None => fail!("{} has no suspend ability", self.def_name(src)),
++                };
++                self.set_pay_hint(a)?;
++                let r = self.choose_obj("suspend", src, |o| match o {
++                    Opt::Activate { src, ability } if *ability == ab => Some(*src),
++                    _ => None,
++                });
++                let r = r.and_then(|_| self.drive_cast(seat, a, false));
++                self.g.raw_state_mut().scenario_pay_hint(Vec::new());
++                r?;
++                // Named sources are the whole payment: a different source paying means the named ones could not.
++                if let Some(l) = a.get("pay").and_then(|p| p.get("tap")).and_then(|t| t.as_array()) {
++                    let mut named = Vec::new();
++                    for al in l {
++                        named.push(self.obj_alias(al.as_str().unwrap_or(""))?.slot);
++                    }
++                    let tapped_other = self.st().battlefield().iter().any(|&r| self.st().obj_data(&self.db, r).tapped && !named.contains(&r.slot));
++                    if tapped_other {
++                        fail!("the named sources cannot pay for the suspend");
++                    }
++                }
++                Ok(())
++            }
+             "activate" | "activate_from_hand" => self.do_activate(seat, a, t == "activate_from_hand"),
+             "legend_rule" => {
+                 let want = self.obj_alias(a["keep"].as_str().unwrap_or(""))?;
+@@ -889,6 +968,14 @@
+             }
+             None => {}
+         }
++        // `bargained: true` (Beseech the Mirror, RFC 0007): the way with the key "bargained".
++        if a.get("bargained").and_then(|x| x.as_bool()) == Some(true) {
++            let def = self.db.def(self.st().def_of(card));
++            return match def.abilities.iter().filter_map(|x| if let AbilityDef::Alt(a) = x { Some(a) } else { None }).position(|ab| ab.key == "bargained") {
++                Some(i) => Ok(i as u8 + 1),
++                None => unsupported!("bargained cast of {}", def.name),
++            };
++        }
+         let alt = match a.get("alt_cost") {
+             None | Some(J::Null) => return Ok(0),
+             Some(x) => x,
+@@ -974,7 +1061,15 @@
+                     let sub = self.st().obj_data(&self.db, src).chars.subtypes;
+                     match [(SUB_PLAINS, 0u8), (SUB_ISLAND, 1), (SUB_SWAMP, 2), (SUB_MOUNTAIN, 3), (SUB_FOREST, 4)].iter().find(|(s, _)| sub.has(*s)) {
+                         Some((_, c)) => *c,
+-                        None => unsupported!("mana ability needs choose_color"),
++                        None => {
++                            // One color on offer (Chrome Mox with a single imprinted color): that one.
++                            let p = self.pending();
++                            let cols: Vec<u8> = p.map(|p| p.options.iter().filter_map(|o| if let Opt::Mana { src: s, ability, color, .. } = o { if self.same_obj(*s, src) && *ability == mab { Some(*color) } else { None } } else { None }).collect()).unwrap_or_default();
++                            match cols.as_slice() {
++                                [c] => *c,
++                                _ => unsupported!("mana ability needs choose_color"),
++                            }
++                        }
+                     }
+                 }
+             };
+@@ -1000,11 +1095,14 @@
+         };
+         // Ninjutsu's returned attacker is a separate `choose_cards` step after the activation.
+         let stop_pick = def.activated(ab).map(|d| d.cost.iter().any(|c| matches!(c, CostItem::ReturnToHand(f) if f.unblocked == Some(true)))).unwrap_or(false);
+-        self.choose_obj("activate", src, |o| match o {
++        self.set_pay_hint(a)?;
++        let r = self.choose_obj("activate", src, |o| match o {
+             Opt::Activate { src, ability } if *ability == ab => Some(*src),
+             _ => None,
+-        })?;
+-        self.drive_cast(seat, a, stop_pick)
++        });
++        let r = r.and_then(|_| self.drive_cast(seat, a, stop_pick));
++        self.g.raw_state_mut().scenario_pay_hint(Vec::new());
++        r
+     }
+ 
+     /// Answers the sub-decisions of a cast/activation from the action's fields.
+@@ -1182,6 +1280,17 @@
+                 if let Some(p) = m.get("player").and_then(|x| x.as_str()) {
+                     return Ok(Target::Player(seat_of(p)?));
+                 }
++                if let Some(card) = m.get("copy_of").and_then(|x| x.as_str()) {
++                    // A copy of the spell with that card alias, counted from the top of the stack.
++                    let src = self.obj_alias(card)?;
++                    let def = self.st().def_of(src);
++                    let nth = m.get("nth").and_then(|x| x.as_u64()).unwrap_or(0) as usize;
++                    let hits: Vec<ObjRef> = self.st().stack().iter().rev().filter(|e| matches!(e.kind, StackKind::Spell) && e.def == def && e.obj.slot != src.slot).map(|e| e.obj).collect();
++                    return match hits.get(nth) {
++                        Some(r) => Ok(Target::Obj(*r)),
++                        None => fail!("no {nth}-th copy of {card} on the stack"),
++                    };
++                }
+                 let key = if m.contains_key("trigger_of") { "trigger_of" } else { "ability_of" };
+                 if let Some(src) = m.get(key).and_then(|x| x.as_str()) {
+                     let src = self.obj_alias(src)?;
+@@ -1258,6 +1367,28 @@
+                     None => fail!("target not legal; options {}", self.describe_opts(&p)),
+                 }
+             }
++            "choose_cards" if p.kind == DecisionKind::ChooseSideboard => {
++                // Burning Wish: the answer names the sideboard card by handle ("p0:Name#1"); none declines.
++                let ans: Vec<J> = a["answer"].as_array().cloned().unwrap_or_default();
++                let name = ans.first().and_then(|x| x.as_str()).map(|h| {
++                    let h = h.split_once(':').map(|(_, n)| n).unwrap_or(h);
++                    h.rsplit_once('#').map(|(n, _)| n).unwrap_or(h).to_string()
++                });
++                let before: Vec<u16> = self.known_slots();
++                match name {
++                    Some(n) => {
++                        let hit = p.options.iter().position(|o| matches!(o, Opt::Name(d) if self.db.def(CardDefId(*d)).name == n));
++                        match hit {
++                            Some(i) => self.apply_opt(i)?,
++                            None => fail!("choose_cards: {n:?} is not in the offered sideboard cards ({})", self.describe_opts(&p)),
++                        }
++                        // The card now exists in the game: the handle names the new object.
++                        self.register_new_card(seat, &n, &before, &ans[0]);
++                        Ok(())
++                    }
++                    None => self.choose("decline", |_, o| *o == Opt::Done),
++                }
++            }
+             "choose_cards" => {
+                 let ans: Vec<J> = a["answer"].as_array().cloned().unwrap_or_default();
+                 for al in ans {
+@@ -1458,6 +1589,7 @@
+             ("declare_blockers", DecisionKind::DeclareBlocker { .. }) => true,
+             ("assign_combat_damage", DecisionKind::AssignDamage { .. }) => true,
+             ("choose_color", DecisionKind::ChooseColor) => true,
++            ("choose_cards", DecisionKind::ChooseSideboard) => true,
+             ("choose_dungeon", DecisionKind::ChooseDungeon) | ("choose_room", DecisionKind::ChooseRoom) => true,
+             ("legend_rule", DecisionKind::LegendRule) => true,
+             ("choose_name", DecisionKind::ChooseName { .. }) | ("choose_name", DecisionKind::ChooseType) => true,
+diff -ruN a/crates/mtg-view/src/project.rs b/crates/mtg-view/src/project.rs
+--- a/crates/mtg-view/src/project.rs	2026-10-03 21:41:52.000000000 +0000
++++ b/crates/mtg-view/src/project.rs	2026-10-06 12:31:30.000000000 +0000
+@@ -162,6 +162,7 @@
+         DecisionKind::ChooseRoom => (ViewDecisionKind::ChooseRoom, "Choose the next room.".to_string()),
+         DecisionKind::ChooseName { lands } => (ViewDecisionKind::ChooseName, if lands { "Choose a card name.".to_string() } else { "Choose a nonland card name.".to_string() }),
+         DecisionKind::ChooseType => (ViewDecisionKind::ChooseName, "Choose a creature type.".to_string()),
++        DecisionKind::ChooseSideboard => (ViewDecisionKind::ChooseName, "Choose a card from your sideboard (or decline).".to_string()),
+         DecisionKind::LegendRule => (ViewDecisionKind::LegendRule, "Choose the legendary permanent to keep.".to_string()),
+         DecisionKind::PayUnless => (ViewDecisionKind::May, "Pay to avoid the effect?".to_string()),
+         DecisionKind::ChangeTargets => (ViewDecisionKind::May, "Choose new targets for the copy?".to_string()),

@@ -1,0 +1,59 @@
+id: storm-c-hexing-squelcher-on-battlefield-show-and-tell-not-countered-by-force-of-will
+title: "With Hexing Squelcher on the battlefield, Show and Tell cannot be countered by a hard-cast Force of Will and resolves for both players"
+area: card
+cards: [Hexing Squelcher, Island, Show and Tell, Lotus Petal, Force of Will]
+tags: [hexing-squelcher, spells-you-control-cant-be-countered, show-and-tell, force-of-will, simultaneous-secret-choice, alurentell-matchup]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Spells you control can't be countered.", verified: true}
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "101.2", text: "the “can’t” effect takes precedence", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Lotus Petal @petal"]
+    battlefield: ["Hexing Squelcher @sq", "Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow"]
+    battlefield: ["Island @j1", "Island @j2", "Island @j3", "Island @j4", "Island @j5"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", targets: ["@snt"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@snt", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Force of Will], hand: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@petal"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Show and Tell]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Hexing Squelcher}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Lotus Petal, tapped: false}
+    p1:
+      hand: []
+      graveyard: [Force of Will]
+notes: >
+  Show and Tell is the Alurentell/Storm payoff spell the opponent most wants to counter; with Squelcher in play it is
+  uncounterable (101.2), so the hard-cast Force of Will (all five Islands) resolves and counters nothing. p1 has no
+  card in hand left after casting Force of Will, so p1 has no choice to make and no decision is raised for p1 (SCHEMA
+  addenda: a player with no eligible card has no choice). p0 puts Lotus Petal onto the battlefield (not cast: only
+  Show and Tell was cast, spells_cast_this_turn 1). A wrong engine counters Show and Tell, leaving Lotus Petal in hand.

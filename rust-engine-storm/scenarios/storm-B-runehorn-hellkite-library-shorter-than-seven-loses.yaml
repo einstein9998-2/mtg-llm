@@ -1,0 +1,39 @@
+id: storm-b-runehorn-hellkite-library-shorter-than-seven-loses
+title: A player with five cards in library draws them all and loses the game after Runehorn Hellkite's ability
+area: card
+cards: [Runehorn Hellkite, Taiga, Island, Brainstorm]
+tags: [runehorn-hellkite, graveyard-ability, draw-seven, empty-library, state-based-action, game-loss]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Runehorn Hellkite, text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", verified: true}
+  - {kind: cr, ref: "104.3c", text: "If a player is required to draw more cards than are left in their library, they draw the remaining cards and then lose the game the next time a player would receive priority.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Brainstorm @bs"]
+    graveyard: ["Runehorn Hellkite @hk"]
+    battlefield: ["Taiga @taiga", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 20
+  p1:
+    hand: ["Brainstorm @pbs"]
+    library: [Island, Island, Island, Island, Island]
+script:
+  - p0: {t: activate, source: "@hk", ability: 0, pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p0:
+      hand: [Island, Island, Island, Island, Island, Island, Island]
+      library_count: 13
+    p1:
+      hand: [Island, Island, Island, Island, Island]
+      library_count: 0
+      graveyard: [Brainstorm]
+notes: >
+  p1 draws the five remaining cards (draws "as many as possible", 104.3c) and then loses at the next state-based action
+  check (704.5b) because it was told to draw a sixth and seventh card from an empty library; p0, with a full library,
+  wins. A wrong engine skips the draw entirely, draws seven from nowhere, or lets p1 continue.

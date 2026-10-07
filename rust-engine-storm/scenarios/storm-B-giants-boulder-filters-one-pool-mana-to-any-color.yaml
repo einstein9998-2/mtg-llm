@@ -1,0 +1,40 @@
+id: storm-b-giants-boulder-filters-one-pool-mana-to-any-color
+title: Giant's Boulder turns one floating {C} into one mana of a chosen colour (net one mana, not two), and then stays tapped
+area: card
+cards: [Giant's Boulder]
+tags: [giants-boulder, mana-filter, mana-ability, mana-pool, summoning-sickness]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Giant's Boulder, text: "{1}, {T}: Add one mana of any color.", verified: false, note: "Giant's Boulder text from three store pages (engine owner's brief), not Scryfall"}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+  - {kind: cr, ref: "405.6c", text: "Mana abilities resolve immediately.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: [{card: Giant's Boulder, as: boulder, sick: true}]
+    mana_pool: {C: 2}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@boulder", ability: 0, choose_color: U}]}}
+  - p0: {t: activate, source: "@boulder", ability: 0, choose_color: U}
+  - check:
+      stack: []
+      p0: {mana_pool: {C: 1, U: 1}}
+  - expect_illegal: {p0: {t: activate, source: "@boulder", ability: 0, choose_color: R}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Giant's Boulder, tapped: true}]
+      mana_pool: {C: 1, U: 1}
+notes: >
+  The Boulder is a filter: it spends {1} from the pool (one of the two identical {C}) and adds one mana of any colour,
+  here {U}. Pool {C:2} -> {C:1, U:1}. It resolves at once (mana ability), is not a creature so the entering turn does
+  not matter (sick: true), and once tapped it cannot be activated again. Per the brief the engine spends floating mana
+  only from the pool and chooses which; both floating mana here are {C}, so that choice cannot matter.

@@ -1,0 +1,55 @@
+id: storm-c-gaeas-will-suspend-from-hand-pays-green-four-time-counters
+title: "Gaea's Will is suspended from hand for {G}: it is exiled face up with four time counters, nothing goes on the stack and no spell is cast"
+area: card
+cards: ["Gaea's Will", Forest, Island]
+tags: [gaeas-will, suspend, special-action, time-counters, no-stack, not-cast]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "Suspend 4—{G}", verified: true}
+  - {kind: cr, ref: "702.62a", text: "you may pay [cost] and exile it with N time counters on it. This action doesn’t use the stack", verified: true}
+  - {kind: cr, ref: "702.62b", text: "A card is “suspended” if it’s in the exile zone, has suspend, and has a time counter on it.", verified: true}
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gaea's Will @will"]
+    battlefield: ["Forest @f", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: suspend, card: "@will"}]}}
+  - p0: {t: suspend, card: "@will", pay: {tap: ["@f"]}}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        exile: [{card: "Gaea's Will", face_up: true, counters: {time: 4}}]
+        hand: []
+        graveyard: []
+        spells_cast_this_turn: 0
+        battlefield: [{card: Forest, tapped: true}, {card: Island, tapped: false}]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      exile: [{card: "Gaea's Will", face_up: true, counters: {time: 4}}]
+      hand: []
+      graveyard: []
+      spells_cast_this_turn: 0
+      lands_played: 0
+    p1:
+      exile: []
+      graveyard: []
+notes: >
+  Suspend is a special action available whenever the player could begin to cast the card from hand: Gaea's Will is a
+  sorcery, so main phase, own turn, empty stack. The cost is {G} (the Forest taps; the Island stays untapped, so exactly
+  one mana was paid). The card is exiled face up with 4 time
+  counters (702.62a) and is then "suspended" (702.62b). The action does not use the stack and is not a cast: the
+  stack is empty and spells_cast_this_turn is 0 (matters for storm count and for Song of Creation). New action
+  spelling: {t: suspend, card: "@alias", pay: ...}; not in SCHEMA.md or in the stock validator's action list.

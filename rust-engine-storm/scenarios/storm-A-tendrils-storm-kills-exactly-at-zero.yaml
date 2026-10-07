@@ -1,0 +1,51 @@
+id: storm-a-tendrils-storm-kills-exactly-at-zero
+title: "Storm Tendrils (two copies) takes the opponent from 6 to 0 on the last resolution and ends the game"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Lotus Petal, Swamp]
+tags: [tendrils-of-agony, storm, lethal, state-based-action, game-over, copies]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tendrils of Agony, text: "Target player loses 2 life and you gain 2 life.", verified: true}
+  - {kind: cr, ref: "119.6", text: "If a player has 0 or less life, that player loses the game as a state-based action.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Lotus Petal @petal", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    life: 6
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      game: {over: false}
+      p1: {life: 2}
+      p0: {life: 24}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p0: {life: 26}
+    p1: {life: 0}
+notes: >
+  Lotus Petal (cast #1) and Dark Ritual (cast #2) precede Tendrils: two copies, three resolutions of 2 life each. After two resolutions
+  p1 is at 2 and the game continues; the third takes p1 to 0 and the state-based action ends the game with p0 the winner at 26.

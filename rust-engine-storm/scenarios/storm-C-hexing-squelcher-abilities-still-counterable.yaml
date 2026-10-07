@@ -1,0 +1,52 @@
+id: storm-c-hexing-squelcher-spells-only-stifle-still-counters-an-ability
+title: "Squelcher protects spells, not abilities: Stifle still counters p0's Goblin Bombardment activation"
+area: card
+cards: [Hexing Squelcher, Goblin Bombardment, "Cat Token (Ocelot Pride)", Stifle, Island]
+tags: [hexing-squelcher, spells-you-control-cant-be-countered, stifle, counter-ability, goblin-bombardment, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Spells you control can't be countered.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq", "Goblin Bombardment @bomb", {token: "Cat Token (Ocelot Pride)", as: cat}]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@cat"], targets: [{player: p1}]}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      stack: [{kind: activated, source: "@bomb", controller: p0}]
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@bomb", nth: 0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: []
+      battlefield: [{card: Hexing Squelcher}, {card: Goblin Bombardment}]
+    p1:
+      life: 20
+      hand: []
+      graveyard: [Stifle]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  "Spells you control can't be countered" says nothing about abilities, so an activated ability of p0's is still a
+  legal target for Stifle and is countered (701.6a): p1 stays at 20 although the sacrifice cost was already paid (the
+  Cat token is gone, it ceased to exist). The Squelcher's own "can't be countered" and "spells you control" clauses
+  must not be implemented as a blanket "nothing of p0's on the stack can be countered". The ability itself has no
+  ward trigger involved (the target is a player).

@@ -1,0 +1,44 @@
+id: storm-a-burning-wish-countered-stays-in-graveyard
+title: A countered Burning Wish goes to the graveyard (not exile) and fetches nothing
+area: card
+cards: [Burning Wish, Tendrils of Agony, Force of Will, Brainstorm, Mountain]
+tags: [burning-wish, sideboard, counterspell, force-of-will, countered, graveyard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Burning Wish, text: "Exile Burning Wish.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur. A countered spell is put into its owner's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Burning Wish @wish"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+    sideboard: [Tendrils of Agony]
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wish", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@wish"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Burning Wish]
+      exile: []
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  The "Exile Burning Wish" instruction is part of the spell's resolution, which never happens (701.6a). The card goes to the
+  graveyard, no reveal decision is raised for p0, and the sideboard card stays outside the game. A wrong engine exiles it
+  or still offers the reveal.

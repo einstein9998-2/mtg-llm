@@ -1,0 +1,48 @@
+id: storm-b-taiga-wasteland-can-target-nonbasic-taiga-not-basic-mountain
+title: Wasteland can destroy Taiga (nonbasic) but cannot target a basic Mountain; mana made in response stays
+area: card
+cards: [Taiga, Mountain, Wasteland]
+tags: [taiga, wasteland, nonbasic-land, basic-supertype, destroy, in-response, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Taiga, text: "{T}: Add {R} or {G}.", verified: true}
+  - {kind: cr, ref: "205.4a", text: "The supertypes are basic, legendary, ongoing, snow, and world.", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn’t go on the stack, so it can’t be targeted, countered, or otherwise responded to.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Taiga @taiga", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: activate, source: "@waste", ability: 1, targets: ["@mtn"]}}
+  - p1: {t: activate, source: "@waste", ability: 1, targets: ["@taiga"]}
+  - check:
+      stack: [{kind: activated, source: "@waste", controller: p1, targets: ["@taiga"]}]
+      p1: {graveyard: [Wasteland]}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@taiga", ability: 0, choose_color: G}
+  - check: {p0: {mana_pool: {G: 1}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mountain, tapped: false}]
+      graveyard: [Taiga]
+      mana_pool: {G: 1}
+    p1:
+      battlefield: []
+      graveyard: [Wasteland]
+notes: >
+  A basic Mountain has the basic supertype, so "nonbasic land" excludes it; Taiga, though it has both basic land types,
+  is not basic and is a legal target. In response p0 taps the Taiga for {G}; that mana is still in the pool after the Taiga
+  is destroyed. A wrong engine treats "has a basic land type" as "is basic".

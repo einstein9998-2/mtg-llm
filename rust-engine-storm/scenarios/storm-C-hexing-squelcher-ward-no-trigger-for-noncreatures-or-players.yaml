@@ -1,0 +1,55 @@
+id: storm-c-hexing-squelcher-ward-not-for-noncreature-permanents-or-players
+title: "Only creatures have ward: p1's Abrade on Lotus Petal and Lightning Bolt at p0's face raise no payment prompt"
+area: card
+cards: [Hexing Squelcher, Lotus Petal, Abrade, Lightning Bolt, Mountain]
+tags: [hexing-squelcher, ward, other-creatures, noncreature-permanent, player-target, negative, no-decision-raised]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: 'Other creatures you control have "Ward—Pay 2 life."', verified: true}
+  - {kind: oracle, card: Abrade, text: "Destroy target artifact.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq", "Lotus Petal @petal"]
+    library_pad: 10
+  p1:
+    hand: ["Abrade @abr", "Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@abr", modes: [2], targets: ["@petal"], pay: {tap: ["@m1", "@m2"]}}
+  - check:
+      stack: [{kind: spell, card: "@abr", controller: p1, targets: ["@petal"]}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p1, kind: priority}
+      p1: {life: 20}
+      p0: {graveyard: [Lotus Petal]}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: {tap: ["@m3"]}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 17
+      graveyard: [Lotus Petal]
+      battlefield: [{card: Hexing Squelcher, damage: 0}]
+    p1:
+      life: 20
+      graveyard: [Abrade, Lightning Bolt]
+notes: >
+  The ward-like ability is granted to "other creatures you control": a noncreature permanent (Lotus Petal) and the
+  player are not creatures, so neither targeting puts a trigger on the stack (the stack holds only the spell, and the
+  spell resolves after two passes with no yes_no step). Abrade's second mode is "Destroy target artifact"; the Petal
+  goes to p0's graveyard. A wrong engine puts ward on every permanent p0 controls or on p0 itself.

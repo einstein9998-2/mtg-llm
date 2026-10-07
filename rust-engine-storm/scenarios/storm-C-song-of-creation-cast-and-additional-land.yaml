@@ -1,0 +1,64 @@
+id: storm-c-song-of-creation-cast-draws-nothing-for-itself-then-two-land-drops-not-three
+title: "Song of Creation, cast for {1}{G}{U}{R}, draws nothing for its own cast; afterwards p0 may play two lands in the turn but not a third"
+area: card
+cards: [Song of Creation, Forest, Island, Mountain]
+tags: [song-of-creation, additional-land-drop, land-drop-limit, cast-trigger-not-self, three-colour-cost, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Song of Creation, text: "You may play an additional land on each of your turns.", verified: true}
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: cr, ref: "305.2", text: "A player can normally play one land during their turn; however, continuous effects may increase this number.", verified: true}
+  - {kind: cr, ref: "305.2b", text: "A player can’t play a land, for any reason, if the number of lands the player can play this turn is equal to or less than the number of lands they have already played this turn.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Once the steps described in 601.2a–h are completed, effects that modify the characteristics of the spell as it’s cast are applied, then the spell becomes cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Song of Creation @song", "Island @a", "Island @b", "Island @c"]
+    battlefield: ["Forest @f", "Island @i1", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@song", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@song", controller: p0}]
+      p0: {hand_count: 3, spells_cast_this_turn: 1}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [Island, Island, Island], lands_played: 0}
+      legal: {p0: {include: [{t: play_land, card: "@a"}]}}
+  - p0: {t: play_land, card: "@a"}
+  - check:
+      p0: {lands_played: 1}
+      legal: {p0: {include: [{t: play_land, card: "@b"}]}}
+  - p0: {t: play_land, card: "@b"}
+  - expect_illegal: {p0: {t: play_land, card: "@c"}}
+  - check:
+      legal: {p0: {exclude: [{t: play_land, card: "@c"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      lands_played: 2
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Song of Creation}
+        - {card: Forest, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+notes: >
+  The Song is a spell on the stack when cast, not yet a permanent, so "whenever you cast a spell" does not see its own
+  cast: the hand stays at three cards (the three Islands) after it resolves. Once on the battlefield it raises the land
+  limit to two (305.2: continuous effects may increase the number): two of the three hand Islands can be played, the
+  second one is offered only after the first, and a third is not offered (305.2b: lands played 2 = lands that can be
+  played 2). The four tapped lands paid {1}{G}{U}{R} in some way; only the totals (all four tapped) are asserted.

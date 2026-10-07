@@ -1,0 +1,40 @@
+id: storm-a-burning-wish-no-sorcery-in-sideboard-still-exiles
+title: With no sorcery in the sideboard Burning Wish finds nothing but is still exiled
+area: card
+cards: [Burning Wish, Lightning Bolt, Brainstorm, "Atraxa, Grand Unifier", Mountain]
+tags: [burning-wish, sideboard, nothing-found, exile-self, no-choice]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Burning Wish, text: "You may reveal a sorcery card you own from outside the game and put it into your hand.", verified: true}
+  - {kind: oracle, card: Burning Wish, text: "Exile Burning Wish.", verified: true}
+  - {kind: cr, ref: "608.2c", text: "The controller of the spell or ability follows its instructions in the order written.", verified: true}
+  - {kind: cr, ref: "101.3", text: "Any part of an instruction that's impossible to perform is ignored.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Burning Wish @wish"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+    sideboard: [Lightning Bolt, Brainstorm, "Atraxa, Grand Unifier"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wish", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      exile: [Burning Wish]
+      library_count: 10
+notes: >
+  The sideboard holds no sorcery, so the first instruction has nothing it can do (101.3) and the player has no choice, so no
+  decision is raised (the script has no step after the two passes; the runner fails the scenario if a decision is
+  pending where the expectation says priority). The second instruction, "Exile Burning Wish", still happens: the card
+  must be in exile, not in the graveyard. A wrong engine skips the exile when the fetch finds nothing.

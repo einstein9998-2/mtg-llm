@@ -1,0 +1,58 @@
+id: storm-a-tendrils-lands-and-abilities-do-not-count-for-storm
+title: "Playing a land and activating Lotus Petal are not spells: storm after Dark Ritual counts exactly one"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Lotus Petal, Swamp]
+tags: [tendrils-of-agony, storm, storm-count, land-play, mana-ability, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tendrils of Agony, text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: cr, ref: "305.1", text: "Playing a land is a special action; it doesn’t use the stack (see rule 116).", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it resolves, and it’s not a loyalty ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Tendrils of Agony @tend", "Swamp @s2"]
+    battlefield: ["Swamp @s1", "Lotus Petal @petal"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@s2"}
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: B}
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      p0: {mana_pool: {B: 4}, lands_played: 1, spells_cast_this_turn: 1}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 24
+      graveyard: [Dark Ritual, Lotus Petal, Tendrils of Agony]
+      battlefield: [{card: Swamp, tapped: true}, {card: Swamp, tapped: false}]
+      mana_pool: {}
+      spells_cast_this_turn: 2
+      lands_played: 1
+    p1: {life: 16}
+notes: >
+  A land play (special action) and Lotus Petal's mana ability (no stack) are not spells. Only Dark Ritual was cast before
+  Tendrils, so there is one copy: 2 resolutions, p1 20 -> 16, p0 20 -> 24. The Petal's B and Ritual's BBB (pool B: 4) pay the whole
+  {2}{B}{B}, leaving the new Swamp untapped.

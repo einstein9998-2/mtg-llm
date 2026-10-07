@@ -1,0 +1,44 @@
+id: storm-a-burning-wish-fetches-sideboard-sorcery-and-exiles-itself
+title: Burning Wish puts the chosen sideboard sorcery into hand and exiles itself instead of going to the graveyard
+area: card
+cards: [Burning Wish, Tendrils of Agony, Doomsday, Lightning Bolt, Mountain]
+tags: [burning-wish, sideboard, outside-the-game, exile-self, sorcery, reveal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Burning Wish, text: "You may reveal a sorcery card you own from outside the game and put it into your hand.", verified: true}
+  - {kind: oracle, card: Burning Wish, text: "Exile Burning Wish.", verified: true}
+  - {kind: cr, ref: "400.11a", text: "Cards in a player's sideboard are outside the game.", verified: true}
+  - {kind: cr, ref: "400.11b", text: "Some effects bring cards into a game from outside the game. Those cards remain in the game until the game ends, their owner leaves the game, or a rule or effect removes them from the game, whichever comes first.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Burning Wish @wish"]
+    battlefield: ["Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+    sideboard: [Tendrils of Agony, Doomsday, Lightning Bolt]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wish", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: reveal_from_sideboard, answer: ["p0:Tendrils of Agony#1"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Tendrils of Agony]
+      graveyard: []
+      exile: [Burning Wish]
+      library_count: 10
+      spells_cast_this_turn: 1
+      battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}]
+    p1: {hand: [], library_count: 10}
+notes: >
+  Burning Wish costs {1}{R} (both Mountains tap). "Outside the game" is p0's sideboard (the sideboard key in setup);
+  the chosen card enters the game in p0's hand, the library is not touched (library_count stays 10), and Burning Wish
+  goes to exile, never the graveyard. The sideboard card is addressed by the handle "p0:Tendrils of Agony#1" because the
+  validator does not register aliases for sideboard entries (see SCENARIO-NOTES-A.md, new spellings).

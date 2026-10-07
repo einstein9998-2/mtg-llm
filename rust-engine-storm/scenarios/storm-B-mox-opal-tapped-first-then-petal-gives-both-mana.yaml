@@ -1,0 +1,36 @@
+id: storm-b-mox-opal-tapped-first-then-petal-gives-both-mana
+title: Tapping Mox Opal first and then sacrificing Lotus Petal gives both mana (metalcraft is checked on activation only)
+area: card
+cards: [Mox Opal, Lotus Petal, Mishra's Bauble]
+tags: [mox-opal, metalcraft, lotus-petal, activation-order, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mox Opal, text: "Activate only if you control three or more artifacts.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "405.6c", text: "Mana abilities resolve immediately.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mox Opal @opal", "Lotus Petal @petal", "Mishra's Bauble @bauble"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@opal", ability: 0, choose_color: B}
+  - check:
+      p0: {mana_pool: {B: 1}}
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield: [{card: Mox Opal, tapped: true}, {card: Mishra's Bauble, tapped: false}]
+      graveyard: [Lotus Petal]
+      mana_pool: {B: 1, R: 1}
+notes: >
+  Same board as the previous scenario, other order: Opal is activated while three artifacts are under control and its
+  mana ({B}) stays in the pool when the Petal is sacrificed afterwards. A wrong engine that re-checks the restriction
+  later (or removes the mana) loses the {B}.

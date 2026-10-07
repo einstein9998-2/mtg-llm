@@ -1,0 +1,36 @@
+id: storm-b-mox-opal-opponents-artifacts-do-not-count
+title: Artifacts the opponent controls do not count for Mox Opal's metalcraft
+area: card
+cards: [Mox Opal, Lotus Petal, Aether Vial, Nihil Spellbomb, Grafdigger's Cage]
+tags: [mox-opal, metalcraft, control, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mox Opal, text: "Activate only if you control three or more artifacts.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mox Opal @opal", "Lotus Petal @petal"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aether Vial @vial", "Nihil Spellbomb @bomb", "Grafdigger's Cage @cage"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@opal", ability: 0, choose_color: R}}
+  - check:
+      legal:
+        p0:
+          include: [{t: activate, source: "@petal", ability: 0}]
+          exclude: [{t: activate, source: "@opal", ability: 0}]
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield: [{card: Mox Opal, tapped: false}, {card: Lotus Petal, tapped: false}]
+      mana_pool: {}
+    p1:
+      battlefield: [{card: Aether Vial}, {card: Nihil Spellbomb}, {card: Grafdigger's Cage}]
+notes: >
+  p0 controls two artifacts (Opal, Petal); p1 controls three. "Three or more artifacts" reads "you control", so only
+  p0's two count and Opal stays off. Lotus Petal's own ability stays offered, as a control that p0's artifacts work normally.

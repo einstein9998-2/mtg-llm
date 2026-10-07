@@ -1,0 +1,55 @@
+id: storm-b-haywire-mite-sacrifice-exiles-artifact-and-gains-two
+title: Haywire Mite sacrificed for {G} exiles a noncreature artifact (not destroys), its dies trigger gains 2 life first, and Taiga (not Mountain) pays the {G}
+area: card
+cards: [Haywire Mite, Taiga, Mountain, Aether Vial]
+tags: [haywire-mite, sacrifice-cost, exile, dies-trigger, stack-order, mana-payment, taiga]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Haywire Mite, text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", verified: true}
+  - {kind: oracle, card: Haywire Mite, text: "When this creature dies, you gain 2 life.", verified: true}
+  - {kind: cr, ref: "700.4", text: "The term dies means \"is put into a graveyard from the battlefield.\"", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Haywire Mite @mite", "Taiga @taiga", "Mountain @mtn"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aether Vial @vial"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@mite", ability: 0, targets: ["@vial"], pay: auto}
+  - check:
+      stack:
+        - {kind: activated, source: "@mite", controller: p0, targets: ["@vial"]}
+        - {kind: triggered, source: "@mite", controller: p0, text_contains: "gain 2 life"}
+      p0:
+        life: 20
+        graveyard: [Haywire Mite]
+        battlefield: [{card: Taiga, tapped: true}, {card: Mountain, tapped: false}]
+  - resolve_top: true
+  - check:
+      stack: [{kind: activated, source: "@mite"}]
+      p0: {life: 22}
+      p1: {battlefield: [{card: Aether Vial}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      graveyard: [Haywire Mite]
+      battlefield: [{card: Taiga, tapped: true}, {card: Mountain, tapped: false}]
+    p1:
+      battlefield: []
+      graveyard: []
+      exile: [{card: Aether Vial, face_up: true}]
+notes: >
+  The sacrifice is a cost, so the Mite is already in the graveyard when the ability is announced and its dies trigger
+  (CR 700.4: put into a graveyard from the battlefield) goes on the stack above the ability: it resolves first, p0 is at
+  22 while the Vial is still on the battlefield, and then the Vial is exiled (it goes to p1's exile zone, not the
+  graveyard). {G} can be paid only with Taiga (Mountain makes only {R}), so pay: auto must tap Taiga and leave the
+  Mountain untapped.

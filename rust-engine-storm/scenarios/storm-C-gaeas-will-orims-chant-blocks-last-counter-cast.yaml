@@ -1,0 +1,66 @@
+id: storm-c-gaeas-will-orims-chant-in-response-to-cast-trigger-leaves-it-exiled-forever
+title: "Orim's Chant on p0 while the last-counter trigger is on the stack: Gaea's Will cannot be cast, stays in exile with no time counters, and is never cast later"
+area: card
+cards: ["Gaea's Will", "Orim's Chant", Plains]
+tags: [gaeas-will, suspend, orims-chant, casting-restriction, last-time-counter, cannot-cast-remains-exiled, free-cast, alurentell-matchup]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true}
+  - {kind: oracle, card: "Gaea's Will", text: "Suspend 4—{G}", verified: true}
+  - {kind: cr, ref: "702.62a", text: "When the last time counter is removed from this card, if it’s exiled, you may play it without paying its mana cost if able. If you don’t, it remains exiled.", verified: true}
+  - {kind: cr, ref: "702.62b", text: "A card is “suspended” if it’s in the exile zone, has suspend, and has a time counter on it.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    exile: [{card: "Gaea's Will", as: will, face_up: true, counters: {time: 1}}]
+    library_pad: 10
+  p1:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "without paying"}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [{card: "Gaea's Will", face_up: true}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@chant", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@will", controller: p0, text_contains: "without paying"}]
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [{card: "Gaea's Will", face_up: true}], graveyard: [], spells_cast_this_turn: 0}
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 7
+      stack: []
+      pending: {actor: p0, kind: priority}
+expect:
+  - at: after_script
+    turn: 7
+    phase: upkeep
+    stack: []
+    p0:
+      exile: [{card: "Gaea's Will", face_up: true}]
+      graveyard: []
+      spells_cast_this_turn: 0
+    p1:
+      graveyard: ["Orim's Chant"]
+notes: >
+  The "may play it without paying its mana cost if able" part can't be done while p0 is under Orim's Chant (601.3),
+  so, per 702.62a, "if you don't, it remains exiled". Its last time counter is already gone, so it is no longer
+  suspended (702.62b) and nothing triggers on later upkeeps: two turns later (p0's turn 7 upkeep, no trigger, empty
+  stack) the card is still in exile and never cast. Chant is cast after the first (counter removal) trigger, in
+  response to the second (cast) trigger. The engine cannot decline the free cast; this scenario exercises "unable",
+  not "decline". A wrong engine casts the card anyway, or puts it back or keeps it suspended with 0 counters so that
+  it triggers again.

@@ -1,0 +1,45 @@
+id: storm-a-echo-hard-cast-both-players-shuffle-and-draw-seven
+title: "Echo of Eons cast from hand: both players shuffle hand and graveyard into library and draw seven, Echo itself goes to the graveyard"
+area: card
+cards: [Echo of Eons, Brainstorm, Lightning Bolt, Dark Ritual, Ponder, Veil of Summer, Faithless Looting, Island]
+tags: [echo-of-eons, wheel, shuffle, hand, graveyard, draw-seven, both-players, counts-only]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Echo of Eons, text: "Each player shuffles their hand and graveyard into their library, then draws seven cards.", verified: true}
+  - {kind: cr, ref: "701.24a", text: "To shuffle a library or a face-down pile of cards, randomize the cards within it so that no player knows their order.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Echo of Eons @echo", "Brainstorm", "Island"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6"]
+    graveyard: ["Lightning Bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Dark Ritual", "Ponder", "Island"]
+    graveyard: ["Veil of Summer", "Faithless Looting"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@echo", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand_count: 7
+      graveyard: [Echo of Eons]
+      exile: []
+      library_count: 6
+    p1:
+      hand_count: 7
+      graveyard: []
+      library_count: 8
+notes: >
+  Library counts follow from the order of events and the fact that Echo is on the stack, not in a hand or graveyard, when it resolves:
+  p0 has 2 other cards in hand and 1 in the graveyard (10 + 3 = 13 cards, draw 7, 6 left); p1 has 3 in hand and 2 in the graveyard
+  (10 + 5 = 15, draw 7, 8 left). Both hands are 7 and p1's graveyard is empty. Which cards are drawn is random and not asserted. A wrong engine
+  shuffles Echo into the library, leaves the graveyards, draws seven only for the caster, or draws before shuffling.

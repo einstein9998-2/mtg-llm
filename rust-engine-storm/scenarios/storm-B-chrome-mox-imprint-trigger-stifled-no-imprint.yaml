@@ -1,0 +1,50 @@
+id: storm-b-chrome-mox-imprint-trigger-stifled-no-imprint
+title: Stifling Chrome Mox's imprint trigger leaves the Mox with nothing imprinted and the card in hand
+area: card
+cards: [Chrome Mox, Brainstorm, Stifle, Island]
+tags: [chrome-mox, imprint, etb-trigger, stifle, stack, in-response]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Chrome Mox, text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Chrome Mox @mox", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mox", pay: auto}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@mox", controller: p0, text_contains: "exile"}]
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@mox"}], pay: auto}
+  - resolve_top: true
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+  - p0: {t: activate, source: "@mox", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      exile: []
+      battlefield: [{card: Chrome Mox, tapped: true}]
+      mana_pool: {}
+    p1:
+      hand: []
+      graveyard: [Stifle]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  The imprint is a triggered ability, so it can be countered. Countered, no choice is raised (no choose_cards step in the
+  script), Brainstorm stays in hand, and the Mox, though on the battlefield, taps for no mana. A wrong engine imprints
+  as part of the permanent entering (a replacement-style "as it enters") and cannot be Stifled.

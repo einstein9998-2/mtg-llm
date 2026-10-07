@@ -1,0 +1,39 @@
+# Storm (TES: The Epic Storm), ALTERNATIVE, not in the deck set | Combo (LED / Wish storm)
+# Source: CardGameAddict, 1st, MTGO Challenge 32, 2026-10-03 (48 players)
+# https://mtgtop8.com/event?e=91636&d=895905&f=LE
+# Kept for reference only: Brady supplied his own Beseech Storm 75 (decks/storm.txt) on 2026-10-06, which replaces this list. Read twice through a page-summarizing fetch tool (identical, main 60 / side 15).
+# Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.
+
+1 Badlands
+4 Bloodstained Mire
+1 Raucous Theater
+1 Swamp
+1 Undercity Sewers
+1 Underground Sea
+3 Urza's Saga
+2 Verdant Catacombs
+1 Hexing Squelcher
+1 Ad Nauseam
+2 Beseech the Mirror
+4 Brainstorm
+3 Burning Wish
+4 Dark Ritual
+3 Duress
+1 Gaea's Will
+4 Infernal Tutor
+1 Tendrils of Agony
+4 Thoughtseize
+4 Chrome Mox
+4 Lion's Eye Diamond
+4 Lotus Petal
+4 Mox Opal
+2 Wishclaw Talisman
+
+1 Beseech the Mirror
+4 Boomerang Basics
+1 Debt to the Deathless
+1 Duress
+2 Hexing Squelcher
+4 Leyline of the Void
+1 Peer into the Abyss
+1 Tendrils of Agony

@@ -1,0 +1,35 @@
+id: storm-b-haywire-mite-needs-green-mana
+title: "Haywire Mite's ability needs {G}: Mountain and Island cannot pay it"
+area: card
+cards: [Haywire Mite, Mountain, Island, Aether Vial]
+tags: [haywire-mite, mana-payment, legal-action-mask, colored-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Haywire Mite, text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true, note: "partial payments are not allowed (same rule text)"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Haywire Mite @mite", "Mountain @mtn", "Island @isl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aether Vial @vial"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@mite", ability: 0, targets: ["@vial"]}}
+  - check:
+      legal: {p0: {exclude: [{t: activate, source: "@mite"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      battlefield: [{card: Haywire Mite}, {card: Mountain, tapped: false}, {card: Island, tapped: false}]
+    p1:
+      battlefield: [{card: Aether Vial}]
+notes: >
+  Red and blue mana cannot pay a green cost, however much mana is available: the ability is not offered at all (and the
+  Mite stays). The green-source case is covered by the first Haywire Mite scenario (Taiga).

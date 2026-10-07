@@ -1,0 +1,67 @@
+id: storm-a-tendrils-copies-are-not-cast-second-tendrils-counts-only-originals
+title: "A second Tendrils does not count the first Tendrils' copies: storm 1 then storm 2, never 3"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Swamp]
+tags: [tendrils-of-agony, storm, storm-count, copies-not-cast, two-storm-spells]
+derived_from: cr
+source:
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: oracle, card: Tendrils of Agony, text: "Target player loses 2 life and you gain 2 life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Tendrils of Agony @t1", "Tendrils of Agony @t2"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@t1", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p0: {life: 24, spells_cast_this_turn: 2}
+      p1: {life: 16}
+  - p0: {t: cast, card: "@t2", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@t2", controller: p0}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0}
+      p0: {spells_cast_this_turn: 3}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 30
+      graveyard: [Dark Ritual, Tendrils of Agony, Tendrils of Agony]
+      spells_cast_this_turn: 3
+    p1: {life: 10}
+notes: >
+  First Tendrils: spells before it = Dark Ritual = 1, so one copy (2 resolutions: p1 16, p0 24). Second Tendrils: spells before it
+  = Dark Ritual and the first Tendrils = 2; the copy of the first Tendrils was not cast (707.10) so it does not count: two copies,
+  3 resolutions (p1 16 -> 10, p0 24 -> 30). A wrong engine that counts copies as casts creates 3 or more copies. Mana: Ritual's BBB
+  plus five Swamps pay the two {2}{B}{B} costs exactly (8 mana).

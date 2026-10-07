@@ -1,0 +1,54 @@
+id: storm-a-beseech-bargained-free-bolt-countered-not-in-hand
+title: "A free-cast card that gets countered goes to the graveyard; it was cast, so Beseech does not also put it into hand"
+area: card
+cards: [Beseech the Mirror, Lightning Bolt, Force of Will, Brainstorm, Lotus Petal, Swamp, Island]
+tags: [beseech-the-mirror, bargain, free-cast, targets, force-of-will, countered, cast-during-resolution]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+  - {kind: oracle, card: Lightning Bolt, text: "Lightning Bolt deals 3 damage to any target.", verified: true}
+  - {kind: cr, ref: "608.2g", text: "That spell becomes the topmost object on the stack, and the currently resolving spell or ability continues to resolve, which may include casting other spells this way.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Lotus Petal @petal"]
+    library: ["Lightning Bolt @bolt", "Island"]
+    library_pad: 4
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@bolt"}
+  - p0: {decision: yes_no, purpose: cast_exiled_card, answer: true}
+  - p0: {decision: choose_target, slot: 0, answer: {player: p1}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0, targets: [{player: p1}]}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      exile: []
+      graveyard: [Beseech the Mirror, Lotus Petal, Lightning Bolt]
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  The Bolt is cast during Beseech's resolution (so a counterspell can answer it) and p0 gets priority with only the Bolt on
+  the stack. When Force of Will counters it, the Bolt goes to the graveyard; "if it wasn't cast this way" is already
+  decided when Beseech resolved, so the card is NOT in hand. p1 pays 1 life for the pitch (19) and takes no damage.

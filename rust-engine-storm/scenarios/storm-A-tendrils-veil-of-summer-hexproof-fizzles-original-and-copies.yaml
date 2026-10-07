@@ -1,0 +1,63 @@
+id: storm-a-tendrils-veil-of-summer-hexproof-fizzles-original-and-copies
+title: "Veil of Summer in response to storm gives the opponent hexproof from black: Tendrils and its copy fizzle, no life gained, Veil draws"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Veil of Summer, Swamp, Forest, Island]
+tags: [tendrils-of-agony, storm, veil-of-summer, hexproof, fizzle, copies, draw-condition]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Veil of Summer, text: "Draw a card if an opponent has cast a blue or black spell this turn.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "You and permanents you control gain hexproof from blue and from black until end of turn.", verified: true}
+  - {kind: oracle, card: Tendrils of Agony, text: "Target player loses 2 life and you gain 2 life.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve.", verified: true}
+  - {kind: cr, ref: "707.10c", text: "The player may leave any number of the targets unchanged, even if those targets would be illegal.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil"]
+    battlefield: ["Forest @pf"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      p1: {hand_count: 1, graveyard: [Veil of Summer]}
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: triggered, source: "@tend", text_contains: "copy"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Dark Ritual, Tendrils of Agony]
+    p1:
+      life: 20
+      hand: [Island]
+      graveyard: [Veil of Summer]
+notes: >
+  Dark Ritual and Tendrils are black spells cast by an opponent this turn, so Veil draws a card (the Island from the padded
+  library). Veil resolves above the storm trigger: p1 has hexproof from black. The storm copy is put on the stack with the unchanged (now
+  illegal) target (707.10c allows leaving it), then both the copy and the original have only an illegal target and do not
+  resolve (608.2b): p1 stays at 20 and p0 gains no life (stays at 20). Tendrils is not countered by Veil (Veil
+  only protects the controller's own spells, and Tendrils is p0's), it fizzles. A wrong engine lets the copy or the original resolve, or gains life
+  although the target is illegal.

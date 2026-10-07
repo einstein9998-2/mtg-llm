@@ -1,0 +1,42 @@
+id: storm-a-gamble-random-discard-can-hit-the-found-card
+title: "Gamble's random discard can discard the very card it just fetched, leaving the other card in hand"
+area: card
+cards: [Gamble, Tendrils of Agony, Lightning Bolt, Ponder, Island, Mountain]
+tags: [gamble, tutor, random-discard, found-card-discarded, scripted-random]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Gamble, text: "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.9a", text: "To discard a card, move it from its owner's hand to that player's graveyard.", verified: true}
+  - {kind: cr, ref: "701.9b", text: "By default, effects that cause a player to discard a card allow the affected player to choose which card to discard. Some effects, however, require a random discard or allow another player to choose which card is discarded.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gamble @gam", "Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library: ["Ponder @pon", "Tendrils of Agony @tend"]
+    library_pad: 3
+  p1:
+    library_pad: 10
+random:
+  - {kind: random_discard, player: p0, result: "@tend"}
+  - {kind: shuffle, player: p0, result: [Island, Ponder, Island, Island]}
+script:
+  - p0: {t: cast, card: "@gam", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tend"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Gamble, Tendrils of Agony]
+      library_count: 4
+      library_top: [Island, Ponder, Island, Island]
+notes: >
+  The fetched card is already in hand when the random discard happens, so it is a candidate: here the scripted discard is
+  the Tendrils. A wrong engine discards only from the cards that were in hand before the search. The library holds the
+  Ponder and three Islands afterwards (4 cards, scripted order).

@@ -1,0 +1,39 @@
+id: storm-c-hexing-squelcher-ward-p1-at-two-life-may-pay-and-loses
+title: "Ward-Pay 2 life with exactly 2 life: paying is legal (life total >= 2), p1 goes to 0 and loses the game"
+area: card
+cards: [Hexing Squelcher, Lightning Bolt, Mountain]
+tags: [hexing-squelcher, ward, pay-life, exact-life, state-based-action, game-over, yes-no-decision]
+derived_from: cr
+source:
+  - {kind: oracle, card: Hexing Squelcher, text: "Ward—Pay 2 life.", verified: true}
+  - {kind: cr, ref: "702.21a", text: "Whenever this permanent becomes the target of a spell or ability an opponent controls, counter that spell or ability unless that player pays [cost].", verified: true}
+  - {kind: cr, ref: "119.4", text: "the player may do so only if their life total is greater than or equal to the amount of the payment", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Hexing Squelcher @sq"]
+    library_pad: 10
+  p1:
+    life: 2
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: ["@sq"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: yes_no, purpose: pay_ward, answer: true, expect_options: {include: [true, false]}}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p1:
+      life: 0
+notes: >
+  p1 is at 2 life. Paying 2 life is allowed when the life total is greater than or equal to the payment (119.4), so
+  the option to pay is offered (expect_options includes true) even though paying is fatal; p1 chooses it, drops to 0
+  and loses to the state-based action (704.5a) before Bolt could matter. This pins the boundary: an engine that
+  requires life strictly greater than 2 would not offer the payment (here it would counter the Bolt automatically and
+  the game would continue).

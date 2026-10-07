@@ -1,0 +1,34 @@
+id: storm-a-echo-flashback-needs-blue-mana
+title: "Echo of Eons flashback is not offered with three lands that cannot make {U}, but is offered once a blue source is present"
+area: card
+cards: [Echo of Eons, Mountain, Island]
+tags: [echo-of-eons, flashback, cost, colored-mana, legal-action-mask, negative]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Echo of Eons, text: "Flashback {2}{U}", verified: true}
+  - {kind: cr, ref: "702.34a", text: "“Flashback [cost]” means “You may cast this card from your graveyard if the resulting spell is an instant or sorcery spell by paying [cost] rather than paying its mana cost” and “If the flashback cost was paid, exile this card instead of putting it anywhere else any time it would leave the stack.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3"]
+    graveyard: ["Echo of Eons @gy"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+random: any
+script:
+  - expect_illegal: {p0: {t: cast, card: "@gy", alt_cost: {flashback: true}, pay: auto}}
+  - check:
+      legal: {p0: {exclude: [{t: cast, card: "@gy"}]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Echo of Eons]
+      battlefield: [{card: Mountain, tapped: false}, {card: Mountain, tapped: false}, {card: Mountain, tapped: false}]
+notes: >
+  Three red lands give {2} but no {U}, so the flashback cost {2}{U} is unpayable. (The "once a blue source is present" half is covered by
+  storm-a-echo-flashback-exiles-and-does-not-shuffle-itself, where three Islands pay it.)

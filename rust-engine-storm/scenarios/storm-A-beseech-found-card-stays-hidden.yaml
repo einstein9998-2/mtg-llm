@@ -1,0 +1,44 @@
+id: storm-a-beseech-found-card-stays-hidden
+title: "Unbargained Beseech: the opponent learns nothing about the searched card, which is exiled face down and then put into hand"
+area: hidden-info
+cards: [Beseech the Mirror, Tendrils of Agony, Doomsday, Swamp, Island]
+tags: [hidden-info, beseech-the-mirror, tutor, exile-face-down, shuffle, search]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "Search your library for a card, exile it face down, then shuffle.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+  - {kind: cr, ref: "701.23e", text: "If the effect that contains the search instruction doesn’t also contain instructions to reveal the found card(s), then they’re not revealed.", verified: true}
+observer: p1
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Beseech the Mirror @bes"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4"]
+    library: ["Island", "Tendrils of Agony @tend", "Island"]
+    library_pad: 3
+  p1:
+    library_pad: 10
+world_b:
+  p0:
+    library: ["Island", "Doomsday @tend", "Island"]
+random: any
+script:
+  - p0: {t: cast, card: "@bes", bargained: false, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tend"}
+expect:
+  - at: after_script
+    observer: p1
+    obs:
+      opp: {hand_count: 1, library_count: 5, revealed_hand: []}
+      option_labels_exclude_names: [Tendrils of Agony, Doomsday]
+      events_text_exclude: [Tendrils of Agony, Doomsday]
+assert_streams_identical: {observer: p1}
+notes: >
+  Beseech does not reveal the card (701.23e, no reveal instruction): it is exiled face down, then put into hand.
+  p1 sees Beseech cast and resolve, p0's hand grow by one and the library shrink by one, never the name. World B differs
+  only in which card sits in the library at the searched position (Doomsday instead of Tendrils): the observer stream
+  must be identical (names never appear in p1's observation, option labels or event text).

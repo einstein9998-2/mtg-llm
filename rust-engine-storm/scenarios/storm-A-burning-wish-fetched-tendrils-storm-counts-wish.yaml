@@ -1,0 +1,56 @@
+id: storm-a-burning-wish-fetched-tendrils-storm-counts-wish
+title: Burning Wish fetches Tendrils; the exiled Burning Wish still counts for storm and the fetched card is castable this turn
+area: card
+cards: [Burning Wish, Tendrils of Agony, Mountain, Swamp]
+tags: [burning-wish, sideboard, storm, tendrils-of-agony, storm-count, exile-self]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Burning Wish, text: "You may reveal a sorcery card you own from outside the game and put it into your hand.", verified: true}
+  - {kind: oracle, card: Tendrils of Agony, text: "Target player loses 2 life and you gain 2 life.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Once the steps described in 601.2a–h are completed, effects that modify the characteristics of the spell as it's cast are applied, then the spell becomes cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Burning Wish @wish"]
+    battlefield: ["Mountain @m1", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5"]
+    library_pad: 10
+    sideboard: [Tendrils of Agony]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@wish", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_cards, purpose: reveal_from_sideboard, answer: ["p0:Tendrils of Agony#1"]}
+  - p0: {t: cast, card: "p0:Tendrils of Agony#1", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "p0:Tendrils of Agony#1", controller: p0}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 24
+      hand: []
+      graveyard: [Tendrils of Agony]
+      exile: [Burning Wish]
+      spells_cast_this_turn: 2
+    p1: {life: 16}
+notes: >
+  Burning Wish is a spell cast before Tendrils even though it left the game's zones by exile on resolution, so storm
+  counts one spell: one copy. Original and copy each drain 2: p1 20 -> 16, p0 20 -> 24. The copy is not a cast
+  (spells_cast_this_turn is 2: Wish and Tendrils). The sideboard card is referred to by the handle
+  "p0:Tendrils of Agony#1" before and after it enters the game (the alias on the sideboard entry is not used because the
+  validator does not register sideboard aliases; the runner may map the handle to the same object).

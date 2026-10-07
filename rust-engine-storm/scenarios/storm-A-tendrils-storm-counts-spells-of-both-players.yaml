@@ -1,0 +1,68 @@
+id: storm-a-tendrils-storm-counts-spells-of-both-players
+title: "Tendrils of Agony storm counts every spell cast before it this turn, including the opponent's Lightning Bolt"
+area: card
+cards: [Tendrils of Agony, Lotus Petal, Lightning Bolt, Swamp, Mountain]
+tags: [tendrils-of-agony, storm, storm-count, copies, opponent-spells, drain]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tendrils of Agony, text: "Target player loses 2 life and you gain 2 life.", verified: true}
+  - {kind: oracle, card: Tendrils of Agony, text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lotus Petal @petal", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@petal", controller: p0}]
+      p0: {life: 17}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0, targets: [{player: p1}]}
+        - {kind: spell, card: Tendrils of Agony, copy: true, controller: p0, targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      graveyard: [Tendrils of Agony]
+      battlefield_contains: [{card: Lotus Petal}]
+      spells_cast_this_turn: 2
+    p1:
+      life: 14
+      graveyard: [Lightning Bolt]
+      spells_cast_this_turn: 1
+notes: >
+  Spells cast before Tendrils this turn: p0's Lotus Petal and p1's Lightning Bolt (cast in response to the Petal) = 2, so two
+  copies (storm counts all players' spells, 702.40a). Bolt took p0 to 17; three resolutions of Tendrils drain 6: p1 20 -> 14,
+  p0 17 -> 23. The copies are not casts (spells_cast_this_turn stays 2 for p0 and 1 for p1). A wrong engine counts only the
+  caster's spells (one copy, p1 at 16) or counts the copies as casts.

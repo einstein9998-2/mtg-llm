@@ -1,0 +1,55 @@
+id: storm-c-song-of-creation-draws-only-for-your-spells-not-abilities-lands-or-opponents-casts
+title: "Song of Creation draws nothing for a Lotus Petal ability, a land play, or p1's Lightning Bolt"
+area: card
+cards: [Song of Creation, Lotus Petal, Island, Lightning Bolt, Mountain]
+tags: [song-of-creation, cast-trigger, negative, mana-ability, land-play, opponents-spell, no-decision-raised]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: oracle, card: Lotus Petal, text: "{T}, Sacrifice this artifact: Add one mana of any color.", verified: true}
+  - {kind: cr, ref: "305.1", text: "Since the land doesn’t go on the stack, it is never a spell, and players can’t respond to it with instants or activated abilities.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Island @a"]
+    battlefield: ["Song of Creation @song", "Lotus Petal @petal"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@a"}
+  - check:
+      stack: []
+      p0: {hand_count: 0, lands_played: 1}
+  - p0: {t: activate, source: "@petal", ability: 0, choose_color: R}
+  - check:
+      stack: []
+      p0: {hand_count: 0, mana_pool: {R: 1}, spells_cast_this_turn: 0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: {tap: ["@pm"]}}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 17
+      hand: []
+      graveyard: [Lotus Petal]
+      library_count: 10
+      spells_cast_this_turn: 0
+      lands_played: 1
+    p1:
+      graveyard: [Lightning Bolt]
+      spells_cast_this_turn: 1
+notes: >
+  Song's trigger is "whenever YOU cast a spell": playing a land is a special action, not a cast (305.1); Lotus Petal's
+  mana ability is an activated ability, not a spell; and p1's Lightning Bolt is cast by the opponent. None of them draws,
+  so p0's hand stays empty and the library keeps its 10 cards. Each step checks that nothing was put on the stack. A
+  wrong engine fires the trigger on any stack object, on any player's cast, or on land plays.

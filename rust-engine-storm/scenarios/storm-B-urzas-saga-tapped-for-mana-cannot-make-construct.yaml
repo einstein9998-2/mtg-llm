@@ -1,0 +1,41 @@
+id: storm-b-urzas-saga-tapped-for-mana-cannot-make-construct
+title: With two Islands and the Saga, tapping the Saga for {C} first makes the Construct ability unavailable that turn
+area: card
+cards: [Urza's Saga, Island]
+tags: [urzas-saga, saga, construct-token, tap-cost, mana-ability, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "II — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"", verified: true}
+  - {kind: oracle, card: Urza's Saga, text: 'I — This Saga gains "{T}: Add {C}."', verified: true}
+  - {kind: cr, ref: "602.2b", text: "The remainder of the process for activating an ability is identical to the process for casting a spell", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga"]
+    battlefield: ["Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@saga", ability: 1}]}}
+  - p0: {t: activate, source: "@saga", ability: 0}
+  - expect_illegal: {p0: {t: activate, source: "@saga", ability: 1}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {C: 1}
+      battlefield: [{card: Urza's Saga, tapped: true}, {card: Island, tapped: false}, {card: Island, tapped: false}]
+notes: >
+  Control: with the Saga untapped and two Islands the Construct ability is offered. After the Saga is tapped for {C}
+  (the pool then holds {C}, plus two untapped Islands = three mana) the ability is gone for the turn because its cost
+  includes {T} of the Saga. A wrong engine checks only the mana.

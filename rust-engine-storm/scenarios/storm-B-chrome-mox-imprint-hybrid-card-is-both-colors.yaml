@@ -1,0 +1,46 @@
+id: storm-b-chrome-mox-imprint-hybrid-card-is-both-colors
+title: Chrome Mox imprinting a card with a {W/U} hybrid symbol can make {W} or {U}
+area: card
+cards: [Chrome Mox, "Spider-Woman, Stunning Savior"]
+tags: [chrome-mox, imprint, hybrid-mana, colour-choice, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Chrome Mox, text: "{T}: Add one mana of any of the exiled card's colors.", verified: true}
+  - {kind: cr, ref: "202.2d", text: "An object with one or more hybrid mana symbols and/or Phyrexian mana symbols in its mana cost is all of the colors of those mana symbols, in addition to any other colors the object might be.", verified: true}
+  - {kind: cr, ref: "107.4e", text: "A hybrid mana symbol is all of its component colors.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Chrome Mox @mox", "Spider-Woman, Stunning Savior @sw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mox", pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: imprint, expect_options: {include: ["@sw"]}, answer: ["@sw"]}
+  - check:
+      legal:
+        p0:
+          include:
+            - {t: activate, source: "@mox", ability: 0, choose_color: W}
+            - {t: activate, source: "@mox", ability: 0, choose_color: U}
+          exclude:
+            - {t: activate, source: "@mox", ability: 0, choose_color: R}
+            - {t: activate, source: "@mox", ability: 0, choose_color: B}
+            - {t: activate, source: "@mox", ability: 0, choose_color: G}
+  - p0: {t: activate, source: "@mox", ability: 0, choose_color: W}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      exile: [{card: "Spider-Woman, Stunning Savior", face_up: true}]
+      battlefield: [{card: Chrome Mox, tapped: true}]
+      mana_pool: {W: 1}
+notes: >
+  Spider-Woman costs {1}{W/U}: a hybrid symbol makes the card both white and blue, so both colours are available to the
+  Mox. The generic {1} adds no colour. A wrong engine that reads only colours of "coloured symbols" literally (W or U
+  symbols only) might read nothing for {W/U}.

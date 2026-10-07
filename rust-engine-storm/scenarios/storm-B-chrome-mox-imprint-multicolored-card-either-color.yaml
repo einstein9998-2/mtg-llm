@@ -1,0 +1,48 @@
+id: storm-b-chrome-mox-imprint-multicolored-card-either-color
+title: Chrome Mox imprinting a blue-red card can make {U} or {R} (chosen at activation) but not green
+area: card
+cards: [Chrome Mox, Prismari Charm]
+tags: [chrome-mox, imprint, multicolored, colour-choice, mana-ability, legal-action-mask]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Chrome Mox, text: "{T}: Add one mana of any of the exiled card's colors.", verified: true}
+  - {kind: cr, ref: "202.2c", text: "An object with two or more different colored mana symbols in its mana cost is each of the colors of those mana symbols.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Chrome Mox @mox", "Prismari Charm @charm"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mox", pay: auto}
+  - resolve_top: true
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: imprint, expect_options: {include: ["@charm"]}, answer: ["@charm"]}
+  - check:
+      p0: {hand: [], exile: [{card: Prismari Charm, face_up: true}]}
+      legal:
+        p0:
+          include:
+            - {t: activate, source: "@mox", ability: 0, choose_color: U}
+            - {t: activate, source: "@mox", ability: 0, choose_color: R}
+          exclude:
+            - {t: activate, source: "@mox", ability: 0, choose_color: G}
+            - {t: activate, source: "@mox", ability: 0, choose_color: W}
+            - {t: activate, source: "@mox", ability: 0, choose_color: B}
+  - expect_illegal: {p0: {t: activate, source: "@mox", ability: 0, choose_color: G}}
+  - p0: {t: activate, source: "@mox", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      hand: []
+      exile: [{card: Prismari Charm, face_up: true}]
+      battlefield: [{card: Chrome Mox, tapped: true}]
+      mana_pool: {R: 1}
+notes: >
+  Prismari Charm ({U}{R}) is both blue and red. Both colours are offered, the player picks one when activating, and only
+  one mana is added. Green, white and black are not offered. A wrong engine hard-codes the first colour, adds both, or
+  lets any colour through.

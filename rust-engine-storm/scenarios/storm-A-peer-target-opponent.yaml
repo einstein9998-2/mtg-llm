@@ -1,0 +1,32 @@
+id: storm-a-peer-target-opponent
+title: "Peer into the Abyss on the opponent: their library (20) and life (20) are halved, the caster is unaffected"
+area: card
+cards: [Peer into the Abyss, Swamp]
+tags: [peer-into-the-abyss, draw, life-loss, opponent-target]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Peer into the Abyss, text: "Target player draws cards equal to half the number of cards in their library and loses half their life.", verified: true}
+  - {kind: oracle, card: Peer into the Abyss, text: "Round up each time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Peer into the Abyss @peer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7"]
+    library_pad: 10
+  p1:
+    library_pad: 20
+script:
+  - p0: {t: cast, card: "@peer", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, hand_count: 0, library_count: 10, graveyard: [Peer into the Abyss]}
+    p1: {life: 10, hand_count: 10, library_count: 10}
+notes: >
+  The target player (p1) draws half of 20 = 10 cards and loses half of 20 life = 10. The caster draws nothing and keeps all life.
+  A wrong engine applies the effect to the controller.

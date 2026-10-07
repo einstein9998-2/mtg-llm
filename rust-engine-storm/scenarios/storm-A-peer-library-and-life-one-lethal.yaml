@@ -1,0 +1,33 @@
+id: storm-a-peer-library-and-life-one-lethal
+title: "Peer into the Abyss at 1 life with 1 card in library: draw 1 (round up) and lose 1 life, losing the game"
+area: card
+cards: [Peer into the Abyss, Swamp]
+tags: [peer-into-the-abyss, draw, life-loss, round-up, lethal, game-over]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Peer into the Abyss, text: "Target player draws cards equal to half the number of cards in their library and loses half their life.", verified: true}
+  - {kind: oracle, card: Peer into the Abyss, text: "Round up each time.", verified: true}
+  - {kind: cr, ref: "119.6", text: "If a player has 0 or less life, that player loses the game as a state-based action.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    hand: ["Peer into the Abyss @peer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7"]
+    library_pad: 1
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@peer", targets: [{player: p0}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0: {life: 0, hand_count: 1, library_count: 0}
+notes: >
+  Half of 1 rounded up is 1 for both amounts: p0 draws the single library card (library 0, but no draw from an empty library
+  was attempted) and loses 1 life, going from 1 to 0, so p0 loses the game as a state-based action; p1 wins. Casting Peer on yourself
+  at low life is legal.

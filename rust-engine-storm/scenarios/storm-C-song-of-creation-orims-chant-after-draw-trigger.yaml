@@ -1,0 +1,72 @@
+id: storm-c-song-of-creation-orims-chant-cannot-stop-the-draw-already-triggered-nor-the-end-step-discard
+title: "Orim's Chant on p0 after the Petal is cast: the Song draw for that cast still happens, no further cast is possible, and the end-step discard still happens"
+area: card
+cards: [Song of Creation, Lotus Petal, Lightning Bolt, Mountain, Island, "Orim's Chant", Plains]
+tags: [song-of-creation, orims-chant, casting-restriction, cast-trigger, draw-two, end-step-discard, stack-order, alurentell-matchup]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Song of Creation, text: "Whenever you cast a spell, draw two cards.", verified: true}
+  - {kind: oracle, card: Song of Creation, text: "At the beginning of your end step, discard your hand.", verified: true}
+  - {kind: oracle, card: "Orim's Chant", text: "Target player can't cast spells this turn.", verified: true}
+  - {kind: cr, ref: "601.3", text: "A player can begin to cast a spell only if a rule or effect allows that player to cast it and no rule or effect prohibits that player from casting it.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "603.2", text: "Whenever a game event or game state matches a triggered ability’s trigger event, that ability automatically triggers.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lotus Petal @petal", "Lightning Bolt @lb"]
+    battlefield: ["Song of Creation @song", "Mountain @m"]
+    library: ["Island @d1", "Island @d2"]
+    library_pad: 10
+  p1:
+    hand: ["Orim's Chant @chant"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@chant", targets: [{player: p0}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@petal", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+        - {kind: spell, card: "@chant", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@petal", controller: p0}
+        - {kind: triggered, source: "@song", controller: p0, text_contains: "draw"}
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {exclude: [{t: cast, card: "@lb"}]}}
+  - expect_illegal: {p0: {t: cast, card: "@lb", targets: [{player: p1}], pay: {tap: ["@m"]}}}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@petal", controller: p0}]
+      p0: {hand: [Lightning Bolt, Island, Island]}
+  - resolve_top: true
+  - advance: {to: end, of: p0}
+  - check:
+      stack: [{kind: triggered, source: "@song", controller: p0, text_contains: "discard"}]
+      p0: {hand: [Lightning Bolt, Island, Island]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt, Island, Island]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Song of Creation}, {card: Mountain, tapped: false}, {card: Lotus Petal}]
+    p1:
+      graveyard: ["Orim's Chant"]
+notes: >
+  Cast order: the Petal is cast (Song's draw trigger goes on the stack above it), then p1 casts Orim's Chant on p0 in
+  response. Chant resolves first: p0 can't cast spells this turn (601.3), but the Song trigger already on the stack is
+  not a cast and is not prevented: it resolves and p0 draws two Islands (the Lightning Bolt in hand can no longer be
+  cast, even with an untapped Mountain and the extra cards). The Petal then resolves. At p0's end step Song's discard
+  trigger still happens (discarding is not casting): the whole hand goes to the graveyard. A wrong engine cancels the
+  already-triggered draw because of the casting restriction, or skips the discard.

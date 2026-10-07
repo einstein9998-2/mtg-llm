@@ -1,0 +1,49 @@
+id: storm-b-giants-boulder-etb-scry-two-bottom-one
+title: Giant's Boulder's enters trigger scries exactly two cards; one goes to the bottom, the other stays on top
+area: card
+cards: [Giant's Boulder, Island, Ponder, Brainstorm, Thoughtseize]
+tags: [giants-boulder, etb-trigger, scry, library-order, artifact]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Giant's Boulder, text: "When this artifact enters, scry 2.", verified: false, note: "Giant's Boulder text comes from three store pages (engine owner's brief), not Scryfall, so it cannot be verified here"}
+  - {kind: cr, ref: "701.22a", text: "To “scry N” means to look at the top N cards of your library, then put any number of them on the bottom of your library in any order and the rest on top of your library in any order.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Giant's Boulder @boulder"]
+    battlefield: ["Island @isl"]
+    library: ["Ponder @pon", "Brainstorm @bs", "Thoughtseize @ts"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@boulder", pay: auto}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@boulder", controller: p0, text_contains: "scry"}]
+      p0: {library_count: 13}
+  - resolve_top: true
+  - p0:
+      decision: scry
+      to_bottom: ["@pon"]
+      on_top_order: ["@bs"]
+      expect_options: {include: ["@pon", "@bs"], exclude: ["@ts"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield: [{card: Giant's Boulder, tapped: false, types: [Artifact]}, {card: Island, tapped: true}]
+      library_top: [Brainstorm, Thoughtseize]
+      library_bottom: [Ponder]
+      library_count: 13
+      spells_cast_this_turn: 1
+notes: >
+  Scry 2 looks at exactly the top two cards: Ponder and Brainstorm are offered, the third card (Thoughtseize) is not.
+  Ponder goes to the bottom (after the ten padding Islands), Brainstorm stays on top over Thoughtseize. The trigger is on
+  the stack after the spell resolves (603.6a) and the scry happens on resolution. The Boulder costs {1} (the Island is
+  tapped) and enters untapped.

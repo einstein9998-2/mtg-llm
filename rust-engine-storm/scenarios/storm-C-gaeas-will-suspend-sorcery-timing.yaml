@@ -1,0 +1,59 @@
+id: storm-c-gaeas-will-suspend-only-in-main-phase-with-empty-stack
+title: "Suspending Gaea's Will follows sorcery timing: not in the upkeep, not with a spell on the stack, allowed in the main phase once the stack is empty"
+area: card
+cards: ["Gaea's Will", "Lotus Petal", Forest, Island]
+tags: [gaeas-will, suspend, sorcery-timing, stack-empty, legal-action-mask, special-action]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Gaea's Will", text: "Suspend 4—{G}", verified: true}
+  - {kind: cr, ref: "702.62a", text: "If you could begin to cast this card by putting it onto the stack from your hand, you may pay [cost] and exile it with N time counters on it.", verified: true}
+  - {kind: cr, ref: "307.1", text: "A player who has priority may cast a sorcery card from their hand during a main phase of their turn when the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: upkeep
+  p0:
+    hand: ["Gaea's Will @will", "Lotus Petal @petal"]
+    battlefield: ["Forest @f"]
+    library: ["Island @draw"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: suspend, card: "@will", pay: {tap: ["@f"]}}}
+  - check:
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {exclude: [{t: suspend, card: "@will"}]}}
+  - advance: {to: main1, of: p0}
+  - check:
+      stack: []
+      p0: {hand: ["Gaea's Will", "Lotus Petal", Island]}
+      legal: {p0: {include: [{t: suspend, card: "@will"}]}}
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@petal", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - expect_illegal: {p0: {t: suspend, card: "@will", pay: {tap: ["@f"]}}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      legal: {p0: {include: [{t: suspend, card: "@will"}]}}
+  - p0: {t: suspend, card: "@will", pay: {tap: ["@f"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      exile: [{card: "Gaea's Will", face_up: true, counters: {time: 4}}]
+      spells_cast_this_turn: 1
+      battlefield: [{card: Forest, tapped: true}, {card: "Lotus Petal"}]
+notes: >
+  Suspend lets a player exile the card only "if you could begin to cast this card by putting it onto the stack from
+  your hand" (702.62a), and a sorcery can only be cast in a main phase of its owner's turn with an empty stack
+  (307.1). Three probes: in the upkeep (illegal, even though p0 has priority and mana), in the main phase with a
+  Lotus Petal spell still on the stack (illegal), and in the main phase after the Petal has resolved (legal; the
+  Petal is the only spell cast, so spells_cast_this_turn is 1). p0 draws an Island in the draw step. A wrong engine
+  lets suspend be used at instant speed, like a flash card.

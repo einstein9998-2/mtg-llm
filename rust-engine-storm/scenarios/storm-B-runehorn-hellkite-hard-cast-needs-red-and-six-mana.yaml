@@ -1,0 +1,39 @@
+id: storm-b-runehorn-hellkite-hard-cast-needs-red-and-six-mana
+title: Runehorn Hellkite cast for {5}{R} (Taiga makes the red) resolves as a 5/5 flying Dragon
+area: card
+cards: [Runehorn Hellkite, Taiga, Island]
+tags: [runehorn-hellkite, hard-cast, mana-payment, colored-cost, flying, creature, taiga]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Runehorn Hellkite, text: "Flying", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Runehorn Hellkite @hk"]
+    battlefield: ["Taiga @taiga", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@hk", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@hk", controller: p0}]
+      p0:
+        mana_pool: {}
+        battlefield: [{card: Taiga, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      spells_cast_this_turn: 1
+      battlefield_contains:
+        - {card: Runehorn Hellkite, controller: p0, pt: [5, 5], keywords: [flying], types: [Creature], subtypes: [Dragon], colors: [R], sick: true}
+notes: >
+  {5}{R} needs exactly six mana with at least one red: Taiga supplies the {R}, the five Islands the generic {5}. It resolves
+  as a 5/5 Dragon with flying (summoning sick this turn).

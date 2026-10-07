@@ -1,0 +1,67 @@
+id: storm-b-chrome-mox-imprint-blue-card-taps-for-blue-only
+title: Chrome Mox cast for {0} counts as a spell, imprint offers only nonartifact nonland cards, and a blue imprint taps for {U} and nothing else
+area: card
+cards: [Chrome Mox, Ponder, Brainstorm, Lotus Petal, Island]
+tags: [chrome-mox, imprint, etb-trigger, exile, colored-mana, zero-cost-spell, storm-count, mana-ability]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Chrome Mox, text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", verified: true}
+  - {kind: oracle, card: Chrome Mox, text: "{T}: Add one mana of any of the exiled card's colors.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Chrome Mox @mox", "Ponder @ponder", "Brainstorm @bs", "Lotus Petal @petal", "Island @isl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mox", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@mox", controller: p0}]
+      p0: {spells_cast_this_turn: 1, mana_pool: {}}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@mox", controller: p0, text_contains: "exile"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        hand: [Ponder, Brainstorm, Lotus Petal, Island]
+        battlefield: [{card: Chrome Mox, tapped: false}]
+  - resolve_top: true
+  - p0:
+      decision: choose_cards
+      purpose: imprint
+      expect_options: {include: ["@ponder", "@bs"], exclude: ["@petal", "@isl"]}
+      answer: ["@ponder"]
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        hand: [Brainstorm, Lotus Petal, Island]
+        exile: [{card: Ponder, face_up: true}]
+      legal:
+        p0:
+          include: [{t: activate, source: "@mox", ability: 0}]
+          exclude: [{t: activate, source: "@mox", ability: 0, choose_color: R}, {t: activate, source: "@mox", ability: 0, choose_color: G}]
+  - p0: {t: activate, source: "@mox", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm, Lotus Petal, Island]
+      exile: [{card: Ponder, face_up: true}]
+      battlefield: [{card: Chrome Mox, types: [Artifact], tapped: true}]
+      mana_pool: {U: 1}
+      spells_cast_this_turn: 1
+    p1: {life: 20}
+notes: >
+  Chrome Mox costs {0}, so it is cast for no mana and still counts as one spell cast this turn (a Storm count would see
+  it). Its enters trigger goes on the stack after the spell resolves; on resolution p0 picks one card, and only
+  nonartifact, nonland cards qualify: Ponder and Brainstorm are offered, Lotus Petal (artifact) and Island (land) are not.
+  Ponder is exiled face up, so the Mox taps for {U} (Ponder's colour from its mana cost) and for no other colour. With
+  a single colour there is no colour choice, so the script carries no choose_color. A wrong engine offers artifacts or
+  lands, or lets the Mox make any colour, or exiles on the spell's resolution instead of on the trigger's.

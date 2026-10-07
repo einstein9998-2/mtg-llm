@@ -1,0 +1,46 @@
+id: storm-b-chrome-mox-put-by-show-and-tell-still-imprints
+title: Show and Tell puts Chrome Mox onto the battlefield, the imprint trigger still happens, and the Mox taps at once
+area: card
+cards: [Chrome Mox, Show and Tell, Brainstorm, Island]
+tags: [chrome-mox, imprint, show-and-tell, put-onto-battlefield, etb-trigger, storm-count, alurentell, simultaneous-secret-choice]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: Chrome Mox, text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Chrome Mox @mox", "Brainstorm @bs"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - resolve_top: true
+  - p0: {decision: simultaneous_secret_choice, answer: "@mox", expect_options: {include: ["@mox"], exclude: ["@bs"]}}
+  - check:
+      stack: [{kind: triggered, source: "@mox", controller: p0, text_contains: "exile"}]
+      p0: {spells_cast_this_turn: 1, hand: [Brainstorm]}
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: imprint, expect_options: {include: ["@bs"]}, answer: ["@bs"]}
+  - p0: {t: activate, source: "@mox", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      exile: [{card: Brainstorm, face_up: true}]
+      graveyard: [Show and Tell]
+      battlefield: [{card: Chrome Mox, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+      mana_pool: {U: 1}
+      spells_cast_this_turn: 1
+notes: >
+  p1 has no card in hand, so no decision is raised for p1. The Mox was never cast (only Show and Tell was), yet
+  "enters" triggers: the imprint still happens and still exiles from hand. The Mox is a noncreature artifact, so it can
+  tap the turn it enters. spells_cast_this_turn is 1 (Show and Tell only). Brainstorm is not an artifact or land and
+  cannot be Show and Tell's choice (exclude).

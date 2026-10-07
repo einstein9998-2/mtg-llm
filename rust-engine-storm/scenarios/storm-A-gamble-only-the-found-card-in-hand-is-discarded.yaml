@@ -1,0 +1,38 @@
+id: storm-a-gamble-only-the-found-card-in-hand-is-discarded
+title: "Gamble with no other card in hand must discard the card it just fetched"
+area: card
+cards: [Gamble, Tendrils of Agony, Mountain]
+tags: [gamble, tutor, random-discard, empty-hand, found-card-discarded]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Gamble, text: "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.", verified: true}
+  - {kind: cr, ref: "701.9a", text: "To discard a card, move it from its owner's hand to that player's graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Gamble @gam"]
+    battlefield: ["Mountain @m"]
+    library: ["Tendrils of Agony @tend"]
+    library_pad: 5
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@gam", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tend"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Gamble, Tendrils of Agony]
+      library_count: 5
+notes: >
+  Casting Gamble empties the hand, so the only card Gamble's discard can find is the one it just fetched: it is discarded
+  (the random choice has a single candidate; every outcome is the same, so `random: any`). The library keeps the five
+  padding Islands and has been shuffled once (only counts asserted).

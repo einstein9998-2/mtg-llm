@@ -1,0 +1,46 @@
+id: storm-b-haywire-mite-cast-and-sacrificed-the-same-turn
+title: A Haywire Mite cast this turn can be sacrificed at once (no {T} in the cost, so no summoning sickness)
+area: card
+cards: [Haywire Mite, Island, Forest, Aether Vial]
+tags: [haywire-mite, summoning-sickness, sacrifice-cost, no-tap-symbol, mana-payment, artifact-creature]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Haywire Mite, text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Haywire Mite @mite"]
+    battlefield: ["Island @isl", "Forest @for"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aether Vial @vial"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mite", pay: {tap: ["@isl"]}}
+  - resolve_top: true
+  - check:
+      p0: {battlefield_contains: [{card: Haywire Mite, sick: true, types: [Artifact, Creature], pt: [1, 1]}]}
+      legal: {p0: {include: [{t: activate, source: "@mite", ability: 0, targets: ["@vial"]}]}}
+  - p0: {t: activate, source: "@mite", ability: 0, targets: ["@vial"], pay: {tap: ["@for"]}}
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      hand: []
+      graveyard: [Haywire Mite]
+      battlefield: [{card: Island, tapped: true}, {card: Forest, tapped: true}]
+      spells_cast_this_turn: 1
+    p1:
+      battlefield: []
+      exile: [{card: Aether Vial, face_up: true}]
+notes: >
+  The Mite's ability costs {G} and a sacrifice but no {T}, so summoning sickness (302.6) does not stop it. The Mite is a
+  {1} artifact creature, cast with the Island; the Forest pays the {G}. A wrong engine applies sickness to every
+  activated ability of a creature.

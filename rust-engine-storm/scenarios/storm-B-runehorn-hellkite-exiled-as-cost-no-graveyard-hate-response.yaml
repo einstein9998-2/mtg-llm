@@ -1,0 +1,56 @@
+id: storm-b-runehorn-hellkite-exiled-as-cost-no-graveyard-hate-response
+title: "With the Hellkite ability on the stack the Hellkite is already exiled: Faerie Macabre cannot target it, and Force of Will and Consign to Memory cannot target the ability"
+area: card
+cards: [Runehorn Hellkite, Taiga, Island, Ponder, Lightning Bolt, Faerie Macabre, Force of Will, Brainstorm, Consign to Memory]
+tags: [runehorn-hellkite, graveyard-ability, exile-cost, faerie-macabre, force-of-will, consign-to-memory, legal-action-mask, in-response, alurentell]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Runehorn Hellkite, text: "{5}{R}, Exile this card from your graveyard: Each player discards their hand, then draws seven cards.", verified: true}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: cr, ref: "602.2", text: "To activate an ability is to put it onto the stack and pay its costs, so that it will eventually resolve and have its effect.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @pbolt"]
+    graveyard: ["Runehorn Hellkite @hk", "Ponder @gy1"]
+    battlefield: ["Taiga @taiga", "Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 20
+  p1:
+    hand: ["Faerie Macabre @mac", "Force of Will @fow", "Brainstorm @bs", "Consign to Memory @cons"]
+    battlefield: ["Island @pi1", "Island @pi2"]
+    library_pad: 20
+script:
+  - p0: {t: activate, source: "@hk", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - check:
+      pending: {actor: p1, kind: priority}
+      stack: [{kind: activated, source: "@hk", controller: p0}]
+      p0: {exile: [{card: Runehorn Hellkite, face_up: true}], graveyard: [Ponder]}
+      legal: {p1: {include: [{t: activate_from_hand, source: "@mac", ability: 0, targets: ["@gy1"]}]}}
+  - expect_illegal: {p1: {t: activate_from_hand, source: "@mac", ability: 0, targets: ["@hk"]}}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: [{ability_of: "@hk"}]}}
+  - expect_illegal: {p1: {t: cast, card: "@cons", targets: [{ability_of: "@hk"}], pay: auto}}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Island, Island, Island, Island, Island, Island]
+      graveyard: [Ponder, Lightning Bolt]
+      exile: [{card: Runehorn Hellkite, face_up: true}]
+    p1:
+      hand: [Island, Island, Island, Island, Island, Island, Island]
+      graveyard: [Faerie Macabre, Force of Will, Brainstorm, Consign to Memory]
+      life: 20
+notes: >
+  The exile is a cost, so when p1 first gets priority the Hellkite is no longer in a graveyard and cannot be Faerie
+  Macabre's target (Ponder, still in a graveyard, is a legal one: the control that the ability is live). The ability is
+  not a spell, so Force of Will cannot target it; it is an activated, not triggered, ability and Consign to Memory
+  counters only triggered abilities or colorless spells, so neither can target it either. p1 passes, the ability resolves
+  and both hands are wheeled (Macabre, Force of Will, Brainstorm and Consign are discarded: discarding is not casting).
+  p1's life is untouched (nothing was pitched). Only Stifle-like effects could answer (see the stifled scenario).

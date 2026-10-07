@@ -1,0 +1,52 @@
+id: storm-b-haywire-mite-ability-stifled-target-survives-life-still-gained
+title: Stifling Haywire Mite's exile ability saves the artifact, but the dies trigger still gains 2 life
+area: card
+cards: [Haywire Mite, Forest, Aether Vial, Stifle, Island]
+tags: [haywire-mite, stifle, sacrifice-cost, dies-trigger, stack, in-response]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Haywire Mite, text: "{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment.", verified: true}
+  - {kind: oracle, card: Haywire Mite, text: "When this creature dies, you gain 2 life.", verified: true}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Haywire Mite @mite", "Forest @for"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Aether Vial @vial", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@mite", ability: 0, targets: ["@vial"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{ability_of: "@mite", text_contains: "Exile"}], pay: auto}
+  - check:
+      stack:
+        - {kind: activated, source: "@mite"}
+        - {kind: triggered, source: "@mite"}
+        - {kind: spell, card: "@stifle", controller: p1}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@mite", text_contains: "gain 2 life"}]
+      pending: {actor: p0, kind: priority}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      graveyard: [Haywire Mite]
+    p1:
+      hand: []
+      graveyard: [Stifle]
+      battlefield: [{card: Aether Vial}, {card: Island, tapped: true}]
+      exile: []
+notes: >
+  Stifle targets the activated exile ability, not the dies trigger (text_contains picks between the Mite's two abilities
+  on the stack). The Mite is already in the graveyard (cost), so its trigger remains and p0 still gains 2; the Vial stays
+  on the battlefield. A wrong engine counts the wrong ability or lets the Mite survive.

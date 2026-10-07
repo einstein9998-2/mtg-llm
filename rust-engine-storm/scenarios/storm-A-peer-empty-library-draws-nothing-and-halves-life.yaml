@@ -1,0 +1,32 @@
+id: storm-a-peer-empty-library-draws-nothing-and-halves-life
+title: "Peer into the Abyss with an empty library draws zero cards (no loss) and still halves life"
+area: card
+cards: [Peer into the Abyss, Swamp]
+tags: [peer-into-the-abyss, draw, life-loss, empty-library, zero, no-draw-loss]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Peer into the Abyss, text: "Target player draws cards equal to half the number of cards in their library and loses half their life.", verified: true}
+  - {kind: oracle, card: Peer into the Abyss, text: "Round up each time.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Peer into the Abyss @peer"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5", "Swamp @s6", "Swamp @s7"]
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@peer", targets: [{player: p0}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 10, hand_count: 0, library_count: 0}
+notes: >
+  p0 has no library_pad, so the library is empty: half of 0 is 0 draws, nobody attempts to draw, and 704.5b does not apply; life 20 -> 10.
+  A wrong engine rounds 0 up to 1 and makes p0 lose the game by drawing from an empty library.

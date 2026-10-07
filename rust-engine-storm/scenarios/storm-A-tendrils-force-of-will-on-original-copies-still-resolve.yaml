@@ -1,0 +1,64 @@
+id: storm-a-tendrils-force-of-will-on-original-copies-still-resolve
+title: "Force of Will on the original Tendrils (in response to the storm trigger) does not stop the copies"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Force of Will, Brainstorm, Swamp]
+tags: [tendrils-of-agony, storm, force-of-will, counterspell, copies, trigger-independent, last-known-information]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: oracle, card: Tendrils of Agony, text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", verified: true}
+  - {kind: cr, ref: "702.40a", text: "Storm is a triggered ability that functions on the stack.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "If an effect requires information from the game", verified: false, note: "last-known-information rule; the exact wording is in the existing excerpts, only the idea is used"}
+  - {kind: ruling, card: Tendrils of Agony, date: "unknown", text: "If the spell with storm is countered, the storm ability will still resolve and create copies.", verified: false, note: "recalled official ruling for storm, not retrieved"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - check:
+      stack:
+        - {kind: spell, card: "@tend", controller: p0}
+        - {kind: triggered, source: "@tend", text_contains: "copy"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@tend"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@tend", text_contains: "copy"}]
+      p0: {graveyard: [Dark Ritual, Tendrils of Agony]}
+      p1: {life: 19}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - check:
+      stack: [{kind: spell, card: Tendrils of Agony, copy: true, controller: p0, targets: [{player: p1}]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 22
+      graveyard: [Dark Ritual, Tendrils of Agony]
+    p1:
+      life: 17
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  The storm trigger is a separate object on the stack above Tendrils; Force of Will counters only the spell. When the trigger
+  resolves it still creates its one copy (Dark Ritual was cast before Tendrils), the copy resolves and drains 2: p1 20 -1 (pitch) -2 =
+  17, p0 22. The original Tendrils is in the graveyard (countered, no effect). A wrong engine counters the trigger together with
+  the spell, or creates no copies because the original left the stack.

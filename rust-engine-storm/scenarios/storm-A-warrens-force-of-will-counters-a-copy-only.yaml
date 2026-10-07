@@ -1,0 +1,62 @@
+id: storm-a-warrens-force-of-will-counters-a-copy-only
+title: "Force of Will can counter a storm copy of Empty the Warrens; the copy ceases to exist and the original still makes two Goblins"
+area: card
+cards: [Empty the Warrens, Dark Ritual, Force of Will, Brainstorm, Goblin Token, Swamp, Mountain]
+tags: [empty-the-warrens, storm, copies, force-of-will, counter-copy, tokens, ceases-to-exist]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "707.10", text: "A copy of a spell is itself a spell, even though it has no spell card associated with it.", verified: true}
+  - {kind: cr, ref: "707.10a", text: "If a copy of a spell is in a zone other than the stack, it ceases to exist.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Empty the Warrens @ew"]
+    battlefield: ["Swamp @s1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@ew", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@ew", controller: p0}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: [{copy_of: "@ew", nth: 0}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@ew", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {life: 19, graveyard: [Force of Will]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Dark Ritual, Empty the Warrens]
+      battlefield:
+        - {card: Swamp}
+        - {card: Mountain}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+        - {token: Goblin Token, controller: p0, pt: [1, 1], colors: [R], sick: true}
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  A copy is a spell on the stack (707.10), so Force of Will may target it. Countering it removes it (a copy leaves the stack and
+  ceases to exist, 707.10a: it is not in p0's graveyard) while the original resolves normally: two Goblins, not four. The copy is targeted
+  with the new target spelling {copy_of: "@ew", nth: 0} (nth counts copies of that spell from the top of the stack), see
+  SCENARIO-NOTES-A.md. Force of Will is cast after the storm trigger resolved.

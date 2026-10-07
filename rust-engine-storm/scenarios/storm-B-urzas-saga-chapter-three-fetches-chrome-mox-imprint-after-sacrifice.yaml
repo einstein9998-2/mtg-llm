@@ -1,0 +1,56 @@
+id: storm-b-urzas-saga-chapter-three-fetches-chrome-mox-imprint-after-sacrifice
+title: "Chapter III fetching Chrome Mox: the Saga is sacrificed first, then the imprint trigger goes on the stack and can imprint from hand"
+area: card
+cards: [Urza's Saga, Island, Chrome Mox, Null Rod, Brainstorm]
+tags: [urzas-saga, saga, chapter-three, chrome-mox, imprint, etb-trigger, sacrifice-sba, trigger-after-sba]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Urza's Saga, text: "III — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Chrome Mox, text: "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.", verified: true}
+  - {kind: cr, ref: "714.4", text: "If the number of lore counters on a Saga permanent with one or more chapter abilities is greater than or equal to its final chapter number, and it isn’t the source of a chapter ability that has triggered but not yet left the stack, that Saga’s controller sacrifices it.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Urza's Saga @saga", "Brainstorm @bs"]
+    library: ["Island", "Island", "Chrome Mox @cmox", "Null Rod @rod"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@saga"}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - advance: {to: main1, of: p1}
+  - advance: {to: main1, of: p0}
+  - resolve_top: true
+  - p0: {decision: search, found: "@cmox", expect_options: {include: ["@cmox"], exclude: ["@rod"]}}
+  - check:
+      stack: [{kind: triggered, source: "@cmox", controller: p0, text_contains: "exile"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        graveyard: [Urza's Saga]
+        battlefield: [{card: Chrome Mox, tapped: false}]
+  - resolve_top: true
+  - p0: {decision: choose_cards, purpose: imprint, expect_options: {include: ["@bs"]}, answer: ["@bs"]}
+  - p0: {t: activate, source: "@cmox", ability: 0}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Urza's Saga]
+      exile: [{card: Brainstorm, face_up: true}]
+      battlefield: [{card: Chrome Mox, tapped: true}]
+      mana_pool: {U: 1}
+      spells_cast_this_turn: 0
+notes: >
+  Chapter III resolves (Chrome Mox put onto the battlefield: its imprint trigger is waiting), then state-based actions
+  sacrifice the Saga (714.4: the chapter ability has left the stack), then the imprint trigger is put on the stack
+  (603.3): at the check the Saga is already in the graveyard while the Mox trigger is on the stack. Brainstorm is imprinted
+  and the Mox taps for {U}. The two Islands in the library are the turn-5 and turn-7 draws, so Brainstorm is the only
+  nonland nonartifact card in hand.

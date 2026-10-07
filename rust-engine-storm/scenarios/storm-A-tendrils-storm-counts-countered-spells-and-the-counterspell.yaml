@@ -1,0 +1,59 @@
+id: storm-a-tendrils-storm-counts-countered-spells-and-the-counterspell
+title: "A countered Dark Ritual and the Force of Will that countered it both count for storm"
+area: card
+cards: [Tendrils of Agony, Dark Ritual, Force of Will, Brainstorm, Swamp]
+tags: [tendrils-of-agony, storm, storm-count, force-of-will, countered-spell, opponent-spells]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Tendrils of Agony, text: "Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "then the spell becomes cast.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dark Ritual @rit", "Tendrils of Agony @tend"]
+    battlefield: ["Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Swamp @s5"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@rit", pay: {tap: ["@s1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@rit"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: []
+      p0: {graveyard: [Dark Ritual], mana_pool: {}}
+      p1: {life: 19}
+  - p0: {t: cast, card: "@tend", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 26
+      graveyard: [Dark Ritual, Tendrils of Agony]
+      spells_cast_this_turn: 2
+    p1:
+      life: 13
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+      spells_cast_this_turn: 1
+notes: >
+  Countering a spell does not un-cast it. Spells cast before Tendrils: p0's countered Dark Ritual and p1's Force of Will = 2, so two
+  copies. p1 pays 1 life for the pitch (19) and loses 6 more (13); p0 gains 6 (26). The Ritual gave no mana: Tendrils is paid
+  with four of the other Swamps.
