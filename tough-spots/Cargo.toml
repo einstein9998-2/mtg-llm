@@ -1,0 +1,23 @@
+[package]
+name = "tough-spots"
+version = "0.1.0"
+edition = "2021"
+
+# Flags positions where the Alurentell bot's decision is hard (close in value, or the net and the
+# search disagree) and renders them for Brady. Agent-side only: built against mtg-view WITHOUT the
+# `diff-harness` feature, so it holds SeatViews and can never see hidden state. The engine core is
+# untouched; the real `Game` is held by the harness loop (as in llm-benchmark/harness/llmgame.rs) only
+# to advance the game, and nothing but SeatView data is written to the output.
+[workspace]
+
+[dependencies]
+mtg-core = { path = "../rust-engine/crates/mtg-core" }
+mtg-view = { path = "../rust-engine/crates/mtg-view" }
+mtg-cards = { path = "../rust-engine/crates/mtg-cards" }
+mtg-agent = { path = "../rust-engine/crates/mtg-agent" }
+serde_json = "1"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 4

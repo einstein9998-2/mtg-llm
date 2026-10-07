@@ -1,0 +1,1408 @@
+[
+ {
+  "id": "s4-g59-d2",
+  "n": 1,
+  "category": "keep",
+  "turn": 0,
+  "view": {
+   "my_bf": [],
+   "opp_bf": [],
+   "stack": [],
+   "events": [
+    "you took a mulligan",
+    "Acererak the Archlich (you's) moved Hand -> Library",
+    "Veil of Summer (you's) moved Hand -> Library",
+    "Misty Rainforest (you's) moved Hand -> Library",
+    "Boseiju, Who Endures (you's) moved Hand -> Library",
+    "Force of Will (you's) moved Hand -> Library (x2)",
+    "Ponder (you's) moved Hand -> Library",
+    "you library shuffled",
+    "you drew Lotus Petal",
+    "you drew Hedge Maze",
+    "you drew Aluren",
+    "you drew Force of Will",
+    "you drew Hedge Maze",
+    "you drew Misty Rainforest (x2)"
+   ],
+   "turn": "0",
+   "step": "Untap",
+   "whose": "your",
+   "my_life": 20,
+   "my_lib": 53,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 7,
+   "opp_lib": 53,
+   "hand": [
+    "2x Hedge Maze",
+    "2x Misty Rainforest",
+    "Lotus Petal",
+    "Force of Will",
+    "Aluren"
+   ],
+   "my_gy": [],
+   "opp_gy": []
+  },
+  "game_log": [
+   "you took a mulligan"
+  ],
+  "decision_kind": "Mulligan",
+  "context": "Keep this hand or take a mulligan?",
+  "question": "Keep this hand or mulligan?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Keep hand",
+    "kind": "Keep",
+    "quick": 42,
+    "deep": 54,
+    "net": 52,
+    "win": 42
+   },
+   {
+    "idx": 1,
+    "label": "Mulligan",
+    "kind": "Mulligan",
+    "quick": 58,
+    "deep": 46,
+    "net": 48,
+    "win": 41
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 0,
+  "net_top": 0,
+  "win_est": 42,
+  "reasons": [
+   "close",
+   "mulligan-check"
+  ],
+  "game_result_for_bot": 1,
+  "on_play": true
+ },
+ {
+  "id": "s4-g44-d1",
+  "n": 2,
+  "category": "keep",
+  "turn": 0,
+  "view": {
+   "my_bf": [],
+   "opp_bf": [],
+   "stack": [],
+   "events": [
+    "you library shuffled",
+    "opponent library shuffled",
+    "you drew Hedge Maze",
+    "you drew Force of Will",
+    "you drew Stock Up",
+    "you drew Lotus Petal",
+    "you drew Ponder",
+    "you drew Force of Will",
+    "you drew Aluren",
+    "opponent drew a card (x7)"
+   ],
+   "turn": "0",
+   "step": "Untap",
+   "whose": "your",
+   "my_life": 20,
+   "my_lib": 53,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 7,
+   "opp_lib": 53,
+   "hand": [
+    "Hedge Maze",
+    "Lotus Petal",
+    "Ponder",
+    "Stock Up",
+    "2x Force of Will",
+    "Aluren"
+   ],
+   "my_gy": [],
+   "opp_gy": []
+  },
+  "game_log": [],
+  "decision_kind": "Mulligan",
+  "context": "Keep this hand or take a mulligan?",
+  "question": "Keep this hand or mulligan?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Keep hand",
+    "kind": "Keep",
+    "quick": 33,
+    "deep": 70,
+    "net": 45,
+    "win": 46
+   },
+   {
+    "idx": 1,
+    "label": "Mulligan",
+    "kind": "Mulligan",
+    "quick": 67,
+    "deep": 30,
+    "net": 55,
+    "win": 42
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 0,
+  "net_top": 1,
+  "win_est": 45,
+  "reasons": [
+   "mulligan-check"
+  ],
+  "game_result_for_bot": 1,
+  "on_play": true
+ },
+ {
+  "id": "s4-g67-d18",
+  "n": 3,
+  "category": "cast-or-wait",
+  "turn": 7,
+  "view": {
+   "my_bf": [
+    "Tropical Island (tapped)",
+    "Ancient Tomb",
+    "Hedge Maze"
+   ],
+   "opp_bf": [
+    "2x Dragon's Rage Channeler 1/1 [creature]",
+    "Volcanic Island (tapped)",
+    "Dragon's Rage Channeler 1/1 [creature] (summoning sick)"
+   ],
+   "stack": [],
+   "events": [
+    "Brainstorm (you's) moved Stack -> Graveyard",
+    "you drew Stock Up"
+   ],
+   "turn": "7",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 13,
+   "my_lib": 46,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 4,
+   "opp_lib": 48,
+   "hand": [
+    "Misty Rainforest",
+    "Prismatic Vista",
+    "Stock Up",
+    "Aluren",
+    "2x Show and Tell"
+   ],
+   "lib_top": [
+    "Ancient Tomb"
+   ],
+   "my_gy": [
+    "Polluted Delta",
+    "2x Ponder",
+    "Boseiju, Who Endures",
+    "Brainstorm"
+   ],
+   "opp_gy": [
+    "Cori-Steel Cutter",
+    "Mishra's Bauble",
+    "Lightning Bolt",
+    "Volcanic Island"
+   ]
+  },
+  "game_log": [
+   "you kept (bottomed 0)",
+   "opponent kept (bottomed 0)",
+   "-- turn 1 (your turn) --",
+   "you played Polluted Delta",
+   "you life -1",
+   "you activated an ability",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Volcanic Island",
+   "opponent cast Dragon's Rage Channeler",
+   "opponent cast Mishra's Bauble",
+   "opponent activated an ability",
+   "-- turn 3 (your turn) --",
+   "you cast Ponder",
+   "you played Ancient Tomb",
+   "-- turn 4 (opponent's turn) --",
+   "opponent cast Lightning Bolt",
+   "you life -3",
+   "3 damage to you",
+   "opponent played Volcanic Island",
+   "opponent cast Dragon's Rage Channeler",
+   "you life -1",
+   "1 combat damage to you",
+   "-- turn 5 (your turn) --",
+   "you life -2",
+   "2 damage to you",
+   "you activated an ability",
+   "you played Hedge Maze",
+   "-- turn 6 (opponent's turn) --",
+   "opponent cast Dragon's Rage Channeler",
+   "-- turn 7 (your turn) --",
+   "you cast Brainstorm"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 27,
+    "deep": 69,
+    "net": 17,
+    "win": 55
+   },
+   {
+    "idx": 1,
+    "label": "Play Misty Rainforest",
+    "kind": "PlayLand",
+    "quick": 3,
+    "deep": 1,
+    "net": 16,
+    "win": 5
+   },
+   {
+    "idx": 2,
+    "label": "Play Prismatic Vista",
+    "kind": "PlayLand",
+    "quick": 3,
+    "deep": 1,
+    "net": 16,
+    "win": 6
+   },
+   {
+    "idx": 3,
+    "label": "Cast Stock Up",
+    "kind": "CastSpell",
+    "quick": 19,
+    "deep": 2,
+    "net": 21,
+    "win": 24
+   },
+   {
+    "idx": 4,
+    "label": "Cast Show and Tell",
+    "kind": "CastSpell",
+    "quick": 48,
+    "deep": 27,
+    "net": 30,
+    "win": 47
+   }
+  ],
+  "bot_choice": 4,
+  "deep_best": 0,
+  "net_top": 4,
+  "win_est": 51,
+  "reasons": [
+   "close",
+   "net-vs-search"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true
+ },
+ {
+  "id": "s3-g28-d19",
+  "n": 4,
+  "category": "cast-or-wait",
+  "turn": 7,
+  "view": {
+   "my_bf": [
+    "Boseiju, Who Endures",
+    "Tropical Island"
+   ],
+   "opp_bf": [
+    "Volcanic Island (tapped)",
+    "Dragon's Rage Channeler 1/1 [creature] (tapped)",
+    "Thundering Falls (tapped)",
+    "Dragon's Rage Channeler 1/1 [creature] (summoning sick)"
+   ],
+   "stack": [],
+   "events": [
+    "you drew Veil of Summer"
+   ],
+   "turn": "7",
+   "step": "Draw",
+   "whose": "your",
+   "my_life": 17,
+   "my_lib": 48,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 18,
+   "opp_hand": 2,
+   "opp_lib": 48,
+   "hand": [
+    "Brainstorm",
+    "Veil of Summer",
+    "Show and Tell",
+    "Atraxa, Grand Unifier"
+   ],
+   "lib_top": [
+    "Ponder"
+   ],
+   "my_gy": [
+    "Force of Will",
+    "2x Brainstorm",
+    "Hedge Maze",
+    "Flooded Strand"
+   ],
+   "opp_gy": [
+    "Dragon's Rage Channeler",
+    "Force of Will",
+    "Wasteland",
+    "Polluted Delta",
+    "Brainstorm"
+   ],
+   "my_exile": [
+    "Force of Will"
+   ],
+   "opp_exile": [
+    "Ponder"
+   ]
+  },
+  "game_log": [
+   "you kept (bottomed 0)",
+   "opponent kept (bottomed 0)",
+   "-- turn 1 (your turn) --",
+   "you played Hedge Maze",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Volcanic Island",
+   "opponent cast Dragon's Rage Channeler",
+   "you life -1",
+   "you cast Force of Will",
+   "spell countered",
+   "-- turn 3 (your turn) --",
+   "you cast Brainstorm",
+   "opponent life -1",
+   "opponent cast Force of Will",
+   "spell countered",
+   "you played Boseiju, Who Endures",
+   "-- turn 4 (opponent's turn) --",
+   "opponent cast Dragon's Rage Channeler",
+   "opponent played Wasteland",
+   "-- turn 5 (your turn) --",
+   "opponent activated an ability",
+   "you played Flooded Strand",
+   "you life -1",
+   "you activated an ability",
+   "you cast Brainstorm",
+   "-- turn 6 (opponent's turn) --",
+   "opponent played Polluted Delta",
+   "opponent life -1",
+   "opponent activated an ability",
+   "you life -1",
+   "1 combat damage to you",
+   "opponent cast Dragon's Rage Channeler",
+   "-- turn 7 (your turn) --"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 41,
+    "deep": 39,
+    "net": 38,
+    "win": 67
+   },
+   {
+    "idx": 1,
+    "label": "Cast Brainstorm",
+    "kind": "CastSpell",
+    "quick": 55,
+    "deep": 59,
+    "net": 36,
+    "win": 67
+   },
+   {
+    "idx": 2,
+    "label": "Cast Veil of Summer",
+    "kind": "CastSpell",
+    "quick": 5,
+    "deep": 2,
+    "net": 26,
+    "win": 25
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 1,
+  "net_top": 0,
+  "win_est": 66,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true
+ },
+ {
+  "id": "s3-g95-d7",
+  "n": 5,
+  "category": "cast-which",
+  "turn": 5,
+  "view": {
+   "my_bf": [
+    "2x Island",
+    "Lotus Petal [artifact]"
+   ],
+   "opp_bf": [
+    "Thundering Falls (tapped)"
+   ],
+   "stack": [],
+   "events": [
+    "Lotus Petal (you's) moved Hand -> Stack",
+    "you cast Lotus Petal",
+    "Lotus Petal (you's) moved Stack -> Battlefield"
+   ],
+   "turn": "5",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 17,
+   "my_lib": 51,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 7,
+   "opp_lib": 50,
+   "hand": [
+    "Hedge Maze",
+    "Prismatic Vista",
+    "City of Traitors",
+    "Lotus Petal",
+    "Veil of Summer",
+    "Show and Tell"
+   ],
+   "my_gy": [],
+   "opp_gy": [
+    "2x Lightning Bolt"
+   ]
+  },
+  "game_log": [
+   "you kept (bottomed 0)",
+   "opponent kept (bottomed 0)",
+   "-- turn 1 (your turn) --",
+   "you played Island",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Thundering Falls",
+   "-- turn 3 (your turn) --",
+   "you played Island",
+   "-- turn 4 (opponent's turn) --",
+   "opponent cast Lightning Bolt",
+   "you life -3",
+   "3 damage to you",
+   "-- turn 5 (your turn) --",
+   "you cast Lotus Petal"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 3,
+    "deep": 3,
+    "net": 13,
+    "win": 47
+   },
+   {
+    "idx": 1,
+    "label": "Play Hedge Maze",
+    "kind": "PlayLand",
+    "quick": 12,
+    "deep": 5,
+    "net": 20,
+    "win": 45
+   },
+   {
+    "idx": 2,
+    "label": "Play Prismatic Vista",
+    "kind": "PlayLand",
+    "quick": 3,
+    "deep": 1,
+    "net": 10,
+    "win": 34
+   },
+   {
+    "idx": 3,
+    "label": "Play City of Traitors",
+    "kind": "PlayLand",
+    "quick": 2,
+    "deep": 1,
+    "net": 10,
+    "win": 14
+   },
+   {
+    "idx": 4,
+    "label": "Cast Lotus Petal",
+    "kind": "CastSpell",
+    "quick": 6,
+    "deep": 3,
+    "net": 13,
+    "win": 46
+   },
+   {
+    "idx": 5,
+    "label": "Cast Veil of Summer",
+    "kind": "CastSpell",
+    "quick": 62,
+    "deep": 43,
+    "net": 12,
+    "win": 59
+   },
+   {
+    "idx": 6,
+    "label": "Cast Show and Tell",
+    "kind": "CastSpell",
+    "quick": 11,
+    "deep": 44,
+    "net": 22,
+    "win": 58
+   }
+  ],
+  "bot_choice": 5,
+  "deep_best": 6,
+  "net_top": 6,
+  "win_est": 56,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true
+ },
+ {
+  "id": "s4-g19-d19",
+  "n": 6,
+  "category": "cast-which",
+  "turn": 7,
+  "view": {
+   "my_bf": [
+    "Ancient Tomb",
+    "Island"
+   ],
+   "opp_bf": [
+    "Island (tapped)",
+    "Thundering Falls (tapped)",
+    "Cori-Steel Cutter [artifact]"
+   ],
+   "stack": [],
+   "events": [
+    "-- turn 6 (opponent's turn) --",
+    "opponent drew a card",
+    "Cori-Steel Cutter (opponent's) moved Hand -> Stack",
+    "opponent cast Cori-Steel Cutter",
+    "Cori-Steel Cutter (opponent's) moved Stack -> Battlefield",
+    "0 attacker(s) declared",
+    "Misty Rainforest (opponent's) moved Hand -> Battlefield",
+    "opponent played Misty Rainforest",
+    "opponent life -1",
+    "Misty Rainforest (opponent's) moved Battlefield -> Graveyard",
+    "opponent activated an ability",
+    "opponent library shuffled",
+    "-- turn 7 (your turn) --",
+    "you drew Show and Tell"
+   ],
+   "turn": "7",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 16,
+   "my_lib": 47,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 17,
+   "opp_hand": 4,
+   "opp_lib": 46,
+   "hand": [
+    "Flooded Strand",
+    "Stock Up",
+    "Boseiju, Who Endures",
+    "Veil of Summer",
+    "Show and Tell",
+    "Atraxa, Grand Unifier"
+   ],
+   "my_gy": [
+    "Force of Will",
+    "Lotus Petal",
+    "Stock Up",
+    "Misty Rainforest"
+   ],
+   "opp_gy": [
+    "Force of Will",
+    "Preordain",
+    "Mishra's Bauble",
+    "Scalding Tarn",
+    "Daze",
+    "Misty Rainforest"
+   ],
+   "my_exile": [
+    "Brainstorm"
+   ],
+   "opp_exile": [
+    "Ponder"
+   ]
+  },
+  "game_log": [
+   "you kept (bottomed 0)",
+   "opponent kept (bottomed 0)",
+   "-- turn 1 (your turn) --",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Island",
+   "opponent cast Preordain",
+   "opponent life -1",
+   "opponent cast Force of Will",
+   "you life -1",
+   "you cast Force of Will",
+   "spell countered",
+   "opponent cast Mishra's Bauble",
+   "opponent activated an ability",
+   "-- turn 3 (your turn) --",
+   "you played Ancient Tomb",
+   "you cast Lotus Petal",
+   "you life -2",
+   "2 damage to you",
+   "you cast Stock Up",
+   "-- turn 4 (opponent's turn) --",
+   "opponent played Scalding Tarn",
+   "opponent life -1",
+   "opponent activated an ability",
+   "-- turn 5 (your turn) --",
+   "you played Misty Rainforest",
+   "you life -1",
+   "you activated an ability",
+   "-- turn 6 (opponent's turn) --",
+   "opponent cast Cori-Steel Cutter",
+   "opponent played Misty Rainforest",
+   "opponent life -1",
+   "opponent activated an ability",
+   "-- turn 7 (your turn) --"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 6,
+    "deep": 3,
+    "net": 14,
+    "win": 55
+   },
+   {
+    "idx": 1,
+    "label": "Play Flooded Strand",
+    "kind": "PlayLand",
+    "quick": 12,
+    "deep": 8,
+    "net": 20,
+    "win": 62
+   },
+   {
+    "idx": 2,
+    "label": "Play Boseiju, Who Endures",
+    "kind": "PlayLand",
+    "quick": 9,
+    "deep": 43,
+    "net": 17,
+    "win": 68
+   },
+   {
+    "idx": 3,
+    "label": "Cast Stock Up",
+    "kind": "CastSpell",
+    "quick": 5,
+    "deep": 3,
+    "net": 18,
+    "win": 46
+   },
+   {
+    "idx": 4,
+    "label": "Cast Show and Tell",
+    "kind": "CastSpell",
+    "quick": 67,
+    "deep": 44,
+    "net": 31,
+    "win": 69
+   }
+  ],
+  "bot_choice": 4,
+  "deep_best": 4,
+  "net_top": 4,
+  "win_est": 67,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true
+ },
+ {
+  "id": "s4-g63-d32",
+  "n": 7,
+  "category": "cards:RevealPick",
+  "turn": 7,
+  "view": {
+   "my_bf": [
+    "City of Traitors (tapped)",
+    "Island (tapped)",
+    "Atraxa, Grand Unifier 7/7 [creature] (summoning sick) <flying | deathtouch | lifelink | vigilance>"
+   ],
+   "opp_bf": [
+    "3x Volcanic Island (tapped)",
+    "Murktide Regent 5/5 [creature] (tapped) PlusOnex2 <flying>",
+    "Murktide Regent 5/5 [creature] (summoning sick) PlusOnex2 <flying>",
+    "Dragon's Rage Channeler 1/1 [creature] (summoning sick)"
+   ],
+   "stack": [
+    "Atraxa, Grand Unifier (ability) controlled by you"
+   ],
+   "events": [
+    "Force of Will (you's) moved Library -> Hand"
+   ],
+   "turn": "7",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 11,
+   "my_lib": 44,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 19,
+   "opp_hand": 4,
+   "opp_lib": 46,
+   "hand": [
+    "2x Ponder",
+    "Stock Up",
+    "Force of Will",
+    "Aluren",
+    "Omniscience",
+    "Acererak the Archlich"
+   ],
+   "lib_top": [
+    "Forest",
+    "Lotus Petal",
+    "Prismatic Vista",
+    "Misty Rainforest",
+    "Hedge Maze",
+    "Aluren",
+    "Tropical Island",
+    "Island"
+   ],
+   "lib_bottom": [
+    "Acererak the Archlich",
+    "Polluted Delta",
+    "Veil of Summer"
+   ],
+   "my_gy": [
+    "Lotus Petal",
+    "2x Show and Tell",
+    "Misty Rainforest",
+    "Brainstorm",
+    "Stock Up"
+   ],
+   "opp_gy": [],
+   "my_exile": [],
+   "opp_exile": [
+    "Polluted Delta",
+    "Brainstorm",
+    "Preordain",
+    "Mishra's Bauble"
+   ]
+  },
+  "game_log": [
+   "you kept (bottomed 0)",
+   "opponent kept (bottomed 0)",
+   "-- turn 1 (your turn) --",
+   "you played City of Traitors",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Volcanic Island",
+   "opponent cast Preordain",
+   "-- turn 3 (your turn) --",
+   "you cast Lotus Petal",
+   "you cast Show and Tell",
+   "-- turn 4 (opponent's turn) --",
+   "opponent cast Mishra's Bauble",
+   "opponent activated an ability",
+   "opponent cast Brainstorm",
+   "you life -1",
+   "you activated an ability",
+   "you cast Brainstorm",
+   "opponent played Volcanic Island",
+   "you life -3",
+   "3 combat damage to you",
+   "-- turn 5 (your turn) --",
+   "you cast Stock Up",
+   "-- turn 6 (opponent's turn) --",
+   "opponent played Polluted Delta",
+   "opponent life -1",
+   "opponent activated an ability",
+   "opponent cast Murktide Regent",
+   "you life -5",
+   "5 combat damage to you",
+   "-- turn 7 (your turn) --",
+   "you cast Show and Tell"
+  ],
+  "decision_kind": "ChooseCards { purpose: RevealPick, remaining: 1 }",
+  "context": "Choose a card (1 left): RevealPick.",
+  "question": "Pick a card from the revealed cards.",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Choose Island",
+    "kind": "ChooseCard",
+    "quick": 14,
+    "deep": 6,
+    "net": 13,
+    "win": 25
+   },
+   {
+    "idx": 1,
+    "label": "Choose Forest",
+    "kind": "ChooseCard",
+    "quick": 19,
+    "deep": 39,
+    "net": 14,
+    "win": 32
+   },
+   {
+    "idx": 2,
+    "label": "Choose Tropical Island",
+    "kind": "ChooseCard",
+    "quick": 11,
+    "deep": 3,
+    "net": 13,
+    "win": 19
+   },
+   {
+    "idx": 3,
+    "label": "Choose Hedge Maze",
+    "kind": "ChooseCard",
+    "quick": 8,
+    "deep": 3,
+    "net": 13,
+    "win": 20
+   },
+   {
+    "idx": 4,
+    "label": "Choose Misty Rainforest",
+    "kind": "ChooseCard",
+    "quick": 17,
+    "deep": 24,
+    "net": 13,
+    "win": 30
+   },
+   {
+    "idx": 5,
+    "label": "Choose Prismatic Vista",
+    "kind": "ChooseCard",
+    "quick": 9,
+    "deep": 3,
+    "net": 11,
+    "win": 21
+   },
+   {
+    "idx": 6,
+    "label": "Choose Lotus Petal",
+    "kind": "ChooseCard",
+    "quick": 11,
+    "deep": 5,
+    "net": 11,
+    "win": 25
+   },
+   {
+    "idx": 7,
+    "label": "Done",
+    "kind": "Done",
+    "quick": 11,
+    "deep": 16,
+    "net": 11,
+    "win": 30
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 1,
+  "net_top": 1,
+  "win_est": 29,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true
+ },
+ {
+  "id": "s4-g49-d36",
+  "n": 8,
+  "category": "cards:PutBack",
+  "turn": 8,
+  "view": {
+   "my_bf": [
+    "Tropical Island (tapped)"
+   ],
+   "opp_bf": [
+    "Volcanic Island (tapped)"
+   ],
+   "stack": [
+    "Brainstorm controlled by you"
+   ],
+   "events": [
+    "Brainstorm (you's) moved Hand -> Stack",
+    "you cast Brainstorm",
+    "Mishra's Bauble (opponent's) moved Battlefield -> Graveyard",
+    "opponent activated an ability",
+    "you drew Stock Up",
+    "you drew Veil of Summer",
+    "you drew Show and Tell"
+   ],
+   "turn": "8",
+   "step": "Draw",
+   "whose": "your",
+   "my_life": 15,
+   "my_lib": 42,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 19,
+   "opp_hand": 4,
+   "opp_lib": 50,
+   "opp_known_hand": [
+    "Island"
+   ],
+   "hand": [
+    "Hedge Maze",
+    "2x Ancient Tomb",
+    "City of Traitors",
+    "Ponder",
+    "Stock Up",
+    "Veil of Summer",
+    "Show and Tell",
+    "Acererak the Archlich"
+   ],
+   "my_gy": [
+    "Misty Rainforest",
+    "Forest",
+    "Hedge Maze",
+    "Force of Will",
+    "Brainstorm",
+    "Ponder"
+   ],
+   "opp_gy": [
+    "Wasteland",
+    "Daze",
+    "Misty Rainforest",
+    "Lightning Bolt",
+    "Mishra's Bauble"
+   ],
+   "my_exile": [
+    "Ponder"
+   ],
+   "opp_exile": []
+  },
+  "game_log": [
+   "opponent took a mulligan",
+   "opponent kept (bottomed 1)",
+   "you kept (bottomed 0)",
+   "-- turn 1 (opponent's turn) --",
+   "opponent played Island",
+   "-- turn 2 (your turn) --",
+   "you played Misty Rainforest",
+   "you life -1",
+   "you activated an ability",
+   "-- turn 3 (opponent's turn) --",
+   "opponent played Wasteland",
+   "opponent activated an ability",
+   "-- turn 4 (your turn) --",
+   "you played Tropical Island",
+   "-- turn 5 (opponent's turn) --",
+   "you cast Brainstorm",
+   "opponent cast Daze",
+   "you life -1",
+   "you cast Force of Will",
+   "spell countered",
+   "-- turn 6 (your turn) --",
+   "you cast Ponder",
+   "-- turn 7 (opponent's turn) --",
+   "opponent played Misty Rainforest",
+   "opponent life -1",
+   "opponent activated an ability",
+   "opponent cast Mishra's Bauble",
+   "opponent cast Lightning Bolt",
+   "you life -3",
+   "3 damage to you",
+   "-- turn 8 (your turn) --",
+   "you cast Brainstorm",
+   "opponent activated an ability"
+  ],
+  "decision_kind": "ChooseCards { purpose: PutBack, remaining: 2 }",
+  "context": "Choose a card (2 left): PutBack.",
+  "question": "Brainstorm: put a card back on top of your library (2 left to choose).",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Choose Hedge Maze",
+    "kind": "ChooseCard",
+    "quick": 6,
+    "deep": 2,
+    "net": 11,
+    "win": 40
+   },
+   {
+    "idx": 1,
+    "label": "Choose Ancient Tomb",
+    "kind": "ChooseCard",
+    "quick": 8,
+    "deep": 2,
+    "net": 13,
+    "win": 41
+   },
+   {
+    "idx": 2,
+    "label": "Choose City of Traitors",
+    "kind": "ChooseCard",
+    "quick": 6,
+    "deep": 2,
+    "net": 12,
+    "win": 40
+   },
+   {
+    "idx": 3,
+    "label": "Choose Ponder",
+    "kind": "ChooseCard",
+    "quick": 11,
+    "deep": 3,
+    "net": 12,
+    "win": 45
+   },
+   {
+    "idx": 4,
+    "label": "Choose Stock Up",
+    "kind": "ChooseCard",
+    "quick": 14,
+    "deep": 44,
+    "net": 14,
+    "win": 58
+   },
+   {
+    "idx": 5,
+    "label": "Choose Veil of Summer",
+    "kind": "ChooseCard",
+    "quick": 39,
+    "deep": 42,
+    "net": 14,
+    "win": 58
+   },
+   {
+    "idx": 6,
+    "label": "Choose Show and Tell",
+    "kind": "ChooseCard",
+    "quick": 6,
+    "deep": 2,
+    "net": 10,
+    "win": 40
+   },
+   {
+    "idx": 7,
+    "label": "Choose Acererak the Archlich",
+    "kind": "ChooseCard",
+    "quick": 9,
+    "deep": 3,
+    "net": 13,
+    "win": 42
+   }
+  ],
+  "bot_choice": 5,
+  "deep_best": 4,
+  "net_top": 5,
+  "win_est": 56,
+  "reasons": [
+   "close",
+   "net-vs-search"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": false
+ },
+ {
+  "id": "s3-g73-d13",
+  "n": 9,
+  "category": "cards:DiscardToHandSize",
+  "turn": 6,
+  "view": {
+   "my_bf": [],
+   "opp_bf": [
+    "Thundering Falls (tapped)"
+   ],
+   "stack": [],
+   "events": [],
+   "turn": "6",
+   "step": "Cleanup",
+   "whose": "your",
+   "my_life": 20,
+   "my_lib": 50,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 19,
+   "opp_hand": 7,
+   "opp_lib": 47,
+   "hand": [
+    "Flooded Strand",
+    "Misty Rainforest",
+    "Brainstorm",
+    "2x Ponder",
+    "2x Force of Will",
+    "Veil of Summer"
+   ],
+   "my_gy": [
+    "Lotus Petal",
+    "Misty Rainforest"
+   ],
+   "opp_gy": [
+    "Mishra's Bauble",
+    "Scalding Tarn",
+    "2x Preordain",
+    "Unholy Heat"
+   ]
+  },
+  "game_log": [
+   "opponent kept (bottomed 0)",
+   "you kept (bottomed 0)",
+   "-- turn 1 (opponent's turn) --",
+   "opponent played Scalding Tarn",
+   "opponent cast Mishra's Bauble",
+   "opponent activated an ability",
+   "opponent life -1",
+   "opponent activated an ability",
+   "-- turn 2 (your turn) --",
+   "-- turn 3 (opponent's turn) --",
+   "opponent cast Preordain",
+   "-- turn 4 (your turn) --",
+   "-- turn 5 (opponent's turn) --",
+   "opponent cast Preordain",
+   "-- turn 6 (your turn) --"
+  ],
+  "decision_kind": "ChooseCards { purpose: DiscardToHandSize, remaining: 1 }",
+  "context": "Choose a card (1 left): DiscardToHandSize.",
+  "question": "Cleanup: discard down to hand size. Which card goes?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Choose Flooded Strand",
+    "kind": "ChooseCard",
+    "quick": 45,
+    "deep": 36,
+    "net": 14,
+    "win": 53
+   },
+   {
+    "idx": 1,
+    "label": "Choose Misty Rainforest",
+    "kind": "ChooseCard",
+    "quick": 17,
+    "deep": 41,
+    "net": 13,
+    "win": 50
+   },
+   {
+    "idx": 2,
+    "label": "Choose Brainstorm",
+    "kind": "ChooseCard",
+    "quick": 8,
+    "deep": 7,
+    "net": 21,
+    "win": 41
+   },
+   {
+    "idx": 3,
+    "label": "Choose Ponder",
+    "kind": "ChooseCard",
+    "quick": 11,
+    "deep": 5,
+    "net": 15,
+    "win": 43
+   },
+   {
+    "idx": 4,
+    "label": "Choose Force of Will",
+    "kind": "ChooseCard",
+    "quick": 9,
+    "deep": 6,
+    "net": 18,
+    "win": 42
+   },
+   {
+    "idx": 5,
+    "label": "Choose Veil of Summer",
+    "kind": "ChooseCard",
+    "quick": 9,
+    "deep": 5,
+    "net": 19,
+    "win": 39
+   }
+  ],
+  "bot_choice": 0,
+  "deep_best": 1,
+  "net_top": 2,
+  "win_est": 49,
+  "reasons": [
+   "close",
+   "net-vs-search"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": false
+ },
+ {
+  "id": "s4-g86-d21",
+  "n": 10,
+  "category": "cards:LookTake",
+  "turn": 8,
+  "view": {
+   "my_bf": [
+    "Ancient Tomb (tapped)",
+    "2x Island (tapped)"
+   ],
+   "opp_bf": [
+    "Cori-Steel Cutter [artifact]",
+    "Island (tapped)",
+    "Monk Token 2/2 [creature] (tapped) <haste | trample | prowess>"
+   ],
+   "stack": [
+    "Stock Up controlled by you"
+   ],
+   "events": [
+    "Aluren (you's) moved Library -> Hand"
+   ],
+   "turn": "8",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 12,
+   "my_lib": 46,
+   "lands_played": 1,
+   "pool": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1
+   ],
+   "opp_life": 19,
+   "opp_hand": 6,
+   "opp_lib": 47,
+   "hand": [
+    "Ancient Tomb",
+    "Ponder",
+    "Stock Up",
+    "Aluren"
+   ],
+   "my_gy": [
+    "Acererak the Archlich",
+    "Lotus Petal",
+    "Show and Tell",
+    "Prismatic Vista",
+    "Brainstorm",
+    "Misty Rainforest"
+   ],
+   "opp_gy": [
+    "Scalding Tarn",
+    "2x Mishra's Bauble",
+    "Daze",
+    "Preordain"
+   ]
+  },
+  "game_log": [
+   "opponent took a mulligan",
+   "opponent kept (bottomed 1)",
+   "you kept (bottomed 0)",
+   "-- turn 1 (opponent's turn) --",
+   "opponent played Scalding Tarn",
+   "opponent life -1",
+   "opponent activated an ability",
+   "opponent cast Mishra's Bauble",
+   "opponent activated an ability",
+   "-- turn 2 (your turn) --",
+   "you played Ancient Tomb",
+   "-- turn 3 (opponent's turn) --",
+   "-- turn 4 (your turn) --",
+   "-- turn 5 (opponent's turn) --",
+   "-- turn 6 (your turn) --",
+   "you cast Lotus Petal",
+   "you life -2",
+   "2 damage to you",
+   "you cast Show and Tell",
+   "you life -1",
+   "you activated an ability",
+   "you cast Brainstorm",
+   "opponent cast Daze",
+   "spell countered",
+   "-- turn 7 (opponent's turn) --",
+   "opponent played Island",
+   "opponent cast Preordain",
+   "opponent cast Mishra's Bauble",
+   "opponent created token Monk Token",
+   "opponent activated an ability",
+   "you life -2",
+   "2 combat damage to you",
+   "-- turn 8 (your turn) --",
+   "you played Misty Rainforest",
+   "you life -1",
+   "you activated an ability",
+   "you life -2",
+   "2 damage to you",
+   "you cast Stock Up"
+  ],
+  "decision_kind": "ChooseCards { purpose: LookTake, remaining: 1 }",
+  "context": "Choose a card (1 left): LookTake.",
+  "question": "Look at the cards: pick one to take (1 left to take).",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Choose Tropical Island",
+    "kind": "ChooseCard",
+    "quick": 41,
+    "deep": 5,
+    "net": 29,
+    "win": 17
+   },
+   {
+    "idx": 1,
+    "label": "Choose Polluted Delta",
+    "kind": "ChooseCard",
+    "quick": 12,
+    "deep": 33,
+    "net": 25,
+    "win": 32
+   },
+   {
+    "idx": 2,
+    "label": "Choose Force of Will",
+    "kind": "ChooseCard",
+    "quick": 8,
+    "deep": 42,
+    "net": 15,
+    "win": 34
+   },
+   {
+    "idx": 3,
+    "label": "Choose Aluren",
+    "kind": "ChooseCard",
+    "quick": 39,
+    "deep": 19,
+    "net": 30,
+    "win": 30
+   }
+  ],
+  "bot_choice": 0,
+  "deep_best": 2,
+  "net_top": 3,
+  "win_est": 31,
+  "reasons": [
+   "close",
+   "quick-vs-deep"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": false
+ }
+]

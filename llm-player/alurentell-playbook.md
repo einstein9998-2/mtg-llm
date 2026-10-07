@@ -67,3 +67,25 @@ Source of the strategy points is Brady (2026-10-01). Lines marked "observed" com
 - Brainstorm put-backs are drawn next turn unless a crack shuffles first; hold the fetch uncracked until their end step so it shuffles before my draw (t25), and never hold Petal/Stock Up on top by accident (t25).
 - Under Omniscience, cast the redundant spell first as bait (Aluren, Stock Up); opponents here answered Goblin tokens with Unholy Heat (t22, t24, t26) instead of the loop.
 - Process: do not use `pick 0` to look at a menu (it passes); use `tplay next`. And one pick per command, always (t26 lost nothing only because main 2 still allowed everything).
+
+## Tips from Brady (2026-10-06, while planning sideboards; not from a played game)
+
+- Show and Tell versus Aluren: decide by how much mana I have and which other combo pieces are in my hand. What the opponent is doing barely matters.
+- Against Boros after a mulligan: Stock Up should put one card back, because I have to win the turn after Stock Up or their creatures kill me. In a blind three-land hand Stock Up is solid; the same card is just good, not a must, against a fast clock.
+- Mirror: Aluren and Show and Tell are symmetric, so whoever blinks first loses (you are down the card and the mana), and whoever resolves more Stock Ups usually wins. If an Aluren is in play, somebody wins at instant speed almost immediately, so check whether the OPPONENT's Aluren lets me win first: example, the opponent resolved Aluren, cast Acererak in my upkeep so I would not draw; I cast my own Acererak in response, they Forced, I Forced back and won.
+- Prismatic Ending does nothing against an Aluren in play; keep it out of the mirror.
+- Orim's Chant (kicked): against the blue interactive decks (UR, UB, UW) it is a turn-of-the-combo tool on my own turn. Against Reanimator, a non-blue combo deck faster than I am, it is a time walk cast on THEIR turn: in their upkeep, or in response to Dark Ritual.
+- Against Reanimator keep one Show and Tell for the high-resource line (Show in Atraxa, Chant them so they cannot answer, win next turn); otherwise Show is risky because they put in something big. Keep City of Traitors over a basic: two extra mana means one land fewer for the combo.
+
+## Rules from Brady's tough-spot review (2026-10-06, first 10 flagged bot decisions; his words from the answer page)
+
+- Never cast Brainstorm in your own upkeep. In general, wait as long as possible to cast a spell if waiting is free (it costs no mana, tempo or card), because you get more information (the draw, their plays, a land drop you may need). This does not mean dawdling: when waiting costs you something (a window against Daze or Force, mana that would go unused, a turn), cast it.
+- Make the land drop before a committal spell (Show and Tell, Aluren, Atraxa, Acererak, anything that spends a key card), but cast cantrips (Brainstorm, Ponder, Stock Up when it is not the combo turn) before playing the land: they find the land or show what you need, and a land played first reveals information. Cast cantrips in your main phase, never in upkeep. Passing priority with a land in hand and mana to spend is "insane" (bot did it in a turn-4 Main 1 with Vista in hand), and the bot's recurring error was casting committal spells before the land drop. Fetch away the cards you put back with Brainstorm if they are bad.
+- Do not cast a raw Show and Tell without a payoff or protection in hand when you can still dig. They may be holding Force of Will for it and get to surveil and turn on delirium. Better sequence (turn 4, Boseiju in hand): play the land, cast Veil of Summer first; if it resolves, Show and Tell for Atraxa; if it does not, Stock Up. If they Daze, pay 1 and draw a card.
+- With no Show and Tell payoff on the board or in hand, play the card-selection land first (Hedge Maze) rather than Veil: you need to find something to put in.
+- Brainstorm put-backs: Mishra's Bauble lets the opponent see the top card, so put back the card whose identity helps them least. Not Veil of Summer, not Show and Tell. (Brady chose Ponder.)
+- Atraxa reveal: the card you pick first is usually the land you want untapped and green to cast Aluren next turn (Tropical Island); Forest is better when a Wasteland could hit a dual or City of Traitors might die.
+- Mulligan: a 7 with no cantrips and no blue card for Force of Will, slow even if it finds Acererak, is a mulligan. A 7 with two Force of Will (second pitches to the first), Hedge Maze surveil and Ponder / Stock Up to dig toward a fast combo is a keep.
+- Opponent at 2 cards in hand and I am about to reach 4 mana: Brainstorm first, then Veil plus Show and Tell wins.
+
+Source and numbers: tough-spots/batch1 (bot agreed with Brady on 3 of 9 answered positions; the bot's recurring error was casting spells before the land drop or into Daze/Force).
