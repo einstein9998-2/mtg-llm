@@ -2,6 +2,7 @@
 //! compares each pick with his. Agent-side only (SeatView). Positions are reproduced by replaying the
 //! recorded action list.
 //! Usage: rescore <decks dir> <net.bin> <labels.jsonl>... [--deep 400]
+//! One net per call: pass the labels of the matchup(s) that net was trained on, and the decks dir of the engine the net matches.
 #[path = "../rules.rs"]
 mod rules;
 
@@ -18,8 +19,6 @@ fn main() {
     let net = Arc::new(Net::load(std::path::Path::new(&a[2])).unwrap_or_else(|e| panic!("{e}")));
     let db = mtg_cards::legacy::build();
     let (names, decks) = load_deck_dir(&db, &a[1]);
-    let me = names.iter().position(|n| n == "alurentell").unwrap();
-    let opp = names.iter().position(|n| n == "ur-cutter").unwrap();
     let n_defs = db.defs.len();
     println!("id\tkind\tbrady\tweight\tbot_orig\tquick\tdeep\tquick+rules\tdeep+rules");
     let mut tally = [0u32; 5];
@@ -33,6 +32,9 @@ fn main() {
             let ix: u64 = id.rsplit("-d").next().unwrap().parse().unwrap();
             let (gseed, bot, first) = (v["game_seed"].as_u64().unwrap(), v["bot_seat"].as_u64().unwrap() as u8, v["first"].as_u64().unwrap() as u8);
             let hist: Vec<(u8, usize)> = v["replay"].as_array().unwrap().iter().map(|x| (x[0].as_u64().unwrap() as u8, x[1].as_u64().unwrap() as usize)).collect();
+            // Labels from batch 3 on carry the matchup; older ones are Alurentell vs UR Cutter.
+            let find = |k: &str, dflt: &str| names.iter().position(|n| n == v[k].as_str().unwrap_or(dflt)).unwrap_or_else(|| panic!("deck {} not in {names:?}", v[k]));
+            let (me, opp) = (find("me", "alurentell"), find("opp", "ur-cutter"));
             let (d0, d1) = if bot == 0 { (&decks[me], &decks[opp]) } else { (&decks[opp], &decks[me]) };
             let mut g = Game::new(db.clone(), [d0, d1], gseed, GameConfig { first_player: Seat(first), ..GameConfig::default() });
             for (i, (seat, idx)) in hist.iter().enumerate() {
