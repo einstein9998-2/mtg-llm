@@ -3,15 +3,28 @@
 Sources: 40 reviews in reviews/ (w1g1-w1g4, g5-g40, including late-arriving g37, g38, g40). g41-g43 have no review; g42 has player reports only and is not used.
 Line numbers (L) refer to alurentell-playbook.md as of this morning. "Brady line" = lines 71-102 or the Brady-sourced top sections.
 
+## 0. Brady's rulings on this synthesis (2026-10-07 13:06Z)
+
+These override the entries below where they differ.
+- **Rule 1 (Lost Mine arithmetic) was incorrect technique.** Aluren lets you cast Acererak at instant speed, so leave all the room triggers on the stack except the Dark Pool drain. Then there is no draw per lap and no library cost. Only with Omniscience in play do you have to resolve them, but you will eventually draw Aluren. The "four casts, library > life" count applies only to the resolve-everything line. Rule 2 (the macro) was built around the wrong technique: it should resolve only Dark Pool's drain and leave the rest stacked.
+- **Rule 3, floating mana (his question):** he wants to know why the engine cannot float mana; floating mana matters against Wasteland. See section 4: the engine has a mana pool and mana-ability actions, so the g30 claim is unverified.
+- **Rule 12:** fine; sometimes Brainstorm then Ponder to shuffle, but with a fetch it is good to weave it in.
+- **B1 (Veil timing):** play Veil first to play around Daze; otherwise play it later to surprise the opponent and draw a card. Situational, not a rule to hold it.
+- **B2 (one-landers):** if you have the combo you do not need cantrips and can keep a one-lander.
+- **B3 (wait a turn):** no hard rule. If there is no clock, waiting is reasonable, but only if waiting is better for you than for them: you could draw mana, or a second combo card for another push.
+- **Section 2, Mishra's Bauble:** target yourself if you can influence your library (most often a fetchland); you can also hold it for a DRC or Cutter trigger. It is not "crack it early".
+- **Section 3, Wasteland:** do not wait for a spell cast. Use it before they untap, to cut the most mana.
+- Everything else: "looks pretty good" (counts as sign-off; added to the playbook as a separate section).
+
 ## 1. Candidate Alurentell playbook rules
 
 Sorted by number of supporting games, then confidence.
 
-1. **Lost Mine lap = 4 Acererak casts, 1 drain, 1 draw.** Each lap is Cave Entrance, Goblin Lair, Dark Pool (drain 1), Temple of Dumathoin (draw 1), so before starting count opponent life <= library + 1, and do not cast free Brainstorm/Ponder mid-loop.
+1. **[CORRECTED by Brady, see section 0] Lost Mine technique.** With Aluren in play, cast Acererak at instant speed and leave all room triggers on the stack except the Dark Pool drain: no draws, no library cost. Only under Omniscience must the triggers resolve. The original reviewer finding (a lap is four Acererak casts, drains 1 and draws 1, so count life <= library + 1 and skip free cantrips) is true only for the resolve-everything line.
    - Games (13): w1g1, g5, g7, g12, g13, g15, g18, g22, g23, g24, g30, g36, g38. Confidence: high (counted from logs).
    - Evidence: g22 ended at library 0 vs 36 life (143 casts = 35x4+3); g38 library 34 vs 25 life.
    - CORRECTS L10: "Dark Pool (drain 1) is the three-cast cycle that drains once per lap, so about three Acererak casts per point of life".
-2. **Auto macro for the loop: rule order and budget.** Put `stack:Pass priority` before `Cast Acererak`, set one budget of about 20 picks per point of opponent life (about 400 for 20), and stop when library <= opponent life.
+2. **[SUPERSEDED, see section 0] Auto macro for the loop.** The old advice (put `stack:Pass priority` first so room triggers resolve, about 20 picks per point of life) built the wrong technique; the macro should instead cast Acererak, choose Lost Mine rooms, leave triggers stacked and resolve only the Dark Pool drain. Brief and macro need rework before the next run.
    - Games (11): g15, g17, g18, g22, g23, g24, g25, g26, g28, g35, g36. Confidence: high.
    - Evidence: cast-first stacked 15-35 room triggers (g17, g23, g25, g26, g28), and in g24 a second Acererak died to the legend rule. Small budgets caused 3-6 relaunches in nearly every macro game.
    - EXTENDS process lines L56/L69 ("One pick per command, always"); the playbook has no macro line yet.
@@ -81,15 +94,15 @@ Sorted by number of supporting games, then confidence.
 
 ### Needs Brady's ruling (contradict or limit Brady's own lines)
 
-- **B1. Hold Veil for their first counter.** On the combo turn, hold Veil for their first Daze/Force instead of casting it first: in response it makes every spell that turn uncounterable (each free Acererak included) and draws a card. With exactly Show and Tell + 1 mana, cast Show and Tell first and hold the 1.
+- **B1. Veil timing. [RULED by Brady: situational]** Play Veil first to play around Daze; otherwise later, to surprise the opponent and draw a card. Original reviewer proposal (hold it for their first counter) was a partial reading of this.
   - Games (4): w1g1, w1g2, g29, g31. Confidence: medium.
   - Evidence: in g29 Veil in response beat Daze twice; in g31 Veil in response to Daze was answered with no Force.
   - CONTRADICTS Brady L97 ("Jam line with Veil: land (Ancient Tomb), Veil of Summer, then Show and Tell"). Self-flagged g29a 112.
-- **B2. One-land and no-cantrip keeps.**
+- **B2. One-land and no-cantrip keeps. [RULED by Brady]** If you have the combo you do not need cantrips and can keep a one-lander. Exception wins (g23, g37, g12, g9, w1g1) fit this; rule-confirming losses g19 and g34 had no combo in hand.
   - Exception wins: g23, g37 (one land + Petal + 2 cantrips + both combo halves); g12 (one land + Ponder); g9, w1g1 (no cantrip). The g33 reviewer leaned keep on a one-land Ponder seven; the g28 reviewer called a no-cantrip seven a keep against Boros when it already has turn-2 Aluren mana plus Acererak. Rule-confirming losses: g19, g34.
   - Games (8): g9, g12, g23, g28, g33, g37 vs g19, g34. Confidence: low.
   - CONTRADICTS Brady L102 ("One land with Ponder is a mulligan unless ... Storm or Reanimator") and L88.
-- **B3. Wait a turn rather than jam with Veil as the only spare.** With Veil as the only spare against an opponent at 5+ cards and no clock, cantrip and wait a turn for one more mana.
+- **B3. Wait a turn rather than jam. [RULED by Brady: contextual, no hard rule]** If there is no clock, waiting is reasonable only if waiting is better for you than for the opponent: you could draw mana, or another combo card for a second push.
   - Games: w1g1 (B held Daze + FoW + FoW); g37 waited without a spare and lost two turns. w1g2's reviewer argues the other way: the wait broke Brady's rule and cost two turns. Confidence: low (conflicting reviews).
   - LIMITS Brady L96 ("when you hold protection ... jam it now").
 
@@ -102,13 +115,13 @@ Sorted by number of supporting games, then confidence.
 - **Do not tap out on your own turn for Murktide/Cutter once they can reach 4 mana.** Hold U(+R) for Prismari Charm, which bounces Aluren in response to the free Acererak, or Unholy Heat (g5, g13). Brainstorm at their end step or in response, not main phase (g15).
 - **Acererak answer.** Bolt + Unholy Heat (delirium) on Acererak with his ETB on the stack ends the loop (w1g1). g23's note "Bolt does nothing to the loop, Acererak returns by himself" holds only for Bolt alone (3 < 5 toughness); it conflicts with w1g1, g32 and g36, where removal in response stopped the return.
 - **Daze timing.** Use Daze on a tapped-out Stock Up or Show and Tell (w1g1, g23, g39) or on their Force when they are tapped out (g8). It is nearly dead into open green mana, because Veil answers it (g29).
-- **Mishra's Bauble.** Crack it early: free card plus the artifact type for DRC delirium (g13, g23, g33).
+- **Mishra's Bauble.** [CORRECTED by Brady] Target yourself if you can influence your library (most often a fetchland), or hold it for a DRC or Cutter trigger. Original reviewer line (crack early for the free card and delirium) was too simple (g13, g23, g33).
 - **Keep and sequencing.** Keep a one-lander on the draw with Brainstorm plus a free counter, counting Brainstorm's 3 cards in the land odds (g15); cast Cutter before the second spell of the turn (g39).
 - **Against Atraxa.** Chump early when it turns on delirium; Heat at the end step on the turn she took block damage; use Charm's bounce mode, not surveil; burn face to 2 or less to turn off their Tombs and Force (w1g2, w1g3, g31).
 
 ## 3. Boros Aggro notes (opponent side)
 
-- **Wasteland timing and targets.** With no 1-drop, play Wasteland as the turn-1 land and fire it in response to their first spell; hit Ancient Tomb or their only blue/green dual, not an uncracked fetch; never surveil Wasteland away while they are short of lands (g9 never activated it and lost; g14, g20, g24, g30, g34, g38, g40).
+- **Wasteland timing and targets.** [CORRECTED by Brady] Do not wait for a spell cast: use it before they untap, to cut off the most mana. Hit Ancient Tomb or their only blue/green dual, not an uncracked fetch; never surveil Wasteland away while they are short of lands (g9 never activated it and lost; g14, g20, g24, g30, g34, g38, g40).
 - **Swords on Acererak.** Keep W open (or Quarry plus a creature) for Swords on Acererak with his ETB trigger on the stack, and fire on the first cast, because each lap draws them a card (g9, g22, g28, g32, g36). A second copy beats it (g32, g36).
 - **Under their Aluren, cast your MV<=3 creatures free at instant speed.** Free Phlage kills at 3 life or less (g10, missed 33 times); cast Amped Raptor last so its discover resolves above Swords (g28, g36).
 - **Goblin Bombardment.** Hold it for their combo turn: let them pay Tomb and fetch life, then sacrifice everything in response (g16); ping Atraxa after combat (g12); kill the first Acererak on its ETB (g32).
@@ -131,7 +144,7 @@ Sorted by number of supporting games, then confidence.
   - Ponder/Stock Up/Brainstorm/Atraxa lists collapse duplicate names (w1g4, g11, g12, g19, g21, g22, g25, g40); "#0" ids (g18, g24, g39, g40).
 - **Lazotep Quarry menu noise** (menu): 15-35 "Tap Quarry for X, sacrificing Y" entries in every B menu (g11, g14, g20, g22, g24, g34, g40). g20 also notes no plain colourless tap is offered; unverified against card text (possible engine issue).
 - **The loser sees no final events after GAME OVER** (harness limitation): g11, g14, g15, g17, g18, g22, g27, g33. Players misreport how they died.
-- **Mana abilities are never offered** (harness limitation), so mana cannot be floated (for example City of Traitors before a land drop) (g30).
+- **Mana abilities and floating mana** (Brady asked why the engine cannot float mana). The engine does have a mana pool (state.rs, mana.rs; the view prints "mana pool") and mana-ability actions ("Tap X for C", kind ActivateMana; they show up as the Lazotep Quarry menu noise), and the design doc says they are offered "only when it matters". The g30 claim that mana cannot be floated (City of Traitors before a land drop) is a player observation and not verified; I did not reproduce it. Needs a check of which sources offer a standalone mana ability before it is called a limitation.
 - **Sim returns 0.0% at a mulligan prompt** (harness tool issue, unverified): g25 B, g34 A; g38 A got "unhelpful, 0 results". g34 notes 0% may be the true answer if `turn` stops before A's first land drop; g12 A claimed lands_playable ignored the land in hand. Make the sim warn at Mulligan prompts and print the simulated turns.
 - **Daze "Pay to avoid?" prompt still asked after Veil made the spell uncounterable** (menu; legal but misleading): g29 paid and wasted Boseiju's mana; g31 prompt 118 shows the same.
 - **Tomb-only casts are offered at lethal life** (menu/engine; legal by the rules): g8 at 2 life, g19 at 3. This contradicts playbook L23.

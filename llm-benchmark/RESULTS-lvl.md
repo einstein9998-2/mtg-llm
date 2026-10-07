@@ -28,7 +28,9 @@ Per-game results are in `lvl/games.json`, tokens in `lvl/tokens.tsv`. For contex
 - **Losses**: Wasteland on Ancient Tomb, Tropical Island or Hedge Maze (g19, g20, g27, g33, g34, g40); one-land or Tomb-dependent keeps; Murktide and DRC clocks (UR); the Ocelot Pride, Ajani and second-Ajani legend-rule flip curve (Boros); and cost misreads by the player (g15, g17, g37). g11 is the only loss with the full combo in hand.
 - Removal on Acererak's enter trigger is the only thing that broke the loop; each time a second Acererak or a Force beat it.
 
-## Candidate playbook rules (need Brady's sign-off)
+## Candidate playbook rules
+**Update 2026-10-07 13:06Z: Brady reviewed the synthesis. His corrections are in `lvl/SYNTHESIS.md` section 0 and the signed-off rules are now in the playbook.** Main corrections: with Aluren in play, leave the Lost Mine room triggers on the stack except Dark Pool's drain (no draws, no library cost; the four-cast arithmetic below applies only under Omniscience, and the macro must be reworked); Veil timing, one-land keeps and waiting a turn are situational, not rules; Bauble should target yourself with a fetchland; Wasteland before they untap. The list below is the original, uncorrected draft.
+
 Full list with games, confidence and evidence: `lvl/SYNTHESIS.md`. Highest value:
 1. **Lost Mine lap is four Acererak casts, drains 1 and draws 1.** Count opponent life against library + 1 before starting and do not cast free cantrips mid-loop. This corrects the playbook line that says three casts per point (13 games, high confidence).
 2. Macro order and budget for the loop (11 games, high).
