@@ -1,0 +1,1950 @@
+[
+ {
+  "id": "s6-ba-g9-d1",
+  "n": 1,
+  "category": "keep",
+  "turn": 0,
+  "view": {
+   "my_bf": [],
+   "opp_bf": [],
+   "stack": [],
+   "events": [
+    "opponent library shuffled",
+    "you library shuffled",
+    "opponent drew a card (x7)",
+    "you drew Plateau",
+    "you drew Windswept Heath",
+    "you drew Plains",
+    "you drew Amped Raptor",
+    "you drew Elegant Parlor",
+    "you drew Sand Scout",
+    "you drew Ocelot Pride",
+    "opponent took a mulligan",
+    "a hidden card of opponent moved Hand -> Library (x7)",
+    "opponent library shuffled",
+    "opponent drew a card (x7)",
+    "a hidden card of opponent moved Hand -> Library",
+    "opponent kept (bottomed 1)"
+   ],
+   "turn": "0",
+   "step": "Untap",
+   "whose": "opponent's",
+   "my_life": 20,
+   "my_lib": 53,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 6,
+   "opp_lib": 54,
+   "hand": [
+    "Plains",
+    "Plateau",
+    "Elegant Parlor",
+    "Windswept Heath",
+    "Ocelot Pride",
+    "Sand Scout",
+    "Amped Raptor"
+   ],
+   "my_gy": [],
+   "opp_gy": []
+  },
+  "game_log": [
+   "you drew Plateau",
+   "you drew Windswept Heath",
+   "you drew Plains",
+   "you drew Amped Raptor",
+   "you drew Elegant Parlor",
+   "you drew Sand Scout",
+   "you drew Ocelot Pride",
+   "opponent took a mulligan",
+   "opponent kept (bottomed 1)"
+  ],
+  "decision_kind": "Mulligan",
+  "context": "Keep this hand or take a mulligan?",
+  "question": "Keep this hand or mulligan?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Keep hand",
+    "kind": "Keep",
+    "quick": 20,
+    "deep": 51,
+    "net": 38,
+    "win": 57
+   },
+   {
+    "idx": 1,
+    "label": "Mulligan",
+    "kind": "Mulligan",
+    "quick": 80,
+    "deep": 49,
+    "net": 62,
+    "win": 55
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 0,
+  "net_top": 1,
+  "win_est": 56,
+  "reasons": [
+   "close",
+   "mulligan-check"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": false,
+  "matchup": "Boros Aggro vs BW Death and Taxes",
+  "me_deck": "Boros Aggro",
+  "batch": 3,
+  "order": 27
+ },
+ {
+  "id": "s6-ba-g11-d35",
+  "n": 2,
+  "category": "cast-or-wait",
+  "turn": 5,
+  "view": {
+   "my_bf": [
+    "Plains",
+    "Guide of Souls 1/2 [creature]"
+   ],
+   "opp_bf": [
+    "Swamp"
+   ],
+   "stack": [],
+   "events": [
+    "you drew Sand Scout"
+   ],
+   "turn": "5",
+   "step": "Draw",
+   "whose": "your",
+   "my_life": 20,
+   "my_lib": 56,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 19,
+   "opp_hand": 3,
+   "opp_lib": 56,
+   "hand": [
+    "Erode",
+    "Sand Scout"
+   ],
+   "my_gy": [],
+   "opp_gy": []
+  },
+  "game_log": [
+   "Erode (you's) moved Hand -> Library",
+   "Amped Raptor (you's) moved Hand -> Library",
+   "Ajani, Nacatl Pariah (you's) moved Hand -> Library",
+   "Elegant Parlor (you's) moved Hand -> Library",
+   "Plains (you's) moved Hand -> Library",
+   "you drew Plateau",
+   "you drew Ajani, Nacatl Pariah",
+   "you drew Goblin Bombardment",
+   "you drew Guide of Souls",
+   "you drew Karakas",
+   "you drew Marsh Flats",
+   "you drew Plains",
+   "you took a mulligan",
+   "Plateau (you's) moved Hand -> Library",
+   "Ajani, Nacatl Pariah (you's) moved Hand -> Library",
+   "Goblin Bombardment (you's) moved Hand -> Library",
+   "Guide of Souls (you's) moved Hand -> Library",
+   "Karakas (you's) moved Hand -> Library",
+   "Marsh Flats (you's) moved Hand -> Library",
+   "Plains (you's) moved Hand -> Library",
+   "you drew Goblin Bombardment",
+   "you drew Wasteland",
+   "you drew Swords to Plowshares",
+   "you drew Amped Raptor",
+   "you drew Ajani, Nacatl Pariah",
+   "you drew Arid Mesa",
+   "you drew Guide of Souls",
+   "you took a mulligan",
+   "Goblin Bombardment (you's) moved Hand -> Library",
+   "Wasteland (you's) moved Hand -> Library",
+   "Swords to Plowshares (you's) moved Hand -> Library",
+   "Amped Raptor (you's) moved Hand -> Library",
+   "Ajani, Nacatl Pariah (you's) moved Hand -> Library",
+   "Arid Mesa (you's) moved Hand -> Library",
+   "Guide of Souls (you's) moved Hand -> Library",
+   "you drew Arid Mesa",
+   "you drew Spider-Woman, Stunning Savior",
+   "you drew Guide of Souls",
+   "you drew Plains",
+   "you drew Guide of Souls",
+   "you drew Ocelot Pride",
+   "Ocelot Pride (you's) moved Hand -> Library",
+   "Guide of Souls (you's) moved Hand -> Library",
+   "Arid Mesa (you's) moved Hand -> Library",
+   "Spider-Woman, Stunning Savior (you's) moved Hand -> Library",
+   "you kept (bottomed 5)",
+   "opponent took a mulligan",
+   "opponent kept (bottomed 5)",
+   "-- turn 1 (your turn) --",
+   "you played Plains",
+   "you cast Guide of Souls",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Swamp",
+   "-- turn 3 (your turn) --",
+   "you drew Erode",
+   "opponent life -1",
+   "1 combat damage to opponent",
+   "-- turn 4 (opponent's turn) --",
+   "-- turn 5 (your turn) --",
+   "you drew Sand Scout"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 67,
+    "deep": 50,
+    "net": 62,
+    "win": 64
+   },
+   {
+    "idx": 1,
+    "label": "Cast Erode",
+    "kind": "CastSpell",
+    "quick": 33,
+    "deep": 50,
+    "net": 38,
+    "win": 67
+   }
+  ],
+  "bot_choice": 0,
+  "deep_best": 0,
+  "net_top": 0,
+  "win_est": 65,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": 1,
+  "on_play": true,
+  "matchup": "Boros Aggro vs BW Death and Taxes",
+  "me_deck": "Boros Aggro",
+  "batch": 3,
+  "order": 28
+ },
+ {
+  "id": "s6-bdat-g10-d9",
+  "n": 3,
+  "category": "cast-which",
+  "turn": 2,
+  "view": {
+   "my_bf": [
+    "Scrubland"
+   ],
+   "opp_bf": [
+    "Elegant Parlor (tapped)"
+   ],
+   "stack": [],
+   "events": [
+    "Scrubland (you's) moved Library -> Battlefield",
+    "you library shuffled"
+   ],
+   "turn": "2",
+   "step": "Main 2",
+   "whose": "your",
+   "my_life": 19,
+   "my_lib": 51,
+   "lands_played": 1,
+   "pool": [],
+   "opp_life": 19,
+   "opp_hand": 3,
+   "opp_lib": 54,
+   "hand": [
+    "Marsh Flats",
+    "Thoughtseize",
+    "Solitude",
+    "Aether Vial",
+    "Orcish Bowmasters",
+    "Overlord of the Balemurk",
+    "Boggart Trawler"
+   ],
+   "my_gy": [
+    "Marsh Flats"
+   ],
+   "opp_gy": [
+    "Flooded Strand",
+    "Goblin Bombardment"
+   ]
+  },
+  "game_log": [
+   "you drew Boggart Trawler",
+   "you drew Marsh Flats",
+   "you drew Aether Vial",
+   "you drew Overlord of the Balemurk",
+   "you drew Marsh Flats",
+   "you drew Orcish Bowmasters",
+   "you drew Thoughtseize",
+   "opponent took a mulligan",
+   "opponent kept (bottomed 3)",
+   "you kept (bottomed 0)",
+   "-- turn 1 (opponent's turn) --",
+   "opponent played Flooded Strand",
+   "opponent life -1",
+   "opponent activated an ability",
+   "-- turn 2 (your turn) --",
+   "you drew Solitude",
+   "you played Marsh Flats",
+   "you life -1",
+   "you activated an ability"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 6,
+    "deep": 7,
+    "net": 32,
+    "win": 37
+   },
+   {
+    "idx": 1,
+    "label": "Cast Thoughtseize",
+    "kind": "CastSpell",
+    "quick": 64,
+    "deep": 54,
+    "net": 35,
+    "win": 52
+   },
+   {
+    "idx": 2,
+    "label": "Cast Aether Vial",
+    "kind": "CastSpell",
+    "quick": 30,
+    "deep": 38,
+    "net": 33,
+    "win": 48
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 1,
+  "net_top": 1,
+  "win_est": 49,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": 1,
+  "on_play": false,
+  "matchup": "BW Death and Taxes vs Boros Aggro",
+  "me_deck": "BW Death and Taxes",
+  "batch": 3,
+  "order": 29
+ },
+ {
+  "id": "s6-bdat-g0-d9",
+  "n": 4,
+  "category": "land-or-fetch",
+  "turn": 3,
+  "view": {
+   "my_bf": [
+    "Swamp",
+    "Aether Vial [artifact]"
+   ],
+   "opp_bf": [
+    "Elegant Parlor (tapped)"
+   ],
+   "stack": [
+    "Aether Vial (ability) controlled by you"
+   ],
+   "events": [
+    "you activated an ability",
+    "-- turn 2 (opponent's turn) --",
+    "opponent drew a card",
+    "Elegant Parlor (opponent's) moved Hand -> Battlefield",
+    "opponent played Elegant Parlor",
+    "Karakas (opponent's) moved Library -> Graveyard",
+    "0 attacker(s) declared",
+    "-- turn 3 (your turn) --"
+   ],
+   "turn": "3",
+   "step": "Upkeep",
+   "whose": "your",
+   "my_life": 20,
+   "my_lib": 54,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 5,
+   "opp_lib": 53,
+   "hand": [
+    "Scrubland",
+    "Marsh Flats",
+    "Flickerwisp",
+    "Overlord of the Balemurk"
+   ],
+   "my_gy": [],
+   "opp_gy": [
+    "Karakas"
+   ]
+  },
+  "game_log": [
+   "you drew Recruiter of the Guard",
+   "you drew Swamp",
+   "you drew Overlord of the Balemurk",
+   "you drew Witch Enchanter",
+   "you drew Phelia, Exuberant Shepherd",
+   "you drew Thoughtseize",
+   "you took a mulligan",
+   "Recruiter of the Guard (you's) moved Hand -> Library",
+   "Swamp (you's) moved Hand -> Library",
+   "Overlord of the Balemurk (you's) moved Hand -> Library",
+   "Witch Enchanter (you's) moved Hand -> Library",
+   "Phelia, Exuberant Shepherd (you's) moved Hand -> Library",
+   "Thoughtseize (you's) moved Hand -> Library",
+   "you drew Aether Vial",
+   "you drew Scrubland",
+   "you drew Overlord of the Balemurk",
+   "you drew Marsh Flats",
+   "you drew Flickerwisp",
+   "you drew Recruiter of the Guard",
+   "you drew Swamp",
+   "Recruiter of the Guard (you's) moved Hand -> Library",
+   "you kept (bottomed 1)",
+   "opponent took a mulligan",
+   "opponent kept (bottomed 2)",
+   "-- turn 1 (your turn) --",
+   "you played Swamp",
+   "you cast Aether Vial",
+   "you activated an ability",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Elegant Parlor",
+   "-- turn 3 (your turn) --"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 48,
+    "deep": 47,
+    "net": 55,
+    "win": 31
+   },
+   {
+    "idx": 1,
+    "label": "Activate Aether Vial",
+    "kind": "ActivateAbility",
+    "quick": 52,
+    "deep": 53,
+    "net": 45,
+    "win": 32
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 1,
+  "net_top": 0,
+  "win_est": 31,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true,
+  "matchup": "BW Death and Taxes vs Boros Aggro",
+  "me_deck": "BW Death and Taxes",
+  "batch": 3,
+  "order": 30
+ },
+ {
+  "id": "s6-dt-g3-d51",
+  "n": 5,
+  "category": "cards:PutBack",
+  "turn": 11,
+  "view": {
+   "my_bf": [
+    "Underground Sea (tapped)",
+    "Nethergoyf 4/5 [creature]",
+    "Undercity Sewers (tapped)",
+    "Orc Army Token 1/1 [creature] PlusOnex1",
+    "Moonshadow 2/2 [creature] MinusOnex5 <menace>"
+   ],
+   "opp_bf": [
+    "Volcanic Island (tapped)",
+    "Snow-Covered Plains (tapped)",
+    "Tundra (tapped)",
+    "Murktide Regent 6/6 [creature] (tapped) PlusOnex3 <flying>",
+    "Wasteland",
+    "Meticulous Archive (tapped)"
+   ],
+   "stack": [
+    "Brainstorm controlled by you"
+   ],
+   "events": [
+    "Force of Will (you's) moved Hand -> Library"
+   ],
+   "turn": "11",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 7,
+   "my_lib": 42,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 10,
+   "opp_hand": 3,
+   "opp_lib": 42,
+   "hand": [
+    "Underground Sea",
+    "Wasteland",
+    "Thoughtseize",
+    "Mishra's Bauble",
+    "Fatal Push"
+   ],
+   "lib_bottom": [
+    "Force of Will"
+   ],
+   "my_gy": [
+    "Thoughtseize",
+    "Mishra's Bauble",
+    "Orcish Bowmasters",
+    "Force of Will",
+    "Flow State",
+    "Brainstorm"
+   ],
+   "opp_gy": [
+    "2x Quantum Riddler",
+    "Tamiyo, Inquisitive Student",
+    "Ponder"
+   ],
+   "my_exile": [
+    "Moonshadow",
+    "Kaito, Bane of Nightmares"
+   ],
+   "opp_exile": [
+    "Polluted Delta",
+    "Brainstorm",
+    "Ponder",
+    "Prismatic Ending",
+    "Quantum Riddler"
+   ]
+  },
+  "game_log": [
+   "opponent cast Prismatic Ending",
+   "-- turn 5 (your turn) --",
+   "you drew Mishra's Bauble",
+   "you cast Orcish Bowmasters",
+   "opponent life -1",
+   "1 damage to opponent",
+   "you created token Orc Army Token",
+   "opponent life -1",
+   "1 combat damage to opponent",
+   "you cast Mishra's Bauble",
+   "-- turn 6 (opponent's turn) --",
+   "opponent played Tundra",
+   "opponent cast Murktide Regent",
+   "you activated an ability",
+   "-- turn 7 (your turn) --",
+   "you drew Flow State",
+   "you drew Force of Will",
+   "you cast Moonshadow",
+   "opponent life -1",
+   "1 combat damage to opponent",
+   "opponent life -2",
+   "2 combat damage to opponent",
+   "1 combat damage to Murktide Regent",
+   "6 combat damage to (gone)",
+   "-- turn 8 (opponent's turn) --",
+   "you life -6",
+   "6 combat damage to you",
+   "opponent cast Quantum Riddler",
+   "you life -1",
+   "you cast Force of Will",
+   "spell countered",
+   "opponent played Wasteland",
+   "opponent cast Tamiyo, Inquisitive Student",
+   "-- turn 9 (your turn) --",
+   "you drew Fatal Push",
+   "opponent life -1",
+   "1 combat damage to opponent",
+   "4 combat damage to (gone)",
+   "opponent life -2",
+   "2 combat damage to opponent",
+   "you cast Flow State",
+   "-- turn 10 (opponent's turn) --",
+   "opponent cast Ponder",
+   "opponent cast Quantum Riddler",
+   "you life -6",
+   "6 combat damage to you",
+   "opponent played Meticulous Archive",
+   "-- turn 11 (your turn) --",
+   "you drew Mishra's Bauble",
+   "you cast Brainstorm",
+   "you drew Brainstorm",
+   "you drew Underground Sea",
+   "you drew Force of Will",
+   "Mishra's Bauble (you's) moved Hand -> Library",
+   "Force of Will (you's) moved Hand -> Library",
+   "you cast Brainstorm",
+   "you drew Mishra's Bauble",
+   "you drew Force of Will",
+   "you drew Wasteland",
+   "Force of Will (you's) moved Hand -> Library"
+  ],
+  "decision_kind": "ChooseCards { purpose: PutBack, remaining: 1 }",
+  "context": "Choose a card (1 left): PutBack.",
+  "question": "Brainstorm: put a card back on top of your library (1 left to choose).",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Choose Underground Sea",
+    "kind": "ChooseCard",
+    "quick": 12,
+    "deep": 5,
+    "net": 20,
+    "win": 45
+   },
+   {
+    "idx": 1,
+    "label": "Choose Wasteland",
+    "kind": "ChooseCard",
+    "quick": 23,
+    "deep": 5,
+    "net": 22,
+    "win": 45
+   },
+   {
+    "idx": 2,
+    "label": "Choose Thoughtseize",
+    "kind": "ChooseCard",
+    "quick": 11,
+    "deep": 5,
+    "net": 18,
+    "win": 48
+   },
+   {
+    "idx": 3,
+    "label": "Choose Mishra's Bauble",
+    "kind": "ChooseCard",
+    "quick": 23,
+    "deep": 39,
+    "net": 24,
+    "win": 56
+   },
+   {
+    "idx": 4,
+    "label": "Choose Fatal Push",
+    "kind": "ChooseCard",
+    "quick": 30,
+    "deep": 45,
+    "net": 17,
+    "win": 60
+   }
+  ],
+  "bot_choice": 4,
+  "deep_best": 4,
+  "net_top": 3,
+  "win_est": 56,
+  "reasons": [
+   "close",
+   "net-vs-search"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true,
+  "matchup": "Dimir Tempo vs UWx Control",
+  "me_deck": "Dimir Tempo",
+  "batch": 3,
+  "order": 31
+ },
+ {
+  "id": "s6-dt-g10-d21",
+  "n": 6,
+  "category": "cards:LookTake",
+  "turn": 6,
+  "view": {
+   "my_bf": [
+    "Island (tapped)",
+    "Swamp (tapped)"
+   ],
+   "opp_bf": [
+    "2x Tundra (tapped)",
+    "Phelia, Exuberant Shepherd 2/2 [creature] (summoning sick) <flash>",
+    "Meticulous Archive (tapped)"
+   ],
+   "stack": [
+    "Flow State controlled by you"
+   ],
+   "events": [
+    "Flow State (you's) moved Hand -> Stack",
+    "you cast Flow State"
+   ],
+   "turn": "6",
+   "step": "Main 2",
+   "whose": "your",
+   "my_life": 19,
+   "my_lib": 48,
+   "lands_played": 1,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 5,
+   "opp_lib": 49,
+   "hand": [
+    "Force of Will",
+    "Thoughtseize",
+    "Fatal Push",
+    "Nethergoyf",
+    "Orcish Bowmasters",
+    "Moonshadow"
+   ],
+   "my_gy": [
+    "Mishra's Bauble",
+    "Bilbo, Thief in the Night",
+    "Polluted Delta"
+   ],
+   "opp_gy": [
+    "Ponder",
+    "Phelia, Exuberant Shepherd"
+   ]
+  },
+  "game_log": [
+   "you drew Bilbo, Thief in the Night",
+   "you drew Island",
+   "you drew Mishra's Bauble",
+   "you drew Nethergoyf",
+   "you drew Polluted Delta",
+   "you drew Moonshadow",
+   "you drew Thoughtseize",
+   "opponent kept (bottomed 0)",
+   "you kept (bottomed 0)",
+   "-- turn 1 (opponent's turn) --",
+   "opponent played Tundra",
+   "opponent cast Ponder",
+   "-- turn 2 (your turn) --",
+   "you drew Fatal Push",
+   "you played Island",
+   "you cast Mishra's Bauble",
+   "you activated an ability",
+   "-- turn 3 (opponent's turn) --",
+   "you drew Orcish Bowmasters",
+   "opponent played Tundra",
+   "-- turn 4 (your turn) --",
+   "you drew Flow State",
+   "-- turn 5 (opponent's turn) --",
+   "opponent cast Phelia, Exuberant Shepherd",
+   "opponent played Meticulous Archive",
+   "-- turn 6 (your turn) --",
+   "you drew Force of Will",
+   "you played Polluted Delta",
+   "you life -1",
+   "you activated an ability",
+   "you cast Flow State"
+  ],
+  "decision_kind": "ChooseCards { purpose: LookTake, remaining: 1 }",
+  "context": "Choose a card (1 left): LookTake.",
+  "question": "Look at the cards: pick one to take (1 left to take).",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Choose Wasteland",
+    "kind": "ChooseCard",
+    "quick": 30,
+    "deep": 25,
+    "net": 29,
+    "win": 52
+   },
+   {
+    "idx": 1,
+    "label": "Choose Brainstorm",
+    "kind": "ChooseCard",
+    "quick": 27,
+    "deep": 41,
+    "net": 32,
+    "win": 53
+   },
+   {
+    "idx": 2,
+    "label": "Choose Nethergoyf",
+    "kind": "ChooseCard",
+    "quick": 44,
+    "deep": 34,
+    "net": 39,
+    "win": 52
+   }
+  ],
+  "bot_choice": 2,
+  "deep_best": 1,
+  "net_top": 2,
+  "win_est": 53,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": false,
+  "matchup": "Dimir Tempo vs UWx Control",
+  "me_deck": "Dimir Tempo",
+  "batch": 3,
+  "order": 32
+ },
+ {
+  "id": "s6-d-g9-d4",
+  "n": 7,
+  "category": "cards:DiscardToHandSize",
+  "turn": 2,
+  "view": {
+   "my_bf": [],
+   "opp_bf": [],
+   "stack": [],
+   "events": [],
+   "turn": "2",
+   "step": "Cleanup",
+   "whose": "your",
+   "my_life": 20,
+   "my_lib": 52,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 7,
+   "opp_lib": 53,
+   "hand": [
+    "2x Underground Sea",
+    "Polluted Delta",
+    "Brainstorm",
+    "Daze",
+    "Force of Will",
+    "Thoughtseize",
+    "Edge of Autumn"
+   ],
+   "my_gy": [],
+   "opp_gy": []
+  },
+  "game_log": [
+   "you drew Underground Sea",
+   "you drew Brainstorm",
+   "you drew Underground Sea",
+   "you drew Daze",
+   "you drew Polluted Delta",
+   "you drew Force of Will",
+   "you drew Edge of Autumn",
+   "opponent kept (bottomed 0)",
+   "you kept (bottomed 0)",
+   "-- turn 1 (opponent's turn) --",
+   "-- turn 2 (your turn) --",
+   "you drew Thoughtseize"
+  ],
+  "decision_kind": "ChooseCards { purpose: DiscardToHandSize, remaining: 1 }",
+  "context": "Choose a card (1 left): DiscardToHandSize.",
+  "question": "Cleanup: discard down to hand size. Which card goes?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Choose Underground Sea",
+    "kind": "ChooseCard",
+    "quick": 2,
+    "deep": 1,
+    "net": 5,
+    "win": 13
+   },
+   {
+    "idx": 1,
+    "label": "Choose Polluted Delta",
+    "kind": "ChooseCard",
+    "quick": 2,
+    "deep": 14,
+    "net": 10,
+    "win": 26
+   },
+   {
+    "idx": 2,
+    "label": "Choose Brainstorm",
+    "kind": "ChooseCard",
+    "quick": 5,
+    "deep": 24,
+    "net": 14,
+    "win": 27
+   },
+   {
+    "idx": 3,
+    "label": "Choose Daze",
+    "kind": "ChooseCard",
+    "quick": 34,
+    "deep": 18,
+    "net": 22,
+    "win": 24
+   },
+   {
+    "idx": 4,
+    "label": "Choose Force of Will",
+    "kind": "ChooseCard",
+    "quick": 34,
+    "deep": 19,
+    "net": 24,
+    "win": 24
+   },
+   {
+    "idx": 5,
+    "label": "Choose Thoughtseize",
+    "kind": "ChooseCard",
+    "quick": 20,
+    "deep": 23,
+    "net": 21,
+    "win": 25
+   },
+   {
+    "idx": 6,
+    "label": "Choose Edge of Autumn",
+    "kind": "ChooseCard",
+    "quick": 3,
+    "deep": 1,
+    "net": 4,
+    "win": 14
+   }
+  ],
+  "bot_choice": 3,
+  "deep_best": 2,
+  "net_top": 4,
+  "win_est": 25,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": false,
+  "matchup": "Doomsday vs Reanimator",
+  "me_deck": "Doomsday",
+  "batch": 3,
+  "order": 33
+ },
+ {
+  "id": "s6-d-g2-d83",
+  "n": 8,
+  "category": "cast-which",
+  "turn": 8,
+  "view": {
+   "my_bf": [
+    "Underground Sea"
+   ],
+   "opp_bf": [
+    "Lotus Petal [artifact]",
+    "Underground Sea (tapped)"
+   ],
+   "stack": [],
+   "events": [],
+   "turn": "8",
+   "step": "Main 2",
+   "whose": "your",
+   "my_life": 9,
+   "my_lib": 4,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 4,
+   "opp_lib": 51,
+   "hand": [
+    "Underground Sea",
+    "Misty Rainforest",
+    "Lion's Eye Diamond",
+    "Edge of Autumn",
+    "Personal Tutor"
+   ],
+   "lib_top": [
+    "Underground Sea",
+    "Thassa's Oracle",
+    "Undercity Sewers",
+    "Underground Sea"
+   ],
+   "my_gy": [
+    "Doomsday"
+   ],
+   "opp_gy": [
+    "2x Shallow Grave",
+    "Dark Ritual"
+   ],
+   "my_exile": [
+    "Flooded Strand",
+    "4x Polluted Delta",
+    "Scalding Tarn",
+    "Verdant Catacombs",
+    "3x Lotus Petal",
+    "4x Brainstorm",
+    "4x Ponder",
+    "Consider",
+    "2x Flow State",
+    "4x Dark Ritual",
+    "3x Daze",
+    "4x Force of Will",
+    "3x Thoughtseize",
+    "4x Street Wraith",
+    "Edge of Autumn",
+    "2x Personal Tutor",
+    "3x Doomsday",
+    "Cavern of Souls",
+    "Jace, Wielder of Mysteries",
+    "Snow-Covered Island",
+    "Snow-Covered Swamp"
+   ],
+   "opp_exile": []
+  },
+  "game_log": [
+   "you drew Edge of Autumn",
+   "you drew Misty Rainforest",
+   "you drew Doomsday",
+   "you drew Street Wraith",
+   "you drew Dark Ritual",
+   "you drew Lion's Eye Diamond",
+   "you drew Thoughtseize",
+   "opponent took a mulligan",
+   "opponent kept (bottomed 1)",
+   "you kept (bottomed 0)",
+   "-- turn 1 (opponent's turn) --",
+   "-- turn 2 (your turn) --",
+   "you drew Underground Sea",
+   "-- turn 3 (opponent's turn) --",
+   "-- turn 4 (your turn) --",
+   "you drew Daze",
+   "-- turn 5 (opponent's turn) --",
+   "-- turn 6 (your turn) --",
+   "you life -2",
+   "you activated an ability",
+   "you drew Personal Tutor",
+   "you drew Lotus Petal",
+   "you cast Lotus Petal",
+   "you cast Dark Ritual",
+   "you played Underground Sea",
+   "you cast Doomsday",
+   "you life -9",
+   "-- turn 7 (opponent's turn) --",
+   "opponent cast Lotus Petal",
+   "opponent played Underground Sea",
+   "-- turn 8 (your turn) --",
+   "you drew Underground Sea",
+   "opponent cast Dark Ritual",
+   "opponent cast Shallow Grave"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 23,
+    "deep": 9,
+    "net": 42,
+    "win": 55
+   },
+   {
+    "idx": 1,
+    "label": "Play Underground Sea",
+    "kind": "PlayLand",
+    "quick": 27,
+    "deep": 29,
+    "net": 12,
+    "win": 71
+   },
+   {
+    "idx": 2,
+    "label": "Play Misty Rainforest",
+    "kind": "PlayLand",
+    "quick": 16,
+    "deep": 25,
+    "net": 11,
+    "win": 67
+   },
+   {
+    "idx": 3,
+    "label": "Cast Lion's Eye Diamond",
+    "kind": "CastSpell",
+    "quick": 8,
+    "deep": 5,
+    "net": 12,
+    "win": 61
+   },
+   {
+    "idx": 4,
+    "label": "Cast Personal Tutor",
+    "kind": "CastSpell",
+    "quick": 16,
+    "deep": 31,
+    "net": 13,
+    "win": 70
+   },
+   {
+    "idx": 5,
+    "label": "Activate Edge of Autumn",
+    "kind": "ActivateAbility",
+    "quick": 11,
+    "deep": 3,
+    "net": 10,
+    "win": 58
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 4,
+  "net_top": 0,
+  "win_est": 67,
+  "reasons": [
+   "close",
+   "net-vs-search"
+  ],
+  "game_result_for_bot": 1,
+  "on_play": false,
+  "matchup": "Doomsday vs Reanimator",
+  "me_deck": "Doomsday",
+  "batch": 3,
+  "order": 34
+ },
+ {
+  "id": "s6-r-g14-d1",
+  "n": 9,
+  "category": "keep",
+  "turn": 0,
+  "view": {
+   "my_bf": [],
+   "opp_bf": [],
+   "stack": [],
+   "events": [
+    "opponent library shuffled",
+    "you library shuffled",
+    "opponent drew a card (x7)",
+    "you drew Atraxa, Grand Unifier",
+    "you drew Koma, World-Eater",
+    "you drew Thoughtseize",
+    "you drew Griselbrand",
+    "you drew Unmask",
+    "you drew Marsh Flats",
+    "you drew Dark Ritual",
+    "opponent kept (bottomed 0)"
+   ],
+   "turn": "0",
+   "step": "Untap",
+   "whose": "opponent's",
+   "my_life": 20,
+   "my_lib": 53,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 7,
+   "opp_lib": 53,
+   "hand": [
+    "Marsh Flats",
+    "Dark Ritual",
+    "Thoughtseize",
+    "Unmask",
+    "Griselbrand",
+    "Atraxa, Grand Unifier",
+    "Koma, World-Eater"
+   ],
+   "my_gy": [],
+   "opp_gy": []
+  },
+  "game_log": [
+   "you drew Atraxa, Grand Unifier",
+   "you drew Koma, World-Eater",
+   "you drew Thoughtseize",
+   "you drew Griselbrand",
+   "you drew Unmask",
+   "you drew Marsh Flats",
+   "you drew Dark Ritual",
+   "opponent kept (bottomed 0)"
+  ],
+  "decision_kind": "Mulligan",
+  "context": "Keep this hand or take a mulligan?",
+  "question": "Keep this hand or mulligan?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Keep hand",
+    "kind": "Keep",
+    "quick": 84,
+    "deep": 92,
+    "net": 48,
+    "win": 76
+   },
+   {
+    "idx": 1,
+    "label": "Mulligan",
+    "kind": "Mulligan",
+    "quick": 16,
+    "deep": 8,
+    "net": 52,
+    "win": 56
+   }
+  ],
+  "bot_choice": 0,
+  "deep_best": 0,
+  "net_top": 1,
+  "win_est": 74,
+  "reasons": [
+   "net-vs-search"
+  ],
+  "game_result_for_bot": 1,
+  "on_play": false,
+  "matchup": "Reanimator vs Doomsday",
+  "me_deck": "Reanimator",
+  "batch": 3,
+  "order": 35
+ },
+ {
+  "id": "s6-r-g3-d23",
+  "n": 10,
+  "category": "cast-or-wait",
+  "turn": 7,
+  "view": {
+   "my_bf": [
+    "Swamp"
+   ],
+   "opp_bf": [
+    "Underground Sea (tapped)",
+    "Underground Sea"
+   ],
+   "stack": [],
+   "events": [],
+   "turn": "7",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 19,
+   "my_lib": 49,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 10,
+   "opp_hand": 4,
+   "opp_lib": 4,
+   "hand": [
+    "Dark Ritual",
+    "Faithless Looting",
+    "Cabal Therapy",
+    "2x Collective Brutality",
+    "3x Animate Dead"
+   ],
+   "my_gy": [
+    "Faithless Looting",
+    "Marsh Flats"
+   ],
+   "opp_gy": [
+    "Doomsday",
+    "Dark Ritual"
+   ],
+   "my_exile": [],
+   "opp_exile": [
+    "Flooded Strand",
+    "4x Polluted Delta",
+    "Misty Rainforest",
+    "Verdant Catacombs",
+    "3x Lotus Petal",
+    "Lion's Eye Diamond",
+    "4x Brainstorm",
+    "4x Ponder",
+    "Consider",
+    "2x Flow State",
+    "3x Dark Ritual",
+    "3x Daze",
+    "4x Force of Will",
+    "3x Thoughtseize",
+    "4x Street Wraith",
+    "2x Edge of Autumn",
+    "2x Personal Tutor",
+    "2x Doomsday",
+    "Cavern of Souls",
+    "Snow-Covered Island",
+    "Snow-Covered Swamp"
+   ]
+  },
+  "game_log": [
+   "you drew Animate Dead",
+   "you drew Collective Brutality",
+   "you drew Cabal Therapy",
+   "you drew Dark Ritual",
+   "you drew Animate Dead",
+   "you drew Faithless Looting",
+   "you drew Collective Brutality",
+   "you kept (bottomed 0)",
+   "opponent kept (bottomed 0)",
+   "-- turn 1 (your turn) --",
+   "-- turn 2 (opponent's turn) --",
+   "-- turn 3 (your turn) --",
+   "you drew Faithless Looting",
+   "-- turn 4 (opponent's turn) --",
+   "opponent played Underground Sea",
+   "opponent cast Dark Ritual",
+   "opponent cast Doomsday",
+   "opponent life -10",
+   "-- turn 5 (your turn) --",
+   "you drew Marsh Flats",
+   "you played Marsh Flats",
+   "-- turn 6 (opponent's turn) --",
+   "you life -1",
+   "you activated an ability",
+   "opponent played Underground Sea",
+   "opponent cast Dark Ritual",
+   "-- turn 7 (your turn) --",
+   "you drew Animate Dead"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 41,
+    "deep": 11,
+    "net": 52,
+    "win": 24
+   },
+   {
+    "idx": 1,
+    "label": "Cast Dark Ritual",
+    "kind": "CastSpell",
+    "quick": 48,
+    "deep": 86,
+    "net": 22,
+    "win": 40
+   },
+   {
+    "idx": 2,
+    "label": "Cast Cabal Therapy",
+    "kind": "CastSpell",
+    "quick": 11,
+    "deep": 3,
+    "net": 26,
+    "win": 13
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 1,
+  "net_top": 0,
+  "win_est": 38,
+  "reasons": [
+   "net-vs-search"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true,
+  "matchup": "Reanimator vs Doomsday",
+  "me_deck": "Reanimator",
+  "batch": 3,
+  "order": 36
+ },
+ {
+  "id": "s6-uc-g11-d26",
+  "n": 11,
+  "category": "cast-which",
+  "turn": 5,
+  "view": {
+   "my_bf": [
+    "2x Volcanic Island"
+   ],
+   "opp_bf": [
+    "2x Island"
+   ],
+   "stack": [],
+   "events": [
+    "opponent life -3",
+    "3 damage to opponent",
+    "Lightning Bolt (you's) moved Stack -> Graveyard",
+    "Island (opponent's) moved Library -> Battlefield",
+    "opponent library shuffled",
+    "opponent drew a card",
+    "Island (opponent's) moved Hand -> Battlefield",
+    "opponent played Island",
+    "0 attacker(s) declared",
+    "-- turn 5 (your turn) --",
+    "you drew Wasteland"
+   ],
+   "turn": "5",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 18,
+   "my_lib": 48,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 16,
+   "opp_hand": 7,
+   "opp_lib": 50,
+   "hand": [
+    "Island",
+    "Wasteland",
+    "Force of Will",
+    "Murktide Regent",
+    "2x Mishra's Bauble"
+   ],
+   "my_gy": [
+    "Flooded Strand",
+    "Preordain",
+    "Scalding Tarn",
+    "Lightning Bolt"
+   ],
+   "opp_gy": [
+    "Prismatic Vista"
+   ]
+  },
+  "game_log": [
+   "you drew Mishra's Bauble",
+   "you drew Scalding Tarn",
+   "you drew Lightning Bolt",
+   "you drew Flooded Strand",
+   "you drew Force of Will",
+   "you drew Preordain",
+   "you drew Mishra's Bauble",
+   "you kept (bottomed 0)",
+   "opponent kept (bottomed 0)",
+   "-- turn 1 (your turn) --",
+   "you played Flooded Strand",
+   "you life -1",
+   "you activated an ability",
+   "you cast Preordain",
+   "you drew Island",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Prismatic Vista",
+   "-- turn 3 (your turn) --",
+   "you drew Murktide Regent",
+   "you played Scalding Tarn",
+   "-- turn 4 (opponent's turn) --",
+   "you life -1",
+   "you activated an ability",
+   "opponent life -1",
+   "opponent activated an ability",
+   "you cast Lightning Bolt",
+   "opponent life -3",
+   "3 damage to opponent",
+   "opponent played Island",
+   "-- turn 5 (your turn) --",
+   "you drew Wasteland"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 69,
+    "deep": 5,
+    "net": 28,
+    "win": 44
+   },
+   {
+    "idx": 1,
+    "label": "Play Island",
+    "kind": "PlayLand",
+    "quick": 9,
+    "deep": 3,
+    "net": 33,
+    "win": 32
+   },
+   {
+    "idx": 2,
+    "label": "Play Wasteland",
+    "kind": "PlayLand",
+    "quick": 12,
+    "deep": 79,
+    "net": 19,
+    "win": 74
+   },
+   {
+    "idx": 3,
+    "label": "Cast Mishra's Bauble",
+    "kind": "CastSpell",
+    "quick": 9,
+    "deep": 13,
+    "net": 20,
+    "win": 51
+   }
+  ],
+  "bot_choice": 0,
+  "deep_best": 2,
+  "net_top": 1,
+  "win_est": 68,
+  "reasons": [
+   "net-vs-search",
+   "quick-vs-deep"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true,
+  "matchup": "UR Cutter vs Alurentell",
+  "me_deck": "UR Cutter",
+  "batch": 3,
+  "order": 37
+ },
+ {
+  "id": "s6-uc-g13-d7",
+  "n": 12,
+  "category": "land-or-fetch",
+  "turn": 4,
+  "view": {
+   "my_bf": [],
+   "opp_bf": [
+    "Hedge Maze (tapped)",
+    "Tropical Island"
+   ],
+   "stack": [],
+   "events": [
+    "-- turn 3 (opponent's turn) --",
+    "opponent drew a card",
+    "Veil of Summer (opponent's) moved Hand -> Stack",
+    "opponent cast Veil of Summer",
+    "Veil of Summer (opponent's) moved Stack -> Graveyard",
+    "Tropical Island (opponent's) moved Hand -> Battlefield",
+    "opponent played Tropical Island",
+    "0 attacker(s) declared",
+    "-- turn 4 (your turn) --",
+    "you drew Thundering Falls"
+   ],
+   "turn": "4",
+   "step": "Main 1",
+   "whose": "your",
+   "my_life": 20,
+   "my_lib": 52,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 18,
+   "opp_hand": 2,
+   "opp_lib": 50,
+   "hand": [
+    "Thundering Falls",
+    "2x Misty Rainforest",
+    "Ponder",
+    "Preordain",
+    "2x Unholy Heat"
+   ],
+   "my_gy": [
+    "Mishra's Bauble"
+   ],
+   "opp_gy": [
+    "Misty Rainforest",
+    "Lotus Petal",
+    "Brainstorm",
+    "Force of Will",
+    "Veil of Summer"
+   ],
+   "my_exile": [],
+   "opp_exile": [
+    "Brainstorm"
+   ]
+  },
+  "game_log": [
+   "you drew Force of Will",
+   "you drew Daze",
+   "you drew Island",
+   "you drew Brainstorm",
+   "you drew Lightning Bolt",
+   "opponent kept (bottomed 0)",
+   "you took a mulligan",
+   "Force of Will (you's) moved Hand -> Library",
+   "Daze (you's) moved Hand -> Library",
+   "Island (you's) moved Hand -> Library",
+   "Brainstorm (you's) moved Hand -> Library",
+   "Lightning Bolt (you's) moved Hand -> Library",
+   "you drew Preordain",
+   "you drew Ponder",
+   "you drew Misty Rainforest",
+   "you drew Unholy Heat",
+   "you drew Ponder",
+   "Ponder (you's) moved Hand -> Library",
+   "you kept (bottomed 1)",
+   "-- turn 1 (opponent's turn) --",
+   "opponent cast Lotus Petal",
+   "opponent played Misty Rainforest",
+   "opponent life -1",
+   "opponent activated an ability",
+   "-- turn 2 (your turn) --",
+   "you drew Mishra's Bauble",
+   "you cast Mishra's Bauble",
+   "opponent cast Brainstorm",
+   "opponent life -1",
+   "opponent cast Force of Will",
+   "spell countered",
+   "-- turn 3 (opponent's turn) --",
+   "opponent cast Veil of Summer",
+   "opponent played Tropical Island",
+   "-- turn 4 (your turn) --",
+   "you drew Thundering Falls"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 22,
+    "deep": 48,
+    "net": 40,
+    "win": 59
+   },
+   {
+    "idx": 1,
+    "label": "Play Thundering Falls",
+    "kind": "PlayLand",
+    "quick": 73,
+    "deep": 48,
+    "net": 42,
+    "win": 59
+   },
+   {
+    "idx": 2,
+    "label": "Play Misty Rainforest",
+    "kind": "PlayLand",
+    "quick": 5,
+    "deep": 4,
+    "net": 18,
+    "win": 46
+   }
+  ],
+  "bot_choice": 1,
+  "deep_best": 0,
+  "net_top": 1,
+  "win_est": 58,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": 1,
+  "on_play": false,
+  "matchup": "UR Cutter vs Alurentell",
+  "me_deck": "UR Cutter",
+  "batch": 3,
+  "order": 38
+ },
+ {
+  "id": "s6-uc-g4-d15",
+  "n": 13,
+  "category": "cards:PutBack",
+  "turn": 3,
+  "view": {
+   "my_bf": [
+    "Volcanic Island (tapped)"
+   ],
+   "opp_bf": [
+    "Undercity Sewers (tapped)"
+   ],
+   "stack": [
+    "Brainstorm controlled by you"
+   ],
+   "events": [
+    "you drew Polluted Delta",
+    "you drew Arid Mesa",
+    "you drew Quantum Riddler"
+   ],
+   "turn": "3",
+   "step": "Draw",
+   "whose": "your",
+   "my_life": 19,
+   "my_lib": 47,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 20,
+   "opp_hand": 5,
+   "opp_lib": 53,
+   "hand": [
+    "Tundra",
+    "Polluted Delta",
+    "Arid Mesa",
+    "Wasteland",
+    "Ponder",
+    "Force of Will",
+    "Murktide Regent",
+    "Quantum Riddler",
+    "Tamiyo, Inquisitive Student"
+   ],
+   "my_gy": [
+    "Polluted Delta",
+    "Brainstorm"
+   ],
+   "opp_gy": [
+    "Moonshadow"
+   ]
+  },
+  "game_log": [
+   "you drew Brainstorm",
+   "you drew Polluted Delta",
+   "you drew Wasteland",
+   "you drew Brainstorm",
+   "you drew Tamiyo, Inquisitive Student",
+   "you drew Murktide Regent",
+   "you drew Force of Will",
+   "you kept (bottomed 0)",
+   "opponent took a mulligan",
+   "opponent kept (bottomed 2)",
+   "-- turn 1 (your turn) --",
+   "you played Polluted Delta",
+   "you life -1",
+   "you activated an ability",
+   "you cast Brainstorm",
+   "you drew Ponder",
+   "you drew Polluted Delta",
+   "you drew Tundra",
+   "Polluted Delta (you's) moved Hand -> Library",
+   "Tamiyo, Inquisitive Student (you's) moved Hand -> Library",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Undercity Sewers",
+   "-- turn 3 (your turn) --",
+   "you drew Tamiyo, Inquisitive Student",
+   "you cast Brainstorm",
+   "you drew Polluted Delta",
+   "you drew Arid Mesa",
+   "you drew Quantum Riddler"
+  ],
+  "decision_kind": "ChooseCards { purpose: PutBack, remaining: 2 }",
+  "context": "Choose a card (2 left): PutBack.",
+  "question": "Brainstorm: put a card back on top of your library (2 left to choose).",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Choose Tundra",
+    "kind": "ChooseCard",
+    "quick": 6,
+    "deep": 3,
+    "net": 11,
+    "win": 56
+   },
+   {
+    "idx": 1,
+    "label": "Choose Polluted Delta",
+    "kind": "ChooseCard",
+    "quick": 5,
+    "deep": 3,
+    "net": 10,
+    "win": 58
+   },
+   {
+    "idx": 2,
+    "label": "Choose Arid Mesa",
+    "kind": "ChooseCard",
+    "quick": 11,
+    "deep": 5,
+    "net": 10,
+    "win": 63
+   },
+   {
+    "idx": 3,
+    "label": "Choose Wasteland",
+    "kind": "ChooseCard",
+    "quick": 3,
+    "deep": 4,
+    "net": 11,
+    "win": 60
+   },
+   {
+    "idx": 4,
+    "label": "Choose Ponder",
+    "kind": "ChooseCard",
+    "quick": 9,
+    "deep": 8,
+    "net": 14,
+    "win": 64
+   },
+   {
+    "idx": 5,
+    "label": "Choose Force of Will",
+    "kind": "ChooseCard",
+    "quick": 33,
+    "deep": 36,
+    "net": 12,
+    "win": 68
+   },
+   {
+    "idx": 6,
+    "label": "Choose Murktide Regent",
+    "kind": "ChooseCard",
+    "quick": 3,
+    "deep": 2,
+    "net": 10,
+    "win": 55
+   },
+   {
+    "idx": 7,
+    "label": "Choose Quantum Riddler",
+    "kind": "ChooseCard",
+    "quick": 9,
+    "deep": 5,
+    "net": 12,
+    "win": 61
+   },
+   {
+    "idx": 8,
+    "label": "Choose Tamiyo, Inquisitive Student",
+    "kind": "ChooseCard",
+    "quick": 20,
+    "deep": 35,
+    "net": 12,
+    "win": 69
+   }
+  ],
+  "bot_choice": 5,
+  "deep_best": 5,
+  "net_top": 4,
+  "win_est": 66,
+  "reasons": [
+   "close",
+   "net-vs-search"
+  ],
+  "game_result_for_bot": -1,
+  "on_play": true,
+  "matchup": "UWx Control vs Dimir Tempo",
+  "me_deck": "UWx Control",
+  "batch": 3,
+  "order": 39
+ },
+ {
+  "id": "s6-uc-g12-d34",
+  "n": 14,
+  "category": "land-or-fetch",
+  "turn": 7,
+  "view": {
+   "my_bf": [
+    "Meticulous Archive (tapped)",
+    "Snow-Covered Plains"
+   ],
+   "opp_bf": [
+    "Swamp (tapped)",
+    "Underground Sea",
+    "Island (tapped)"
+   ],
+   "stack": [],
+   "events": [
+    "0 attacker(s) declared"
+   ],
+   "turn": "7",
+   "step": "Main 2",
+   "whose": "your",
+   "my_life": 17,
+   "my_lib": 44,
+   "lands_played": 0,
+   "pool": [],
+   "opp_life": 19,
+   "opp_hand": 3,
+   "opp_lib": 49,
+   "hand": [
+    "Tundra",
+    "Arid Mesa",
+    "2x Ponder",
+    "Murktide Regent"
+   ],
+   "lib_top": [
+    "Brainstorm",
+    "Phelia, Exuberant Shepherd"
+   ],
+   "my_gy": [
+    "2x Flooded Strand",
+    "Stifle",
+    "2x Brainstorm",
+    "Swords to Plowshares",
+    "Force of Will"
+   ],
+   "opp_gy": [
+    "Bloodstained Mire",
+    "2x Nethergoyf",
+    "Fatal Push",
+    "Ponder"
+   ],
+   "my_exile": [
+    "2x Quantum Riddler"
+   ],
+   "opp_exile": []
+  },
+  "game_log": [
+   "you drew Brainstorm",
+   "you drew Force of Will",
+   "you drew Swords to Plowshares",
+   "you drew Murktide Regent",
+   "you drew Flooded Strand",
+   "you drew Quantum Riddler",
+   "you drew Flooded Strand",
+   "you kept (bottomed 0)",
+   "opponent took a mulligan",
+   "opponent kept (bottomed 1)",
+   "-- turn 1 (your turn) --",
+   "you played Flooded Strand",
+   "you life -1",
+   "you activated an ability",
+   "-- turn 2 (opponent's turn) --",
+   "opponent played Bloodstained Mire",
+   "opponent life -1",
+   "opponent activated an ability",
+   "-- turn 3 (your turn) --",
+   "you drew Prismatic Ending",
+   "you cast Brainstorm",
+   "you drew Ponder",
+   "you drew Murktide Regent",
+   "you drew Ponder",
+   "Prismatic Ending (you's) moved Hand -> Library",
+   "Murktide Regent (you's) moved Hand -> Library",
+   "you played Flooded Strand",
+   "you life -1",
+   "you activated an ability",
+   "-- turn 4 (opponent's turn) --",
+   "opponent played Underground Sea",
+   "opponent cast Nethergoyf",
+   "you cast Swords to Plowshares",
+   "opponent cast Fatal Push",
+   "spell fizzled",
+   "-- turn 5 (your turn) --",
+   "you drew Quantum Riddler",
+   "you cast Quantum Riddler",
+   "you drew Brainstorm",
+   "-- turn 6 (opponent's turn) --",
+   "opponent played Island",
+   "opponent cast Ponder",
+   "opponent cast Nethergoyf",
+   "you life -1",
+   "you cast Force of Will",
+   "spell countered",
+   "-- turn 7 (your turn) --",
+   "you drew Phelia, Exuberant Shepherd",
+   "you cast Brainstorm",
+   "you drew Brainstorm",
+   "you drew Tundra",
+   "you drew Arid Mesa",
+   "Brainstorm (you's) moved Hand -> Library",
+   "Phelia, Exuberant Shepherd (you's) moved Hand -> Library"
+  ],
+  "decision_kind": "Priority",
+  "context": "You have priority.",
+  "question": "You have priority. What do you do?",
+  "options": [
+   {
+    "idx": 0,
+    "label": "Pass priority",
+    "kind": "Pass",
+    "quick": 5,
+    "deep": 3,
+    "net": 27,
+    "win": 32
+   },
+   {
+    "idx": 1,
+    "label": "Play Tundra",
+    "kind": "PlayLand",
+    "quick": 16,
+    "deep": 54,
+    "net": 40,
+    "win": 59
+   },
+   {
+    "idx": 2,
+    "label": "Play Arid Mesa",
+    "kind": "PlayLand",
+    "quick": 80,
+    "deep": 44,
+    "net": 32,
+    "win": 66
+   }
+  ],
+  "bot_choice": 2,
+  "deep_best": 1,
+  "net_top": 1,
+  "win_est": 61,
+  "reasons": [
+   "close"
+  ],
+  "game_result_for_bot": 1,
+  "on_play": true,
+  "matchup": "UWx Control vs Dimir Tempo",
+  "me_deck": "UWx Control",
+  "batch": 3,
+  "order": 40
+ }
+]

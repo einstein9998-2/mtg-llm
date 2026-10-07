@@ -89,3 +89,16 @@ Source of the strategy points is Brady (2026-10-01). Lines marked "observed" com
 - Opponent at 2 cards in hand and I am about to reach 4 mana: Brainstorm first, then Veil plus Show and Tell wins.
 
 Source and numbers: tough-spots/batch1 (bot agreed with Brady on 3 of 9 answered positions; the bot's recurring error was casting spells before the land drop or into Daze/Force).
+
+## Rules from Brady's tough-spot review, batch 2 (2026-10-07)
+
+- Play a land every turn you have one. Brady refused to answer three positions (batch 1 #9, batch 2 #13 and #16) because the bot had skipped its land drop or cast Brainstorm in upkeep earlier in the turn, so the question was already wrong. Fix the earlier mistake first.
+- Show and Tell: when you hold protection (Force of Will, Veil of Summer), jam it now; it will not get better by waiting. Never cast Acererak instead of Show and Tell: Acererak is "plan F" because it achieves so little, and a resolved Show and Tell wins the game.
+- Jam line with Veil: land (Ancient Tomb), Veil of Summer, then Show and Tell for Atraxa. If Veil resolves, you probably win. If it is Dazed, pay 1 and draw. If it is forced, try again next turn.
+- Land drop vs Atraxa: playing a fetch before Show and Tell plays around double Daze, which is worth slightly more than holding the land drop for a possible Atraxa trigger, because a resolved Show and Tell usually wins anyway.
+- Atraxa reveal: do not take 0 cards. The only reason to take fewer than allowed is to put back cards you would discard to hand size anyway. Take the green source and Force of Will, then Aluren, and win.
+- Brainstorm put-back with plenty of lands (4 across battlefield and hand): put back Lotus Petal, not a land.
+- Stock Up pick (look at 5, take 2): with enough lands in hand and no Show and Tell or Acererak in hand to complete a pair, take the strong cantrip (the other Stock Up) first, then Atraxa or Force, not another land.
+- Mulligan: Two surveil lands toward Acererak or Atraxa or more cantrips, with live Force, is a keep (close). Stock Up on turn 1 that likely finds a permanent mana source is a keep (close). One land with Ponder is a mulligan unless you know the opponent is Storm or Reanimator (then keep). No permanent coloured source or no cantrips with one land is a mulligan.
+
+Source: tough-spots/batch2 (bot agreed with Brady on 4 of 14 answered positions; 2 more declined as moot).

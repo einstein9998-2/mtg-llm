@@ -1,0 +1,2 @@
+ANSWER: B
+WHY: The opponent has no board, so the tapped land costs little now, and the surveil improves my draws. Next turn I can fetch an untapped dual and have two mana for Ponder plus Preordain, which beats spending a land drop now on one cantrip.

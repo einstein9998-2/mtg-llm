@@ -189,7 +189,8 @@ def main():
         excl = set(open(sys.argv[sys.argv.index('--exclude') + 1]).read().split())
     os.makedirs(out, exist_ok=True)
     P = [json.loads(l) for l in open(path)]
-    P = [p for p in P if 0.25 <= p['deep_win_est'] <= 0.75 and p['id'] not in excl]
+    # Brady (2026-10-07): do not ask cleanup / discard-to-hand-size questions.
+    P = [p for p in P if 0.25 <= p['deep_win_est'] <= 0.75 and p['id'] not in excl and 'DiscardToHandSize' not in p['decision_kind']]
     # drop positions where the best two options are not really distinct choices
     keep = []
     for p in P:
@@ -212,7 +213,10 @@ def main():
         by[c].sort(key=lambda p: -p['score'])
     print({c: len(v) for c, v in sorted(by.items(), key=lambda kv: -len(kv[1]))})
     nk = int(sys.argv[sys.argv.index('--keeps') + 1]) if '--keeps' in sys.argv else 2
-    quotas = [('keep', nk), ('cast-or-wait', 2), ('cast-which', 2), ('cards:RevealPick', 1), ('cards:PutBack', 1), ('cards:DiscardToHandSize', 1), ('cards:LookTake', 1), ('land-or-fetch', 1)]
+    if '--cats' in sys.argv:
+        quotas = [(c, 1) for c in sys.argv[sys.argv.index('--cats') + 1].split(',')]
+    else:
+        quotas = [('keep', nk), ('cast-or-wait', 2), ('cast-which', 2), ('cards:RevealPick', 1), ('cards:PutBack', 1), ('cards:LookTake', 1), ('land-or-fetch', 1)]
     chosen, games = [], set()
 
     def take(c, k):

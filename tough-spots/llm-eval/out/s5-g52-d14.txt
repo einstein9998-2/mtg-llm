@@ -1,0 +1,2 @@
+ANSWER: A
+WHY: I have only three mana (Island, Tropical Island, Lotus Petal), so Show and Tell (four mana) and Acererak (needs black) can't actually be paid for. Passing keeps the Petal, and the opponent has no lands in play, so there is no Wasteland or Daze risk to my lands.

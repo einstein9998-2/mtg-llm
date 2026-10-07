@@ -1,0 +1,2 @@
+ANSWER: C
+WHY: Arid Mesa thins the deck, adds a card to the graveyard for Murktide's delve, and shuffles away the known Brainstorm and Phelia on top, which are poor draws. It also keeps Tundra safe in hand as next turn's land drop.
