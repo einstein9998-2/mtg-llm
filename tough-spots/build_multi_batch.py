@@ -9,7 +9,7 @@ import json, os, subprocess, sys, glob
 
 runs, out, tag, batch_no, first = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5])
 per = sys.argv[sys.argv.index('--per') + 1] if '--per' in sys.argv else '2'
-CATS = ['keep', 'cast-or-wait', 'cast-which', 'land-or-fetch', 'cards:PutBack', 'cards:LookTake', 'cards:RevealPick', 'cards:DiscardToHandSize']
+CATS = ['keep', 'cast-or-wait', 'cast-which', 'land-or-fetch', 'cards:PutBack', 'cards:LookTake', 'cards:RevealPick']
 NAMES = {'alurentell': 'Alurentell', 'boros-aggro': 'Boros Aggro', 'bw-death-and-taxes': 'BW Death and Taxes', 'dimir-tempo': 'Dimir Tempo',
          'doomsday': 'Doomsday', 'reanimator': 'Reanimator', 'ur-cutter': 'UR Cutter', 'uwx-control': 'UWx Control', 'storm': 'Storm',
          'colorless-tron': 'Colorless Tron'}
