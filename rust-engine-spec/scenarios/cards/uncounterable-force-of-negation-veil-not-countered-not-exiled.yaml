@@ -1,0 +1,65 @@
+id: uncounterable-force-of-negation-veil-not-countered-not-exiled
+title: Force of Negation on a spell made uncounterable by Veil of Summer neither counters nor exiles it, and the spell resolves
+area: card
+cards: [Veil of Summer, Grafdigger's Cage, Force of Negation, Brainstorm, Forest, Mountain]
+tags: [force-of-negation, counterspell, exile-instead, cant-be-countered, veil-of-summer, alternative-cost, rule-modification]
+derived_from: cr
+source:
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.", verified: true}
+  - {kind: oracle, card: Force of Negation, text: "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil", "Grafdigger's Cage @cage"]
+    battlefield: ["Forest @f", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@cage", pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@cage"]}
+  - check:
+      stack: [{kind: spell, card: "@cage", controller: p0}, {kind: spell, card: "@fon", controller: p1, targets: ["@cage"]}]
+      p1: {hand: [], exile: [Brainstorm]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@cage", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: []}
+      p1: {graveyard: [Force of Negation]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Veil of Summer]
+      exile: []
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: "Grafdigger's Cage", controller: p0}
+    p1:
+      hand: []
+      graveyard: [Force of Negation]
+      exile: [Brainstorm]
+notes: >
+  It is p0's turn, so p1 may exile a blue card (Brainstorm) rather than pay Force of Negation's mana cost. Grafdigger's
+  Cage is a noncreature spell, a legal target. Force of Negation resolves, but the spell can't be countered (101.2), so
+  the "exile it instead" clause (which only modifies the outcome "If that spell is countered this way") never applies:
+  Cage must not be in exile and must not be in the graveyard, it resolves onto the battlefield. A wrong engine counters
+  it, or exiles it without countering (an unconditional exile of the target), or fizzles Force of Negation as
+  having an illegal target.

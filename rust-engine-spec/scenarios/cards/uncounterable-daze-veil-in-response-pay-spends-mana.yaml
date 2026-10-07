@@ -1,0 +1,62 @@
+id: uncounterable-daze-veil-in-response-pay-spends-mana
+title: With Veil of Summer resolved in response, a player may still pay Daze's {1}; the payment is made (an Island is tapped) and the spell resolves
+area: card
+cards: [Veil of Summer, Grafdigger's Cage, Daze, Forest, Mountain, Island]
+tags: [daze, counter-unless-pay, cant-be-countered, veil-of-summer, in-response, mana-payment, yes-no-decision]
+derived_from: cr
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil", "Grafdigger's Cage @cage"]
+    battlefield: ["Forest @f", "Mountain @m1", "Mountain @m2"]
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@cage", pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", targets: ["@cage"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: true, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@cage", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield: [{card: Forest, tapped: true}, {card: Mountain, tapped: true}, {card: Mountain, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: [Veil of Summer]
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: "Grafdigger's Cage", controller: p0}
+    p1:
+      hand: []
+      graveyard: [Daze]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Companion to the decline scenario. The unless-payment is an optional action the spell's controller may take (118.12a)
+  and the "can't be countered" effect does not remove that option, so a player who chooses yes pays: the second Mountain
+  is tapped. Cage resolves either way. A wrong engine skips the prompt for uncounterable spells (leaving the Mountain
+  untapped) or takes the payment and still counters.

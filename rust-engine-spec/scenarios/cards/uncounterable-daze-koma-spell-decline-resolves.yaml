@@ -1,0 +1,61 @@
+id: uncounterable-daze-koma-spell-decline-resolves
+title: Koma, World-Eater ("This spell can't be countered") survives Daze when its controller declines to pay {1}
+area: card
+cards: ["Koma, World-Eater", Daze, Forest, Island, Mountain]
+tags: [daze, counter-unless-pay, cant-be-countered, koma-world-eater, intrinsic-uncounterable, yes-no-decision]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Koma, World-Eater", text: "This spell can't be countered.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+setup:
+  turn: 7
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Koma, World-Eater @koma"]
+    battlefield: ["Forest @f1", "Forest @f2", "Island @i1", "Island @i2", "Mountain @m1", "Mountain @m2", "Mountain @m3", "Mountain @m4"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@koma", pay: {tap: ["@f1", "@f2", "@i1", "@i2", "@m1", "@m2", "@m3"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", targets: ["@koma"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@koma", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Forest, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: false}
+        - {card: "Koma, World-Eater", controller: p0}
+    p1:
+      hand: []
+      graveyard: [Daze]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  The third source of "can't be countered" in the pool (after Veil of Summer and Cavern of Souls): printed text on the
+  spell itself. Koma costs {3}{G}{G}{U}{U}; seven lands are tapped and one Mountain stays untapped so that the Daze
+  payment is a real choice. p0 declines (118.12a); the counter cannot happen (101.2); Koma resolves. Force of Will on
+  Koma is already covered by koma-world-eater.yaml; this one covers the "unless pays" path.

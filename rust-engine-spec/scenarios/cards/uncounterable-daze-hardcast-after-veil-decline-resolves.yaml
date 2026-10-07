@@ -1,0 +1,69 @@
+id: uncounterable-daze-hardcast-after-veil-decline-resolves
+title: Hard-cast Daze on a spell made uncounterable by an already-resolved Veil of Summer; declining to pay {1} does not counter it
+area: card
+cards: [Veil of Summer, Grafdigger's Cage, Daze, Forest, Mountain, Island]
+tags: [daze, counter-unless-pay, cant-be-countered, veil-of-summer, hard-cast, yes-no-decision, rule-modification]
+derived_from: cr
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil", "Grafdigger's Cage @cage"]
+    battlefield: ["Forest @f", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Veil of Summer], hand: ["Grafdigger's Cage"]}
+  - p0: {t: cast, card: "@cage", pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", targets: ["@cage"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@cage", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Daze]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Veil of Summer]
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: false}
+        - {card: "Grafdigger's Cage", controller: p0}
+    p1:
+      hand: []
+      graveyard: [Daze]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}]
+notes: >
+  Veil of Summer resolved before Grafdigger's Cage was cast, so Cage is a spell p0 controls this turn and can't be
+  countered (101.2: the "can't" effect beats Daze's counter). Daze is still cast, may legally target the spell and
+  resolves; its instruction is "unless its controller pays {1}" = "may pay {1}; if that player doesn't, counter" (118.12a),
+  so p0 is still offered the choice (an untapped Mountain is available, so the choice is real). p0 declines; the counter
+  instruction then cannot happen (701.6a would cancel the spell, but it can't be countered), so Cage stays on the stack
+  and resolves normally. p0's untapped Mountain stays untapped (nothing was paid). Daze was hard cast, so p1's Islands
+  are both tapped and nothing returns to hand. A wrong engine counters Cage when the answer is no (the untouched
+  daze.yaml behaviour applied to an uncounterable spell), skips the prompt, or makes Daze uncastable against it.

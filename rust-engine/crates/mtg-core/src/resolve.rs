@@ -1955,7 +1955,8 @@ fn counter_stack_obj(cx: &mut Cx, victim: ObjRef) {
     if matches!(cx.s.stack.iter().find(|e| e.obj == victim).map(|e| e.kind), Some(StackKind::Ability { .. })) {
         cx.s.stack.retain(|x| x.obj != victim);
         cx.commit_move(victim, ZoneKind::Gone, MoveOpts { quiet: true, ..Default::default() }, None);
-    } else {
+    } else if cx.can_be_countered(victim) {
+        // CR 101.2, 118.12a: the unless-payment was offered, but a spell that can't be countered stays on the stack.
         cx.emit(Event::SpellCountered { obj: victim });
         counter_dest(cx, victim, ZoneKind::Graveyard);
     }

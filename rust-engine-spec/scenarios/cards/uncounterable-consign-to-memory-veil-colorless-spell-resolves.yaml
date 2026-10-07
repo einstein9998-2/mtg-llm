@@ -1,0 +1,60 @@
+id: uncounterable-consign-to-memory-veil-colorless-spell-resolves
+title: Consign to Memory on a colorless spell made uncounterable by Veil of Summer does not counter it
+area: card
+cards: [Veil of Summer, Grafdigger's Cage, Consign to Memory, Forest, Mountain, Island]
+tags: [consign-to-memory, counterspell, cant-be-countered, veil-of-summer, colorless-spell, rule-modification]
+derived_from: cr
+source:
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn't resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil", "Grafdigger's Cage @cage"]
+    battlefield: ["Forest @f", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @cm"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@cage", pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@cm", targets: ["@cage"], pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@cage", controller: p0}, {kind: spell, card: "@cm", controller: p1, targets: ["@cage"]}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@cage", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {graveyard: [Consign to Memory]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Veil of Summer]
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: "Grafdigger's Cage", controller: p0}
+    p1:
+      hand: []
+      graveyard: [Consign to Memory]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  Grafdigger's Cage is a colorless spell (a legal Consign target). Consign's counter uses a different effect than the
+  "counter target spell" family and is checked here so that every counter effect in the pool is covered against
+  "can't be countered". Cage can't be countered (101.2) and resolves; Consign goes to the graveyard. A wrong engine
+  counters Cage on this path.

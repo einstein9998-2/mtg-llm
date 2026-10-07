@@ -1,0 +1,64 @@
+id: uncounterable-daze-return-island-after-veil-decline-resolves
+title: Daze cast by returning an Island on a spell made uncounterable by an already-resolved Veil of Summer; declining to pay {1} does not counter it
+area: card
+cards: [Veil of Summer, Grafdigger's Cage, Daze, Forest, Mountain, Island]
+tags: [daze, alternative-cost, counter-unless-pay, cant-be-countered, veil-of-summer, yes-no-decision, rule-modification]
+derived_from: cr
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can't happen, the \"can't\" effect takes precedence.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Veil of Summer @veil", "Grafdigger's Cage @cage"]
+    battlefield: ["Forest @f", "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@veil", pay: {tap: ["@f"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@cage", pay: {tap: ["@m1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@cage"]}
+  - check:
+      stack: [{kind: spell, card: "@cage", controller: p0}, {kind: spell, card: "@daze", controller: p1, targets: ["@cage"]}]
+      p1: {hand: [Island], battlefield: []}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false, expect_options: {include: [true, false]}}
+  - check:
+      stack: [{kind: spell, card: "@cage", controller: p0}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Veil of Summer]
+      battlefield:
+        - {card: Forest, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: false}
+        - {card: "Grafdigger's Cage", controller: p0}
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: []
+notes: >
+  Same as the hard-cast scenario but Daze is cast for its alternative cost: the Island is returned as a cost while Daze
+  is cast (mid-script check), so it is already in p1's hand. Whether the spell was cast for an alternative cost has no
+  bearing on the unless-payment prompt: p0 is still asked (118.12a), declines, and the spell cannot be countered because
+  Veil's "can't be countered" effect wins (101.2). A wrong engine counters Cage on the "no" answer, or takes a code path
+  for alternative-cost Daze that skips the uncounterable check.
