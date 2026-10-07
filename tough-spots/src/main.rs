@@ -2,7 +2,7 @@
 //! opponent and records the decisions where the bot's choice is hard, so Brady can give input.
 //!
 //! Usage: tough <decks dir> --net w.bin --out DIR [--me alurentell] [--opp ur-cutter] [--opp-net w2.bin]
-//!        [--games 20] [--iters 64] [--deep 400] [--opp-iters 32] [--seed 1] [--threads 4]
+//!        [--rules] [--games 20] [--iters 64] [--deep 400] [--opp-iters 32] [--seed 1] [--threads 4]
 //!
 //! Per bot decision (non-trivial, more than "pass or tap mana"):
 //!   1. net priors and value on the bot's own observation;
@@ -14,6 +14,7 @@
 //! The bot only ever acts on its `SeatView`; the real game is held by this loop to advance it, and the
 //! output holds nothing but what the bot saw (rendered Observation) plus the bot's own numbers.
 mod render;
+mod rules;
 
 use mtg_agent::*;
 use mtg_core::decision::{GameResult, Status};
@@ -29,6 +30,7 @@ struct Params {
     deep: u32,
     opp_iters: u32,
     seed: u64,
+    rules: bool,
 }
 
 struct Flagged {
@@ -43,6 +45,7 @@ struct GameStats {
     contested: u32,
     flagged: u32,
     turns: u16,
+    violations: u32, // quick-search picks that the rules guard would forbid
 }
 
 fn boring(d: &Decision) -> bool {
@@ -129,7 +132,18 @@ fn play_game(
                 let net_eval = peek.eval(&g, seat, n);
                 // 2. normal search = what the bot plays
                 let cfg = SearchConfig { iterations: p.iters, seed: gseed.wrapping_mul(1315423911).wrapping_add(ix as u64), ..SearchConfig::default() };
-                let r1 = search(&sv, &model, &mut me_ev, &cfg);
+                let mut r1 = search(&sv, &model, &mut me_ev, &cfg);
+                let bad_all = rules::forbidden(&obs, &d);
+                if bad_all[r1.best()] {
+                    st.violations += 1;
+                }
+                let bad = if p.rules { bad_all } else { vec![false; n] };
+                for a in 0..n {
+                    if bad[a] {
+                        r1.visits[a] = 0;
+                        r1.q[a] = -2.0;
+                    }
+                }
                 let choice = r1.best();
                 let events_shown = std::mem::take(&mut pending);
                 if !boring(&d) {
@@ -149,7 +163,13 @@ fn play_game(
                         let mut best_by_run = vec![];
                         for k in 0..2u64 {
                             let c = SearchConfig { iterations: p.deep, seed: cfg.seed ^ (0xABCDEF + k * 7919), ..SearchConfig::default() };
-                            let r = search(&sv, &model, &mut me_ev, &c);
+                            let mut r = search(&sv, &model, &mut me_ev, &c);
+                            for a in 0..n {
+                                if bad[a] {
+                                    r.visits[a] = 0;
+                                    r.q[a] = -2.0;
+                                }
+                            }
                             best_by_run.push(r.best());
                             for a in 0..n {
                                 visits[a] += r.visits[a];
@@ -253,6 +273,7 @@ fn main() {
         deep: flag("--deep").and_then(|s| s.parse().ok()).unwrap_or(400),
         opp_iters: flag("--opp-iters").and_then(|s| s.parse().ok()).unwrap_or(32),
         seed: base,
+        rules: a.iter().any(|x| x == "--rules"),
     };
     let out_dir = std::path::PathBuf::from(flag("--out").expect("--out"));
     std::fs::create_dir_all(&out_dir).unwrap();
@@ -291,12 +312,13 @@ fn main() {
     }
     let mut stats = stats.into_inner().unwrap();
     stats.sort_by_key(|s| s.0);
-    let mut tsv = String::from("game\tbot_seat\tresult\tturns\tdecisions\tcontested\tflagged\n");
+    let mut tsv = String::from("game\tbot_seat\tresult\tturns\tdecisions\tcontested\tflagged\tviolations\n");
     for (i, s) in &stats {
-        tsv += &format!("{i}\t{}\t{}\t{}\t{}\t{}\t{}\n", i % 2, s.result, s.turns, s.decisions, s.contested, s.flagged);
+        tsv += &format!("{i}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n", i % 2, s.result, s.turns, s.decisions, s.contested, s.flagged, s.violations);
     }
     std::fs::write(out_dir.join("games.tsv"), tsv).unwrap();
     let (d, c, fl): (u32, u32, u32) = stats.iter().fold((0, 0, 0), |a, (_, s)| (a.0 + s.decisions, a.1 + s.contested, a.2 + s.flagged));
     let w = stats.iter().filter(|s| s.1.result == 1).count();
-    println!("{games} games, bot (Alurentell) won {w}; {d} real decisions, {c} contested, {fl} flagged; {:.0}s", t0.elapsed().as_secs_f64());
+    let viol: u32 = stats.iter().map(|s| s.1.violations).sum();
+    println!("{games} games, bot (Alurentell) won {w}; {viol} rule violations (land-drop / upkeep) in the first-choice search; {d} real decisions, {c} contested, {fl} flagged; {:.0}s", t0.elapsed().as_secs_f64());
 }
