@@ -1,0 +1,2 @@
+ANSWER: B
+WHY: With only one Swamp and no creature to reanimate, Dark Ritual gives BBB to cast Collective Brutality (reveal hand and strip an instant/sorcery) and then an informed Cabal Therapy. That attacks the opponent's four-card hand before they can finish with the four-card Doomsday pile.

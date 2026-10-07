@@ -1,0 +1,290 @@
+{
+ "s4-g59-d2": {
+  "brady": "B",
+  "bot": "B",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s4-g44-d1": {
+  "brady": "A",
+  "bot": "B",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s4-g67-d18": {
+  "brady": "C",
+  "bot": "E",
+  "deep": "A",
+  "n": 5,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s3-g28-d19": {
+  "brady": "B",
+  "bot": "B",
+  "deep": "B",
+  "n": 3,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s3-g95-d7": {
+  "brady": "B",
+  "bot": "F",
+  "deep": "G",
+  "n": 7,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s4-g19-d19": {
+  "brady": "C",
+  "bot": "E",
+  "deep": "E",
+  "n": 5,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s4-g63-d32": {
+  "brady": "C",
+  "bot": "B",
+  "deep": "B",
+  "n": 8,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s4-g49-d36": {
+  "brady": "D",
+  "bot": "F",
+  "deep": "E",
+  "n": 8,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s4-g86-d21": {
+  "brady": "A",
+  "bot": "A",
+  "deep": "C",
+  "n": 4,
+  "weight": 1.0,
+  "batch": "batch1"
+ },
+ "s5-g60-d1": {
+  "brady": "A",
+  "bot": "B",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g108-d1": {
+  "brady": "B",
+  "bot": "B",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g56-d1": {
+  "brady": "B",
+  "bot": "B",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g40-d1": {
+  "brady": "B",
+  "bot": "A",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g19-d1": {
+  "brady": "A",
+  "bot": "B",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g70-d1": {
+  "brady": "B",
+  "bot": "A",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g95-d13": {
+  "brady": "C",
+  "bot": "D",
+  "deep": "A",
+  "n": 4,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g52-d14": {
+  "brady": "B",
+  "bot": "B",
+  "deep": "B",
+  "n": 3,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g32-d6": {
+  "brady": "D",
+  "bot": "E",
+  "deep": "D",
+  "n": 5,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g63-d9": {
+  "brady": "B",
+  "bot": "B",
+  "deep": "B",
+  "n": 4,
+  "weight": 0.5,
+  "batch": "batch2"
+ },
+ "s5-g105-d17": {
+  "brady": "D",
+  "bot": "H",
+  "deep": "H",
+  "n": 8,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g74-d10": {
+  "brady": "C",
+  "bot": "B",
+  "deep": "B",
+  "n": 5,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g20-d12": {
+  "brady": "C",
+  "bot": "A",
+  "deep": "E",
+  "n": 5,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s5-g10-d42": {
+  "brady": "D",
+  "bot": "C",
+  "deep": "D",
+  "n": 5,
+  "weight": 1.0,
+  "batch": "batch2"
+ },
+ "s6-ba-g9-d1": {
+  "brady": "A",
+  "bot": "B",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-ba-g11-d35": {
+  "brady": "A",
+  "bot": "A",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-bdat-g10-d9": {
+  "brady": "C",
+  "bot": "B",
+  "deep": "B",
+  "n": 3,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-bdat-g0-d9": {
+  "brady": "A",
+  "bot": "B",
+  "deep": "B",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-dt-g3-d51": {
+  "brady": "A",
+  "bot": "E",
+  "deep": "E",
+  "n": 5,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-dt-g10-d21": {
+  "brady": "B",
+  "bot": "C",
+  "deep": "B",
+  "n": 3,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-d-g2-d83": {
+  "brady": "C",
+  "bot": "B",
+  "deep": "E",
+  "n": 6,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-r-g14-d1": {
+  "brady": "B",
+  "bot": "A",
+  "deep": "A",
+  "n": 2,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-r-g3-d23": {
+  "brady": "B",
+  "bot": "B",
+  "deep": "B",
+  "n": 3,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-uc-g11-d26": {
+  "brady": "D",
+  "bot": "A",
+  "deep": "C",
+  "n": 4,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-uc-g13-d7": {
+  "brady": "C",
+  "bot": "B",
+  "deep": "A",
+  "n": 3,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-uc-g4-d15": {
+  "brady": "A",
+  "bot": "F",
+  "deep": "F",
+  "n": 9,
+  "weight": 1.0,
+  "batch": "batch3"
+ },
+ "s6-uc-g12-d34": {
+  "brady": "C",
+  "bot": "C",
+  "deep": "B",
+  "n": 3,
+  "weight": 1.0,
+  "batch": "batch3"
+ }
+}

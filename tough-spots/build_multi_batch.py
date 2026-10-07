@@ -20,7 +20,8 @@ for k, d in enumerate(sorted(glob.glob(os.path.join(runs, '*-vs-*')))):
     if not os.path.isdir(d):
         continue
     me, opp = os.path.basename(d).split('-vs-')
-    abbr = ''.join(w[0] for w in me.split('-'))
+    ini = lambda n: ''.join(w[0] for w in n.split('-'))
+    abbr = ini(me) + ini(opp)  # unique per matchup
     src = os.path.join(d, 'positions.jsonl')
     tmp = os.path.join(out, f'_{me}')
     pre = os.path.join(tmp, 'positions-prefixed.jsonl')

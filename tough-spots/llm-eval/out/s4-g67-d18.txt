@@ -1,0 +1,2 @@
+ANSWER: C
+WHY: Play Prismatic Vista first so Stock Up (found creature or Omniscience) has a spare mana against Daze, since their only land is tapped and just Force of Will or Daze can interfere. Show and Tell with no creature in hand would only hand them a free Aluren, so dig first.
