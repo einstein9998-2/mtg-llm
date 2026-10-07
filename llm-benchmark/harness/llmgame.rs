@@ -1015,6 +1015,46 @@ fn only_mana_or_pass(d: &Decision) -> bool {
     d.options.iter().all(|a| matches!(a.kind, ActionKind::Pass | ActionKind::ActivateMana))
 }
 
+/// Player-written macro: pick options by label rules for up to `left` more prompts (loops such as Aluren + Acererak).
+struct Auto {
+    rules: Vec<String>,
+    left: u32,
+    lifemin: i32,
+    done: u32,
+}
+
+/// Rules are tried in order; a rule is `[last:][stack:][=]<label text>`. `last:` picks the last matching option
+/// (the free Aluren cast is the later duplicate), `stack:` applies only while something is on the stack, `=` needs the
+/// whole label to match. Returns None when no rule matches, which ends the macro.
+fn auto_pick(rules: &[String], labels: &[String], stack_nonempty: bool) -> Option<usize> {
+    for r in rules {
+        let mut t = r.trim();
+        let (mut last, mut stack_only, mut exact) = (false, false, false);
+        loop {
+            if let Some(x) = t.strip_prefix("last:") {
+                last = true;
+                t = x;
+            } else if let Some(x) = t.strip_prefix("stack:") {
+                stack_only = true;
+                t = x;
+            } else if let Some(x) = t.strip_prefix('=') {
+                exact = true;
+                t = x;
+            } else {
+                break;
+            }
+        }
+        if t.is_empty() || (stack_only && !stack_nonempty) {
+            continue;
+        }
+        let hits: Vec<usize> = labels.iter().enumerate().filter(|(_, l)| if exact { l.as_str() == t } else { l.contains(t) }).map(|(i, _)| i).collect();
+        if !hits.is_empty() {
+            return Some(if last { *hits.last().unwrap() } else { hits[0] });
+        }
+    }
+    None
+}
+
 fn main() {
     let a: Vec<String> = std::env::args().collect();
     let flag = |name: &str| a.iter().position(|x| x == name).and_then(|i| a.get(i + 1)).cloned();
@@ -1050,6 +1090,15 @@ fn main() {
     dbk = d1;
     let mut g = Game::new(db.clone(), [da, dbk], seed, GameConfig { first_player: first, ..GameConfig::default() });
     let opp_seat = llm_seat.other();
+    // Two-LLM mode: the opponent seat is answered through its own prompt dir (same file protocol).
+    let opp_pdir: Option<PathBuf> = flag("--opp-pdir").map(PathBuf::from);
+    if let Some(d) = &opp_pdir {
+        std::fs::create_dir_all(d).unwrap();
+        for f in ["consult.req", "consult.txt", "ans.txt", "result.txt"] {
+            let _ = std::fs::remove_file(d.join(f));
+        }
+    }
+    let mut pending_events_opp: Vec<ViewEvent> = Vec::new();
     let model = UniformConsistentModel { decks: [da.main.clone(), dbk.main.clone()] };
     let cfg = SearchConfig { iterations: iters, seed: seed + 11, ..SearchConfig::default() };
     let ev: Box<dyn Evaluator> = match &opp_net {
@@ -1065,6 +1114,10 @@ fn main() {
     let me_iters: u32 = flag("--me-iters").and_then(|s| s.parse().ok()).unwrap_or(iters);
     let mut me_auto = MctsPolicy::new(&model, ev_me, SearchConfig { iterations: me_iters, seed: seed + 12, ..SearchConfig::default() });
     let mut seq = 0u32;
+    let mut actions: Vec<(u8, usize)> = Vec::new();
+    let mut autos: [Option<Auto>; 2] = [None, None];
+    let mut auto_notes: [Option<String>; 2] = [None, None];
+    let mut auto_total = 0u32;
     let mut log: Vec<u8> = Vec::new();
     use std::io::Write;
     let mut n_dec = 0u32;
@@ -1101,21 +1154,24 @@ fn main() {
                     g.apply(d.id, ri).unwrap();
                     continue;
                 }
-                if seat == opp_seat {
+                if seat == opp_seat && opp_pdir.is_none() {
                     let idx = opp.choose(&sv, d.options.len());
                     let _ = writeln!(log, "opp[{}] t{} {} -> {} {}", d.options.len(), obs.turn, step_name(obs.step), idx, d.options[idx].label);
-                    g.apply(d.id, idx).unwrap();
+                    { actions.push((seat.0, idx)); g.apply(d.id, idx).unwrap(); }
                     continue;
                 }
                 // Events are handed out once per apply; keep the ones that auto-answered windows swallow.
-                pending_events.extend(obs.events.iter().cloned());
+                let is_opp_llm = seat == opp_seat;
+                let cdir: PathBuf = if is_opp_llm { opp_pdir.clone().unwrap() } else { pdir.clone() };
+                let pe: &mut Vec<ViewEvent> = if is_opp_llm { &mut pending_events_opp } else { &mut pending_events };
+                pe.extend(obs.events.iter().cloned());
                 if d.trivial {
-                    g.apply(d.id, 0).unwrap();
+                    { actions.push((seat.0, 0)); g.apply(d.id, 0).unwrap(); }
                     continue;
                 }
-                if auto_llm {
+                if auto_llm && !is_opp_llm {
                     let idx = me_auto.choose(&sv, d.options.len());
-                    g.apply(d.id, idx).unwrap();
+                    { actions.push((seat.0, idx)); g.apply(d.id, idx).unwrap(); }
                     n_prompts += 1;
                     continue;
                 }
@@ -1125,27 +1181,47 @@ fn main() {
                 if matches!(d.kind, ViewDecisionKind::Priority) && !oneshot {
                     let only_pass = only_mana_or_pass(&d);
                     let stop = !obs.stack.is_empty()
-                        || if obs.active_is_me { obs.step == Step::Main1 || (obs.step == Step::Main2 && obs.battlefield.iter().any(|p| p.controlled_by_me && p.types.contains(Types::CREATURE))) } else { obs.step == Step::End };
+                        || if obs.active_is_me { obs.step == Step::Main1 || obs.step == Step::Main2 } else { obs.step == Step::End };
                     if only_pass || !stop {
                         auto_passes += 1;
-                        g.apply(d.id, 0).unwrap();
+                        { actions.push((seat.0, 0)); g.apply(d.id, 0).unwrap(); }
                         continue;
+                    }
+                }
+                // Macro in progress for this seat: answer by the player's rules until they stop matching.
+                if let Some(st) = autos[seat.0 as usize].as_mut() {
+                    let labels: Vec<String> = d.options.iter().map(|o| o.label.clone()).collect();
+                    let hit = auto_pick(&st.rules, &labels, !obs.stack.is_empty());
+                    let why = if st.left == 0 { Some("pick budget used up".to_string()) } else if obs.me.life <= st.lifemin { Some(format!("your life is {} (lifemin {})", obs.me.life, st.lifemin)) } else if hit.is_none() { Some("no rule matches this prompt".to_string()) } else { None };
+                    match (why, hit) {
+                        (None, Some(idx)) => {
+                            st.left -= 1;
+                            st.done += 1;
+                            auto_total += 1;
+                            let _ = writeln!(log, "  auto[{}] -> {} {}", seat.0, idx, d.options[idx].label);
+                            { actions.push((seat.0, idx)); g.apply(d.id, idx).unwrap(); }
+                            continue;
+                        }
+                        (why, _) => {
+                            auto_notes[seat.0 as usize] = Some(format!("AUTO MACRO STOPPED after {} picks: {}. Re-read this prompt.\n", st.done, why.unwrap_or_default()));
+                            autos[seat.0 as usize] = None;
+                        }
                     }
                 }
                 seq += 1;
                 n_prompts += 1;
                 let mut shown = obs.clone();
-                shown.events = std::mem::take(&mut pending_events);
-                let text = render(&shown, seq);
+                shown.events = std::mem::take(pe);
+                let text = format!("{}{}", auto_notes[seat.0 as usize].take().unwrap_or_default(), render(&shown, seq));
                 prompt_chars += text.len();
                 let _ = writeln!(log, "llm prompt {seq}: t{} {}", obs.turn, step_name(obs.step));
-                let tmp = pdir.join("prompt.tmp");
+                let tmp = cdir.join("prompt.tmp");
                 std::fs::write(&tmp, &text).unwrap();
-                std::fs::rename(&tmp, pdir.join("prompt.txt")).unwrap();
+                std::fs::rename(&tmp, cdir.join("prompt.txt")).unwrap();
                 let mut last_consult: Option<(Option<usize>, Option<usize>)> = None;
                 let idx = loop {
-                    if let Ok(t) = std::fs::read_to_string(pdir.join("consult.req")) {
-                        let _ = std::fs::remove_file(pdir.join("consult.req"));
+                    if let Ok(t) = std::fs::read_to_string(cdir.join("consult.req")) {
+                        let _ = std::fs::remove_file(cdir.join("consult.req"));
                         let mut it = t.split_whitespace();
                         let (rs, ri) = (it.next().and_then(|x| x.parse::<u32>().ok()), it.next().and_then(|x| x.parse::<u32>().ok()));
                         let mut words = t.trim().splitn(3, ' ');
@@ -1153,14 +1229,14 @@ fn main() {
                         let out = if rs != Some(seq) {
                             format!("!! consult refused: need '{seq} [iterations]' for the current prompt\n")
                         } else if cmd == "sim" {
-                            let (mine_d, theirs_d) = if llm_seat == Seat(0) { (da, dbk) } else { (dbk, da) };
+                            let (mine_d, theirs_d) = if seat == Seat(0) { (da, dbk) } else { (dbk, da) };
                             let txt = sim_report(&obs, &db, mine_d, theirs_d, seq, rest, seed);
                             n_sims += 1;
                             sim_chars += txt.len();
                             let _ = writeln!(log, "sim prompt {seq}: {}", rest.trim());
                             txt
                         } else if cmd == "odds" || cmd == "opp" {
-                            let (mine_d, theirs_d) = if llm_seat == Seat(0) { (da, dbk) } else { (dbk, da) };
+                            let (mine_d, theirs_d) = if seat == Seat(0) { (da, dbk) } else { (dbk, da) };
                             let txt = odds_report(&obs, &db, mine_d, theirs_d, seq, cmd, rest);
                             n_odds += 1;
                             odds_chars += txt.len();
@@ -1175,27 +1251,58 @@ fn main() {
                             last_consult = Some((bs, bn));
                             txt
                         };
-                        let ctmp = pdir.join("consult.tmp");
+                        let ctmp = cdir.join("consult.tmp");
                         std::fs::write(&ctmp, out).unwrap();
-                        std::fs::rename(&ctmp, pdir.join("consult.txt")).unwrap();
+                        std::fs::rename(&ctmp, cdir.join("consult.txt")).unwrap();
                     }
-                    if let Ok(t) = std::fs::read_to_string(pdir.join("ans.txt")) {
+                    if let Ok(t) = std::fs::read_to_string(cdir.join("auto.req")) {
+                        let _ = std::fs::remove_file(cdir.join("auto.req"));
+                        // "SEQ N LIFEMIN rule;rule;..."
+                        let mut it = t.trim().splitn(4, ' ');
+                        let (rs, n, lm, rules) = (it.next().and_then(|x| x.parse::<u32>().ok()), it.next().and_then(|x| x.parse::<u32>().ok()), it.next().and_then(|x| x.parse::<i32>().ok()), it.next().unwrap_or(""));
+                        let rules: Vec<String> = rules.split(';').map(|x| x.trim().to_string()).filter(|x| !x.is_empty()).collect();
+                        let labels: Vec<String> = d.options.iter().map(|o| o.label.clone()).collect();
+                        let first = if rs == Some(seq) && n.unwrap_or(0) >= 1 && lm.is_some() && !rules.is_empty() { auto_pick(&rules, &labels, !obs.stack.is_empty()) } else { None };
+                        match first {
+                            Some(i) => {
+                                autos[seat.0 as usize] = Some(Auto { rules, left: n.unwrap() - 1, lifemin: lm.unwrap(), done: 1 });
+                                auto_total += 1;
+                                let _ = writeln!(log, "  auto macro started at prompt {seq}");
+                                break i;
+                            }
+                            None => {
+                                let mut t2 = format!("!! auto refused: need 'auto {seq} N LIFEMIN rule;rule;...' with at least one rule matching an option of THIS prompt\n");
+                                t2.push_str(&text);
+                                std::fs::write(&tmp, t2).unwrap();
+                                std::fs::rename(&tmp, cdir.join("prompt.txt")).unwrap();
+                            }
+                        }
+                    }
+                    if let Ok(t) = std::fs::read_to_string(cdir.join("ans.txt")) {
                         let mut it = t.split_whitespace();
                         let (s, i) = (it.next().and_then(|x| x.parse::<u32>().ok()), it.next().and_then(|x| x.parse::<usize>().ok()));
-                        let _ = std::fs::remove_file(pdir.join("ans.txt"));
+                        let _ = std::fs::remove_file(cdir.join("ans.txt"));
                         match (s, i) {
                             (Some(s), Some(i)) if s == seq && i < d.options.len() => break i,
                             _ => {
                                 let mut t2 = format!("!! bad answer '{}' (need '{seq} <index 0..{}>')\n", t.trim(), d.options.len() - 1);
                                 t2.push_str(&text);
                                 std::fs::write(&tmp, t2).unwrap();
-                                std::fs::rename(&tmp, pdir.join("prompt.txt")).unwrap();
+                                std::fs::rename(&tmp, cdir.join("prompt.txt")).unwrap();
                             }
                         }
                     }
                     std::thread::sleep(std::time::Duration::from_millis(40));
                 };
-                let _ = writeln!(log, "llm -> {} {}", idx, d.options[idx].label);
+                let _ = writeln!(log, "{} -> {} {}", if is_opp_llm { "llm-b" } else { "llm" }, idx, d.options[idx].label);
+                {
+                    // Full transcript per player for post-game review (truth dir only; players never see it).
+                    use std::io::Write as _;
+                    let tn = if is_opp_llm { "transcript-b.txt" } else { "transcript-a.txt" };
+                    if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(tdir.join(tn)) {
+                        let _ = writeln!(f, "{}\n>>> ACTIONS-BEFORE {}\n>>> CHOSE [{}] {}\n", text, actions.len(), idx, d.options[idx].label);
+                    }
+                }
                 if let Some((bs, bn)) = last_consult {
                     consult_decisions += 1;
                     followed_search += (bs == Some(idx)) as u32;
@@ -1206,7 +1313,7 @@ fn main() {
                     oneshot_done = Some(format!("{} {}", idx, d.options[idx].label));
                     break None;
                 }
-                g.apply(d.id, idx).unwrap();
+                { actions.push((seat.0, idx)); g.apply(d.id, idx).unwrap(); }
             }
         }
     };
@@ -1222,10 +1329,19 @@ fn main() {
         None => "DRAW / TRUNCATED".to_string(),
         },
     };
-    let summary = format!("{verdict} | prompts {n_prompts} | prompt chars {prompt_chars} | auto-passed windows {auto_passes} | odds calls {n_odds} | odds chars {odds_chars} | sim calls {n_sims} | sim chars {sim_chars} | consults {n_consults} | consult chars {consult_chars} | consulted decisions {consult_decisions} (took search-best {followed_search}, net-best {followed_net}) | wall {:.0}s", t0.elapsed().as_secs_f64());
+    let summary = format!("{verdict} | auto picks {auto_total} | prompts {n_prompts} | prompt chars {prompt_chars} | auto-passed windows {auto_passes} | odds calls {n_odds} | odds chars {odds_chars} | sim calls {n_sims} | sim chars {sim_chars} | consults {n_consults} | consult chars {consult_chars} | consulted decisions {consult_decisions} (took search-best {followed_search}, net-best {followed_net}) | wall {:.0}s", t0.elapsed().as_secs_f64());
     let _ = writeln!(log, "{summary}");
     std::fs::write(tdir.join("log.txt"), &log).unwrap();
+    std::fs::write(tdir.join("actions.json"), serde_json::to_string(&actions).unwrap()).unwrap();
     std::fs::write(pdir.join("result.txt"), &summary).unwrap();
+    if let Some(od) = &opp_pdir {
+        let ov = match llm_won { Some(true) => "YOU LOST", Some(false) => "YOU WON", None => "DRAW / TRUNCATED" };
+        let osum = summary.replacen(&verdict, ov, 1);
+        std::fs::write(od.join("result.txt"), &osum).unwrap();
+        let t2 = od.join("prompt.tmp");
+        std::fs::write(&t2, format!("=== GAME OVER === {osum}\n")).unwrap();
+        std::fs::rename(&t2, od.join("prompt.txt")).unwrap();
+    }
     let tmp = pdir.join("prompt.tmp");
     std::fs::write(&tmp, format!("=== GAME OVER === {summary}\n")).unwrap();
     std::fs::rename(&tmp, pdir.join("prompt.txt")).unwrap();

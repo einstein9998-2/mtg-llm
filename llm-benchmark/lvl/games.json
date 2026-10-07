@@ -1,0 +1,154 @@
+{
+ "w1g1": {
+  "seed": 3001,
+  "a_seat": 0,
+  "b_seat": 1,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter",
+  "a_result": "won",
+  "b_result": "lost"
+ },
+ "w1g2": {
+  "seed": 3002,
+  "a_seat": 1,
+  "b_seat": 0,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter",
+  "a_result": "won",
+  "b_result": "lost"
+ },
+ "w1g3": {
+  "seed": 3003,
+  "a_seat": 0,
+  "b_seat": 1,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter",
+  "a_result": "lost",
+  "b_result": "won"
+ },
+ "w1g4": {
+  "seed": 3004,
+  "a_seat": 1,
+  "b_seat": 0,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter",
+  "a_result": "lost",
+  "b_result": "won"
+ },
+ "g5": {
+  "seed": 3005,
+  "a_seat": 0,
+  "b_seat": 1,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter",
+  "a_result": "won",
+  "b_result": "lost"
+ },
+ "g6": {
+  "seed": 3006,
+  "a_seat": 1,
+  "b_seat": 0,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter",
+  "a_result": "won",
+  "b_result": "lost"
+ },
+ "g7": {
+  "seed": 3007,
+  "a_seat": 0,
+  "b_seat": 1,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter",
+  "a_result": "won",
+  "b_result": "lost"
+ },
+ "g8": {
+  "seed": 3008,
+  "a_seat": 1,
+  "b_seat": 0,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter",
+  "a_result": "lost",
+  "b_result": "won"
+ },
+ "g9": {
+  "seed": 3009,
+  "a_seat": 0,
+  "b_seat": 1,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "boros-aggro",
+  "a_result": "won",
+  "b_result": "lost"
+ },
+ "g10": {
+  "seed": 3010,
+  "a_seat": 1,
+  "b_seat": 0,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "boros-aggro",
+  "a_result": "won",
+  "b_result": "lost"
+ },
+ "g11": {
+  "seed": 3011,
+  "a_seat": 0,
+  "b_seat": 1,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "boros-aggro",
+  "a_result": "lost",
+  "b_result": "won"
+ },
+ "g12": {
+  "seed": 3012,
+  "a_seat": 1,
+  "b_seat": 0,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "boros-aggro",
+  "a_result": "won",
+  "b_result": "lost"
+ },
+ "g13": {
+  "seed": 3013,
+  "a_seat": 0,
+  "b_seat": 1,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter"
+ },
+ "g14": {
+  "seed": 3014,
+  "a_seat": 1,
+  "b_seat": 0,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "boros-aggro"
+ },
+ "g15": {
+  "seed": 3015,
+  "a_seat": 0,
+  "b_seat": 1,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "ur-cutter"
+ },
+ "g16": {
+  "seed": 3016,
+  "a_seat": 1,
+  "b_seat": 0,
+  "first_seat": 0,
+  "a_deck": "alurentell",
+  "b_deck": "boros-aggro"
+ }
+}

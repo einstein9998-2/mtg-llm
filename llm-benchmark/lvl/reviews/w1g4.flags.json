@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 25, "kind": "likely-mistake", "note": "T4 with Hedge Maze untapped: played and cracked Misty before Brainstorm, so the 2 Acererak put back stayed on top and Ponder saw only them plus Strand. Better: Brainstorm off Maze, then crack Misty to shuffle them away, then Ponder 3 fresh cards (~34% vs ~12% to find FoW/Veil; one Force wins the T6 Show and Tell war)."},
+  {"seat": "a", "seq": 57, "kind": "close", "note": "T6 at 14 life facing DRC 3/3 flier + Monk (5/turn), no Force or Veil, 3 Show and Tell + Atraxa in hand, opp tapped out with 4 cards: jammed Show and Tell with a Daze spare (eaten by Force). Alternative: Stock Up first (Maze spare) to dig for Force/Veil and try on T8 at about 5 life."},
+  {"seat": "b", "seq": 71, "kind": "close", "note": "T7 main 2, opp at 5 with 6 cards: held Murktide as the only Force of Will pitch instead of casting it with delve. B's report calls this a mistake; it looks right because the board already kills next turn and the turn-8 Force pitching Murktide stopped Show and Tell."},
+  {"seat": "b", "seq": 19, "kind": "close", "note": "T3 Preordain against an unknown blue-green opponent (Hedge Maze): bottomed Prismari Charm along with Unholy Heat to dig for a threat (drew DRC). Charm is the deck's only answer to a resolved Atraxa/Aluren/Omniscience, but B already held 2 Force of Will."}
+]
