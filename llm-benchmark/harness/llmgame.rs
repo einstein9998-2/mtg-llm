@@ -1122,10 +1122,17 @@ fn main() {
     let (names, decks) = load_deck_dir(&db, dir);
     let find = |n: &str| names.iter().position(|x| x == n).unwrap_or_else(|| panic!("deck {n} not in {names:?}"));
     let (mut da, mut dbk) = (&decks[find(my_deck)], &decks[find(opp_deck)]);
+    // What each player is told about the other's list (odds/opp/sim pools). After sideboarding the real lists differ
+    // from what the other side can know, so a match passes the opponent's game-1 main as the expectation.
+    let (a_real, b_real) = (da, dbk);
+    let exp_b_for_a = flag("--expect-opp").map(|n| &decks[find(&n)]).unwrap_or(b_real);
+    let exp_a_for_b = flag("--expect-llm").map(|n| &decks[find(&n)]).unwrap_or(a_real);
     // decks are indexed by seat: seat 0 gets the first, seat 1 the second.
     let (d0, d1) = if llm_seat == Seat(0) { (da, dbk) } else { (dbk, da) };
     da = d0;
     dbk = d1;
+    // belief[s] = the list seat s expects the other seat to play.
+    let belief: [&DeckList; 2] = if llm_seat == Seat(0) { [exp_b_for_a, exp_a_for_b] } else { [exp_a_for_b, exp_b_for_a] };
     let mut g = Game::new(db.clone(), [da, dbk], seed, GameConfig { first_player: first, ..GameConfig::default() });
     let opp_seat = llm_seat.other();
     // Two-LLM mode: the opponent seat is answered through its own prompt dir (same file protocol).
@@ -1268,14 +1275,14 @@ fn main() {
                         let out = if rs != Some(seq) {
                             format!("!! consult refused: need '{seq} [iterations]' for the current prompt\n")
                         } else if cmd == "sim" {
-                            let (mine_d, theirs_d) = if seat == Seat(0) { (da, dbk) } else { (dbk, da) };
+                            let (mine_d, theirs_d) = if seat == Seat(0) { (da, belief[0]) } else { (dbk, belief[1]) };
                             let txt = sim_report(&obs, &db, mine_d, theirs_d, seq, rest, seed);
                             n_sims += 1;
                             sim_chars += txt.len();
                             let _ = writeln!(log, "sim prompt {seq}: {}", rest.trim());
                             txt
                         } else if cmd == "odds" || cmd == "opp" {
-                            let (mine_d, theirs_d) = if seat == Seat(0) { (da, dbk) } else { (dbk, da) };
+                            let (mine_d, theirs_d) = if seat == Seat(0) { (da, belief[0]) } else { (dbk, belief[1]) };
                             let txt = odds_report(&obs, &db, mine_d, theirs_d, seq, cmd, rest);
                             n_odds += 1;
                             odds_chars += txt.len();

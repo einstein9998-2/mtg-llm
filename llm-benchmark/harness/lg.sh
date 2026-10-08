@@ -39,12 +39,14 @@ case $cmd in
   rm -rf $W/runs/$tag; mkdir -p $P $T
   nohup $BIN $DECKS $MYDECK $OPPDECK $P $T --seed $seed --llm-seat $seat --first $first --iters $iters $extra > $T/stdout.txt 2>&1 &
   wait_new none ;;
- pick)
+ pick) # pick TAG SEQ INDEX ["why"]: the optional reason is logged for the post-game play-by-play and changes nothing
   h=$(md5sum $P/prompt.txt | cut -d' ' -f1)
+  [ -n "$5" ] && printf '%s\t%s\t%s\n' "$3" "$4" "$5" >> $W/runs/$tag/reasons.tsv
   echo "$3 $4" > $P/ans.tmp && mv $P/ans.tmp $P/ans.txt
   wait_new $h ;;
  auto) # auto TAG SEQ N LIFEMIN "rule;rule;..." : answer this prompt and the next ones by label rules (loops), see BRIEF
   h=$(md5sum $P/prompt.txt | cut -d' ' -f1)
+  [ -n "$7" ] && printf '%s\tauto\t%s\n' "$3" "$7" >> $W/runs/$tag/reasons.tsv
   echo "$3 $4 $5 $6" > $P/auto.tmp && mv $P/auto.tmp $P/auto.req
   wait_new $h ;;
  show) cat $P/prompt.txt ;;
