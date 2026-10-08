@@ -1,0 +1,86 @@
+id: ur-a-levels-are-gained-one-at-a-time-never-skipped-never-repeated
+title: "Level 3 is not offered at level 1, level 2 cannot be activated twice, and level 3 is not offered while the level 2 trigger is on the stack"
+area: card
+cards: ["Stormchaser's Talent", Island, Lightning Bolt]
+tags: [stormchasers-talent, class, level-up, level-n-minus-1, legal-action-mask, sorcery-timing, ur-alternate]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "{5}{U}: Level 3", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "716.2a", text: "This Class’s level becomes N. Activate only if this Class is level N-1 and only as a sorcery", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 1}}
+      - "Island @is1"
+      - "Island @is2"
+      - "Island @is3"
+      - "Island @is4"
+      - "Island @is5"
+      - "Island @is6"
+      - "Island @is7"
+      - "Island @is8"
+      - "Island @is9"
+      - "Island @is10"
+    graveyard: ["Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - label: level-1
+    check:
+      legal:
+        p0:
+          include: [{t: activate, source: "@talent", ability: 0}]
+          exclude: [{t: activate, source: "@talent", ability: 1}]
+  - expect_illegal: {p0: {t: activate, source: "@talent", ability: 1, pay: auto}}
+  - p0: {t: activate, source: "@talent", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@bolt"}
+  - label: level-2-trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0}]
+      p0: {battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 2}}]}
+      legal:
+        p0:
+          exclude: [{t: activate, source: "@talent", ability: 0}, {t: activate, source: "@talent", ability: 1}]
+  - expect_illegal: {p0: {t: activate, source: "@talent", ability: 1, pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: level-2-empty-stack
+    check:
+      stack: []
+      p0: {hand: [Lightning Bolt]}
+      legal:
+        p0:
+          include: [{t: activate, source: "@talent", ability: 1}]
+          exclude: [{t: activate, source: "@talent", ability: 0}]
+  - expect_illegal: {p0: {t: activate, source: "@talent", ability: 0, pay: auto}}
+  - p0: {t: activate, source: "@talent", ability: 1, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: level-3
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 3}}]}
+      legal:
+        p0:
+          exclude: [{t: activate, source: "@talent", ability: 0}, {t: activate, source: "@talent", ability: 1}]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: []
+      battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 3}}]
+notes: >
+  Ten Islands pay for both {3}{U} and {5}{U}, so only the level restriction (and the stack) decides. At level 1 only
+  Level 2 is offered, never Level 3 (levels cannot be skipped). While the level 2 trigger is on the stack neither level-up
+  is offered (sorcery timing needs an empty stack). At level 2 the first ability is gone (Activate only if this Class is
+  level 1) and the second is offered. At level 3 neither is offered. The ability index convention is the brief's: 0 = Level 2,
+  1 = Level 3. A wrong engine keeps offering Level 2 (repeatable level-up) or allows the jump from 1 to 3.

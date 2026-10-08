@@ -1,0 +1,73 @@
+id: ur-a-level-2-returns-instant-or-sorcery-from-your-graveyard
+title: "Level 2 is an activated ability that resolves to level 2, then its trigger targets an instant or sorcery card in your own graveyard and returns it"
+area: card
+cards: ["Stormchaser's Talent", Island, Lightning Bolt, Ponder, Ocelot Pride, Brainstorm]
+tags: [stormchasers-talent, class, level-up, activated-ability, becomes-level-2, trigger-target, graveyard-return, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "{3}{U}: Level 2", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.", verified: true}
+  - {kind: cr, ref: "716.2a", text: "“[Cost]: Level N — [Abilities]” means “[Cost]: This Class’s level becomes N. Activate only if this Class is level N-1 and only as a sorcery”", verified: true}
+  - {kind: cr, ref: "603.3d", text: "The remainder of the process for putting a triggered ability on the stack is identical to the process for casting a spell listed in rules 601.2c-d.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: []
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 1}}
+      - "Island @is1"
+      - "Island @is2"
+      - "Island @is3"
+      - "Island @is4"
+    graveyard: ["Ocelot Pride @pride", "Lightning Bolt @bolt", "Ponder @ponder", "Island @isg"]
+    library_pad: 10
+  p1:
+    graveyard: ["Brainstorm @pbs"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@talent", ability: 0, pay: auto}
+  - label: level-up-on-stack
+    check:
+      stack: [{kind: activated, source: "@talent", controller: p0}]
+      p0:
+        battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 1}}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_target
+      slot: 0
+      answer: "@bolt"
+      expect_options: {include: ["@bolt", "@ponder"], exclude: ["@pride", "@isg", "@pbs"], count: 2}
+  - label: trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0, text_contains: "return", targets: ["@bolt"]}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 2}}]
+        hand: []
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Ocelot Pride, Ponder, Island]
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 2}}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+    p1:
+      graveyard: [Brainstorm]
+notes: >
+  The level-up is an activated ability (4 mana, uses the stack), not a spell; the level changes only when it
+  resolves, and "becomes level 2" then triggers. The target is chosen when the trigger goes on the stack and must be an
+  instant or sorcery card in p0's graveyard: Lightning Bolt and Ponder are offered; the creature (Ocelot Pride), the
+  land, and the opponent's Brainstorm are not (count 2). Bolt returns to hand; the rest of the graveyard is untouched.
+  A wrong engine changes the level at activation time, lets the trigger pick from either graveyard or any card type, or
+  returns a card without a target choice.

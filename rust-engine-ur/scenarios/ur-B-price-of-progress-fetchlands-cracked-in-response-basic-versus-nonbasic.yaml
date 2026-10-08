@@ -1,0 +1,61 @@
+id: ur-b-price-of-progress-fetchlands-cracked-in-response-basic-versus-nonbasic
+title: "p1 cracks two fetchlands in response to Price of Progress: the one that finds a basic Island stops counting, the one that finds Tropical Island still counts; the caster's Volcanic Island counts"
+area: card
+cards: [Price of Progress, Mountain, Island, Volcanic Island, Scalding Tarn, Misty Rainforest, Tropical Island]
+tags: [price-of-progress, nonbasic-land, fetchland, crack-in-response, sacrifice-cost, basic-supertype, search, life-payment]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Price of Progress, text: "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.", verified: true}
+  - {kind: oracle, card: Misty Rainforest, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: oracle, card: Scalding Tarn, text: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.", verified: true}
+  - {kind: cr, ref: "205.4c", text: "Any land with the supertype “basic” is a basic land. Any land that doesn’t have this supertype is a nonbasic land, even if it has a basic land type.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Price of Progress @pop"]
+    battlefield: ["Mountain @m", "Island @i", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    battlefield: ["Scalding Tarn @tarn", "Misty Rainforest @misty", "Mountain @pm"]
+    library: ["Tropical Island @trop", "Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pop", pay: {tap: ["@m", "@i"]}}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@tarn", ability: 0, targets: []}
+  - p1: {t: activate, source: "@misty", ability: 0, targets: []}
+  - label: both-fetches-on-stack
+    check:
+      stack: [{kind: spell, card: "@pop"}, {kind: activated, source: "@tarn"}, {kind: activated, source: "@misty"}]
+      p1: {life: 18, battlefield: [{card: Mountain}], graveyard: [Scalding Tarn, Misty Rainforest]}
+  - resolve_top: true
+  - p1: {decision: search, purpose: fetch, found: "@trop", expect_options: {include: ["@trop", "@isl"]}}
+  - resolve_top: true
+  - p1: {decision: search, purpose: fetch, found: "@isl", expect_options: {include: ["@isl"]}}
+  - label: pop-alone-on-stack
+    check:
+      stack: [{kind: spell, card: "@pop"}]
+      p1: {battlefield: [{card: Mountain}, {card: Tropical Island}, {card: Island}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Price of Progress]
+    p1:
+      life: 16
+      battlefield: [{card: Mountain}, {card: Tropical Island}, {card: Island}]
+      graveyard: [Scalding Tarn, Misty Rainforest]
+notes: >
+  While Price of Progress is on the stack p1 pays 1 life and sacrifices each fetchland as a cost, so both leave the
+  battlefield at once and stop counting (p1 is at 18). Misty Rainforest resolves first (last activated) and finds
+  Tropical Island (a Forest Island card, nonbasic); Scalding Tarn then finds a basic Island. When Price of Progress
+  resolves p1 controls one nonbasic land (Tropical Island) = 2 damage (18 to 16); the basic Island and Mountain add
+  nothing. p0 controls one nonbasic (Volcanic Island) = 2 damage (20 to 18). The library shuffles between fetches
+  (random: any; the second search is for the Island that is in the library either way). A wrong engine counts
+  the fetchlands as still present, counts every fetched land, or applies Price of Progress' count when it was cast.

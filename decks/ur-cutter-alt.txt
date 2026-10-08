@@ -1,0 +1,37 @@
+# UR Cutter alternate (Stormchaser's Talent / Boomerang Basics / Flow State, no Murktide) | Tempo (non-combo)
+# Source: Brady's own list, posted 2026-10-07. Not a tournament list; rarely played, Brady thinks it is better than the main UR Cutter list.
+# The main UR opponent stays decks/ur-cutter.txt. Engine gaps: Stormchaser's Talent, Pyrokinesis, Price of Progress (see legacy-deck-set.md).
+# Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.
+
+4 Dragon's Rage Channeler
+1 Thundering Falls
+1 Flooded Strand
+4 Force of Will
+4 Lightning Bolt
+4 Stormchaser's Talent
+1 Misty Rainforest
+4 Scalding Tarn
+3 Boomerang Basics
+4 Ponder
+4 Wasteland
+4 Flow State
+1 Mountain
+1 Island
+1 Polluted Delta
+4 Mishra's Bauble
+4 Brainstorm
+3 Cori-Steel Cutter
+2 Daze
+1 Unholy Heat
+4 Volcanic Island
+1 Bloodstained Mire
+
+2 Hydroblast
+1 Torpor Orb
+2 Pyroblast
+1 Consign to Memory
+1 Force of Negation
+2 Price of Progress
+2 Tormod's Crypt
+2 Pyrokinesis
+2 Unholy Heat

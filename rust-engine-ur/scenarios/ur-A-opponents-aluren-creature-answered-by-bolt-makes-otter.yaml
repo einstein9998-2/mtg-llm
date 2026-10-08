@@ -1,0 +1,64 @@
+id: ur-a-opponents-aluren-creature-answered-by-bolt-makes-otter
+title: "The opponent casts a creature for free with Aluren; p0 responds with Lightning Bolt and the level 3 Talent makes an Otter"
+area: card
+cards: ["Stormchaser's Talent", Aluren, Ocelot Pride, Lightning Bolt, Mountain, "Otter Token"]
+tags: [stormchasers-talent, class, level-3, cast-trigger, aluren, response, opponents-turn, alurentell, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - "Mountain @mt"
+    library_pad: 10
+  p1:
+    hand: ["Ocelot Pride @pride"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@pride", alt_cost: {free: aluren}}
+  - p1: {t: pass}
+  - label: p0-responds
+    check:
+      stack: [{kind: spell, card: "@pride", controller: p1}]
+      pending: {actor: p0, kind: priority}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - label: trigger-above-bolt-above-pride
+    check:
+      stack:
+        - {kind: spell, card: "@pride", controller: p1}
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {card: Mountain, tapped: true}
+        - {token: Otter Token, pt: [1, 1]}
+    p1:
+      life: 17
+      battlefield:
+        - {card: Aluren}
+        - {card: Ocelot Pride, sick: true}
+notes: >
+  The Alurentell player's free creature spell is the only thing p1 casts; p0, receiving priority with it on the stack,
+  responds with an instant paid from the Mountain. The Talent triggers on p0's own cast (not on p1's creature spell), the
+  trigger resolves first, then Bolt (p1 at 17), then Ocelot Pride. Priority returns to p1, the active player, after each
+  resolution (117.3b). A wrong engine does not let p0 respond before the creature resolves, or fires the Talent on p1's cast.

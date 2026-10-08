@@ -1,0 +1,61 @@
+id: ur-a-level-2-trigger-target-exiled-in-response-returns-nothing
+title: "If the level 2 trigger's only target is exiled in response (Faerie Macabre), the trigger does not resolve and the other graveyard cards stay put"
+area: card
+cards: ["Stormchaser's Talent", Island, Lightning Bolt, Ponder, Faerie Macabre]
+tags: [stormchasers-talent, class, becomes-level-2, target-illegal, graveyard-hate, faerie-macabre, ur-alternate]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Faerie Macabre, text: "Discard this card: Exile up to two target cards from graveyards.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve. It's removed from the stack", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 1}}
+      - "Island @is1"
+      - "Island @is2"
+      - "Island @is3"
+      - "Island @is4"
+    graveyard: ["Ponder @ponder", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Faerie Macabre @fm"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@talent", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@bolt"}
+  - check:
+      stack: [{kind: triggered, source: "@talent", controller: p0, targets: ["@bolt"]}]
+  - p0: {t: pass}
+  - p1: {t: activate_from_hand, source: "@fm", ability: 0, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: bolt-exiled-trigger-still-on-stack
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {exile: [Lightning Bolt], graveyard: [Ponder]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      exile: [Lightning Bolt]
+      graveyard: [Ponder]
+      battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 2}}]
+    p1:
+      hand: []
+      graveyard: [Faerie Macabre]
+notes: >
+  The target is chosen when the trigger goes on the stack, so p1 can respond by exiling exactly that card. On
+  resolution the single target is illegal (it left the graveyard), so the trigger is removed and nothing returns; Ponder,
+  also a legal target earlier, is NOT substituted. The Talent stays at level 2 because the level change already happened
+  when the activated ability resolved. A wrong engine re-targets, returns the exiled card, or reverts the level.

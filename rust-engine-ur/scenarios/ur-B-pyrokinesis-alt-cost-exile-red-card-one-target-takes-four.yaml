@@ -1,0 +1,54 @@
+id: ur-b-pyrokinesis-alt-cost-exile-red-card-one-target-takes-four
+title: "Pyrokinesis cast by exiling a red card from hand (no mana) puts all 4 damage on one target and kills a 3/4"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Brainstorm, Street Wraith]
+tags: [pyrokinesis, alternative-cost, exile-red-card, divided-damage, single-target, lethal-damage, ur-cutter-alt]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "You may exile a red card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Pyrokinesis, text: "Pyrokinesis deals 4 damage divided as you choose among any number of target creatures.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell's text, or applied to it from another effect, that its controller may pay rather than paying the spell's mana cost.", verified: true}
+  - {kind: cr, ref: "601.2d", text: "If the spell requires the player to divide or distribute an effect (such as damage or counters) among one or more targets, the player announces the division. Each of these targets must receive at least one of whatever is being divided.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed. Regeneration can replace this event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt", "Brainstorm @bs"]
+    library_pad: 10
+  p1:
+    battlefield: ["Street Wraith @salv"]
+    library_pad: 10
+script:
+  - check:
+      legal:
+        p0:
+          include: [{t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}}]
+          exclude: [{t: cast, card: "@pyro", alt_cost: null}]
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@salv": 4}}
+  - label: on-stack
+    check:
+      stack: [{kind: spell, card: "@pyro", controller: p0}]
+      p0: {hand: [Brainstorm], exile: [Lightning Bolt], spells_cast_this_turn: 1}
+      p1: {battlefield: [{card: Street Wraith, damage: 0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm]
+      graveyard: [Pyrokinesis]
+      exile: [Lightning Bolt]
+    p1:
+      battlefield: []
+      graveyard: [Street Wraith]
+notes: >
+  p0 has no lands at all, so the only way to cast the six-mana Pyrokinesis is the alternative cost: exile a red card
+  from hand (Lightning Bolt; Brainstorm is blue and stays). The exile is paid as the spell is cast (601.2h), so the
+  Bolt is already in exile while Pyrokinesis is still on the stack (mid-script check). One target means the whole
+  division is 4 on that target (601.2d: at least 1 each, shares sum to 4); Street Wraith (3/4) has lethal damage
+  marked and is destroyed (704.5g). A wrong engine exiles at resolution, offers the cast with no red card,
+  leaves the Bolt in hand, or treats 4 damage as less than lethal on a 3/4.

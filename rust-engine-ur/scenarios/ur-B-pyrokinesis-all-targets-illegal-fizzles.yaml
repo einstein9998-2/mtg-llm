@@ -1,0 +1,54 @@
+id: ur-b-pyrokinesis-all-targets-illegal-fizzles
+title: "Pyrokinesis with both targets sacrificed in response does not resolve (fizzles) and goes to the graveyard; the untargeted creature takes nothing"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Goblin Bombardment, Guide of Souls, Containment Priest, "Thassa's Oracle"]
+tags: [pyrokinesis, divided-damage, all-targets-illegal, fizzle, sacrifice-in-response, goblin-bombardment]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "Pyrokinesis deals 4 damage divided as you choose among any number of target creatures.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard. A player can’t sacrifice something that isn’t a permanent, or something that’s a permanent they don’t control. Sacrificing a permanent doesn’t destroy it, so regeneration or other effects that replace destruction can’t affect this action.", verified: true}
+  - {kind: oracle, card: Goblin Bombardment, text: "Sacrifice a creature: This enchantment deals 1 damage to any target.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    battlefield: ["Goblin Bombardment @bomb", "Guide of Souls @sav", "Containment Priest @raven", "Thassa's Oracle @oracle"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@sav": 2, "@raven": 2}}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@sav"], targets: [{player: p0}]}
+  - p1: {t: activate, source: "@bomb", ability: 0, sacrifice: ["@raven"], targets: [{player: p0}]}
+  - label: both-targets-gone
+    check:
+      stack: [{kind: spell, card: "@pyro", controller: p0}, {kind: activated, source: "@bomb"}, {kind: activated, source: "@bomb"}]
+      p1: {graveyard: [Guide of Souls, Containment Priest]}
+  - resolve_top: true
+  - resolve_top: true
+  - label: pyrokinesis-on-top
+    check:
+      stack: [{kind: spell, card: "@pyro", controller: p0}]
+      p0: {life: 18}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Pyrokinesis]
+      exile: [Lightning Bolt]
+    p1:
+      battlefield: [{card: Goblin Bombardment}, {card: "Thassa's Oracle", damage: 0}]
+      graveyard: [Guide of Souls, Containment Priest]
+notes: >
+  p1 gets priority with Pyrokinesis on the stack and activates Goblin Bombardment twice, sacrificing each target as a
+  cost (so each target has left the battlefield before anything resolves). The two pings resolve first (p0 at 18).
+  When Pyrokinesis resolves, every target is illegal, so it does not resolve at all (608.2b) and is put into its
+  owner's graveyard; Thassa's Oracle was never a target and has no damage. A wrong engine applies the damage to
+  something else, keeps the spell on the stack, or exiles it.

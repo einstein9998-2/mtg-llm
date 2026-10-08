@@ -1,0 +1,59 @@
+id: ur-b-boomerang-basics-opponents-aluren-no-draw-and-free-casts-end
+title: "Boomerang Basics on the opponent's Aluren returns it to their hand and I do not draw; p1 could respond with a free Ocelot Pride, but not once Aluren is gone"
+area: card
+cards: [Boomerang Basics, Island, Aluren, Ocelot Pride, Ponder]
+tags: [boomerang-basics, bounce, opponent-permanent, no-draw, aluren, enchantment, free-cast, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: cr, ref: "400.3", text: "If an object would go to any library, graveyard, or hand other than its owner’s, it goes to its owner’s corresponding zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @isl"]
+    library: ["Ponder"]
+    library_pad: 10
+  p1:
+    hand: ["Ocelot Pride @pride"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@alu"], pay: auto}
+  - p0: {t: pass}
+  - label: p1-may-respond-with-free-pride
+    check:
+      pending: {actor: p1, kind: priority}
+      legal: {p1: {include: [{t: cast, card: "@pride", alt_cost: {free: aluren}}]}}
+  - p1: {t: pass}
+  - label: aluren-bounced
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {hand: [], library_count: 11}
+      p1: {hand: [Aluren, Ocelot Pride], battlefield: []}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@pride", alt_cost: {free: aluren}}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Boomerang Basics]
+      library_count: 11
+    p1:
+      hand: [Aluren, Ocelot Pride]
+      battlefield: []
+      graveyard: []
+    legal: {p1: {exclude: [{t: cast, card: "@pride"}]}}
+notes: >
+  Aluren is an enchantment, so Boomerang Basics may target it. p0 did not control it (p1 did), so no card is drawn: p0's
+  hand stays empty and its library keeps eleven cards. While Boomerang Basics is on the stack Aluren still works: p1
+  could cast Ocelot Pride (mana value 1) for free at instant speed (positive control). After Aluren is in p1's hand,
+  p1 has no lands and the free cast is gone: casting the Ocelot Pride is not legal at all (p1 has no mana). A wrong engine
+  draws a card whenever the target was a permanent of any controller, or leaves Aluren's permission active.

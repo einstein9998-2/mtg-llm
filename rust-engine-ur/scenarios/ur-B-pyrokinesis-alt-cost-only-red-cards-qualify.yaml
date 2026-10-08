@@ -1,0 +1,48 @@
+id: ur-b-pyrokinesis-alt-cost-only-red-cards-qualify
+title: "Only a red card can be exiled for Pyrokinesis: blue, colorless and Pyrokinesis itself are illegal; a blue-red card and a red artifact are legal"
+area: card
+cards: [Pyrokinesis, Brainstorm, Lotus Petal, Prismari Charm, Cori-Steel Cutter, Ocelot Pride]
+tags: [pyrokinesis, alternative-cost, exile-red-card, card-color, multicolored, colorless, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "You may exile a red card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "105.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+  - {kind: cr, ref: "105.2b", text: "A multicolored object is two or more of the five colors.", verified: true}
+  - {kind: cr, ref: "105.2c", text: "A colorless object has no color.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast. The controller of the spell announces their intentions to pay that cost as described in rule 601.2b.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Brainstorm @bs", "Lotus Petal @petal", "Prismari Charm @charm", "Cori-Steel Cutter @cutter"]
+    library_pad: 10
+  p1:
+    battlefield: ["Ocelot Pride @pride"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bs"}, divide: {"@pride": 4}}}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@petal"}, divide: {"@pride": 4}}}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@pyro"}, divide: {"@pride": 4}}}
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@charm"}, divide: {"@pride": 4}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Brainstorm, Lotus Petal, Cori-Steel Cutter]
+      graveyard: [Pyrokinesis]
+      exile: [Prismari Charm]
+    p1:
+      battlefield: []
+      graveyard: [Ocelot Pride]
+notes: >
+  A card is the color of the mana symbols in its mana cost (105.2). Brainstorm ({U}) is blue, Lotus Petal ({0}) is
+  colorless (105.2c), and Pyrokinesis itself is on the stack when the cost is paid, not in hand, so none of the three can
+  be exiled. Prismari Charm ({U}{R}) is two colors, one of them red (105.2b), so it is a legal choice and is the card exiled here;
+  Cori-Steel Cutter ({1}{R}) is a red artifact card and would be legal too (not probed: the harness cannot compare which
+  card is pitched in a legal-pattern check). The cast exiles the Charm; the Cutter, Brainstorm and Petal stay in hand.
+  Ocelot Pride (1/1) dies to the 4 damage. A wrong engine filters by card type or by the word red in the text, lets a multicolored card
+  not count, or lets the spell exile itself.

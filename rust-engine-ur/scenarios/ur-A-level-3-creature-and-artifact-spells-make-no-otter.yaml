@@ -1,0 +1,62 @@
+id: ur-a-level-3-creature-and-artifact-spells-make-no-otter
+title: "At level 3 a creature spell triggers nothing at all and an artifact spell only pumps the Otter's prowess; neither creates an Otter"
+area: card
+cards: ["Stormchaser's Talent", Plains, Ocelot Pride, Lotus Petal, "Otter Token"]
+tags: [stormchasers-talent, class, level-3, cast-trigger, negative-case, creature-spell, artifact-spell, prowess, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "702.108a", text: "“Prowess” means “Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @pride", "Lotus Petal @petal"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - "Plains @pl"
+      - {token: Otter Token, as: otter}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pride", pay: auto}
+  - label: creature-spell-no-triggers
+    check:
+      stack: [{kind: spell, card: "@pride", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: pride-resolved
+    check:
+      stack: []
+      p0:
+        battlefield_contains: [{card: Ocelot Pride}, {token: Otter Token, alias: otter, pt: [1, 1]}]
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - label: artifact-spell-prowess-only
+    check:
+      stack:
+        - {kind: spell, card: "@petal", controller: p0}
+        - {kind: triggered, source: "@otter", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      spells_cast_this_turn: 2
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {card: Plains, tapped: true}
+        - {card: Ocelot Pride, sick: true}
+        - {card: Lotus Petal}
+        - {token: Otter Token, pt: [2, 2]}
+notes: >
+  Ocelot Pride is a creature spell: it is not an instant or sorcery (no Otter) and not a noncreature spell (no prowess), so
+  the stack holds only the spell. Lotus Petal (cost 0) is a noncreature artifact spell: prowess triggers, the Talent does
+  not. End state has exactly one Otter, 2/2. A wrong engine reads "instant or sorcery" as "any spell" or "any noncreature
+  spell".

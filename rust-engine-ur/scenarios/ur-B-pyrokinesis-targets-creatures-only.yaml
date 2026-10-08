@@ -1,0 +1,42 @@
+id: ur-b-pyrokinesis-targets-creatures-only
+title: "Pyrokinesis can only target creatures: Aluren, an Island and Lotus Petal are illegal alone or in a split, Ocelot Pride is legal"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Aluren, Island, Lotus Petal, Ocelot Pride]
+tags: [pyrokinesis, targeting, mask-validity, divided-damage, aluren, only-creatures]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "Pyrokinesis deals 4 damage divided as you choose among any number of target creatures.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed. Regeneration can replace this event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    battlefield: ["Aluren @alu", "Island @isl", "Lotus Petal @petal", "Ocelot Pride @pride"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@alu": 4}}}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@isl": 4}}}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@petal": 4}}}
+  - expect_illegal: {p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@pride": 2, "@alu": 2}}}
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@pride": 4}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Pyrokinesis]
+      exile: [Lightning Bolt]
+    p1:
+      battlefield: [{card: Aluren}, {card: Island}, {card: Lotus Petal}]
+      graveyard: [Ocelot Pride]
+notes: >
+  "Target creatures" means a creature only. Aluren (enchantment), Island (land) and Lotus Petal (artifact) are never
+  legal targets, alone or mixed into a split with a legal creature. Ocelot Pride (1/1) is legal and dies to 4. A wrong
+  engine accepts any permanent or any object with a toughness. (The brief's rule that zero targets is not modelled is
+  respected: no scenario casts it with no creature.)

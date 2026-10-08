@@ -1,0 +1,44 @@
+id: ur-b-price-of-progress-force-of-will-counters-no-damage
+title: "Force of Will counters Price of Progress: neither player takes damage although both control nonbasic lands"
+area: card
+cards: [Price of Progress, Force of Will, Brainstorm, Mountain, Island, Volcanic Island, Tundra]
+tags: [price-of-progress, force-of-will, counter, nonbasic-land, alternative-cost, damage-to-each-player]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Price of Progress, text: "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast. The controller of the spell announces their intentions to pay that cost as described in rule 601.2b.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Price of Progress @pop"]
+    battlefield: ["Mountain @m", "Island @i", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Tundra"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pop", pay: {tap: ["@m", "@i"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@pop"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Price of Progress]
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  Price of Progress would deal 2 to each player (one nonbasic land each). Force of Will, paid with 1 life and the exile
+  of Brainstorm, counters it, so p0 stays at 20 and p1 pays only the 1 life for the alternative cost (19). The countered
+  spell goes to the graveyard without any effect. A wrong engine applies the damage anyway or fails to count the
+  Force of Will life payment.

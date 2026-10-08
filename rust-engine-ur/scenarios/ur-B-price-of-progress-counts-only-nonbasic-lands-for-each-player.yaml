@@ -1,0 +1,47 @@
+id: ur-b-price-of-progress-counts-only-nonbasic-lands-for-each-player
+title: "Price of Progress deals each player twice their own nonbasic land count: duals, Ancient Tomb, City of Traitors, an uncracked fetchland, Hedge Maze and Tron lands count; basics do not"
+area: card
+cards: [Price of Progress, Mountain, Island, Forest, Volcanic Island, Ancient Tomb, City of Traitors, "Urza's Tower", "Urza's Mine", "Urza's Power Plant", Misty Rainforest, Hedge Maze]
+tags: [price-of-progress, nonbasic-land, basic-supertype, dual-land, fetchland-uncracked, tron-lands, damage-to-each-player, different-amounts]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Price of Progress, text: "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.", verified: true}
+  - {kind: cr, ref: "205.4c", text: "Any land with the supertype “basic” is a basic land. Any land that doesn’t have this supertype is a nonbasic land, even if it has a basic land type.", verified: true}
+  - {kind: cr, ref: "120.3a", text: "Damage dealt to a player by a source without infect causes that player to lose that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Price of Progress @pop"]
+    battlefield: ["Mountain @m", "Island @i", "Volcanic Island @volc", "Ancient Tomb @tomb", "City of Traitors @city"]
+    library_pad: 10
+  p1:
+    battlefield: ["Urza's Tower", "Urza's Mine", "Urza's Power Plant", "Misty Rainforest", "Hedge Maze", "Forest"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pop", pay: {tap: ["@m", "@i"]}}
+  - label: on-stack
+    check:
+      stack: [{kind: spell, card: "@pop", controller: p0}]
+      p0: {life: 20}
+      p1: {life: 20}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 14
+      graveyard: [Price of Progress]
+    p1:
+      life: 10
+notes: >
+  A land is nonbasic if it lacks the supertype basic, even if it has basic land types (205.4c). p0 pays with the basic
+  Mountain and Island (neither counts), and controls three nonbasic lands: Volcanic Island (Island Mountain), Ancient
+  Tomb and City of Traitors = 3 x 2 = 6 damage, 20 to 14. p1 controls five
+  nonbasics: the three Urza's lands (Tron lands are nonbasic), the fetchland Misty Rainforest that has not been cracked,
+  and Hedge Maze (Forest Island, nonbasic) = 5 x 2 = 10 damage, 20 to 10; the basic Forest adds nothing. Each player is
+  dealt damage by the same spell based on their own lands. A wrong engine counts lands with basic land types as basic,
+  counts only the caster's lands, or counts both players' lands together.

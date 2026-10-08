@@ -1,0 +1,65 @@
+id: ur-a-level-3-instant-cast-creates-otter-and-pumps-existing-otter
+title: "At level 3 casting an instant creates an Otter; an Otter already on the battlefield gets prowess, the new one does not"
+area: card
+cards: ["Stormchaser's Talent", Mountain, Lightning Bolt, "Otter Token"]
+tags: [stormchasers-talent, class, level-3, cast-trigger, otter, prowess, order-triggers, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "702.108a", text: "“Prowess” means “Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.”", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "603.3b", text: "each player, in APNAP order, puts each triggered ability they control with a trigger condition that isn't another ability triggering on the stack in any order they choose.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - "Mountain @mt"
+      - {token: Otter Token, as: otter}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {decision: order_triggers, answer: ["@talent", "@otter"]}
+  - label: both-triggers-above-bolt
+    check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+        - {kind: triggered, source: "@otter", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: prowess-resolved
+    check:
+      stack:
+        - {kind: spell, card: "@bolt"}
+        - {kind: triggered, source: "@talent"}
+      p0:
+        battlefield_contains: [{token: Otter Token, alias: otter, pt: [2, 2]}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {card: Mountain, tapped: true}
+        - {token: Otter Token, pt: [2, 2], keywords: [prowess], sick: false}
+        - {token: Otter Token, pt: [1, 1], keywords: [prowess], sick: true}
+      spells_cast_this_turn: 1
+    p1: {life: 17}
+notes: >
+  One cast makes two triggers controlled by p0 (the Talent's and the old Otter's prowess), so p0 orders them (603.3b).
+  Whatever the order, the final state is the same: the old Otter is 2/2 until end of turn, the new Otter is a fresh 1/1
+  (it entered after the spell was cast, so no prowess trigger for it), Bolt deals 3. The order chosen here puts prowess on
+  top. A wrong engine pumps both Otters, creates two Otters, or makes none because Bolt is an instant "spell" it checks only
+  on resolution.

@@ -1,0 +1,38 @@
+id: ur-b-price-of-progress-lethal-for-one-player
+title: "Price of Progress kills the opponent at 6 life with three nonbasic lands while the caster survives at 18"
+area: card
+cards: [Price of Progress, Mountain, Island, Volcanic Island, Tundra, Tropical Island, Hedge Maze]
+tags: [price-of-progress, nonbasic-land, lethal-damage, state-based-actions, game-over, damage-to-each-player]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Price of Progress, text: "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: cr, ref: "120.3a", text: "Damage dealt to a player by a source without infect causes that player to lose that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Price of Progress @pop"]
+    battlefield: ["Mountain @m", "Island @i", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    life: 6
+    battlefield: ["Tundra", "Tropical Island", "Hedge Maze"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pop", pay: {tap: ["@m", "@i"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, winner: p0}
+    p0:
+      life: 18
+    p1:
+      life: 0
+notes: >
+  p1 controls three nonbasic lands (Tundra, Tropical Island, Hedge Maze): 3 x 2 = 6 damage takes it from 6 to 0 and it
+  loses at the next state-based-action check (704.5a). p0 controls one nonbasic land (Volcanic Island) and takes 2, ending at
+  18. A wrong engine counts basic-typed duals as basic (p1 would survive), or ends the game as a draw because the caster
+  also took damage.

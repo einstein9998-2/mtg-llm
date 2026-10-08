@@ -1,0 +1,53 @@
+id: ur-b-pyrokinesis-own-creature-bolted-in-response-share-lost
+title: "p1 Lightning Bolts one of Pyrokinesis' targets in response (1 on my Thassa's Oracle, 3 on Street Wraith): the Oracle's share is lost and the Street Wraith still takes exactly 3"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Mountain, "Thassa's Oracle", Street Wraith]
+tags: [pyrokinesis, divided-damage, target-becomes-illegal, share-lost, partial-resolution, lightning-bolt, in-response]
+derived_from: cr
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "Pyrokinesis deals 4 damage divided as you choose among any number of target creatures.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "Illegal targets, if any, won’t be affected by parts of a resolving spell’s effect for which they’re illegal. Other parts of the effect for which those targets are not illegal may still affect them.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed. Regeneration can replace this event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt"]
+    battlefield: ["Thassa's Oracle @oracle"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @pbolt"]
+    battlefield: ["Mountain @pm", "Street Wraith @wraith"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@oracle": 1, "@wraith": 3}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@pbolt", targets: ["@oracle"], pay: auto}
+  - label: bolt-above-pyrokinesis
+    check:
+      stack: [{kind: spell, card: "@pyro", controller: p0}, {kind: spell, card: "@pbolt", controller: p1}]
+  - resolve_top: true
+  - label: oracle-dead
+    check:
+      stack: [{kind: spell, card: "@pyro", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: ["Thassa's Oracle"], battlefield: []}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Thassa's Oracle", Pyrokinesis]
+      exile: [Lightning Bolt]
+    p1:
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Mountain, tapped: true}, {card: Street Wraith, damage: 3, pt: [3, 4]}]
+notes: >
+  Pyrokinesis targets the caster's own Thassa's Oracle (1) and the opponent's Street Wraith (3). p1 responds with
+  Lightning Bolt on the Oracle (1/3), which dies before Pyrokinesis resolves, so that target is illegal (608.2b). The
+  spell still resolves for the legal target: Street Wraith takes exactly its own 3 (3/4 survives with 3 marked); the
+  Oracle's 1 point is not moved to anything else. A wrong engine fizzles the whole spell, gives the lost share to the
+  Wraith (killing it, 4 damage), or deals damage to the Oracle's new graveyard object.

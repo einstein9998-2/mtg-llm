@@ -111,6 +111,47 @@ Sideboard (15)
 3 Surgical Extraction
 ```
 
+### 1b. UR Cutter alternate (Brady's list, added 2026-10-07)
+
+Source: Brady's own list, posted 2026-10-07 (not a tournament list; `ur-cutter-alt.txt`). Rarely played; Brady thinks it is better than the main list above. It is an alternate opponent only: `ur-cutter.txt` stays the default UR deck (deck 1). Brady (2026-10-07): a comparison between the two UR lists (differential tests) comes later, once LLM vs LLM testing is proven working. Differences from the main list: no Murktide Regent, Preordain or Prismari Charm; adds 4 Stormchaser's Talent, 3 Boomerang Basics, 4 Flow State, 1 Mountain, 1 Bloodstained Mire, 1 Flooded Strand; sideboard swaps in Torpor Orb, Consign to Memory, Force of Negation, Price of Progress, Tormod's Crypt, Pyrokinesis. The three cards the engine lacked (Stormchaser's Talent, Pyrokinesis, Price of Progress) were added by RFC 0009 on 2026-10-08, so the deck loads and plays in the live engine (package: `rust-engine-ur/`).
+
+```
+Main (60)
+4 Dragon's Rage Channeler
+1 Thundering Falls
+1 Flooded Strand
+4 Force of Will
+4 Lightning Bolt
+4 Stormchaser's Talent
+1 Misty Rainforest
+4 Scalding Tarn
+3 Boomerang Basics
+4 Ponder
+4 Wasteland
+4 Flow State
+1 Mountain
+1 Island
+1 Polluted Delta
+4 Mishra's Bauble
+4 Brainstorm
+3 Cori-Steel Cutter
+2 Daze
+1 Unholy Heat
+4 Volcanic Island
+1 Bloodstained Mire
+
+Sideboard (15)
+2 Hydroblast
+1 Torpor Orb
+2 Pyroblast
+1 Consign to Memory
+1 Force of Negation
+2 Price of Progress
+2 Tormod's Crypt
+2 Pyrokinesis
+2 Unholy Heat
+```
+
 ### 2. Alurentell (Aluren + Show and Tell + Omniscience)
 
 Source: Brady's personal list, 2026-10-06 (not a tournament list; replaces the Freqing 1st-place list of 2026-09-27, kept in `superseded-v3/`). The engine needs Orim's Chant for the sideboard (RFC 0005); Savannah was already in the pool.
