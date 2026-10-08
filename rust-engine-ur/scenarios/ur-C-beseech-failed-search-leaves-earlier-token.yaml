@@ -1,0 +1,85 @@
+id: ur-c-beseech-failed-search-leaves-earlier-token
+title: "Bargained Beseech the Mirror that finds nothing (empty library) moves no other object to hand: the Eldrazi Scion made earlier this turn stays on the battlefield"
+area: card
+cards: [Beseech the Mirror, Warping Wail, Ancient Tomb, Lotus Petal, Swamp, Eldrazi Scion Token]
+tags: [beseech-the-mirror, bargain, search-fails, empty-library, only-the-found-card, token, eldrazi-scion, warping-wail, regression]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "Search your library for a card, exile it face down, then shuffle.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+  - {kind: oracle, card: Warping Wail, text: "Create a 1/1 colorless Eldrazi Scion creature token.", verified: true}
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+  - {kind: cr, ref: "701.23d", text: "If a player is searching a hidden zone simply for a quantity of cards, such as “a card” or “three cards,” that player must find that many cards (or as many as possible, if the zone doesn’t contain enough cards).", verified: true}
+  - {kind: cr, ref: "400.7j", text: "If an effect causes an object to move to a public zone, other parts of that effect can find that object. If the cost of a spell or ability causes an object to move to a public zone, that spell or ability’s effects can find that object.", verified: true}
+  - {kind: cr, ref: "101.3", text: "Any part of an instruction that's impossible to perform is ignored.", verified: true}
+  - {kind: cr, ref: "704.5b", text: "If a player attempted to draw a card from a library with no cards in it since the last time state-based actions were checked, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Warping Wail @ww", "Beseech the Mirror @bes"]
+    battlefield: ["Ancient Tomb @tomb", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Lotus Petal @petal"]
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@ww", modes: [3], pay: {tap: ["@tomb"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: scion-made
+    check:
+      stack: []
+      p0:
+        life: 18
+        graveyard: [Warping Wail]
+        battlefield_contains: [{token: Eldrazi Scion Token, pt: [1, 1], types: [Creature]}]
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - label: beseech-on-stack
+    check:
+      stack: [{kind: spell, card: "@bes", controller: p0}]
+      p0:
+        hand: []
+        library_count: 0
+        graveyard: [Warping Wail, Lotus Petal]
+        battlefield_contains: [{token: Eldrazi Scion Token}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: null}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      hand: []
+      library_count: 0
+      exile: []
+      graveyard: [Warping Wail, Beseech the Mirror, Lotus Petal]
+      spells_cast_this_turn: 2
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {token: Eldrazi Scion Token, controller: p0, pt: [1, 1]}
+    p1:
+      life: 20
+      hand: []
+      exile: []
+      graveyard: []
+      battlefield: []
+notes: >
+  Regression scenario for a once-seen engine bug: a Beseech whose search finds nothing put an object made by an EARLIER effect
+  into hand. The only card Beseech's "exiled card" can refer to is the one its own search exiled (400.7j: other parts of that
+  effect find the object the effect moved). Here the search finds nothing: p0's library is empty, which is the only way a
+  search for "a card" can fail, because with any card in the library 701.23d forces the player to find one (so "choose to
+  find nothing" is not a legal answer for an unrestricted "a card"). The search decision is still raised (SCHEMA addenda: a
+  search with nothing to find is answered found: null). No exiled card exists, so the free-cast question (yes_no) is not
+  raised and nothing is put into hand; the shuffle of an empty library is a no-op. Earlier-effect objects an engine might
+  wrongly grab: the Eldrazi Scion token created by Warping Wail (it would "cease to exist" in hand, 111.7, and vanish from
+  the battlefield) and the Lotus Petal sacrificed as the bargain cost (now in the graveyard). Both must stay where they are.
+  Mana: Ancient Tomb pays Wail's {1}{C} exactly ({C}{C}, 2 damage to p0: life 18); the four Swamps pay Beseech's
+  {1}{B}{B}{B}. No card is drawn, so the empty library does not make p0 lose (704.5b needs a draw attempt).

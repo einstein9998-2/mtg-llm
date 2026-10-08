@@ -13,3 +13,6 @@ Applied to `/mnt/project-files/rust-engine` on 2026-10-08 (Brady asked to start 
 
 ## Scenarios
 `tools/spec2json.py` takes a spec dir with a `scenarios/` folder; symlink the spec folders plus `rust-engine-{tron,storm,orims-chant,ur}/scenarios` into one, then `specrun all.json`.
+
+## RFC 0010 (follow-up fix)
+`0010-search-clears-moved.{md,patch}` fixes the Storm `Hand -> Hand` fuzz finding (a failed Beseech the Mirror search moved a stale object). Scenarios `scenarios/ur-C-*` test it. Applied to the live engine 2026-10-08.
