@@ -7,7 +7,7 @@ Source of the strategy points is Brady (2026-10-01). Lines marked "observed" com
 - Default: do **not** complete Tomb of Annihilation. Acererak then bounces to hand every time, and Aluren recasts him for free, so the loop keeps producing rooms (Goblins, Treasures, scry, cards, Dark Pool drain, life).
 - Exception (Brady): if the opponent has a card that stops the Aluren loop, for example Sphere of Resistance, Damping Sphere, Trinisphere or Disruptor Flute, go through Tomb of Annihilation on purpose. Once the dungeon is completed Acererak stays on the battlefield by himself, and completing it also gives a 4/4 (The Atropal). Check the opponent's battlefield for tax and lock pieces before starting the loop and again whenever one appears.
 - Tomb rooms hurt both players (Trapped Entry: each loses 1; Veils of Fear and Sandfall Cell: lose 2 or discard/sacrifice). Observed in a04: the opponent discarded Force of Will and sacrificed a creature to avoid the loss, and the engine chose my discard and sacrifice for me.
-- Dungeon and room choices are now mine (prompts added). In a06 I took Lost Mine every time: Cave Entrance (scry), Goblin Lair (blocker), Dark Pool (drain 1) is the room that drains. With Aluren in play (Brady, 2026-10-07): cast Acererak at instant speed and leave every room trigger on the stack except the Dark Pool drain, so no cards are drawn and the library is not touched. Only under Omniscience must the triggers resolve (you will eventually draw Aluren); then a lap is four casts, one drain and one draw, so check library size against their life. The earlier "about three casts per point of life" was wrong. Mad Mage and Tomb were never needed.
+- Dungeon and room choices are now mine (prompts added). In a06 I took Lost Mine every time: Cave Entrance (scry), Goblin Lair (blocker), Dark Pool (drain 1) is the three-cast cycle that drains once per lap, so about three Acererak casts per point of life. Mad Mage and Tomb were never needed.
 
 ## Show and Tell and Omniscience
 
@@ -20,7 +20,7 @@ Source of the strategy points is Brady (2026-10-01). Lines marked "observed" com
 - They hold Force of Will and Daze for my first Stock Up (a01, a04, a05). Veil of Summer first if I have it; otherwise a Stock Up into Force of Will plus Daze is a 2-for-1 for me.
 - Do not tap out for Aluren when Daze may be in hand and I have no spare mana (a05).
 - Wasteland takes Ancient Tomb and Tropical Island: prefer basics or fetches when I am short on lands, and keep a land drop for Hedge Maze.
-- Omniscience costs ten mana ({7}{U}{U}{U}). Count it before planning around a hardcast: two Ancient Tombs, six other lands and a Petal are needed; each Tomb tap costs 2 life, and the engine can still offer Tomb-only casts at 2 or 3 life (seen in LvL games g8 and g19), so check your life yourself (engine-oddities.md item 9, withdrawn as a bug). Show and Tell is the normal way to get it out.
+- Omniscience costs ten mana ({7}{U}{U}{U}). Count it before planning around a hardcast: two Ancient Tombs, six other lands and a Petal are needed; each Tomb tap costs 2 life, so at 4 life or less the engine will not offer it (engine-oddities.md item 9, withdrawn as a bug). Show and Tell is the normal way to get it out.
 - Prismari Charm (bounce) and Lightning Bolt are the cards that have hit Atraxa/me: Veil of Summer in response to the Charm worked in a06 and drew a card (they had cast a blue spell).
 - Keep the menu discipline: indices shift after every action (a06 slip, report.md).
 
@@ -103,48 +103,13 @@ Source and numbers: tough-spots/batch1 (bot agreed with Brady on 3 of 9 answered
 
 Source: tough-spots/batch2 (bot agreed with Brady on 4 of 14 answered positions; 2 more declined as moot).
 
-## Rules from LvL reviews (LLM vs LLM overnight run, 40 games; Brady signed off 2026-10-07 13:06Z, with his corrections)
+## Rules from Brady's review of the LLM-vs-LLM games (2026-10-08)
 
-Source: llm-benchmark/lvl/SYNTHESIS.md (games and evidence per rule). The Lost Mine technique is in the Acererak section above.
+- Omniscience or Aluren in play: Acererak is free, so cast every Acererak you hold. The LLM passed with Omniscience out and Acererak in hand and Brady said "we should probably win the game with Acererak" (positions 70 and 71).
+- Pick Acererak when you hold Omniscience and need the second piece (Stock Up pick with Omniscience x2 and Atraxa in hand: "helps us win"). When Atraxa is already on the battlefield, take Acererak over a second Atraxa (legend rule): "we're trying to win with Aluren next turn".
+- Do not complete Tomb of Annihilation unless the opponent has a lock piece (see the first section). Brady's notes on two LLM positions were "this is the wrong dungeon" and "why do we have the Atropal": the LLM had chosen rooms that completed Tomb. Pick Lost Mine rooms.
+- Lotus Petal: cast it in main 2 when the mana will be used next turn ("why not, lets us use the mana next turn").
+- Boros and UR Cutter (the attacking side): attack first, then cast spells in second main ("attack first, then cast spells second main"; same for Brainstorm).
+- With Veil of Summer, know what you cast after it. Brady asked "what are we casting after Veil or is this just a bait" when the LLM cast Veil with nothing to follow.
 
-- Count mana before planning. Show and Tell is {2}{U}; Aluren is {2}{G}{G}; Ancient Tomb counts as 2 and a Petal on the battlefield as one coloured mana. Cast Veil only if the combo spell is still castable this turn (Veil + Show and Tell = 4 mana, Veil + Aluren = 5 including GG). Spend City of Traitors' mana before the land drop.
-- Life is mana: before paying Tomb or fetch life, check your life afterwards against their instant reach (Goblin Bombardment = their creature count; a second Ajani flip; free Phlage = 3 under your Aluren; burn to 2 or less turns off your Tombs and Force of Will).
-- On the combo turn, take every card Atraxa offers, a spare Acererak first. When discarding to hand size with Aluren in hand, keep Acererak and drop a second Atraxa (on the combo turn hand size never applies to the reveal).
-- Daze is live whenever they control any Island-typed land, tapped or untapped. Only an untapped land or a Petal already on the battlefield pays for it; a Petal in hand cannot be cast in response.
-- With Aluren or Omniscience in play (or castable) and Acererak in hand, loop now and keep choosing Lost Mine until they are dead. Do not cantrip, attack or take Tomb first. Trapped Entry only for the last point. If you do enter Tomb, take Veils of Fear and Sandfall Cell, never Oubliette.
-- Spend Force of Will on what breaks the loop (removal on Acererak while his enter trigger is on the stack), not on Swords for a Show-and-Tell Atraxa and not on face burn when you are tapped out and they have Daze.
-- Against Boros, Veil of Summer is a blank in game 1. After a mulligan, bottom the card that is dead in the matchup (Veil) and keep the Show and Tell payoff (Omniscience, Atraxa).
-- Boros permanents: Voice of Victory stops your spells on their turn, not theirs on yours; count their untapped white (and Lazotep Quarry with a creature) as Swords before looping; Karakas bounces a legendary Atraxa or Acererak; Spider-Woman makes Petals and the Show-and-Tell Atraxa enter tapped (cast Petals a turn early).
-- Hedge Maze: at their end step fetch it over a dual or basic when either gives the colours you need; from hand, play it on a turn where the untapped land's mana would go unused (play Hedge Maze rather than Boseiju before a Ponder).
-- Brainstorm, fetch and Ponder: put back duplicates (a second Atraxa or Show and Tell, extra lands), never your only Aluren or Acererak. Sometimes Brainstorm then Ponder to shuffle; with a fetch in hand, weave it in so Ponder sees fresh cards.
-- Aluren is symmetric: the opponent casts MV 3 or less creatures free at instant speed (free Phlage deals 3; Amped Raptor can discover Swords, Erode or Bombardment). Do not cast Aluren at 3 life or less against Boros.
-- Ponder: without an enabler in hand, keep a known Aluren or Show and Tell on top; otherwise shuffle any look with no enabler, creature or cantrip. A lone land is not enough unless you are stuck on one land with none in hand (then shuffle any landless look).
-- Show and Tell with Acererak in hand: put in Aluren, not Atraxa, then cast the free Acererak and loop. This includes a known Acererak on top with a cantrip and a spare mana to draw it. Against Boros with white open, weigh Swords first.
-- Stock Up with two or fewer lands and none in hand: take a land first. Take a creature only if Aluren or Show and Tell can cast it next turn; with Aluren and Acererak already in hand, dig for mana.
-- A keep needs a route to a payoff. A seven whose only spells are Show and Tell and Acererak, or one land plus Ponder with no creature, is a mulligan. Exception (Brady): if you have the combo you do not need cantrips and can keep a one-lander.
-- Veil timing is situational (Brady): play it first to play around Daze; otherwise play it later to surprise the opponent and draw a card.
-- Waiting a turn instead of jamming is contextual (Brady): with no clock on you it is reasonable, but only if waiting helps you more than the opponent (you may draw mana, or a second combo card for another push).
-
-## Notes for the opponent decks in Alurentell matchups (from LvL reviews; Brady signed off 2026-10-07)
-
-UR Cutter:
-- Keep one blue pitch card per Force of Will. Never Brainstorm, Preordain-bottom or surveil away Daze, Force or the last pitch card against a combo deck.
-- Force a Veil cast on their own turn: once it resolves, every spell that turn is uncounterable.
-- Wasteland: Ancient Tomb when Show and Tell is the threat; the green dual once Aluren is seen (GG); their only land on turn 2 against a one-land keep. Use it before they untap, to cut the most mana.
-- Cast cantrips before the land drop when your lands are fetches or a Wasteland could be found.
-- Do not tap out on your own turn for Murktide or Cutter once they can reach 4 mana: hold U (and R) for Prismari Charm, which bounces Aluren in response to the free Acererak, or Unholy Heat. Brainstorm at their end step or in response.
-- Bolt plus Unholy Heat (delirium) on Acererak with his trigger on the stack ends the loop; Bolt alone does not.
-- Daze: use it on a tapped-out Stock Up or Show and Tell, or on their Force when they are tapped out. It is nearly dead into open green mana, because Veil answers it.
-- Mishra's Bauble: target yourself if you can influence your library (most often a fetchland), or hold it for a DRC or Cutter trigger.
-- Against Atraxa: chump early when it turns on delirium; Heat at the end step on the turn she took block damage; use Charm's bounce mode, not surveil; burn face to 2 or less to turn off their Tombs and Force.
-
-Boros Aggro:
-- Wasteland: with no 1-drop, play it as the turn-1 land. Hit Ancient Tomb or their only blue or green dual, not an uncracked fetch. Use it before they untap, not after a spell. Never surveil Wasteland away while they are short of lands.
-- Keep W open (or Quarry plus a creature) for Swords on Acererak with his trigger on the stack, and fire on the first cast: each lap draws them a card.
-- Under their Aluren, cast your MV 3 or less creatures free at instant speed (free Phlage kills at 3 life or less); cast Amped Raptor last so its discover resolves above Swords.
-- Goblin Bombardment: hold it for their combo turn; let them pay Tomb and fetch life, then sacrifice everything in response; kill the first Acererak on its enter trigger.
-- Cast the second Ajani while the first is out: the legend-rule death flips the survivor, and Avenger's 0 deals damage equal to your creature count with a red permanent. In the menu "ability 1" is the +2 and "ability 2" is the 0.
-- Voice of Victory first among 2-drops against Force decks. Keep Karakas untapped for a legendary Atraxa. Spider-Woman early makes their Petals and Atraxa enter tapped.
-- Swords the Show-and-Tell Atraxa before attacking even though they gain 7, but count your removal against their Force, since Acererak needs an answer too.
-- Count to ten permanents for Ascend before the end step. Order Voice's sacrifice trigger first so Ocelot Pride copies the mobilize Warriors.
-- One pick per command: a scripted Bombardment loop once hit The Atropal instead of the player.
+Source: tough-spots/llm-games (Brady agreed with the LLM on 2 of 14 answered positions; these were the reviewer's likely-mistake spots; 2 more declined as moot because of the dungeon mistake).

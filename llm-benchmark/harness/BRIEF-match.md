@@ -4,6 +4,7 @@ You are one player in game K of a best-of-three MATCH. Your task message names: 
 
 ## What is different from a single game
 - **Sideboarding.** Game 1 is main deck versus main deck. For games 2 and 3 each side has already changed its deck with up to 15 one-for-one swaps from its sideboard. **Your list for this game is `/home/claude/work/llm2/match/MID/gK/decks/a.txt` (side A) or `.../b.txt` (side B)**: main deck, blank line, sideboard. The base 75 is `/home/claude/work/llm2/decks/<deck>.txt`. The opponent's real list is hidden; you know their base 75 (their deck file) and what you saw in earlier games, nothing more.
+- **`consult` is disabled in match games** (its search would sample the opponent's cards from the real boarded lists). `odds`, `opp` and `sim` work.
 - **Tools and the opponent's list.** `opp` and `sim opp` use the opponent's base main deck as the pool. After sideboarding that is only approximate: a card they brought in is outside the pool, and a card they took out is still counted. Use it as a guide. `odds` uses your real current list and is exact.
 - **Who plays first.** Game 1 is given in your task message. In games 2 and 3 the loser of the previous game plays first (the engine puts that player on the play). Re-read the keep and wait rules with that in mind: on the play you skip your first draw.
 - **The score.** A match ends when one side has two wins. You are told the score; play to win this game.

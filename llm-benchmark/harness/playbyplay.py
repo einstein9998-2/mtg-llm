@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""playbyplay.py GAMEID [outfile]: merge both transcripts + the players' pick reasons into one readable play-by-play
+"""Run this ONLY after the match is over: the output shows both hands and both sides' notes, and must not be written where players can read it during play.
+playbyplay.py GAMEID [outfile]: merge both transcripts + the players' pick reasons into one readable play-by-play
 (for Brady, who sees both hands). Needs runs/GAME/truth/transcript-{a,b}.txt and optional runs/GAMEa|b/reasons.tsv."""
 import re, sys, os
 W = '/home/claude/work/llm2'

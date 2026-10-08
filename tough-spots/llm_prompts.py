@@ -10,7 +10,7 @@ import json, os, sys, re
 out = sys.argv[1]
 os.makedirs(out, exist_ok=True)
 root = os.path.dirname(os.path.abspath(__file__))
-pb = open(os.path.join(root, '..', 'llm-player', 'alurentell-playbook.md')).read().split('\n## Rules from Brady')[0]
+pb = open(os.path.join(root, '..', 'llm-player', 'alurentell-playbook-v1-archive.md')).read().split('\n## Rules from Brady')[0]
 HEAD = ("You are a strong Legacy Magic: The Gathering player piloting one deck in a 1v1 game. You see only what the player sees: your own hand, "
         "the public board, graveyards, library sizes, and the opponent's hand size (not its contents). The engine lists the legal options. "
         "Pick the best one. Do not use any tools and do not read any other file; answer from this text alone.\n")

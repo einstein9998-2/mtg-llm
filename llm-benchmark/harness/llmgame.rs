@@ -1127,6 +1127,8 @@ fn main() {
     let (a_real, b_real) = (da, dbk);
     let exp_b_for_a = flag("--expect-opp").map(|n| &decks[find(&n)]).unwrap_or(b_real);
     let exp_a_for_b = flag("--expect-llm").map(|n| &decks[find(&n)]).unwrap_or(a_real);
+    // Match games (sideboarded lists): consult would sample hidden cards from the real lists, so it is refused.
+    let match_mode = flag("--expect-opp").is_some() || flag("--expect-llm").is_some();
     // decks are indexed by seat: seat 0 gets the first, seat 1 the second.
     let (d0, d1) = if llm_seat == Seat(0) { (da, dbk) } else { (dbk, da) };
     da = d0;
@@ -1288,6 +1290,8 @@ fn main() {
                             odds_chars += txt.len();
                             let _ = writeln!(log, "{cmd} prompt {seq}: {}", rest.trim());
                             txt
+                        } else if match_mode {
+                            "!! consult is disabled in match games: its search would sample the opponent's cards from the real post-sideboard lists. Use odds, opp and sim, which use the list you can know.\n".to_string()
                         } else {
                             let iters = ri.unwrap_or(consult_iters).clamp(16, 2000);
                             let (txt, bs, bn) = consult(&sv, &obs, &model, consult_net.as_ref(), n_defs, iters, seed, seq);
