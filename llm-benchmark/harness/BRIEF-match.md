@@ -1,0 +1,17 @@
+# Best-of-three match addendum (read BRIEF-vs.md first; it still applies except where this file changes it)
+
+You are one player in game K of a best-of-three MATCH. Your task message names: MID (match id), K (game number), your side (A = Alurentell, B = the opponent deck), your TAG (MIDgKa or MIDgKb), the score so far and who plays first.
+
+## What is different from a single game
+- **Sideboarding.** Game 1 is main deck versus main deck. For games 2 and 3 each side has already changed its deck with up to 15 one-for-one swaps from its sideboard. **Your list for this game is `/home/claude/work/llm2/match/MID/gK/decks/a.txt` (side A) or `.../b.txt` (side B)**: main deck, blank line, sideboard. The base 75 is `/home/claude/work/llm2/decks/<deck>.txt`. The opponent's real list is hidden; you know their base 75 (their deck file) and what you saw in earlier games, nothing more.
+- **`consult` is disabled in match games** (its search would sample the opponent's cards from the real boarded lists). `odds`, `opp` and `sim` work.
+- **Tools and the opponent's list.** `opp` and `sim opp` use the opponent's base main deck as the pool. After sideboarding that is only approximate: a card they brought in is outside the pool, and a card they took out is still counted. Use it as a guide. `odds` uses your real current list and is exact.
+- **Who plays first.** Game 1 is given in your task message. In games 2 and 3 the loser of the previous game plays first (the engine puts that player on the play). Re-read the keep and wait rules with that in mind: on the play you skip your first draw.
+- **The score.** A match ends when one side has two wins. You are told the score; play to win this game.
+- **Your memo.** If this is game 2 or 3, read your own memo `/home/claude/work/llm2/match/MID/memo<A|B>.md` (written by your side after the previous game: the opponent's cards you saw, what worked, what to watch). Read only your own side's memo and board file, never the other side's.
+
+## After the game (before your final report)
+1. Write your memo: `/home/claude/work/llm2/match/MID/memo<A|B>.md` (overwrite it, at most 15 lines): which of the opponent's cards you saw (including sideboard cards, which tell you what they changed), how they played, what worked and what did not, and what to do differently. Facts only from your own view.
+2. Write your sideboard plan for the next game: `/home/claude/work/llm2/match/MID/board<A|B>.txt`. Swaps are relative to the BASE 75, not to this game's list: lines `-N Card` (out of the main deck) and `+N Card` (in from the sideboard), one for one, main stays 60, at most four copies of a nonbasic card. Include every swap you want, not just changes from this game. Then validate it: `python3 /home/claude/work/llm2/matchctl.py check MID <A|B>` and fix any complaint. Think about what the sideboard cards are for and what the opponent showed you. Write the file even if you won (the match may go on). Write an empty file for no change. In the file add `#` comment lines with the reason for each swap (one line each).
+3. Your final report is as in BRIEF-vs.md, plus one line `SIDEBOARD: <your swaps in one line>`.
+- If your side is **Alurentell**: your notes are the files named in your task message (a playbook of principles plus skill files; the skill `sideboarding.md` has Brady's locked plans). If you are the **opponent**: sideboard suggestions (provisional, written by a helper, yours to override) are in `/home/claude/work/live/engine/sideboard-plans/<your deck>.txt`, section `vs alurentell`.
