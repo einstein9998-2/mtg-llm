@@ -141,6 +141,8 @@ header { display: flex; flex-direction: column; gap: 10px; }
 .piles details + details { margin-top: 8px; }
 .pill { font-family: var(--font-mono); font-size: 11px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
 /* free-text note on a position, shown above the options */
+.why { background: var(--accent-soft); border-radius: 6px; padding: 8px 12px; margin: 10px 16px 0; font-size: 13.5px; }
+.why b { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 2px; }
 .stack { background: var(--bot-soft); border-radius: 6px; padding: 8px 12px; margin: 0 16px; font-size: 13.5px; }
 .stack b { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--bot); margin-right: 8px; }
 details.log { margin: 10px 16px 0; font-size: 13px; color: var(--muted); }
@@ -180,7 +182,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
 <main>
   <header>
     <h1>Alurentell tough spots</h1>
-    <p class="lede">Positions where the bot was unsure: the search could not separate the top options, or the network and the search disagreed. Pick what you would play. The bot's choice and its numbers appear after you answer. Positions marked "LLM game" come from Claude playing both sides, and show what the LLM played instead.</p>
+    <p class="lede">Positions where the bot was unsure: the search could not separate the top options, or the network and the search disagreed. Pick what you would play. The bot's choice and its numbers appear after you answer. Positions marked "LLM game" come from Claude playing both sides: they show what the LLM played and a note on why the spot was flagged.</p>
     <div class="progress"><span id="prog-text">loading</span><div class="bar"><i id="prog-bar"></i></div></div>
     <nav class="tabs" id="tabs" aria-label="Positions"></nav>
   </header>
@@ -427,7 +429,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       var chosen = a.pick === i;
       var badges = '';
       var nums = '';
-      if (answered && p.source === 'llm-vs-llm') {
+      if (p.source === 'llm-vs-llm' && (answered || p.explanation)) {
         if (i === p.llm_choice) badges += '<span class="tag bot">the LLM played this</span>';
       } else if (answered) {
         if (i === p.bot_choice) badges += '<span class="tag bot">bot played this</span>';
@@ -437,7 +439,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       return '<button class="opt" data-pick="' + esc(p.id) + ':' + i + '" aria-pressed="' + chosen + '"><span class="ltr">' + letter(i) + '</span><span class="body"><span class="lbl">' + esc(o.label) + '</span>' + (badges ? '<span class="badges">' + badges + '</span>' : '') + nums + '</span></button>';
     }).join('');
     var reveal = '';
-    if (answered && p.source === 'llm-vs-llm') {
+    if (answered && p.source === 'llm-vs-llm' && !p.explanation) {
       var same = a.pick === p.llm_choice;
       reveal = '<div class="reveal">' + (same ? '<span class="agree">You and the LLM picked the same option.</span> ' : '') +
         'The LLM played <b>' + esc(letter(p.llm_choice) + '. ' + p.options[p.llm_choice].label) + '</b>.</div>';
@@ -453,7 +455,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     return '<article class="card" id="card-' + esc(p.id) + '">' +
       '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : (v.whose === 'your' ? 'Your' : 'Opponent\'s') + ' turn ' + Math.ceil((+v.turn) / 2) + ', ' + esc(v.step) + (p.on_play === true ? ' (you are on the play)' : p.on_play === false ? ' (you are on the draw)' : '')) + '</span><span class="meta">batch ' + esc(p.batch || 1) + ' · ' + (p.matchup ? esc(p.matchup) + ' (you play ' + esc(p.me_deck) + ') · ' : '') + esc(p.category) + '</span></div>' +
       (p.category === 'keep' ? '' : stepsBar(v)) + board(p, v) +
-      extra + log +
+      extra + (p.explanation ? '<div class="why"><b>Why this was flagged</b>' + esc(p.explanation) + '</div>' : '') + log +
       '<div class="q">' + esc(p.question) + '</div><div class="opts">' + opts + '</div>' + reveal +
       '<div class="extras"><div class="flags">' + flag('either', 'Either is fine') + flag('cant_tell', "Can't tell from this view") + flag('rule', 'Make this a rule') + '</div>' +
       '<textarea id="note-' + esc(p.id) + '" data-note="' + esc(p.id) + '" placeholder="Why? (optional, one line is plenty)">' + (forKey ? '' : esc(a.note || '')) + '</textarea>' +
