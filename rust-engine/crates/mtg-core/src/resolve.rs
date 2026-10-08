@@ -1927,10 +1927,6 @@ fn counter_unless(cx: &mut Cx, victim: ObjRef, pays: &crate::mana::ManaCost, aux
     let payer = cx.s.stack.iter().find(|e| e.obj == victim).map(|e| e.controller).unwrap_or(cx.s.obj(victim).controller);
     match aux {
         0 => {
-            if !cx.can_be_countered(victim) {
-                // Uncounterable (Veil of Summer, Abrupt Decay): paying could not change anything, so do not ask.
-                return Flow::Next;
-            }
             if cx.plan_cost(payer, pays, 0, None, None).is_some() {
                 ask(cx, payer, DecisionKind::PayUnless, vec![Opt::Yes, Opt::No]);
                 Flow::Await
