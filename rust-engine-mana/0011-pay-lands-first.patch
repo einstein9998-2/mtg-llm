@@ -1,0 +1,82 @@
+--- base-engine/crates/mtg-core/src/mana.rs
++++ engine/crates/mtg-core/src/mana.rs
+@@ -186,6 +186,31 @@
+ /// Exactness: colored pips are payable iff a matching saturating them exists, and generic is
+ /// payable iff enough unmatched sources remain, so this is a complete decision procedure.
+ pub fn plan_payment(pips: [u8; 6], hyb: [u8; 10], generic: u32, pool: &ManaPool, sources: &[ManaSource]) -> Option<Payment> {
++    plan_payment_with(pips, hyb, generic, pool, sources, LANDS_FIRST.load(std::sync::atomic::Ordering::Relaxed))
++}
++
++/// `plan_payment` with the generic-cost policy given: `lands_first` is the player's choice (601.2h)
++/// to pay colored costs from floating mana but generic from sources first, falling back to the
++/// default policy when the sources cannot pay.
++pub fn plan_payment_with(pips: [u8; 6], hyb: [u8; 10], generic: u32, pool: &ManaPool, sources: &[ManaSource], lands_first: bool) -> Option<Payment> {
++    if lands_first {
++        if let Some(p) = plan_payment_inner(pips, hyb, generic, pool, sources, false) {
++            return Some(p);
++        }
++    }
++    plan_payment_inner(pips, hyb, generic, pool, sources, true)
++}
++
++static LANDS_FIRST: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
++
++/// Interface hook for the LLM game harness (process-wide, off by default; nothing in the engine, the
++/// fuzzers or the tests sets it): when set, generic costs are paid from sources before floating mana
++/// (colored costs still use floating mana first). Falls back to the default policy if sources cannot pay.
++pub fn set_lands_first(on: bool) {
++    LANDS_FIRST.store(on, std::sync::atomic::Ordering::Relaxed);
++}
++
++fn plan_payment_inner(pips: [u8; 6], hyb: [u8; 10], generic: u32, pool: &ManaPool, sources: &[ManaSource], pool_generic: bool) -> Option<Payment> {
+     let mut pay = Payment::default();
+     let mut need = pips;
+     let mut hneed = hyb;
+@@ -205,7 +230,7 @@
+         }
+     }
+     for c in 0..6 {
+-        if gen == 0 {
++        if gen == 0 || !pool_generic {
+             break;
+         }
+         let avail = pool.0[c] - pay.pool_used[c];
+@@ -314,6 +339,38 @@
+     }
+ 
+     #[test]
++    fn lands_first_pays_generic_from_sources_and_keeps_floating_mana() {
++        use ManaColor::*;
++        // {2} with two black mana floating and two Swamps.
++        let mut pool = ManaPool::default();
++        pool.0[B.idx()] = 2;
++        let s = [src(0, &[B]), src(1, &[B])];
++        let d = plan_payment_with([0; 6], [0; 10], 2, &pool, &s, false).unwrap();
++        assert_eq!((d.pool_used[B.idx()], d.taps.len()), (2, 0), "default spends the pool first");
++        let l = plan_payment_with([0; 6], [0; 10], 2, &pool, &s, true).unwrap();
++        assert_eq!((l.pool_used[B.idx()], l.taps.len()), (0, 2), "lands first taps the sources");
++        // {1}{B}: the colored pip still comes from the pool, the generic from a source.
++        let l = plan_payment_with([0, 0, 1, 0, 0, 0], [0; 10], 1, &pool, &s, true).unwrap();
++        assert_eq!((l.pool_used[B.idx()], l.taps.len()), (1, 1));
++    }
++
++    #[test]
++    fn lands_first_falls_back_when_sources_cannot_pay() {
++        use ManaColor::*;
++        let mut pool = ManaPool::default();
++        pool.0[B.idx()] = 2;
++        // {2} with no sources: the pool pays, as in the default policy.
++        let l = plan_payment_with([0; 6], [0; 10], 2, &pool, &[], true).unwrap();
++        assert_eq!((l.pool_used[B.idx()], l.taps.len()), (2, 0));
++        // {3} with two floating and one Swamp: sources alone are short, the default plan is used.
++        let s = [src(0, &[B])];
++        let l = plan_payment_with([0; 6], [0; 10], 3, &pool, &s, true).unwrap();
++        assert_eq!(l, plan_payment_with([0; 6], [0; 10], 3, &pool, &s, false).unwrap());
++        // Unpayable stays unpayable.
++        assert!(plan_payment_with([0; 6], [0; 10], 4, &pool, &s, true).is_none());
++    }
++
++    #[test]
+     fn dual_land_flexibility() {
+         use ManaColor::*;
+         // {U}{R} with Island and a U/R dual: dual must pay R.
