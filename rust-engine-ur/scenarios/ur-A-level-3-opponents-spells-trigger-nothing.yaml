@@ -1,0 +1,43 @@
+id: ur-a-level-3-opponents-spells-trigger-nothing
+title: "At level 3 the opponent casting Lightning Bolt creates no Otter and does not trigger the Otter's prowess"
+area: card
+cards: ["Stormchaser's Talent", Mountain, Lightning Bolt, "Otter Token"]
+tags: [stormchasers-talent, class, level-3, you-cast, prowess, negative-case, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "702.108a", text: "“Prowess” means “Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.”", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - {token: Otter Token, as: otter}
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mt"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - label: only-the-spell
+    check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 17
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {token: Otter Token, pt: [1, 1]}
+    p1:
+      graveyard: [Lightning Bolt]
+notes: >
+  Both the Class trigger and prowess say "you cast". The opponent's Bolt (p1 is the active player here) puts only itself
+  on the stack; p0 takes 3 and still has exactly one 1/1 Otter. A wrong engine triggers on any player's spells.

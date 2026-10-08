@@ -1,0 +1,50 @@
+id: ur-b-boomerang-basics-token-ceases-to-exist-and-still-draws
+title: "Boomerang Basics on my own Otter token: the token leaves the battlefield and ceases to exist (it never reaches my hand), and I still draw a card"
+area: card
+cards: [Boomerang Basics, Island, Otter Token, Ponder]
+tags: [boomerang-basics, bounce, token, ceases-to-exist, you-controlled, draw-a-card, otter]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "111.7", text: "A token that’s in a zone other than the battlefield ceases to exist. This is a state-based action; see rule 704. (Note that if a token changes zones, applicable triggered abilities will trigger before the token ceases to exist.)", verified: true}
+  - {kind: cr, ref: "111.8", text: "A token that has left the battlefield can’t move to another zone or come back onto the battlefield. If such a token would change zones, it remains in its current zone instead. It ceases to exist the next time state-based actions are checked; see rule 704.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @isl", {token: Otter Token, as: otter}]
+    library: ["Ponder"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@otter"], pay: auto}
+  - label: prowess-above-spell
+    check:
+      stack: [{kind: spell, card: "@bb", controller: p0}, {kind: triggered, source: "@otter", controller: p0}]
+  - resolve_top: true
+  - label: prowess-resolved
+    check:
+      stack: [{kind: spell, card: "@bb", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{token: Otter Token, pt: [2, 2]}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Boomerang Basics]
+      exile: []
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  A token that changes zones is put into the hand, and then ceases to exist the next time state-based actions are
+  checked (111.7, 111.8), so it is never a card in hand and the hand shows only the drawn Ponder. The spell still
+  returned a permanent that p0 controlled, so the draw happens. The Otter has prowess: casting the noncreature
+  Boomerang Basics triggers it, the trigger goes on the stack above the spell and resolves first (the Otter is 2/2
+  for a moment, as the mid-script check shows); then the spell resolves and bounces the token. A wrong engine leaves a token card in hand, keeps it on
+  the battlefield, or skips the draw because the object no longer exists.

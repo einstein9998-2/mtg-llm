@@ -1,0 +1,57 @@
+id: ur-a-talent-enters-level-1-creates-otter-with-prowess
+title: "A resolved Stormchaser's Talent is a level 1 Class and its enters trigger creates a 1/1 blue and red Otter token with prowess"
+area: card
+cards: ["Stormchaser's Talent", Island, "Otter Token"]
+tags: [stormchasers-talent, class, enters-trigger, token, otter, prowess, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "When this Class enters, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "716.3", text: "In particular, the Class has the ability printed in its top text box section at all times.", verified: true}
+  - {kind: cr, ref: "716.2d", text: "If a rule or effect refers to a permanent’s level and that permanent doesn’t have a level, it is treated as though its level is 1.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stormchaser's Talent @talent"]
+    battlefield: ["Island @is1"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@talent", pay: auto}
+  - check:
+      stack: [{kind: spell, card: "@talent", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0, text_contains: "Otter"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        battlefield:
+          - {card: "Stormchaser's Talent", types: [Enchantment], subtypes: [Class], counters: {level: 1}}
+          - {card: Island, tapped: true}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: []
+      battlefield:
+        - {card: "Stormchaser's Talent", types: [Enchantment], subtypes: [Class], counters: {level: 1}}
+        - {card: Island, tapped: true}
+        - {token: Otter Token, controller: p0, types: [Creature], subtypes: [Otter], colors: [U, R], pt: [1, 1], keywords: [prowess], sick: true}
+    p1:
+      battlefield: []
+notes: >
+  The Talent is a non-creature enchantment spell; when it enters, the trigger goes on the stack (above nothing: the
+  spell has resolved) and p0 gets priority with the Otter not yet created. After the trigger resolves there is exactly
+  one Otter token, a 1/1 creature that is both blue and red with prowess; it came under p0's control this turn so it is
+  summoning sick. The Talent has no level counter beyond the level 1 it enters with (716.2d); the scenario asserts level 1
+  through `counters: {level: 1}` as the brief's representation. A wrong engine creates the Otter on cast, creates no
+  token (confusing the Class with its level abilities), makes it colorless or single-colored, or omits prowess.

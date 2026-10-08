@@ -1,0 +1,61 @@
+id: ur-b-pyrokinesis-aluren-bowmasters-trigger-survives-pyrokinesis-on-its-source
+title: "Aluren turn: p1 casts Orcish Bowmasters for free; Pyrokinesis in response to its enters trigger kills Bowmasters, but the trigger still pings my Ocelot Pride and amasses"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Aluren, Orcish Bowmasters, Ocelot Pride, Orc Army Token]
+tags: [pyrokinesis, aluren, orcish-bowmasters, enters-trigger, trigger-independent-of-source, in-response, alternative-cost, exile-red-card, free-cast, amass]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "You may exile a red card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: Orcish Bowmasters, text: "this creature deals 1 damage to any target. Then amass Orcs 1.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability. Note that some abilities cause a source to do something (for example, “This creature deals 1 damage to any target”) rather than the ability doing anything directly. In these cases, any activated or triggered ability that references information about the source for use while announcing an activated ability or putting a triggered ability on the stack checks that information when the ability is put onto the stack. Otherwise, it will check that information when it resolves. In both instances, if the source is no longer in the zone it’s expected to be in at that time, its last known information is used. The source can still perform the action even though it no longer exists.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed. Regeneration can replace this event.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt"]
+    battlefield: ["Ocelot Pride @pride"]
+    library_pad: 10
+  p1:
+    hand: ["Orcish Bowmasters @bow"]
+    battlefield: ["Aluren @alu"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bow", alt_cost: {free: aluren}}
+  - resolve_top: true
+  - p1: {decision: choose_target, slot: 0, answer: "@pride"}
+  - label: bowmasters-trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@bow", controller: p1}]
+      pending: {actor: p1, kind: priority}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@bow": 4}}
+  - resolve_top: true
+  - label: bowmasters-dead
+    check:
+      stack: [{kind: triggered, source: "@bow"}]
+      pending: {actor: p1, kind: priority}
+      p1: {graveyard: [Orcish Bowmasters], battlefield: [{card: Aluren}]}
+      p0: {battlefield: [{card: Ocelot Pride, damage: 0}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Pyrokinesis, Ocelot Pride]
+      exile: [Lightning Bolt]
+      battlefield: []
+    p1:
+      battlefield: [{card: Aluren}, {token: Orc Army Token, pt: [1, 1]}]
+      graveyard: [Orcish Bowmasters]
+notes: >
+  Orcish Bowmasters (mana value 2) is cast free through Aluren on p1's turn. Its enters trigger targets p0's Ocelot Pride
+  (the target is chosen when the trigger is put on the stack). With the trigger on the stack p0 casts Pyrokinesis by
+  exiling a red card and puts all 4 on the Bowmasters (1/1), which dies. The trigger exists on the stack independently of
+  its source (113.7a): it still deals its 1 damage (using last known information) and the Pride (1/1) dies, then
+  "amass Orcs 1" gives p1 an Orc Army token with one +1/+1 counter (1/1) even though Bowmasters is gone. Killing the
+  creature does not stop its enters trigger. A wrong engine counters the trigger when its source leaves, or skips the
+  amass. The Pride's end-step trigger and Bowmasters' draw trigger are not involved.

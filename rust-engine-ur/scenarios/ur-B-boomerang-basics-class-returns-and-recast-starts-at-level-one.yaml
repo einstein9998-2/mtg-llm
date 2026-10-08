@@ -1,0 +1,63 @@
+id: ur-b-boomerang-basics-class-returns-and-recast-starts-at-level-one
+title: "Boomerang Basics on my own level 2 Stormchaser's Talent draws a card; recast it and it enters at level 1 with a new Otter"
+area: card
+cards: [Boomerang Basics, Island, "Stormchaser's Talent", Otter Token, Ponder, Brainstorm]
+tags: [boomerang-basics, bounce, class, class-level, level-reset, new-object, you-controlled, draw-a-card, otter, stormchasers-talent]
+derived_from: cr
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+  - {kind: cr, ref: "716.2b", text: "A level is a designation that any permanent can have. A Class retains its level even if it stops being a Class. Levels are not a copiable characteristic.", verified: true}
+  - {kind: cr, ref: "716.2d", text: "If a rule or effect refers to a permanent’s level and that permanent doesn’t have a level, it is treated as though its level is 1.", verified: true}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "When this Class enters, create a 1/1 blue and red Otter creature token with prowess.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @i1", "Island @i2", {card: "Stormchaser's Talent", as: talent, counters: {level: 2}}]
+    library: ["Ponder", "Brainstorm"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@talent"], pay: {tap: ["@i1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: talent-bounced
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0: {hand: ["Stormchaser's Talent", Ponder], battlefield: [{card: Island}, {card: Island}]}
+  - p0: {t: cast, card: "@talent", pay: {tap: ["@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: talent-entered
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0}]
+      p0:
+        battlefield_contains: [{card: "Stormchaser's Talent", types: [Enchantment], subtypes: [Class], counters: {level: 1}}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder]
+      graveyard: [Boomerang Basics]
+      library_top: [Brainstorm]
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: "Stormchaser's Talent", counters: {level: 1}}
+        - {token: Otter Token, pt: [1, 1], keywords: [prowess]}
+notes: >
+  Boomerang Basics may target a Class (a nonland permanent). p0 controls it, so p0 draws Ponder. The Talent returned to
+  hand is a new object when it is cast again (400.7). Its level was a designation of the old object (716.2b), and a
+  permanent with no level is treated as level 1 (716.2d), so it re-enters at level 1 (the engine's level counter is 1,
+  not 2) and its enters trigger makes an Otter. The setup deliberately has no Otter token, so the only token at the end
+  is the one made by the recast (no prowess trigger is involved either). A wrong engine keeps the level counter
+  across the zone change, makes no Otter on the recast, or leaves the Talent without a level counter.

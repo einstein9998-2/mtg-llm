@@ -1,0 +1,82 @@
+id: ur-a-level-3-spell-cast-in-response-to-the-level-up-makes-no-otter
+title: "A spell cast in response to the level 3 activation makes no Otter (the Class is still level 2); the next spell after it resolves does"
+area: card
+cards: ["Stormchaser's Talent", Island, Mountain, Lightning Bolt, "Otter Token"]
+tags: [stormchasers-talent, class, level-up, level-3, cast-trigger, response, level-changes-on-resolution, ur-alternate]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "{5}{U}: Level 3", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true}
+  - {kind: cr, ref: "716.2a", text: "“[Cost]: Level N — [Abilities]” means “[Cost]: This Class’s level becomes N.", verified: true}
+  - {kind: cr, ref: "603.2", text: "Whenever a game event or game state matches a triggered ability's trigger event, that ability automatically triggers.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 2}}
+      - "Island @i1"
+      - "Island @i2"
+      - "Island @i3"
+      - "Island @i4"
+      - "Island @i5"
+      - "Island @i6"
+      - "Mountain @m1"
+      - "Mountain @m2"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@talent", ability: 1, pay: {tap: ["@i1", "@i2", "@i3", "@i4", "@i5", "@i6"]}}
+  - p0: {t: cast, card: "@b1", targets: [{player: p1}], pay: {tap: ["@m1"]}}
+  - label: no-trigger-at-level-2
+    check:
+      stack:
+        - {kind: activated, source: "@talent", controller: p0}
+        - {kind: spell, card: "@b1", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: level-3-reached-no-otter
+    check:
+      stack: []
+      p0:
+        battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 3}}]
+      p1: {life: 17}
+  - p0: {t: cast, card: "@b2", targets: [{player: p1}], pay: {tap: ["@m2"]}}
+  - label: trigger-at-level-3
+    check:
+      stack:
+        - {kind: spell, card: "@b2", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt, Lightning Bolt]
+      spells_cast_this_turn: 2
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {token: Otter Token, pt: [1, 1]}
+    p1: {life: 14}
+notes: >
+  The Class becomes level 3 only when the activated ability resolves. The first Bolt is cast while the ability is still
+  on the stack and the Talent is level 2, so it has no "whenever you cast" ability to trigger: the stack holds only the
+  ability and the spell. The second Bolt, cast after the level-up resolves, triggers the Talent: one Otter. A wrong
+  engine applies the level on activation (two Otters) or never applies it.

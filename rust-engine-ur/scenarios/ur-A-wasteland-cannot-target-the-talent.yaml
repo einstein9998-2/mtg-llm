@@ -1,0 +1,46 @@
+id: ur-a-wasteland-cannot-target-the-talent
+title: "Wasteland cannot target Stormchaser's Talent (not a land) but can still destroy a nonbasic land beside it"
+area: card
+cards: ["Stormchaser's Talent", Wasteland, Volcanic Island]
+tags: [stormchasers-talent, class, wasteland, targeting, legal-action-mask, not-a-land, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}: Add {C}.", verified: true, note: "ability 0 of Wasteland, so the destroy ability is ability 1"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 1}}
+      - "Volcanic Island @volc"
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - label: p1-has-priority
+    check:
+      pending: {actor: p1, kind: priority}
+      legal:
+        p1:
+          include: [{t: activate, source: "@waste", ability: 1}]
+  - expect_illegal: {p1: {t: activate, source: "@waste", ability: 1, targets: ["@talent"]}}
+  - p1: {t: activate, source: "@waste", ability: 1, targets: ["@volc"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      graveyard: [Volcanic Island]
+      battlefield: [{card: "Stormchaser's Talent", types: [Enchantment], counters: {level: 1}}]
+    p1:
+      graveyard: [Wasteland]
+      battlefield: []
+notes: >
+  The Talent's type line is Enchantment — Class; the Wasteland ability needs a target nonbasic land, so the Talent is
+  rejected as a target (`expect_illegal` with the Talent as target), while the Wasteland ability is offered because the Volcanic Island is a legal target. Activating on the Island proves the Talent is unaffected. Ability 1 of Wasteland is
+  the destroy ability (0 is the mana ability). A wrong engine matches "nonbasic" without checking the land type.

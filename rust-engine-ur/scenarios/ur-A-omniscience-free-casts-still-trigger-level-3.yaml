@@ -1,0 +1,61 @@
+id: ur-a-omniscience-free-casts-still-trigger-level-3
+title: "Spells cast through Omniscience without paying their mana costs are still cast: two free Lightning Bolts at level 3 make two Otters"
+area: card
+cards: ["Stormchaser's Talent", Omniscience, Lightning Bolt, "Otter Token"]
+tags: [stormchasers-talent, class, level-3, cast-trigger, omniscience, free-cast, alurentell, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "601.2i", text: "the spell becomes cast. Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "118.9", text: "You may cast [this object] without paying its mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @b1", "Lightning Bolt @b2"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - "Omniscience @omni"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@b1", alt_cost: {free: omniscience}, targets: [{player: p1}]}
+  - p0: {t: cast, card: "@b2", alt_cost: {free: omniscience}, targets: [{player: p1}]}
+  - label: two-spells-two-triggers
+    check:
+      stack:
+        - {kind: spell, card: "@b1", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+        - {kind: spell, card: "@b2", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+      p0: {spells_cast_this_turn: 2}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt, Lightning Bolt]
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {card: Omniscience}
+        - {token: Otter Token, pt: [1, 1]}
+        - {token: Otter Token, pt: [1, 1]}
+    p1: {life: 14}
+notes: >
+  p0 has no lands at all: both Bolts are cast for free with Omniscience, in response to the first Talent trigger (Bolt is
+  an instant). Each cast triggers the Talent once, so two triggers and two Otters; neither Otter existed when either spell
+  was cast, so there is no prowess. Order of resolution is top-down: second trigger, second Bolt, first trigger, first Bolt.
+  The scenario is the core "Omniscience plus Talent" line: free is not the same as not cast. A wrong engine treats the
+  free cast as a put or skips cast triggers for alternative costs.

@@ -1,0 +1,78 @@
+id: ur-a-level-up-is-sorcery-speed-only
+title: "Level 2 can be activated only in your own main phase with an empty stack: not with a spell on the stack, not in combat, not on the opponent's turn"
+area: card
+cards: ["Stormchaser's Talent", Island, Mountain, Lightning Bolt]
+tags: [stormchasers-talent, class, level-up, sorcery-timing, legal-action-mask, ur-alternate]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "{3}{U}: Level 2", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "716.2a", text: "Activate only if this Class is level N-1 and only as a sorcery", verified: true}
+  - {kind: cr, ref: "602.5d", text: "Activated abilities that read “Activate only as a sorcery” mean the player must follow the timing rules for casting a sorcery spell, though the ability isn’t actually a sorcery.", verified: true}
+  - {kind: cr, ref: "117.1a", text: "A player may cast a noninstant spell during their main phase any time they have priority and the stack is empty.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 1}}
+      - "Island @is1"
+      - "Island @is2"
+      - "Island @is3"
+      - "Island @is4"
+      - "Mountain @mt"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@talent", ability: 0}]}}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: {tap: ["@mt"]}}
+  - label: spell-on-stack
+    check:
+      stack: [{kind: spell, card: "@bolt"}]
+      legal: {p0: {exclude: [{t: activate, source: "@talent", ability: 0}]}}
+  - expect_illegal: {p0: {t: activate, source: "@talent", ability: 0, pay: auto}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - advance: {to: begin_combat, of: p0}
+  - label: beginning-of-combat
+    check:
+      phase: begin_combat
+      legal: {p0: {exclude: [{t: activate, source: "@talent", ability: 0}]}}
+  - expect_illegal: {p0: {t: activate, source: "@talent", ability: 0, pay: auto}}
+  - advance: {to: main2, of: p0}
+  - label: second-main-phase
+    check:
+      phase: main2
+      stack: []
+      legal: {p0: {include: [{t: activate, source: "@talent", ability: 0}]}}
+  - advance: {to: main1, of: p1}
+  - p1: {t: pass}
+  - label: opponents-main-phase
+    check:
+      turn: 4
+      active: p1
+      phase: main1
+      priority: p0
+      stack: []
+      legal: {p0: {exclude: [{t: activate, source: "@talent", ability: 0}]}}
+  - expect_illegal: {p0: {t: activate, source: "@talent", ability: 0, pay: auto}}
+expect:
+  - at: after_script
+    turn: 4
+    active: p1
+    phase: main1
+    stack: []
+    p0:
+      graveyard: [Lightning Bolt]
+      battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 1}}]
+    p1: {life: 17}
+notes: >
+  Four untapped Islands pay {3}{U} the whole time, so only timing decides. Offered: first main phase with an empty stack
+  and second main phase with an empty stack. Not offered: with Lightning Bolt on the stack (even though p0 has priority),
+  at the beginning of combat, and on the opponent's turn when p0 receives priority in p1's main phase with an empty stack.
+  Nothing changes (the Talent stays level 1). A wrong engine treats the level-up as instant speed because it is an
+  "activated ability", or ignores the empty-stack requirement. The `advance` steps pass no decisions: p0 has no creature,
+  so declare_attackers raises nothing, and p1 draws and does nothing.

@@ -1,0 +1,50 @@
+id: ur-b-pyrokinesis-daze-tapped-out-countered
+title: "Casting Pyrokinesis by exiling a red card is not free of Daze: with no mana left to pay {1} Daze (cast by returning an Island) counters it"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Daze, Island, Street Wraith]
+tags: [pyrokinesis, daze, alternative-cost, counter-unless-pay, tapped-out, exile-cost, return-island]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "You may exile a red card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2", "Street Wraith @salv"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@salv": 4}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j2"}, targets: ["@pyro"]}
+  - label: both-on-stack
+    check:
+      stack: [{kind: spell, card: "@pyro", controller: p0}, {kind: spell, card: "@daze", controller: p1, targets: ["@pyro"]}]
+      p1: {hand: [Island]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Pyrokinesis]
+      exile: [Lightning Bolt]
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: [{card: Island, tapped: false}, {card: Street Wraith, damage: 0}]
+notes: >
+  The alternative cost pays no mana, but Pyrokinesis is still a spell that Daze can counter "unless its controller pays
+  {1}". p0 controls no lands, so it cannot pay and is given no real choice (no yes_no prompt, the same convention as
+  the other tapped-out Daze scenarios); Pyrokinesis is countered and the exiled Bolt stays exiled. p1 returned an
+  Island as Daze's own alternative cost and keeps the other Island untapped. A wrong engine skips Daze because "no
+  mana was spent", or lets Pyrokinesis resolve.

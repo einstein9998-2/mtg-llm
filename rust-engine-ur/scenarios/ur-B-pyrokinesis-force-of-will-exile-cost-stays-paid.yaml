@@ -1,0 +1,52 @@
+id: ur-b-pyrokinesis-force-of-will-exile-cost-stays-paid
+title: "Force of Will counters Pyrokinesis that was cast by exiling a red card: the exiled card stays exiled, Pyrokinesis goes to the graveyard, the target is unhurt"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Force of Will, Brainstorm, Street Wraith]
+tags: [pyrokinesis, force-of-will, alternative-cost, cost-already-paid, counter, exile-cost]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "You may exile a red card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true}
+  - {kind: cr, ref: "118.9a", text: "Only one alternative cost can be applied to any one spell as it’s being cast. The controller of the spell announces their intentions to pay that cost as described in rule 601.2b.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Street Wraith @salv"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@salv": 4}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@pyro"]}
+  - label: both-on-stack
+    check:
+      stack: [{kind: spell, card: "@pyro", controller: p0}, {kind: spell, card: "@fow", controller: p1, targets: ["@pyro"]}]
+      p0: {exile: [Lightning Bolt]}
+      p1: {life: 19, exile: [Brainstorm], hand: []}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Pyrokinesis]
+      exile: [Lightning Bolt]
+    p1:
+      life: 19
+      hand: []
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+      battlefield: [{card: Street Wraith, damage: 0}]
+notes: >
+  Exiling the red card is a cost of casting Pyrokinesis (601.2h): it is paid before the spell is on the stack, so
+  countering the spell later does not give the Bolt back. Force of Will (alternative cost: pay 1 life and exile a
+  blue card, Brainstorm) counters Pyrokinesis, which goes to the graveyard; the Street Wraith never takes damage. A wrong
+  engine returns the exiled card on a counter or exiles it only at resolution.

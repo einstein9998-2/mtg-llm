@@ -1,0 +1,51 @@
+id: ur-b-boomerang-basics-target-removed-in-response-no-draw
+title: "Boomerang Basics targeting my own Ocelot Pride fizzles when p1 exiles the Ocelot Pride in response: nothing returns and I draw no card"
+area: card
+cards: [Boomerang Basics, Island, Ocelot Pride, Swords to Plowshares, Plains, Ponder]
+tags: [boomerang-basics, target-becomes-illegal, fizzle, no-draw, swords-to-plowshares, exile-in-response]
+derived_from: cr
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @isl", "Ocelot Pride @pride"]
+    library: ["Ponder"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@pride"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@pride"], pay: auto}
+  - resolve_top: true
+  - label: savage-exiled
+    check:
+      stack: [{kind: spell, card: "@bb", controller: p0}]
+      p0: {life: 21, exile: [Ocelot Pride]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 21
+      hand: []
+      library_count: 11
+      graveyard: [Boomerang Basics]
+      exile: [Ocelot Pride]
+    p1:
+      graveyard: [Swords to Plowshares]
+notes: >
+  Swords to Plowshares exiles the Ocelot Pride (p0 gains 1). When Boomerang Basics resolves its only target is gone, so it
+  does not resolve (608.2b): it is removed from the stack and put into the graveyard without drawing. The "if you
+  controlled that permanent" draw is part of the resolution, which never happens. A wrong engine still draws, or
+  returns the exiled Pride.

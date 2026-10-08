@@ -1,0 +1,46 @@
+id: ur-a-daze-declined-talent-countered-no-otter
+title: "Daze on Stormchaser's Talent: p0 declines to pay {1}, the Talent is countered and no Otter appears"
+area: card
+cards: ["Stormchaser's Talent", Island, Daze]
+tags: [stormchasers-talent, class, daze, counter-unless-pay, decline-to-pay, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "“[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player doesn’t], [do something].”", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stormchaser's Talent @talent"]
+    battlefield: ["Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@talent", pay: {tap: ["@is1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@talent"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: false}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: ["Stormchaser's Talent"]
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: false}
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: []
+notes: >
+  p0 could pay but chooses not to (the second Island stays untapped). The Talent is countered, goes to the graveyard, and
+  the enters trigger never exists. The Daze caster keeps nothing on the battlefield (the Island was returned as the cost).
