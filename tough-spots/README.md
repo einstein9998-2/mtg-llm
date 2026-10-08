@@ -45,3 +45,7 @@ Source: the overnight LLM-vs-LLM games (Alurentell vs UR Cutter and Boros, both 
 Positions are drawn as a board: opponent on top, your side below, the stack in the middle. Each permanent is a card tile with a color stripe (from its mana cost), type, cost pips and power/toughness. Lands show a stripe from the colors they make. Tapped cards are dimmed and marked, not rotated. Hands expand to one tile per copy, life has a bar, the step bar shows where in the turn it is, and graveyards and exile are tile lists under the board.
 
 The page embeds a name to type and cost table printed by `cardinfo` (`cargo run --release --bin cardinfo`), between the `/*CARDINFO*/` and `/*END*/` markers in `answer-page.html`. Re-run it and paste the output there after the card pool changes; cards missing from the table fall back to the type tag in the position text.
+
+## Second night of LLM games (s9)
+
+Games g44 to g112 (69 games) produced 493 flagged positions; the 79 the reviewer marked likely-mistake are on the answer page (orders 335..413) and saved in `llm-games/s9/`. The other 414 are in the shared folder (`tough-spots/llmgames/s9/batch.json`) and are not seeded. Brady asked for spots that come with explanations, so these cards carry the reviewer's note as `explanation`, shown up front as "Why this was flagged", with the option the LLM played badged. Seed with `seed_llm_games.py <src> <out> 335 --explain`.

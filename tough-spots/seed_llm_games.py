@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """Prepare the LLM-vs-LLM tough spots (source dir from the "LLM player with net tool" thread) for the answer page.
-Usage: seed_llm_games.py <src dir with batch.json + batch-priority.json> <out dir> <first_order> [--all]
+Usage: seed_llm_games.py <src dir with batch.json + batch-priority.json> <out dir> <first_order> [--all] [--explain]
 Priority (reviewer likely-mistake) positions come first; with --all the other flagged positions follow.
 Cards written to <out>/docs/<id>.json carry no reviewer notes and no game result (hindsight would bias the answer);
-those, plus the seeds, go to <out>/review-private.jsonl."""
+those, plus the seeds, go to <out>/review-private.jsonl.
+With --explain the reviewer's note is kept on the card as `explanation` (shown up front as "why this was flagged"; Brady asked for
+spots that come with explanations); the game result is still removed."""
 import json, os, sys
 
 src, out, first = sys.argv[1], sys.argv[2], int(sys.argv[3])
 allp = '--all' in sys.argv
+explain = '--explain' in sys.argv
 full = json.load(open(f'{src}/batch.json'))
 prio_ids = [x['id'] for x in json.load(open(f'{src}/batch-priority.json'))]
 by = {x['id']: x for x in full}
@@ -25,6 +28,8 @@ for i, pid in enumerate(order):
     rev.append({**priv.get(pid, {'id': pid}), 'flags': c.pop('flags'), 'reasons': c.pop('reasons'), 'game_result_for_llm': c.pop('game_result_for_llm'),
                 'priority': pid in set(prio_ids), 'order': first + i})
     c.update(order=first + i, batch='LLM games')
+    if explain:
+        c['explanation'] = ' '.join(f['note'] for f in rev[-1]['flags'])
     cards.append(c)
     json.dump(c, open(f'{out}/docs/{pid}.json', 'w'))
 json.dump(cards, open(f'{out}/batch.json', 'w'))
