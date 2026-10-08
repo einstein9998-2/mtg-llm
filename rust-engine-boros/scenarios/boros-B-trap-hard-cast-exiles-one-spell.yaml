@@ -1,0 +1,57 @@
+id: boros-b-trap-hard-cast-exiles-one-spell
+title: "With only one opposing spell cast, Mindbreak Trap is not free: it costs {2}{U}{U} and exiles that one spell"
+area: card
+cards: [Mindbreak Trap, Lightning Bolt, Island, Mountain]
+tags: [mindbreak-trap, normal-cost, alternative-cost-unavailable, exile-spell, single-target, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell’s text, or applied to it from another effect, that its controller may pay rather than paying the spell’s mana cost.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mt"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@bolt"]}}
+  - p0: {t: cast, card: "@trap", targets: ["@bolt"], pay: auto}
+  - label: trap-hard-cast
+    check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@trap", controller: p0, targets: ["@bolt"]}
+      p0:
+        battlefield:
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Mindbreak Trap]
+      exile: []
+      spells_cast_this_turn: 1
+    p1:
+      life: 20
+      graveyard: []
+      exile: [Lightning Bolt]
+      spells_cast_this_turn: 1
+notes: >
+  p1 has cast one spell, which is fewer than three, so the free alternative cost is not available: the probe with
+  alt_cost three_spells is illegal and changes nothing. The normal cost {2}{U}{U} taps all four Islands. The Trap exiles
+  the Bolt (p0 stays at 20; the Bolt is in exile, not the graveyard). One target out of "any number".

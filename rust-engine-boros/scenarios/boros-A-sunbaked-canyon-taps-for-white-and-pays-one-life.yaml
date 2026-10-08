@@ -1,0 +1,52 @@
+id: boros-a-sunbaked-canyon-taps-for-white-and-pays-one-life
+title: "Sunbaked Canyon tapped for {W} costs 1 life and the white mana casts Swords to Plowshares but not Lightning Bolt"
+area: card
+cards: [Sunbaked Canyon, Lightning Bolt, Swords to Plowshares, "Phelia, Exuberant Shepherd"]
+tags: [sunbaked-canyon, mana-ability, pay-life, color-choice, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Sunbaked Canyon, text: "{T}, Pay 1 life: Add {R} or {W}.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Lightning Bolt @bolt", "Swords to Plowshares @sw"]
+    battlefield: ["Sunbaked Canyon @can"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@can", ability: 0, choose_color: W}
+  - label: white-mana-added
+    check:
+      stack: []
+      p0:
+        life: 19
+        mana_pool: {W: 1}
+        battlefield: [{card: Sunbaked Canyon, tapped: true}]
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}}
+  - p0: {t: cast, card: "@sw", targets: ["@ph"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Lightning Bolt]
+      graveyard: [Swords to Plowshares]
+      mana_pool: {}
+    p1:
+      life: 22
+      battlefield: []
+      exile: ["Phelia, Exuberant Shepherd"]
+notes: >
+  Mirror of the red scenario: the same land makes {W} when W is chosen, so Lightning Bolt ({R}) is not castable with it
+  but Swords to Plowshares is. Phelia (power 2) is exiled and p1 gains 2 life (20 to 22). A wrong engine ignores the
+  colour choice (always R, or both).

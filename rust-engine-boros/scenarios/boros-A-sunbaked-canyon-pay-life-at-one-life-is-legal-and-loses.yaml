@@ -1,0 +1,35 @@
+id: boros-a-sunbaked-canyon-pay-life-at-one-life-is-legal-and-loses
+title: "At 1 life Sunbaked Canyon can still be tapped for mana (paying 1 life is legal) and the player then loses at 0 life"
+area: card
+cards: [Sunbaked Canyon]
+tags: [sunbaked-canyon, mana-ability, pay-life, state-based-actions, boundary, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Sunbaked Canyon, text: "{T}, Pay 1 life: Add {R} or {W}.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "119.4", text: "the player may do so only if their life total is greater than or equal to the amount of the payment", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 1
+    battlefield: ["Sunbaked Canyon @can"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: activate, source: "@can", ability: 0}]}}
+  - p0: {t: activate, source: "@can", ability: 0, choose_color: R}
+expect:
+  - at: after_script
+    game: {over: true, winner: p1}
+    p0:
+      life: 0
+notes: >
+  Life total 1 is greater than or equal to the payment of 1, so the activation is offered (119.4). Paying it leaves 0 life
+  and the next state-based action check ends the game with p1 the winner. A wrong engine treats "life greater than the
+  payment" as the test and hides the ability at 1 life, or lets the player survive at 0. An activation at 0 life cannot be
+  constructed (the game is already over), so the "cannot pay with too little life" side is not asserted; see the notes
+  file.

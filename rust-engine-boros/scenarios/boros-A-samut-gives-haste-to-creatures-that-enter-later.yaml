@@ -1,0 +1,56 @@
+id: boros-a-samut-gives-haste-to-creatures-that-enter-later
+title: "A creature cast after Samut is already on the battlefield has haste and attacks the turn it enters"
+area: card
+cards: ["Samut, Hazoret's Champion", Dragon's Rage Channeler, Mountain]
+tags: [samut, haste, continuous-effect, summoning-sickness, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Samut, Hazoret's Champion", text: "Creatures you control have haste.", verified: false, note: "Not in Savecraft; text from two card sites per SCENARIO-BRIEF.md; entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "702.10b", text: "If a creature has haste, it can attack even if it hasn’t been controlled by its controller continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "611.3c", text: "Continuous effects that modify characteristics of permanents do so simultaneously with the permanent entering the battlefield.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Dragon's Rage Channeler @drc"]
+    battlefield: ["Samut, Hazoret's Champion @samut", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    life: 20
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@drc", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: channeler-has-haste
+    check:
+      stack: []
+      p0:
+        battlefield_contains:
+          - {card: "Dragon's Rage Channeler", keywords: [haste], pt: [1, 1]}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      expect_options: {include: ["@drc", "@samut"]}
+      attacks:
+        - {creature: "@drc", target: {player: p1}}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main2
+    p1:
+      life: 19
+    p0:
+      battlefield:
+        - {card: "Samut, Hazoret's Champion", tapped: false}
+        - {card: "Dragon's Rage Channeler", tapped: true}
+        - {card: Mountain, tapped: true}
+notes: >
+  The Channeler is a creature spell (no surveil trigger) that enters while Samut is on the battlefield; it has haste from the
+  moment it enters and is offered as an attacker together with Samut (who has been there since before the turn). Only the
+  Channeler attacks: 1 damage (20 to 19), Samut stays untapped. A wrong engine gives haste only to creatures already on the
+  battlefield when Samut resolved. Source claims about Samut are unverified; see notes.

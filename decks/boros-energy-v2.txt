@@ -1,0 +1,36 @@
+# Boros Energy (Brady's list, posted in the project thread 2026-10-08). Replaces the earlier Boros Aggro list (boros-aggro.txt, Fenrir18's tournament list) for review purposes; boros-aggro.txt is left unchanged and is what the engine and the overnight games used.
+# Not in the engine yet: no definitions found for Static Prison, Samut (Hazoret's Champion), Forth Eorlingas!, Sunbaked Canyon, Mindbreak Trap. Hexing Squelcher exists only in the Storm package. Format: N Card Name; blank line, then sideboard.
+
+4 Ocelot Pride
+4 Guide of Souls
+4 Swords to Plowshares
+3 Static Prison
+4 Ajani, Nacatl Pariah
+2 Goblin Bombardment
+2 Sand Scout
+1 Phlage, Titan of Fire's Fury
+4 Arid Mesa
+1 Elegant Parlor
+4 Marsh Flats
+2 Plateau
+2 Karakas
+4 Wasteland
+4 Amped Raptor
+4 Voice of Victory
+2 Lazotep Quarry
+2 Sunbaked Canyon
+1 Mountain
+2 Hexing Squelcher
+2 Plains
+1 Samut, Hazoret's Champion
+1 Forth Eorlingas!
+
+2 Pyroblast
+2 Surgical Extraction
+2 Price of Progress
+1 Abrade
+2 Mindbreak Trap
+2 Containment Priest
+2 Null Rod
+1 Erode
+1 Grafdigger's Cage

@@ -1,0 +1,48 @@
+id: boros-a-sunbaked-canyon-sacrifice-to-draw-costs-one-mana-no-life
+title: "Sunbaked Canyon's draw ability is a stack ability: {1}, tap and sacrifice it as costs, no life paid, the card is drawn on resolution"
+area: card
+cards: [Sunbaked Canyon, Mountain, Lightning Bolt]
+tags: [sunbaked-canyon, activated-ability, sacrifice-cost, draw, stack, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Sunbaked Canyon, text: "{1}, {T}, Sacrifice this land: Draw a card.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "602.2b", text: "An activated ability’s analog to a spell’s mana cost (as referenced in rule 601.2f) is its activation cost.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    battlefield: ["Sunbaked Canyon @can", "Mountain @m1"]
+    library: [Lightning Bolt]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@can", ability: 1, pay: {tap: ["@m1"]}}
+  - label: ability-on-stack
+    check:
+      stack: [{kind: activated, source: "@can", controller: p0}]
+      p0:
+        life: 20
+        hand: []
+        graveyard: [Sunbaked Canyon]
+        battlefield: [{card: Mountain, tapped: true}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Lightning Bolt]
+      library_count: 10
+      graveyard: [Sunbaked Canyon]
+      battlefield: [{card: Mountain, tapped: true}]
+notes: >
+  Ability index 1 is the second ability in Oracle order. Its costs ({1} from the Mountain, {T} and the sacrifice of the
+  Canyon itself) are paid on activation, so the Canyon is already in the graveyard while the ability is on the stack, and
+  no life is paid (only the first ability costs life). The draw happens on resolution. A wrong engine charges life, draws
+  on activation, or keeps the Canyon until resolution.

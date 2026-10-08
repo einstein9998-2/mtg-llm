@@ -1,0 +1,72 @@
+id: boros-a-static-prison-declined-payment-returns-exiled-permanent-next-turn
+title: "Full cycle: Static Prison exiles a creature, p0 declines to pay {E} on the next turn, the Prison is sacrificed and the creature returns"
+area: card
+cards: [Static Prison, "Phelia, Exuberant Shepherd", Plains]
+tags: [static-prison, energy, pay-energy, sacrifice, exile-until-leaves, return-from-exile, full-cycle, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Static Prison, text: "exile target nonland permanent an opponent controls until this enchantment leaves the battlefield", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Static Prison, text: "At the beginning of your first main phase, sacrifice this enchantment unless you pay {E}.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "610.3", text: "A second one-shot effect is created immediately after the specified event. This second one-shot effect returns the object to its previous zone.", verified: true}
+  - {kind: cr, ref: "610.3c", text: "An object returned to the battlefield this way returns under its owner’s control unless otherwise specified.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Static Prison @sp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph", "Plains @pw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sp", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@ph"}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: phelia-exiled
+    check:
+      stack: []
+      p0: {energy: 2}
+      p1: {exile: ["Phelia, Exuberant Shepherd"]}
+  - advance: {to: end, of: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: next-turn-trigger
+    check:
+      turn: 5
+      phase: main1
+      stack: [{kind: triggered, source: "@sp", controller: p0, text_contains: "sacrifice"}]
+      p0: {energy: 2}
+      p1: {exile: ["Phelia, Exuberant Shepherd"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_energy, answer: false}
+expect:
+  - at: after_script
+    turn: 5
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 2
+      battlefield: [{card: Plains}]
+      graveyard: [Static Prison]
+    p1:
+      battlefield:
+        - {card: "Phelia, Exuberant Shepherd", controller: p1}
+        - {card: Plains}
+      exile: []
+notes: >
+  The sacrifice (not an opposing removal spell) ends the "until" duration, so Phelia comes back under p1's control as soon
+  as the Prison reaches the graveyard, during p0's own first main phase. Energy is not taken back (p0 keeps the 2 it got on
+  entering). The advance to p1's end step passes through p1's whole turn 4 with no decisions (p1 has no creature to attack
+  with, Phelia being exiled); the first Prison trigger does not fire on p1's turn.

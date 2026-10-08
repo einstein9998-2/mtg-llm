@@ -1,0 +1,60 @@
+id: boros-b-trap-exiles-spells-that-cannot-be-countered-veil-of-summer
+title: "Veil of Summer makes the opponent's spells uncounterable but Mindbreak Trap still exiles them (exile is not a counter)"
+area: card
+cards: [Mindbreak Trap, Veil of Summer, Brainstorm, Lightning Bolt, Forest, Island, Mountain]
+tags: [mindbreak-trap, veil-of-summer, cant-be-countered, exile-spell, alternative-cost, three-spells, resolved-spell-counts, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "701.13a", text: "To exile an object, move it to the exile zone from wherever it is.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    battlefield: ["Island @is1"]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil", "Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Forest @fo", "Island @pi", "Mountain @mt"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - resolve_top: true
+  - label: veil-resolved
+    check:
+      stack: []
+      priority: p1
+      p1:
+        hand: [Brainstorm, Lightning Bolt]
+        graveyard: [Veil of Summer]
+        spells_cast_this_turn: 1
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@bs", "@bolt"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Mindbreak Trap]
+      battlefield: [{card: Island, tapped: false}]
+    p1:
+      life: 20
+      hand: []
+      graveyard: [Veil of Summer]
+      exile: [Brainstorm, Lightning Bolt]
+      spells_cast_this_turn: 3
+notes: >
+  Veil of Summer was cast first and resolved (it is already in the graveyard), but it still counts as the first of
+  the three spells p1 cast this turn, so the Trap is free. Veil makes p1's spells uncounterable, but the Trap does not
+  counter: it exiles (701.13a vs 701.6a), so both Brainstorm and the Bolt are exiled anyway. Veil's hexproof from
+  blue is irrelevant: the Trap targets spells, not p1 or p1's permanents. p0 has cast no blue or black spell, so the
+  Veil drew nothing for p1 (hand is Brainstorm and Bolt after it resolves).

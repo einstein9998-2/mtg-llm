@@ -1,0 +1,35 @@
+{
+ "_meta": {
+  "group": "B",
+  "note": "Entries to merge into reference/oracle.json (cards, tokens). Oracle text for Forth Eorlingas!, Mindbreak Trap and the red Human Knight token retrieved with Savecraft card_search on 2026-10-08 (exact name, Scryfall data)."
+ },
+ "cards": {
+  "Forth Eorlingas!": {
+   "name": "Forth Eorlingas!",
+   "mana_cost": "{X}{R}{W}",
+   "type_line": "Sorcery",
+   "oracle_text": "Create X 2/2 red Human Knight creature tokens with trample and haste.\nWhenever one or more creatures you control deal combat damage to one or more players this turn, you become the monarch.",
+   "source": "Savecraft card_search (Scryfall oracle data), 2026-10-08"
+  },
+  "Mindbreak Trap": {
+   "name": "Mindbreak Trap",
+   "mana_cost": "{2}{U}{U}",
+   "type_line": "Instant — Trap",
+   "oracle_text": "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.\nExile any number of target spells.",
+   "source": "Savecraft card_search (Scryfall oracle data), 2026-10-08"
+  }
+ },
+ "tokens": {
+  "Human Knight Token": {
+   "name": "Human Knight",
+   "type_line": "Token Creature — Human Knight",
+   "colors": [
+    "R"
+   ],
+   "pt": "2/2",
+   "text": "Trample, haste",
+   "created_by": "Forth Eorlingas!",
+   "source": "Savecraft card_search token 'Human Knight' (set TLTC, 2/2, red, trample and haste), 2026-10-08"
+  }
+ }
+}

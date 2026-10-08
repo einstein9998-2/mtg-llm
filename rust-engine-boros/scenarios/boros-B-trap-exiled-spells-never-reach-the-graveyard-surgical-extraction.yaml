@@ -1,0 +1,59 @@
+id: boros-b-trap-exiled-spells-never-reach-the-graveyard-surgical-extraction
+title: "Spells exiled by Mindbreak Trap never reach the graveyard: Surgical Extraction cannot target them"
+area: card
+cards: [Mindbreak Trap, Surgical Extraction, Lightning Bolt, Brainstorm, Dark Ritual, Island, Mountain, Swamp]
+tags: [mindbreak-trap, exile-spell, graveyard-hate, surgical-extraction, zone-change, alternative-cost, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Surgical Extraction, text: "Choose target card in a graveyard other than a basic land card.", verified: true}
+  - {kind: cr, ref: "406.1", text: "The exile zone is essentially a holding area for objects.", verified: true}
+  - {kind: cr, ref: "701.13a", text: "To exile an object, move it to the exile zone from wherever it is.", verified: true}
+  - {kind: cr, ref: "404.1", text: "Any object that’s countered, discarded, destroyed, or sacrificed is put on top of its owner’s graveyard, as is any instant or sorcery spell that’s finished resolving.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap", "Surgical Extraction @surg"]
+    battlefield: ["Island @is1"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt", "Brainstorm @bs", "Dark Ritual @dr"]
+    battlefield: ["Mountain @mt", "Island @pi", "Swamp @sw"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: cast, card: "@dr", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@bolt", "@bs", "@dr"]}
+  - resolve_top: true
+  - p1: {t: pass}
+  - label: p0-priority-empty-stack
+    check:
+      stack: []
+      priority: p0
+      p0: {graveyard: [Mindbreak Trap]}
+      p1: {graveyard: [], exile: [Lightning Bolt, Brainstorm, Dark Ritual]}
+  - expect_illegal: {p0: {t: cast, card: "@surg", phyrexian: [life], targets: ["@bolt"]}}
+  - expect_illegal: {p0: {t: cast, card: "@surg", phyrexian: [life], targets: ["@bs"]}}
+  - expect_illegal: {p0: {t: cast, card: "@surg", phyrexian: [life], targets: ["@dr"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: [Surgical Extraction]
+      graveyard: [Mindbreak Trap]
+    p1:
+      graveyard: []
+      exile: [Lightning Bolt, Brainstorm, Dark Ritual]
+notes: >
+  After the free Trap resolves p1 (active player) gets priority and passes, so p0 holds priority with an empty stack and
+  Surgical Extraction (an instant costing {B/P}, payable with 2 life, so cost is no obstacle) in hand. The three exiled
+  spells are in exile and p1's graveyard is empty, so none of them is "a card in a graveyard": every attempt to target
+  one is illegal. A wrong engine puts exiled spells into the graveyard first (or lets graveyard hate see them). A
+  delve check (Murktide Regent) is not scripted: Murktide Regent is a sorcery-speed creature spell that cannot be cast
+  on p1's turn.

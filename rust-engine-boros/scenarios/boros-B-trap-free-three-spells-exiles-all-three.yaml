@@ -1,0 +1,82 @@
+id: boros-b-trap-free-three-spells-exiles-all-three
+title: "Mindbreak Trap costs {0} when the opponent has cast three spells this turn and exiles all three spells on the stack"
+area: card
+cards: [Mindbreak Trap, Lightning Bolt, Brainstorm, Dark Ritual, Island, Mountain, Swamp]
+tags: [mindbreak-trap, alternative-cost, three-spells, exile-spell, multiple-targets, instant-speed, boros]
+derived_from: oracle
+symmetric: true
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell’s text, or applied to it from another effect, that its controller may pay rather than paying the spell’s mana cost.", verified: true}
+  - {kind: cr, ref: "701.13a", text: "To exile an object, move it to the exile zone from wherever it is.", verified: true}
+  - {kind: cr, ref: "404.1", text: "Any object that’s countered, discarded, destroyed, or sacrificed is put on top of its owner’s graveyard, as is any instant or sorcery spell that’s finished resolving.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    battlefield: ["Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt", "Brainstorm @bs", "Dark Ritual @dr"]
+    battlefield: ["Mountain @mt", "Island @pi", "Swamp @sw"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: cast, card: "@dr", pay: auto}
+  - p1: {t: pass}
+  - label: three-on-stack
+    check:
+      priority: p0
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@bs", controller: p1}
+        - {kind: spell, card: "@dr", controller: p1}
+      p1: {spells_cast_this_turn: 3}
+  - p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@bolt", "@bs", "@dr"]}
+  - label: trap-free-on-stack
+    check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@bs", controller: p1}
+        - {kind: spell, card: "@dr", controller: p1}
+        - {kind: spell, card: "@trap", controller: p0, targets: ["@bolt", "@bs", "@dr"]}
+      p0:
+        battlefield:
+          - {card: Island, tapped: false}
+          - {card: Island, tapped: false}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      hand: []
+      graveyard: [Mindbreak Trap]
+      exile: []
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: false}
+    p1:
+      life: 20
+      hand: []
+      graveyard: []
+      exile: [Lightning Bolt, Brainstorm, Dark Ritual]
+      mana_pool: {}
+      spells_cast_this_turn: 3
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Swamp, tapped: true}
+notes: >
+  p1 casts three spells (Bolt, Brainstorm, Dark Ritual), each added on top while p1 keeps priority, so all three are on
+  the stack when p0 gets priority. p1 has cast three spells, so p0 may pay {0} (the check proves both of p0's Islands
+  stay untapped). One Trap with three targets exiles all three: none of them resolve (p0 keeps 20 life, p1 draws nothing
+  from Brainstorm, Dark Ritual makes no mana) and none lands in the graveyard (exile is not the graveyard, 701.13a /
+  404.1); the Trap itself finishes resolving and goes to p0's graveyard. p0's cast count is 1, p1's is 3. Symmetric
+  because either seat could be the Trap player.

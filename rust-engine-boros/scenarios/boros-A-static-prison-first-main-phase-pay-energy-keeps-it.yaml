@@ -1,0 +1,56 @@
+id: boros-a-static-prison-first-main-phase-pay-energy-keeps-it
+title: "At the beginning of its controller's first main phase Static Prison costs one energy to keep"
+area: card
+cards: [Static Prison, Plains]
+tags: [static-prison, energy, pay-energy, unless-pay, beginning-of-main-phase, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Static Prison, text: "At the beginning of your first main phase, sacrifice this enchantment unless you pay {E}.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "118.12a", text: "This means the same thing as “[A player may do something else]. If [that player doesn’t], [do something].”", verified: true}
+  - {kind: cr, ref: "603.2b", text: "When a phase or step begins, all abilities that trigger “at the beginning of” that phase or step trigger.", verified: true}
+  - {kind: cr, ref: "107.14", text: "To pay {E}, a player removes one energy counter from themselves.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    energy: 2
+    battlefield: ["Static Prison @sp", "Plains @pl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: trigger-on-stack
+    check:
+      turn: 3
+      phase: main1
+      active: p0
+      stack: [{kind: triggered, source: "@sp", controller: p0, text_contains: "sacrifice"}]
+      pending: {actor: p0, kind: priority}
+      p0: {energy: 2}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_energy, answer: true}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 1
+      battlefield: [{card: Static Prison, types: [Enchantment]}, {card: Plains}]
+      graveyard: []
+notes: >
+  The six passes walk from p1's end step through p0's upkeep and draw step (no actions) to the beginning of p0's first
+  main phase, where the trigger goes on the stack. The pay-or-sacrifice choice is made on resolution (118.12a): a yes/no
+  decision because p0 has energy. Paying removes one energy counter and the Prison stays. The setup has no "exiled by this
+  Prison" link (the format cannot express one); the exile-return side is covered by the other Static Prison scenarios.
+  Decision shape (yes_no, purpose pay_energy) follows the brief ("a yes/no decision when you have energy"); the adapter
+  owns the exact shape.

@@ -1,0 +1,48 @@
+id: boros-b-forth-x0-creates-no-tokens
+title: "Forth Eorlingas! with X = 0 costs only {R}{W} and creates no tokens"
+area: card
+cards: ["Forth Eorlingas!", Mountain, Plains, Island, "Human Knight Token"]
+tags: [forth-eorlingas, x-spell, x-zero, token-creation, mana-payment, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Forth Eorlingas!", text: "Create X 2/2 red Human Knight creature tokens with trample and haste.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "107.3a", text: "the controller of that spell or ability chooses and announces the value of X as part of casting the spell", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Forth Eorlingas! @forth"]
+    battlefield: ["Mountain @mt", "Plains @pl", "Island @is"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@forth", x: 0, pay: auto}
+  - label: x0-on-stack
+    check:
+      stack: [{kind: spell, card: "@forth", controller: p0, x: 0}]
+      p0:
+        battlefield:
+          - {card: Mountain, tapped: true}
+          - {card: Plains, tapped: true}
+          - {card: Island, tapped: false}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Forth Eorlingas!"]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: false}
+    p1:
+      battlefield: []
+notes: >
+  X = 0 is a legal choice (107.3a: the controller chooses and announces X). The cost is {0}{R}{W}: only the Mountain and
+  the Plains are tapped, the Island stays untapped. The spell resolves and creates zero tokens, then goes to the graveyard;
+  no creature of any kind appears. (The monarch clause is not modelled by the engine and is not asserted.) A wrong engine
+  refuses X = 0, creates a token regardless, or charges generic mana for it.

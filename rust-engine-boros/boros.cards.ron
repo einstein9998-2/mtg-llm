@@ -1,0 +1,37 @@
+// Boros Energy additions (Brady's list of 2026-10-08), RFC 0012. Oracle text per Savecraft card_search (Scryfall), 2026-10-08,
+// except Samut, Hazoret's Champion (not in that database; text from two card sites, cost {1}{R} from one of them).
+// Kept apart from legacy.cards.ron so that the pinned real-pool snapshot and its goldens stay untouched.
+[
+  (name: "Human Knight Token", types: "CREATURE", colors: "R", subtypes: ["Human", "Knight"], pt: (2, 2), keywords: "TRAMPLE | HASTE", is_token: true),
+  // Monarch is not modelled (RFC 0012): the second ability is missing.
+  (name: "Forth Eorlingas!", cost: "{X}{R}{W}", types: "SORCERY", abilities: [
+    Spell(effect: CreateToken(token: "Human Knight Token", n: X, who: You)),
+  ]),
+  // The exile is linked to the Prison (Portable Hole's mechanism); the two energy come with the same trigger, so a Prison whose
+  // trigger fizzles (target gone) gives none (CR 608.2b).
+  (name: "Static Prison", cost: "{W}", types: "ENCHANTMENT", abilities: [
+    Triggered(text: "When this enchantment enters, exile target nonland permanent an opponent controls until this enchantment leaves the battlefield. You get {E}{E} (two energy counters).", on: Enters(filter: (self_only: true)),
+      targets: [(objects: (types_not: "LAND", controller: Opp))], effect: Seq([ExileTargetUntilLeaves(target: 0), GainEnergy(who: You, n: Const(2))])),
+    Triggered(text: "At the beginning of your first main phase, sacrifice this enchantment unless you pay {E}.", on: BeginStep(step: Main1, whose: You),
+      effect: MayElse(who: You, can: Cmp(Energy(You), Ge, Const(1)), then: LoseEnergy(who: You, n: Const(1)), els: Sacrifice(One(This)))),
+  ]),
+  (name: "Samut, Hazoret's Champion", cost: "{1}{R}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Human", "Warrior", "Cleric"], pt: (2, 2), abilities: [
+    Static(layer: L6, applies_to: (types_any: "CREATURE", controller: You), effect: GrantKeywords("HASTE")),
+  ]),
+  (name: "Sunbaked Canyon", types: "LAND", abilities: [
+    Activated(text: "{T}, Pay 1 life: Add {R}.", cost: [TapSelf, PayLife(1)], is_mana: true, effect: AddMana(color: R, n: 1)),
+    Activated(text: "{T}, Pay 1 life: Add {W}.", cost: [TapSelf, PayLife(1)], is_mana: true, effect: AddMana(color: W, n: 1)),
+    Activated(text: "{1}, {T}, Sacrifice this land: Draw a card.", cost: [Mana("{1}"), TapSelf, SacrificeSelf], effect: Draw(who: You, n: Const(1))),
+  ]),
+  // "Exile any number of target spells" is modelled as up to four optional, distinct spell targets (RFC 0012). Exile, not counter:
+  // it works on spells that can't be countered. The Trap subtype is left out (no subtype slot is spent on it).
+  (name: "Mindbreak Trap", cost: "{2}{U}{U}", types: "INSTANT", abilities: [
+    Spell(targets: [
+        (objects: (zone: Stack, stack: Spell, not_self: true), optional: true),
+        (objects: (zone: Stack, stack: Spell, not_self: true), optional: true, distinct: true),
+        (objects: (zone: Stack, stack: Spell, not_self: true), optional: true, distinct: true),
+        (objects: (zone: Stack, stack: Spell, not_self: true), optional: true, distinct: true),
+      ], effect: Exile(TargetsFrom(0))),
+    Alt(label: "pay {0} (an opponent cast three or more spells this turn)", key: "three_spells", cost: [], cond: Cmp(SpellsCastThisTurn(Opp), Ge, Const(3))),
+  ]),
+]

@@ -1,0 +1,41 @@
+id: boros-a-samut-does-not-give-haste-to-opponents-creatures
+title: "Samut gives haste only to creatures its controller controls: the opponent's creature that just entered cannot attack"
+area: card
+cards: ["Samut, Hazoret's Champion", "Phelia, Exuberant Shepherd"]
+tags: [samut, haste, controller-only, summoning-sickness, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Samut, Hazoret's Champion", text: "Creatures you control have haste.", verified: false, note: "Not in Savecraft; text from two card sites per SCENARIO-BRIEF.md; entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "302.6", text: "A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    life: 20
+    battlefield: ["Samut, Hazoret's Champion @samut"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: "Phelia, Exuberant Shepherd", as: ph, sick: true}]
+    library_pad: 10
+script:
+  - check:
+      p1:
+        battlefield_contains: [{card: "Phelia, Exuberant Shepherd", keywords_exclude: [haste]}]
+      p0:
+        battlefield_contains: [{card: "Samut, Hazoret's Champion", keywords: [haste]}]
+  - advance: {to: main2, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main2
+    active: p1
+    p0:
+      life: 20
+    p1:
+      battlefield: [{card: "Phelia, Exuberant Shepherd", tapped: false}]
+notes: >
+  Phelia came under p1's control this turn (sick: true) and Samut's "Creatures you control" refers to Samut's controller
+  (p0) only. With no legal attacker the engine raises no declare-attackers decision, so the advance passes straight through
+  combat; if the engine wrongly gave Phelia haste, a declaration would be raised and the advance would fail. p0's life
+  and Phelia untapped confirm no attack happened.

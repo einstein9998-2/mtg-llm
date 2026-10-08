@@ -1,0 +1,56 @@
+id: boros-b-trap-free-exiles-two-of-three-third-spell-resolves
+title: "Free Mindbreak Trap targets only two of the three opposing spells; the third one still resolves"
+area: card
+cards: [Mindbreak Trap, Lightning Bolt, Brainstorm, Dark Ritual, Island, Mountain, Swamp]
+tags: [mindbreak-trap, alternative-cost, three-spells, exile-spell, partial-targets, any-number, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true}
+  - {kind: cr, ref: "601.2c", text: "The player announces their choice of an appropriate object or player for each target the spell requires.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    battlefield: ["Island @is1"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs", "Dark Ritual @dr", "Lightning Bolt @bolt"]
+    battlefield: ["Island @pi", "Swamp @sw", "Mountain @mt"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: cast, card: "@dr", pay: auto}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@bs", "@dr"]}
+  - resolve_top: true
+  - label: bolt-left-on-stack
+    check:
+      priority: p1
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      p1:
+        exile: [Brainstorm, Dark Ritual]
+        mana_pool: {}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 17
+      graveyard: [Mindbreak Trap]
+      battlefield: [{card: Island, tapped: false}]
+    p1:
+      hand: []
+      graveyard: [Lightning Bolt]
+      exile: [Brainstorm, Dark Ritual]
+      spells_cast_this_turn: 3
+      mana_pool: {}
+notes: >
+  Three spells cast by p1 make the Trap free, but the player chooses which spells to target ("any number"): Brainstorm
+  and Dark Ritual are exiled (no draw, no mana), and the Lightning Bolt, which was cast last and sits above them, is
+  left alone. After the Trap resolves the Bolt is still on the stack and resolves normally (p0 20 to 17, Bolt to p1's
+  graveyard). The Trap touches exactly the chosen spells.

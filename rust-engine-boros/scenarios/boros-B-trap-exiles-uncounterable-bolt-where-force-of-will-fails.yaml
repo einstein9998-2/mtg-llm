@@ -1,0 +1,66 @@
+id: boros-b-trap-exiles-uncounterable-bolt-where-force-of-will-fails
+title: "Force of Will cannot counter a Bolt made uncounterable by Veil of Summer, but Mindbreak Trap then exiles it"
+area: card
+cards: [Mindbreak Trap, Veil of Summer, Force of Will, Ponder, Brainstorm, Lightning Bolt, Forest, Island, Mountain]
+tags: [mindbreak-trap, veil-of-summer, cant-be-countered, force-of-will, exile-spell, alternative-cost, three-spells, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Veil of Summer, text: "Spells you control can't be countered this turn.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "101.2", text: "When a rule or effect allows or directs something to happen, and another effect states that it can’t happen, the “can’t” effect takes precedence.", verified: true}
+  - {kind: cr, ref: "701.13a", text: "To exile an object, move it to the exile zone from wherever it is.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Force of Will @fow", "Ponder @pon", "Mindbreak Trap @trap"]
+    library_pad: 10
+  p1:
+    hand: ["Veil of Summer @veil", "Brainstorm @bs", "Lightning Bolt @bolt"]
+    battlefield: ["Forest @fo", "Island @pi", "Mountain @mt"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@veil", pay: auto}
+  - resolve_top: true
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@pon", pay_life: 1}, targets: ["@bolt"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: fow-resolved-bolt-not-countered
+    check:
+      priority: p1
+      stack:
+        - {kind: spell, card: "@bs", controller: p1}
+        - {kind: spell, card: "@bolt", controller: p1}
+      p0: {life: 19, graveyard: [Force of Will], exile: [Ponder]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@bs", "@bolt"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 19
+      hand: []
+      graveyard: [Force of Will, Mindbreak Trap]
+      exile: [Ponder]
+      spells_cast_this_turn: 2
+    p1:
+      life: 20
+      hand: []
+      graveyard: [Veil of Summer]
+      exile: [Brainstorm, Lightning Bolt]
+      spells_cast_this_turn: 3
+notes: >
+  Contrast inside one game. After the Veil resolves, p1's Bolt cannot be countered ("can't" beats "can", 101.2):
+  Force of Will may target it but it does nothing, so the Bolt stays on the stack (the check) and Force of Will goes to
+  the graveyard (paid for with 1 life and the pitched Ponder, p0 at 19). p1 then passes with the stack unchanged and p0,
+  holding priority again, casts the free Trap (p1 has cast Veil, Brainstorm and Bolt) and exiles both Brainstorm and
+  the Bolt: exile is not a counter, so Veil does not stop it. The Bolt never resolves (p0 stays at 19). Same prelude
+  as the previous Veil scenario. If an engine refuses to let Force of Will target the uncounterable Bolt, that is
+  also a deviation (it is a legal target, it just does not get countered).

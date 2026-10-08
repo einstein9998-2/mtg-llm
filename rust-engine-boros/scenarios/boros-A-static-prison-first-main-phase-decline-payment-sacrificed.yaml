@@ -1,0 +1,44 @@
+id: boros-a-static-prison-first-main-phase-decline-payment-sacrificed
+title: "Declining to pay {E} at the beginning of the first main phase sacrifices Static Prison and keeps the energy"
+area: card
+cards: [Static Prison, Plains]
+tags: [static-prison, energy, pay-energy, unless-pay, sacrifice, beginning-of-main-phase, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Static Prison, text: "At the beginning of your first main phase, sacrifice this enchantment unless you pay {E}.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "118.12a", text: "This means the same thing as “[A player may do something else]. If [that player doesn’t], [do something].”", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    energy: 2
+    battlefield: ["Static Prison @sp", "Plains @pl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_energy, answer: false}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 2
+      battlefield: [{card: Plains}]
+      graveyard: [Static Prison]
+notes: >
+  Same walk as the "pay energy keeps it" scenario, but p0 answers no: Static Prison is sacrificed (goes to its owner's
+  graveyard) and no energy is spent even though p0 could have paid. A wrong engine pays energy automatically, keeps the
+  Prison, or sacrifices without asking when energy is available.

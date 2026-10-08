@@ -1,0 +1,49 @@
+id: boros-b-forth-x3-creates-three-knight-tokens-for-five-mana
+title: "Forth Eorlingas! with X = 3 costs five mana and creates three separate 2/2 Human Knight tokens"
+area: card
+cards: ["Forth Eorlingas!", Mountain, Plains, Island, "Human Knight Token"]
+tags: [forth-eorlingas, x-spell, token-creation, mana-payment, multiple-tokens, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Forth Eorlingas!", text: "Create X 2/2 red Human Knight creature tokens with trample and haste.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "107.3a", text: "While a spell is on the stack, any X in its mana cost or in any alternative cost or additional cost it has equals the announced value.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Forth Eorlingas! @forth"]
+    battlefield: ["Mountain @mt", "Plains @pl", "Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@forth", x: 3, pay: auto}
+  - label: x3-on-stack
+    check:
+      stack: [{kind: spell, card: "@forth", controller: p0, x: 3}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Forth Eorlingas!"]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: false}
+        - {token: Human Knight Token, tapped: false, pt: [2, 2], keywords: [trample, haste], subtypes: [Human, Knight], colors: [R]}
+        - {token: Human Knight Token, tapped: false, pt: [2, 2], keywords: [trample, haste], subtypes: [Human, Knight], colors: [R]}
+        - {token: Human Knight Token, tapped: false, pt: [2, 2], keywords: [trample, haste], subtypes: [Human, Knight], colors: [R]}
+    p1:
+      battlefield: []
+notes: >
+  X = 3 costs {3}{R}{W} = five mana: the Mountain, the Plains and three of the four Islands are tapped (which three
+  Islands is the engine's payment choice; the asserted multiset (three tapped, one untapped) is the same for any choice).
+  Three distinct 2/2 red Human Knight tokens appear, each with trample and haste. A wrong engine creates one token with
+  a larger body, or fewer or more than X tokens.

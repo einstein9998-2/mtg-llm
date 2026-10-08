@@ -1,0 +1,62 @@
+id: boros-b-trap-hard-cast-exiles-own-spell-and-opponents-spell
+title: "Mindbreak Trap can target a spell of its own controller together with an opponent's spell"
+area: card
+cards: [Mindbreak Trap, Lightning Bolt, Brainstorm, Island, Mountain]
+tags: [mindbreak-trap, own-spell-target, exile-spell, multiple-targets, normal-cost, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "601.2c", text: "The player announces their choice of an appropriate object or player for each target the spell requires.", verified: true}
+  - {kind: cr, ref: "701.13a", text: "To exile an object, move it to the exile zone from wherever it is.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt", "Mindbreak Trap @trap"]
+    battlefield: ["Mountain @mt", "Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: pass}
+  - label: both-spells-on-stack
+    check:
+      priority: p0
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: spell, card: "@bs", controller: p1}
+  - p0: {t: cast, card: "@trap", targets: ["@bolt", "@bs"], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      hand: []
+      graveyard: [Mindbreak Trap]
+      exile: [Lightning Bolt]
+      spells_cast_this_turn: 2
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+    p1:
+      life: 20
+      hand: []
+      graveyard: []
+      exile: [Brainstorm]
+      spells_cast_this_turn: 1
+notes: >
+  "Exile any number of target spells" has no controller restriction, so p0's own Bolt and p1's Brainstorm (responding)
+  are both legal targets of one Trap. The Bolt is cast with the Mountain and the Trap with the four Islands ({2}{U}{U}).
+  Both spells end up in exile (p1 draws nothing, p1 takes no damage), each in its owner's exile zone; the Trap goes to
+  p0's graveyard. p1 has cast only one spell, so the Trap is paid for normally.

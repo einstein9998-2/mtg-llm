@@ -1,0 +1,38 @@
+id: boros-a-samut-second-copy-legend-rule
+title: "Samut is legendary: a second Samut triggers the legend rule and the owner keeps one"
+area: card
+cards: ["Samut, Hazoret's Champion", Mountain]
+tags: [samut, legendary, legend-rule, state-based-actions, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Samut, Hazoret's Champion", text: "Legendary Creature — Human Warrior Cleric", verified: false, note: "type line from the brief (card sites), not in Savecraft; entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "704.5j", text: "If two or more legendary permanents with the same name are controlled by the same player, that player chooses one of them, and the rest are put into their owners’ graveyards.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Samut, Hazoret's Champion @new"]
+    battlefield: [{card: "Samut, Hazoret's Champion", as: old, damage: 1}, "Mountain @m1", "Mountain @m2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@new", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: legend_rule, keep: "@old"}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Samut, Hazoret's Champion"]
+      battlefield:
+        - {card: "Samut, Hazoret's Champion", damage: 1, keywords: [haste]}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+notes: >
+  The new Samut enters and the legend rule gives p0 the choice (704.5j). Keeping the old one (marked with 1 damage so the
+  survivor is identifiable) sends the new card to the graveyard. Samut's legendary supertype is unverified (brief only).
+  A wrong engine keeps both, or removes the old one without asking.

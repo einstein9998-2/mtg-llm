@@ -1,0 +1,62 @@
+id: boros-b-trap-caster-casting-three-spells-does-not-make-it-free
+title: "Mindbreak Trap is not free when only its own caster cast three spells; it costs {2}{U}{U} and can exile the caster's own spell"
+area: card
+cards: [Mindbreak Trap, Lotus Petal, Mishra's Bauble, Brainstorm, Lightning Bolt, Island]
+tags: [mindbreak-trap, alternative-cost-unavailable, opponent-cast-count, own-spell-target, exile-spell, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell’s text, or applied to it from another effect, that its controller may pay rather than paying the spell’s mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lotus Petal @petal", "Mishra's Bauble @bauble", "Brainstorm @bs", "Mindbreak Trap @trap"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3", "Island @is4", "Island @is5"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@petal", pay: auto}
+  - resolve_top: true
+  - p0: {t: cast, card: "@bauble", pay: auto}
+  - resolve_top: true
+  - p0: {t: cast, card: "@bs", pay: auto}
+  - label: caster-cast-three
+    check:
+      priority: p0
+      stack: [{kind: spell, card: "@bs", controller: p0}]
+      p0: {spells_cast_this_turn: 3}
+      p1: {spells_cast_this_turn: 0}
+  - expect_illegal: {p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@bs"]}}
+  - p0: {t: cast, card: "@trap", targets: ["@bs"], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Mindbreak Trap]
+      exile: [Brainstorm]
+      spells_cast_this_turn: 4
+      battlefield:
+        - Lotus Petal
+        - Mishra's Bauble
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+    p1:
+      hand: [Lightning Bolt]
+      spells_cast_this_turn: 0
+notes: >
+  The condition counts spells cast by an OPPONENT of the Trap's controller. p0 casts Lotus Petal, Mishra's Bauble and
+  Brainstorm (three spells), p1 casts nothing, so the alternative cost is not available (expect_illegal) and the Trap
+  is cast for {2}{U}{U} (Brainstorm took the fifth Island). A Trap can target its own controller's spell, so it exiles
+  p0's own Brainstorm: no draw and no put-back, Brainstorm in exile. A wrong engine counts the caster's own spells or
+  counts all spells of both players.
