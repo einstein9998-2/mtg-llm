@@ -1,0 +1,146 @@
+diff -ruN a/crates/mtg-cards/cards/boros.cards.ron b/crates/mtg-cards/cards/boros.cards.ron
+--- a/crates/mtg-cards/cards/boros.cards.ron	1970-01-01 00:00:00.000000000 +0000
++++ b/crates/mtg-cards/cards/boros.cards.ron	2026-10-08 14:03:20.875599987 +0000
+@@ -0,0 +1,37 @@
++// Boros Energy additions (Brady's list of 2026-10-08), RFC 0012. Oracle text per Savecraft card_search (Scryfall), 2026-10-08,
++// except Samut, Hazoret's Champion (not in that database; text from two card sites, cost {1}{R} from one of them).
++// Kept apart from legacy.cards.ron so that the pinned real-pool snapshot and its goldens stay untouched.
++[
++  (name: "Human Knight Token", types: "CREATURE", colors: "R", subtypes: ["Human", "Knight"], pt: (2, 2), keywords: "TRAMPLE | HASTE", is_token: true),
++  // Monarch is not modelled (RFC 0012): the second ability is missing.
++  (name: "Forth Eorlingas!", cost: "{X}{R}{W}", types: "SORCERY", abilities: [
++    Spell(effect: CreateToken(token: "Human Knight Token", n: X, who: You)),
++  ]),
++  // The exile is linked to the Prison (Portable Hole's mechanism); the two energy come with the same trigger, so a Prison whose
++  // trigger fizzles (target gone) gives none (CR 608.2b).
++  (name: "Static Prison", cost: "{W}", types: "ENCHANTMENT", abilities: [
++    Triggered(text: "When this enchantment enters, exile target nonland permanent an opponent controls until this enchantment leaves the battlefield. You get {E}{E} (two energy counters).", on: Enters(filter: (self_only: true)),
++      targets: [(objects: (types_not: "LAND", controller: Opp))], effect: Seq([ExileTargetUntilLeaves(target: 0), GainEnergy(who: You, n: Const(2))])),
++    Triggered(text: "At the beginning of your first main phase, sacrifice this enchantment unless you pay {E}.", on: BeginStep(step: Main1, whose: You),
++      effect: MayElse(who: You, can: Cmp(Energy(You), Ge, Const(1)), then: LoseEnergy(who: You, n: Const(1)), els: Sacrifice(One(This)))),
++  ]),
++  (name: "Samut, Hazoret's Champion", cost: "{1}{R}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Human", "Warrior", "Cleric"], pt: (2, 2), abilities: [
++    Static(layer: L6, applies_to: (types_any: "CREATURE", controller: You), effect: GrantKeywords("HASTE")),
++  ]),
++  (name: "Sunbaked Canyon", types: "LAND", abilities: [
++    Activated(text: "{T}, Pay 1 life: Add {R}.", cost: [TapSelf, PayLife(1)], is_mana: true, effect: AddMana(color: R, n: 1)),
++    Activated(text: "{T}, Pay 1 life: Add {W}.", cost: [TapSelf, PayLife(1)], is_mana: true, effect: AddMana(color: W, n: 1)),
++    Activated(text: "{1}, {T}, Sacrifice this land: Draw a card.", cost: [Mana("{1}"), TapSelf, SacrificeSelf], effect: Draw(who: You, n: Const(1))),
++  ]),
++  // "Exile any number of target spells" is modelled as up to four optional, distinct spell targets (RFC 0012). Exile, not counter:
++  // it works on spells that can't be countered. The Trap subtype is left out (no subtype slot is spent on it).
++  (name: "Mindbreak Trap", cost: "{2}{U}{U}", types: "INSTANT", abilities: [
++    Spell(targets: [
++        (objects: (zone: Stack, stack: Spell, not_self: true), optional: true),
++        (objects: (zone: Stack, stack: Spell, not_self: true), optional: true, distinct: true),
++        (objects: (zone: Stack, stack: Spell, not_self: true), optional: true, distinct: true),
++        (objects: (zone: Stack, stack: Spell, not_self: true), optional: true, distinct: true),
++      ], effect: Exile(TargetsFrom(0))),
++    Alt(label: "pay {0} (an opponent cast three or more spells this turn)", key: "three_spells", cost: [], cond: Cmp(SpellsCastThisTurn(Opp), Ge, Const(3))),
++  ]),
++]
+diff -ruN a/crates/mtg-cards/src/legacy.rs b/crates/mtg-cards/src/legacy.rs
+--- a/crates/mtg-cards/src/legacy.rs	2026-10-08 14:03:20.750927306 +0000
++++ b/crates/mtg-cards/src/legacy.rs	2026-10-08 14:03:20.753707237 +0000
+@@ -11,7 +11,9 @@
+ 
+ pub const UR_CARDS: &str = include_str!("../cards/ur.cards.ron");
+ 
++pub const BOROS_CARDS: &str = include_str!("../cards/boros.cards.ron");
++
+ pub fn build() -> Arc<CardDb> {
+-    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS), ("storm.cards.ron", STORM_CARDS), ("ur.cards.ron", UR_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
++    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS), ("storm.cards.ron", STORM_CARDS), ("ur.cards.ron", UR_CARDS), ("boros.cards.ron", BOROS_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
+     Arc::new(db)
+ }
+diff -ruN a/crates/mtg-spec/src/expect.rs b/crates/mtg-spec/src/expect.rs
+--- a/crates/mtg-spec/src/expect.rs	2026-10-08 14:03:20.853795666 +0000
++++ b/crates/mtg-spec/src/expect.rs	2026-10-08 14:03:20.857005121 +0000
+@@ -683,7 +683,7 @@
+                     None => None,
+                     Some(i) => {
+                         let def = self.db.def(self.st().def_of(want));
+-                        let acts: Vec<usize> = def.abilities.iter().enumerate().filter_map(|(k, x)| matches!(x, AbilityDef::Activated(_)).then_some(k)).collect();
++                        let acts: Vec<usize> = crate::runner::oracle_activated(&def.abilities);
+                         match acts.get(i as usize) {
+                             Some(&k) => Some(k as u8),
+                             None => Some(255),
+@@ -692,7 +692,7 @@
+                 };
+                 p.options.iter().any(|o| match o {
+                     Opt::Activate { src, ability } => self.same_obj(*src, want) && want_ab.map_or(true, |w| w == *ability) && color.is_none(),
+-                    Opt::Mana { src, ability, color: c, .. } => self.same_obj(*src, want) && want_ab.map_or(true, |w| w == *ability) && color.map_or(true, |x| x == *c),
++                    Opt::Mana { src, ability, color: c, .. } => self.same_obj(*src, want) && want_ab.map_or(true, |w| w == *ability || (w != 255 && crate::runner::mana_group(&self.db.def(self.st().def_of(want)).abilities, w as usize).contains(&(*ability as usize)))) && color.map_or(true, |x| x == *c),
+                     _ => false,
+                 })
+             }
+diff -ruN a/crates/mtg-spec/src/runner.rs b/crates/mtg-spec/src/runner.rs
+--- a/crates/mtg-spec/src/runner.rs	2026-10-08 14:03:20.863770980 +0000
++++ b/crates/mtg-spec/src/runner.rs	2026-10-08 14:03:20.870539374 +0000
+@@ -577,7 +577,7 @@
+     /// mana ability is 0 when the card has none of its own) to the engine's ability index.
+     pub(crate) fn activated_index(&self, src: ObjRef, idx: usize) -> Option<u8> {
+         let def = self.db.def(self.st().def_of(src));
+-        let acts: Vec<usize> = def.abilities.iter().enumerate().filter_map(|(i, x)| if matches!(x, AbilityDef::Activated(_)) { Some(i) } else { None }).collect();
++        let acts: Vec<usize> = oracle_activated(&def.abilities);
+         match acts.get(idx) {
+             Some(i) => Some(*i as u8),
+             None if idx == 0 => Some(255),
+@@ -1032,7 +1032,7 @@
+         let def = self.db.def(self.st().def_of(src));
+         // A permanent that lost its abilities (Magus of the Moon) has only its intrinsic land-type mana ability.
+         let lost = self.st().obj_data(&self.db, src).chars.lost;
+-        let acts: Vec<(usize, &ActivatedDef)> = def.abilities.iter().enumerate().filter_map(|(i, x)| if let AbilityDef::Activated(d) = x { Some((i, d)) } else { None }).collect();
++        let acts: Vec<(usize, &ActivatedDef)> = oracle_activated(&def.abilities).into_iter().filter_map(|i| if let AbilityDef::Activated(d) = &def.abilities[i] { Some((i, d)) } else { None }).collect();
+         let want_color: Option<u8> = a.get("choose_color").and_then(|x| x.as_str()).map(|c| match c {
+             "W" => 0,
+             "U" => 1,
+@@ -1052,7 +1052,15 @@
+             None if intrinsic && idx == 0 => Some(255),
+             None => None,
+         };
+-        if let Some(mab) = mana_ab {
++        if let Some(mut mab) = mana_ab {
++            // One Oracle ability written as several (one per color): the color picks the engine ability.
++            if mab != 255 {
++                if let Some(c) = want_color {
++                    if let Some(&k) = mana_group(&def.abilities, mab as usize).iter().find(|&&k| def.activated(k as u8).and_then(|d| d.effect.as_ref()).and_then(mana_fixed_color) == Some(c)) {
++                        mab = k as u8;
++                    }
++                }
++            }
+             let fixed: Option<u8> = if mab == 255 { None } else { def.activated(mab).and_then(|d| d.effect.as_ref()).and_then(mana_fixed_color) };
+             let color = match (want_color, fixed) {
+                 (Some(c), _) => c,
+@@ -1711,6 +1719,31 @@
+     std::mem::discriminant(a) == std::mem::discriminant(b)
+ }
+ 
++/// A mana ability written as several engine abilities of one cost ("{T}, Pay 1 life: Add {R} or {W}" is one
++/// ability per color, RFC 0012) is one ability in Oracle order: this is whether `abs[i]` continues the one before it.
++fn continues_mana_group(abs: &[AbilityDef], i: usize) -> bool {
++    match (i.checked_sub(1).and_then(|p| abs.get(p)), abs.get(i)) {
++        (Some(AbilityDef::Activated(a)), Some(AbilityDef::Activated(b))) => a.is_mana && b.is_mana && a.cost == b.cost && a.cost.len() > 1,
++        _ => false,
++    }
++}
++
++/// Indices of the activated abilities in Oracle order (see `continues_mana_group`): the first of each group.
++pub(crate) fn oracle_activated(abs: &[AbilityDef]) -> Vec<usize> {
++    abs.iter().enumerate().filter_map(|(i, x)| (matches!(x, AbilityDef::Activated(_)) && !continues_mana_group(abs, i)).then_some(i)).collect()
++}
++
++/// The engine ability indices of the group that starts at `first`.
++pub(crate) fn mana_group(abs: &[AbilityDef], first: usize) -> Vec<usize> {
++    let mut v = vec![first];
++    let mut i = first + 1;
++    while i < abs.len() && continues_mana_group(abs, i) {
++        v.push(i);
++        i += 1;
++    }
++    v
++}
++
+ /// The color of a mana ability that always makes one color.
+ fn mana_fixed_color(e: &Effect) -> Option<u8> {
+     match e {

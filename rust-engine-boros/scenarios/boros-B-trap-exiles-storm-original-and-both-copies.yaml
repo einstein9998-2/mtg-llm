@@ -1,0 +1,71 @@
+id: boros-b-trap-exiles-storm-original-and-both-copies
+title: "Free Mindbreak Trap exiles Empty the Warrens and both of its storm copies at once: no Goblins"
+area: card
+cards: [Mindbreak Trap, Empty the Warrens, Lotus Petal, Mishra's Bauble, Mountain, Goblin Token]
+tags: [mindbreak-trap, storm, storm-copies, exile-spell, copies-cease-to-exist, three-spells, alternative-cost, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+  - {kind: cr, ref: "707.10", text: "A copy of a spell is itself a spell, even though it has no spell card associated with it.", verified: true}
+  - {kind: cr, ref: "704.5e", text: "If a copy of a spell is in a zone other than the stack, it ceases to exist.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    library_pad: 10
+  p1:
+    hand: ["Lotus Petal @petal", "Mishra's Bauble @bauble", "Empty the Warrens @etw"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Mountain @m4"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@petal", pay: auto}
+  - resolve_top: true
+  - p1: {t: cast, card: "@bauble", pay: auto}
+  - resolve_top: true
+  - p1: {t: cast, card: "@etw", pay: auto}
+  - label: storm-trigger-on-stack
+    check:
+      stack:
+        - {kind: spell, card: "@etw", controller: p1}
+        - {kind: triggered, source: "@etw", controller: p1}
+      p1: {spells_cast_this_turn: 3}
+  - resolve_top: true
+  - label: original-and-two-copies
+    check:
+      priority: p1
+      stack:
+        - {kind: spell, card: "@etw", controller: p1}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p1}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p1}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@etw", {copy_of: "@etw", nth: 0}, {copy_of: "@etw", nth: 1}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Mindbreak Trap]
+      exile: []
+      spells_cast_this_turn: 1
+    p1:
+      graveyard: []
+      exile: [Empty the Warrens]
+      spells_cast_this_turn: 3
+      battlefield:
+        - Lotus Petal
+        - Mishra's Bauble
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+notes: >
+  p1 casts Lotus Petal and Mishra's Bauble (resolved), then Empty the Warrens: storm counts the two earlier spells
+  (702.40a), so the trigger makes two copies. Copies are spells on the stack (707.10), so a Trap can target them. Three
+  spells have been cast by p1 (the copies are not cast, so the count stays 3), which makes the Trap free. The Trap exiles
+  the original and both copies together: the original card is in exile, the copies cease to exist (704.5e) and no
+  Goblin token is ever created. Targets of the copies are named with {copy_of: "@etw", nth: n} (counted from the top).

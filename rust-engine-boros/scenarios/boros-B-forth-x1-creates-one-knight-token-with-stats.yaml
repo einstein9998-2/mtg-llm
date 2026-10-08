@@ -1,0 +1,49 @@
+id: boros-b-forth-x1-creates-one-knight-token-with-stats
+title: "Forth Eorlingas! with X = 1 costs three mana and creates one 2/2 red Human Knight token with trample and haste"
+area: card
+cards: ["Forth Eorlingas!", Mountain, Plains, Island, "Human Knight Token"]
+tags: [forth-eorlingas, x-spell, token-creation, token-characteristics, trample, haste, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Forth Eorlingas!", text: "Create X 2/2 red Human Knight creature tokens with trample and haste.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "107.3a", text: "While a spell is on the stack, any X in its mana cost or in any alternative cost or additional cost it has equals the announced value.", verified: true}
+  - {kind: cr, ref: "111.2", text: "The player who creates a token is its owner. The token enters the battlefield under that player’s control.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Forth Eorlingas! @forth"]
+    battlefield: ["Mountain @mt", "Plains @pl", "Island @is"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@forth", x: 1, pay: auto}
+  - label: x1-on-stack
+    check:
+      stack: [{kind: spell, card: "@forth", controller: p0, x: 1}]
+      p0:
+        battlefield:
+          - {card: Mountain, tapped: true}
+          - {card: Plains, tapped: true}
+          - {card: Island, tapped: true}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Forth Eorlingas!"]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: true}
+        - {token: Human Knight Token, controller: p0, tapped: false, types: [Creature], subtypes: [Human, Knight], colors: [R], pt: [2, 2], keywords: [trample, haste]}
+    p1:
+      battlefield: []
+notes: >
+  {X}{R}{W} with X = 1 is three mana: all three lands are tapped. The single token is a 2/2 red Human Knight creature
+  with trample and haste, controlled by the caster, untapped. The token's stats and keywords are asserted here once;
+  the other Forth Eorlingas! scenarios rely on them. The spell, a sorcery, goes to the graveyard after resolving.

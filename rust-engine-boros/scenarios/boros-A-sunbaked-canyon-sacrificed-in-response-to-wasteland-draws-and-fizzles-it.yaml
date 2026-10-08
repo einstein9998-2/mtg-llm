@@ -1,0 +1,60 @@
+id: boros-a-sunbaked-canyon-sacrificed-in-response-to-wasteland-draws-and-fizzles-it
+title: "Sacrificing Sunbaked Canyon for a card in response to Wasteland fizzles Wasteland"
+area: card
+cards: [Sunbaked Canyon, Mountain, Wasteland, Lightning Bolt]
+tags: [sunbaked-canyon, wasteland, response, fizzle, sacrifice-cost, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: oracle, card: Sunbaked Canyon, text: "{1}, {T}, Sacrifice this land: Draw a card.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word \"target,\" are now illegal, the spell or ability doesn't resolve.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Sunbaked Canyon @can", "Mountain @m1"]
+    library: [Lightning Bolt]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @waste"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@waste", ability: 1, targets: ["@can"]}
+  - check:
+      stack: [{kind: activated, source: "@waste", controller: p1, targets: ["@can"]}]
+      p1: {graveyard: [Wasteland]}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@can", ability: 1, pay: {tap: ["@m1"]}}
+  - label: both-on-stack
+    check:
+      stack:
+        - {kind: activated, source: "@waste", controller: p1}
+        - {kind: activated, source: "@can", controller: p0}
+      p0: {graveyard: [Sunbaked Canyon]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: draw-resolved
+    check:
+      stack: [{kind: activated, source: "@waste", controller: p1}]
+      p0: {hand: [Lightning Bolt]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Sunbaked Canyon]
+      battlefield: [{card: Mountain, tapped: true}]
+    p1:
+      graveyard: [Wasteland]
+      battlefield: []
+notes: >
+  Wasteland's sacrifice is a cost, so the ability is already on the stack when p0 responds. Sunbaked Canyon is a nonbasic
+  land, a legal Wasteland target. p0 sacrifices the Canyon in response (paying {1} with the Mountain), draws a card when
+  that ability resolves, and Wasteland's ability then finds its only target gone and does not resolve (608.2b). Nothing
+  else changes; the Canyon ends up in the graveyard either way, but p0 has replaced it with a card. A wrong engine denies
+  the response (the Canyon is "already destroyed"), or counts the Wasteland ability as still having a target.

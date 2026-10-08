@@ -1,0 +1,49 @@
+id: boros-a-static-prison-no-energy-sacrificed-without-a-choice
+title: "With no energy the Static Prison trigger sacrifices it automatically: no payment decision is raised"
+area: card
+cards: [Static Prison, Plains]
+tags: [static-prison, energy, unpayable-cost, sacrifice, mask-validity, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Static Prison, text: "At the beginning of your first main phase, sacrifice this enchantment unless you pay {E}.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "118.3", text: "A player can’t pay a cost without having the necessary resources to pay it fully.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    energy: 0
+    battlefield: ["Static Prison @sp", "Plains @pl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: trigger-on-stack
+    check:
+      turn: 3
+      phase: main1
+      stack: [{kind: triggered, source: "@sp", controller: p0}]
+      p0: {energy: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 0
+      battlefield: [{card: Plains}]
+      graveyard: [Static Prison]
+notes: >
+  The trigger still triggers and uses the stack, but p0 cannot pay {E}, so on resolution there is nothing to decide
+  (project contract: an option that cannot be paid is not offered; same convention as Guide of Souls' attack trigger
+  with fewer than three energy). The Prison is sacrificed and energy cannot go negative. A wrong engine raises a
+  pay decision, lets energy go to -1, or keeps the Prison.

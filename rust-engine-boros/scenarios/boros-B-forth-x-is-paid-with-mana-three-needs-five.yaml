@@ -1,0 +1,53 @@
+id: boros-b-forth-x-is-paid-with-mana-three-needs-five
+title: "Forth Eorlingas! with four lands cannot be cast with X = 3 (five mana) but can with X = 2, tapping all four"
+area: card
+cards: ["Forth Eorlingas!", Mountain, Plains, Island, "Human Knight Token"]
+tags: [forth-eorlingas, x-spell, mana-payment, insufficient-mana, expect-illegal, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Forth Eorlingas!", text: "Create X 2/2 red Human Knight creature tokens with trample and haste.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "601.2f", text: "The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions.", verified: true}
+  - {kind: cr, ref: "107.3a", text: "the controller of that spell or ability chooses and announces the value of X as part of casting the spell", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Forth Eorlingas! @forth"]
+    battlefield: ["Mountain @mt", "Plains @pl", "Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@forth", x: 3, pay: auto}}
+  - p0: {t: cast, card: "@forth", x: 2, pay: auto}
+  - label: x2-on-stack
+    check:
+      stack: [{kind: spell, card: "@forth", controller: p0, x: 2}]
+      p0:
+        battlefield:
+          - {card: Mountain, tapped: true}
+          - {card: Plains, tapped: true}
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      graveyard: ["Forth Eorlingas!"]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {token: Human Knight Token, pt: [2, 2]}
+        - {token: Human Knight Token, pt: [2, 2]}
+    p1:
+      battlefield: []
+notes: >
+  X is paid with real mana in addition to {R}{W}: X = 3 needs five mana and the player has four lands, so the cast is
+  illegal and nothing changes (the first step is an expect_illegal probe that leaves the state untouched). X = 2 needs
+  exactly four: all four lands are tapped and two tokens are created. A wrong engine lets X exceed the available
+  mana, or leaves lands untapped.

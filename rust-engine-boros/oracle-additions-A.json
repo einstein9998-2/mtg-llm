@@ -1,0 +1,30 @@
+{
+ "_meta": {
+  "group": "A",
+  "note": "Entries to merge into reference/oracle.json (cards). Static Prison and Sunbaked Canyon oracle text retrieved with Savecraft card_search on 2026-10-08 (exact name, Scryfall data). Samut, Hazoret's Champion is NOT in the Savecraft database (card_search returned 0 results); its entry is taken from the brief (two card sites) and is unverified, so every scenario source that quotes it is verified: false. Cost {1}{R} is the engine's choice per the brief (one source showed CMC 2 with a blank cost). No tokens are needed (Goblin Token is already in reference/oracle.json)."
+ },
+ "cards": {
+  "Static Prison": {
+   "name": "Static Prison",
+   "mana_cost": "{W}",
+   "type_line": "Enchantment",
+   "oracle_text": "When this enchantment enters, exile target nonland permanent an opponent controls until this enchantment leaves the battlefield. You get {E}{E} (two energy counters).\nAt the beginning of your first main phase, sacrifice this enchantment unless you pay {E}.",
+   "source": "Savecraft card_search (Scryfall oracle data), 2026-10-08"
+  },
+  "Sunbaked Canyon": {
+   "name": "Sunbaked Canyon",
+   "mana_cost": "",
+   "type_line": "Land",
+   "oracle_text": "{T}, Pay 1 life: Add {R} or {W}.\n{1}, {T}, Sacrifice this land: Draw a card.",
+   "source": "Savecraft card_search (Scryfall oracle data), 2026-10-08"
+  },
+  "Samut, Hazoret's Champion": {
+   "name": "Samut, Hazoret's Champion",
+   "mana_cost": "{1}{R}",
+   "type_line": "Legendary Creature — Human Warrior Cleric",
+   "pt": "2/2",
+   "oracle_text": "Creatures you control have haste.",
+   "source": "UNVERIFIED: text from two card sites as given in SCENARIO-BRIEF.md (2026-10-08); Savecraft card_search returned no result. Mana cost {1}{R} is the engine's choice."
+  }
+ }
+}

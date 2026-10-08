@@ -1,0 +1,38 @@
+id: boros-a-sunbaked-canyon-draw-ability-needs-one-other-mana-source
+title: "The Canyon's draw ability is not offered without {1} from another source; the Canyon cannot tap for its own cost"
+area: card
+cards: [Sunbaked Canyon, Mountain]
+tags: [sunbaked-canyon, activated-ability, mask-validity, unpayable-cost, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Sunbaked Canyon, text: "{1}, {T}, Sacrifice this land: Draw a card.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "118.3", text: "a permanent that’s already tapped can’t be tapped to pay a cost", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    battlefield: ["Sunbaked Canyon @can", {card: Mountain, as: m1, tapped: true}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      pending: {actor: p0, kind: priority}
+      legal:
+        p0:
+          include: [{t: activate, source: "@can", ability: 0}]
+          exclude: [{t: activate, source: "@can", ability: 1}]
+  - expect_illegal: {p0: {t: activate, source: "@can", ability: 1}}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 20
+      battlefield: [{card: Sunbaked Canyon, tapped: false}, {card: Mountain, tapped: true}]
+      graveyard: []
+notes: >
+  The only untapped mana source is the Canyon itself. Tapping it for {R}/{W} would also tap it, but its {T} cost needs it
+  untapped (118.3), so {1} cannot be paid and the draw ability is not offered. The mana ability (index 0) is still offered
+  (life 20). Nothing changes. A wrong engine pays {1} by tapping the Canyon for mana and then "tapping" it again.

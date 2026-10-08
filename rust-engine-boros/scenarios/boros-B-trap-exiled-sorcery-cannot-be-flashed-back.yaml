@@ -1,0 +1,65 @@
+id: boros-b-trap-exiled-sorcery-cannot-be-flashed-back
+title: "A Faithless Looting exiled by Mindbreak Trap is not in the graveyard: it cannot be cast with flashback"
+area: card
+cards: [Mindbreak Trap, Faithless Looting, Lotus Petal, Mishra's Bauble, Mountain]
+tags: [mindbreak-trap, exile-spell, flashback, graveyard-zone, alternative-cost, three-spells, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Faithless Looting, text: "Flashback {2}{R}", verified: true}
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "701.13a", text: "To exile an object, move it to the exile zone from wherever it is.", verified: true}
+  - {kind: cr, ref: "404.1", text: "Any object that’s countered, discarded, destroyed, or sacrificed is put on top of its owner’s graveyard, as is any instant or sorcery spell that’s finished resolving.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    library_pad: 10
+  p1:
+    hand: ["Lotus Petal @petal", "Mishra's Bauble @bauble", "Faithless Looting @loot"]
+    battlefield: ["Mountain @mt1", "Mountain @mt2", "Mountain @mt3", "Mountain @mt4"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@petal", pay: auto}
+  - resolve_top: true
+  - p1: {t: cast, card: "@bauble", pay: auto}
+  - resolve_top: true
+  - p1: {t: cast, card: "@loot", pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@loot"]}
+  - resolve_top: true
+  - label: looting-exiled
+    check:
+      stack: []
+      priority: p1
+      p1:
+        hand: []
+        graveyard: []
+        exile: [Faithless Looting]
+        spells_cast_this_turn: 3
+        battlefield:
+          - Lotus Petal
+          - Mishra's Bauble
+          - {card: Mountain, tapped: true}
+          - {card: Mountain, tapped: false}
+          - {card: Mountain, tapped: false}
+          - {card: Mountain, tapped: false}
+  - expect_illegal: {p1: {t: cast, card: "@loot", alt_cost: {flashback: true}, pay: auto}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: []
+      graveyard: []
+      exile: [Faithless Looting]
+    p0:
+      graveyard: [Mindbreak Trap]
+notes: >
+  p1 casts Lotus Petal and Mishra's Bauble (both resolve, three casts in all with the Looting) and then Faithless Looting
+  with one Mountain; three Mountains stay untapped, so the flashback cost {2}{R} would be payable. The Trap, free
+  because p1 has cast three spells, exiles the Looting from the stack: it is in exile, not the graveyard, so flashback
+  (which only works from the graveyard) is not offered: casting it with flashback is illegal. A wrong engine puts the
+  exiled spell into the graveyard first.

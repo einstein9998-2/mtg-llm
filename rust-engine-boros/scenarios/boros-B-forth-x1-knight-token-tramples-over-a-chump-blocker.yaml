@@ -1,0 +1,57 @@
+id: boros-b-forth-x1-knight-token-tramples-over-a-chump-blocker
+title: "A hasty Human Knight token blocked by a 1/1 assigns 1 lethal damage to the blocker and tramples over for 1"
+area: card
+cards: ["Forth Eorlingas!", Mountain, Plains, Island, "Human Knight Token", "Goblin Token"]
+tags: [forth-eorlingas, token-creation, haste, trample, combat-damage-assignment, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Forth Eorlingas!", text: "Create X 2/2 red Human Knight creature tokens with trample and haste.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "702.19b", text: "The controller of an attacking creature with trample first assigns damage to the creature(s) blocking it. Once all those blocking creatures are assigned lethal damage, any excess damage is assigned as its controller chooses among those blocking creatures and the player, planeswalker, or battle the creature is attacking.", verified: true}
+  - {kind: cr, ref: "510.1c", text: "If exactly one creature is blocking it, it assigns all its combat damage to that creature.", verified: true}
+  - {kind: cr, ref: "702.10b", text: "If a creature has haste, it can attack even if it hasn’t been controlled by its controller continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Forth Eorlingas! @forth"]
+    battlefield: ["Mountain @mt", "Plains @pl", "Island @is"]
+    library_pad: 10
+  p1:
+    battlefield: [{token: Goblin Token, as: gob}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@forth", x: 1, pay: auto}
+  - resolve_top: true
+  - bind: {as: knight, find: {name: "Human Knight Token", controller: p0}}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks: [{creature: "@knight", target: {player: p1}}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@gob", attacker: "@knight"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {decision: assign_combat_damage, assignment: {"@gob": 0, player: 2}}}
+  - p0:
+      decision: assign_combat_damage
+      assignment: {"@gob": 1, player: 1}
+      expect_options: {include: ["@gob", {player: p1}]}
+expect:
+  - at: after_script
+    p1:
+      life: 19
+      battlefield: []
+    p0:
+      life: 20
+      battlefield_contains:
+        - {token: Human Knight Token, tapped: true, damage: 1, pt: [2, 2]}
+notes: >
+  The 2/2 trampler is blocked by a 1/1 Goblin. Lethal damage to the blocker is 1, so the excess 1 may go to the
+  player (702.19b): the Goblin dies, p1 goes from 20 to 19. Assigning 0 to the Goblin and 2 to the player is illegal
+  because lethal damage must be assigned to the blocker first. The Goblin deals 1 damage to the Knight, which
+  survives as a 2/2 with 1 damage. Because the attacker has trample and a blocker, assign_combat_damage is raised
+  (addenda, CR 510.1c would otherwise assign everything to the lone blocker automatically).

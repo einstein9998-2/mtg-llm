@@ -1,0 +1,62 @@
+id: boros-b-trap-two-spells-not-enough-for-free-hard-cast-exiles-two
+title: "With exactly two opposing spells cast, Mindbreak Trap is not free; paying {2}{U}{U} exiles both spells"
+area: card
+cards: [Mindbreak Trap, Lightning Bolt, Brainstorm, Island, Mountain]
+tags: [mindbreak-trap, normal-cost, alternative-cost-unavailable, two-spells-boundary, exile-spell, multiple-targets, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true}
+  - {kind: cr, ref: "118.9", text: "An alternative cost is a cost listed in a spell’s text, or applied to it from another effect, that its controller may pay rather than paying the spell’s mana cost.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt", "Brainstorm @bs"]
+    battlefield: ["Mountain @mt", "Island @pi"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: cast, card: "@bs", pay: auto}
+  - p1: {t: pass}
+  - check:
+      priority: p0
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@bs", controller: p1}
+      p1: {spells_cast_this_turn: 2}
+  - expect_illegal: {p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@bolt", "@bs"]}}
+  - p0: {t: cast, card: "@trap", targets: ["@bolt", "@bs"], pay: auto}
+  - label: trap-hard-cast
+    check:
+      p0:
+        battlefield:
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+          - {card: Island, tapped: true}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Mindbreak Trap]
+      exile: []
+      spells_cast_this_turn: 1
+    p1:
+      life: 20
+      hand: []
+      graveyard: []
+      exile: [Lightning Bolt, Brainstorm]
+      spells_cast_this_turn: 2
+notes: >
+  Boundary case: two spells cast by the opponent is not "three or more", so the alternative cost is not offered
+  (expect_illegal) and the Trap is paid for with four Islands. It still exiles both spells at once (two targets). Brainstorm
+  never resolves, so p1's hand stays empty.

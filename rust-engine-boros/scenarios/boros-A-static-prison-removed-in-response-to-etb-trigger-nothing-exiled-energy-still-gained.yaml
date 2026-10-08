@@ -1,0 +1,79 @@
+id: boros-a-static-prison-removed-in-response-to-etb-trigger-nothing-exiled-energy-still-gained
+title: "If Static Prison leaves the battlefield while its enters trigger is on the stack, the target is not exiled but its controller still gets {E}{E}"
+area: card
+cards: [Static Prison, Aether Vial, "Phelia, Exuberant Shepherd", Skyclave Apparition, Plains]
+tags: [static-prison, exile-until-leaves, leaves-before-resolution, energy, response, aether-vial, skyclave-apparition, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Static Prison, text: "When this enchantment enters, exile target nonland permanent an opponent controls until this enchantment leaves the battlefield. You get {E}{E} (two energy counters).", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Skyclave Apparition, text: "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.", verified: true}
+  - {kind: cr, ref: "610.3b", text: "and the specified event has already occurred before that one-shot effect would occur but after that ability triggered, the object doesn’t move.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "Otherwise, the spell or ability will resolve normally.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    energy: 0
+    hand: ["Static Prison @sp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+  p1:
+    hand: ["Skyclave Apparition @sky"]
+    battlefield: [{card: Aether Vial, as: vial, counters: {charge: 3}}, "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@sp", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@ph"}
+  - label: prison-trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@sp", controller: p0, targets: ["@ph"]}]
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@vial", ability: 0}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: choose_cards, purpose: put_onto_battlefield, answer: ["@sky"]}
+  - p1: {decision: choose_target, slot: 0, answer: "@sp", expect_options: {include: ["@sp"], exclude: ["@ph", "@vial", "@pl"]}}
+  - label: both-triggers-on-stack
+    check:
+      stack:
+        - {kind: triggered, source: "@sp", controller: p0, targets: ["@ph"]}
+        - {kind: triggered, source: "@sky", controller: p1, targets: ["@sp"]}
+      p0: {energy: 0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: prison-exiled
+    check:
+      stack: [{kind: triggered, source: "@sp", controller: p0, targets: ["@ph"]}]
+      p0:
+        energy: 0
+        battlefield: [{card: Plains, tapped: true}]
+        exile: [Static Prison]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      energy: 2
+      battlefield: [{card: Plains, tapped: true}]
+      exile: [Static Prison]
+    p1:
+      battlefield:
+        - {card: Aether Vial, tapped: true}
+        - {card: "Phelia, Exuberant Shepherd", controller: p1}
+        - {card: Skyclave Apparition, controller: p1}
+      exile: []
+      graveyard: []
+notes: >
+  p1 answers the Prison's trigger with Aether Vial (3 counters) putting Skyclave Apparition onto the battlefield; its
+  enters trigger exiles the Prison (mana value 1) before the Prison trigger resolves. When the Prison trigger then
+  resolves its target (Phelia) is still legal, so the ability resolves normally (608.2b), but because the Prison already
+  left after the ability triggered, Phelia is not exiled (610.3b), while "You get {E}{E}" still happens: energy 2. Order
+  of events at the brink: Skyclave trigger on top, resolves first. A wrong engine exiles Phelia permanently (the duration
+  never ends), or skips the energy because the source is gone. Skyclave's own leaves-the-battlefield trigger is not
+  involved. The energy-still-gained claim follows from 608.2b (not all targets illegal) and the single-ability text; I
+  could not retrieve an official ruling.

@@ -1,0 +1,55 @@
+id: boros-a-sunbaked-canyon-taps-for-red-and-pays-one-life
+title: "Sunbaked Canyon tapped for {R} costs 1 life, uses no stack and the red mana casts Lightning Bolt but not Swords to Plowshares"
+area: card
+cards: [Sunbaked Canyon, Lightning Bolt, Swords to Plowshares, "Phelia, Exuberant Shepherd"]
+tags: [sunbaked-canyon, mana-ability, pay-life, color-choice, boros]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Sunbaked Canyon, text: "{T}, Pay 1 life: Add {R} or {W}.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria: it doesn’t require a target", verified: true}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn’t go on the stack, so it can’t be targeted, countered, or otherwise responded to.", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Lightning Bolt @bolt", "Swords to Plowshares @sw"]
+    battlefield: ["Sunbaked Canyon @can"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@can", ability: 0, choose_color: R}
+  - label: red-mana-added
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        life: 19
+        mana_pool: {R: 1}
+        battlefield: [{card: Sunbaked Canyon, tapped: true}]
+  - expect_illegal: {p0: {t: cast, card: "@sw", targets: ["@ph"], pay: auto}}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 19
+      hand: [Swords to Plowshares]
+      graveyard: [Lightning Bolt]
+      mana_pool: {}
+      battlefield: [{card: Sunbaked Canyon, tapped: true}]
+    p1:
+      life: 17
+      battlefield: [{card: "Phelia, Exuberant Shepherd"}]
+notes: >
+  The first ability is a mana ability: nothing goes on the stack, the life is paid as a cost on activation (20 to 19), and
+  exactly one {R} is in the pool. With only {R} available, Swords to Plowshares ({W}) is not castable. The R then pays for
+  Lightning Bolt. A wrong engine makes {W} also (the player chooses one colour), skips the life payment, or uses the
+  stack.

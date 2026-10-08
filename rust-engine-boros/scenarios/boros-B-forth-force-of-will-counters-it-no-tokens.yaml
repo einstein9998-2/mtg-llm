@@ -1,0 +1,57 @@
+id: boros-b-forth-force-of-will-counters-it-no-tokens
+title: "Force of Will counters Forth Eorlingas! (X = 2): the mana stays spent, no tokens are created"
+area: card
+cards: ["Forth Eorlingas!", Mountain, Plains, Island, Force of Will, Brainstorm, "Human Knight Token"]
+tags: [forth-eorlingas, x-spell, counterspell, force-of-will, alternative-cost, countered-no-effect, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Forth Eorlingas!", text: "Create X 2/2 red Human Knight creature tokens with trample and haste.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.", verified: true}
+  - {kind: cr, ref: "701.6b", text: "The player who cast a countered spell or activated a countered ability doesn’t get a “refund” of any costs that were paid.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Forth Eorlingas! @forth"]
+    battlefield: ["Mountain @mt", "Plains @pl", "Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@forth", x: 2, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@forth"]}
+  - label: fow-on-stack
+    check:
+      stack:
+        - {kind: spell, card: "@forth", controller: p0, x: 2}
+        - {kind: spell, card: "@fow", controller: p1, targets: ["@forth"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Forth Eorlingas!"]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Mountain, tapped: true}
+        - {card: Plains, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+      hand: []
+      battlefield: []
+notes: >
+  Forth Eorlingas! is countered on the stack: it never resolves, so no Human Knight tokens are created; it goes to
+  its owner's graveyard and the four tapped lands are not refunded. A wrong engine creates the tokens on cast or
+  resolves the spell anyway. The pitched Brainstorm is exiled and Force of Will costs 1 life (19). The sorcery was
+  cast at sorcery timing and countered at instant speed.

@@ -1,0 +1,65 @@
+id: boros-b-trap-storm-copies-do-not-count-toward-three-spells
+title: "Storm copies are not cast: two cast spells plus a storm copy do not make Mindbreak Trap free"
+area: card
+cards: [Mindbreak Trap, Empty the Warrens, Lotus Petal, Mountain, Island, Goblin Token]
+tags: [mindbreak-trap, storm, copies-not-cast, alternative-cost-unavailable, spells-cast-count, normal-cost, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast and a copy of an activated ability isn’t activated.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "\"Storm\" means \"When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    hand: ["Lotus Petal @petal", "Empty the Warrens @etw"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Mountain @m4"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@petal", pay: auto}
+  - resolve_top: true
+  - p1: {t: cast, card: "@etw", pay: auto}
+  - resolve_top: true
+  - label: original-and-one-copy
+    check:
+      priority: p1
+      stack:
+        - {kind: spell, card: "@etw", controller: p1}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p1}
+      p1: {spells_cast_this_turn: 2}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@etw", {copy_of: "@etw", nth: 0}]}}
+  - p0: {t: cast, card: "@trap", targets: ["@etw", {copy_of: "@etw", nth: 0}], pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Mindbreak Trap]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+    p1:
+      graveyard: []
+      exile: [Empty the Warrens]
+      spells_cast_this_turn: 2
+      battlefield:
+        - Lotus Petal
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+notes: >
+  p1 casts Lotus Petal and then Empty the Warrens: two spells cast. Storm (702.40a) puts one copy on the stack, but
+  a copy of a spell is not cast (707.10), so p1's cast count stays at 2: the stack holds three spell objects yet the
+  alternative cost is not available (expect_illegal) and p0 pays {2}{U}{U} with four Islands. The Trap then exiles the
+  original and the copy; no Goblin is created. A wrong engine counts the copy as a cast spell and makes the Trap free.

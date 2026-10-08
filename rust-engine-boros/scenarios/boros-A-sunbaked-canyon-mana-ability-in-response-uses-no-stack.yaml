@@ -1,0 +1,59 @@
+id: boros-a-sunbaked-canyon-mana-ability-in-response-uses-no-stack
+title: "Tapping Sunbaked Canyon for mana in response to a spell puts nothing on the stack and the mana can be used at once"
+area: card
+cards: [Sunbaked Canyon, Lightning Bolt, Mountain]
+tags: [sunbaked-canyon, mana-ability, response, stack, pay-life, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Sunbaked Canyon, text: "{T}, Pay 1 life: Add {R} or {W}.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "605.3b", text: "An activated mana ability doesn’t go on the stack, so it can’t be targeted, countered, or otherwise responded to.", verified: true}
+  - {kind: cr, ref: "119.4", text: "If a player pays life, the payment is subtracted from their life total; in other words, the player loses that much life.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    hand: ["Lightning Bolt @bolt0"]
+    battlefield: ["Sunbaked Canyon @can"]
+    library_pad: 10
+  p1:
+    life: 20
+    hand: ["Lightning Bolt @bolt1"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt1", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: activate, source: "@can", ability: 0, choose_color: R}
+  - label: mana-no-stack
+    check:
+      stack: [{kind: spell, card: "@bolt1", controller: p1}]
+      pending: {actor: p0, kind: priority}
+      p0: {life: 19, mana_pool: {R: 1}}
+  - p0: {t: cast, card: "@bolt0", targets: [{player: p1}], pay: auto}
+  - label: both-bolts
+    check:
+      stack:
+        - {kind: spell, card: "@bolt1", controller: p1}
+        - {kind: spell, card: "@bolt0", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 16
+      hand: []
+      graveyard: [Lightning Bolt]
+    p1:
+      life: 17
+      graveyard: [Lightning Bolt]
+notes: >
+  Activating the mana ability is not a spell or ability on the stack: the stack still holds only p1's Bolt, p0 keeps
+  priority, and the {R} (cost: 1 life, 20 to 19) is immediately spendable on p0's own Bolt, which resolves first.
+  Final life: p0 20 - 1 - 3 = 16, p1 20 - 3 = 17. A wrong engine puts the mana ability on the stack, hands priority to p1
+  after it, or does not take the life until resolution.

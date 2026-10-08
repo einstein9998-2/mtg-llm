@@ -1,0 +1,83 @@
+id: boros-b-trap-in-response-to-storm-trigger-exiles-original-copies-still-come
+title: "Mindbreak Trap cast in response to the storm trigger exiles only the original: the copies still resolve and make Goblins"
+area: card
+cards: [Mindbreak Trap, Empty the Warrens, Lotus Petal, Mishra's Bauble, Mountain, Goblin Token]
+tags: [mindbreak-trap, storm, storm-trigger, exile-spell, last-known-information, copies-still-created, three-spells, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mindbreak Trap, text: "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Empty the Warrens, text: "Create two 1/1 red Goblin creature tokens.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "Storm is a triggered ability that functions on the stack.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "if it’s no longer in that zone, or if the effect has moved it from a public zone to a hidden zone, the effect uses the object’s last known information.", verified: true}
+  - {kind: ruling, card: Storm, date: "unknown", text: "If the spell with storm is countered or otherwise leaves the stack before the storm ability resolves, the storm ability still resolves and creates its copies.", verified: false, note: "recalled official ruling, not retrieved; consistent with 702.40a (the trigger is its own stack object) and 608.2h"}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap"]
+    library_pad: 10
+  p1:
+    hand: ["Lotus Petal @petal", "Mishra's Bauble @bauble", "Empty the Warrens @etw"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Mountain @m3", "Mountain @m4"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@petal", pay: auto}
+  - resolve_top: true
+  - p1: {t: cast, card: "@bauble", pay: auto}
+  - resolve_top: true
+  - p1: {t: cast, card: "@etw", pay: auto}
+  - p1: {t: pass}
+  - label: trap-in-response-to-storm-trigger
+    check:
+      priority: p0
+      stack:
+        - {kind: spell, card: "@etw", controller: p1}
+        - {kind: triggered, source: "@etw", controller: p1}
+  - p0: {t: cast, card: "@trap", alt_cost: {three_spells: true}, targets: ["@etw"]}
+  - resolve_top: true
+  - label: original-gone-trigger-remains
+    check:
+      priority: p1
+      stack: [{kind: triggered, source: "@etw", controller: p1}]
+      p1: {exile: [Empty the Warrens], graveyard: []}
+  - resolve_top: true
+  - label: copies-created
+    check:
+      priority: p1
+      stack:
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p1}
+        - {kind: spell, card: Empty the Warrens, copy: true, controller: p1}
+  - resolve_top: true
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Mindbreak Trap]
+    p1:
+      graveyard: []
+      exile: [Empty the Warrens]
+      spells_cast_this_turn: 3
+      battlefield:
+        - Lotus Petal
+        - Mishra's Bauble
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {card: Mountain, tapped: true}
+        - {token: Goblin Token, pt: [1, 1]}
+        - {token: Goblin Token, pt: [1, 1]}
+        - {token: Goblin Token, pt: [1, 1]}
+        - {token: Goblin Token, pt: [1, 1]}
+notes: >
+  The punishing sequencing for the Trap player. Empty the Warrens is p1's third spell, so the Trap is free the moment it
+  is cast, even in response to the storm trigger. But the storm trigger is its own object on the stack (702.40a): exiling
+  the original does not remove it, so it still resolves and puts two copies on the stack (storm counted the two earlier
+  spells), and each copy resolves for two Goblins: four tokens in all, the original card sitting in exile. The right
+  answer is to wait and target the copies too (previous scenario). That the trigger still creates copies after the original
+  left the stack rests on the last-known-information rules (608.2h) and a recalled official storm ruling (verified: false);
+  an engine that creates no copies here deviates from that ruling. Targets: none of the copies has targets, so no
+  change-target prompt is raised.

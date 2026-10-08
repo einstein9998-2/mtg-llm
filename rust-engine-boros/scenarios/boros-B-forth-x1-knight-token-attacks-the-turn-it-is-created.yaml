@@ -1,0 +1,51 @@
+id: boros-b-forth-x1-knight-token-attacks-the-turn-it-is-created
+title: "A Human Knight token from Forth Eorlingas! has haste: it attacks the turn it is created and deals 2"
+area: card
+cards: ["Forth Eorlingas!", Mountain, Plains, Island, "Human Knight Token"]
+tags: [forth-eorlingas, token-creation, haste, summoning-sickness, declare-attackers, combat-damage, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Forth Eorlingas!", text: "Create X 2/2 red Human Knight creature tokens with trample and haste.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "302.6", text: "A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "702.10b", text: "If a creature has haste, it can attack even if it hasn’t been controlled by its controller continuously since their most recent turn began.", verified: true}
+  - {kind: cr, ref: "508.1a", text: "each one must either have haste or have been controlled by the active player continuously since the turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Forth Eorlingas! @forth"]
+    battlefield: ["Mountain @mt", "Plains @pl", "Island @is"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@forth", x: 1, pay: auto}
+  - resolve_top: true
+  - bind: {as: knight, find: {name: "Human Knight Token", controller: p0}}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: declare_attackers
+      attacks: [{creature: "@knight", target: {player: p1}}]
+      expect_options: {include: ["@knight"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    priority: p0
+    p1: {life: 18, battlefield: []}
+    p0:
+      life: 20
+      battlefield_contains:
+        - {token: Human Knight Token, tapped: true, pt: [2, 2], damage: 0}
+notes: >
+  The token entered the battlefield this turn, so without haste it could not attack (302.6); with haste it can (702.10b,
+  508.1a), and expect_options proves the declaration offers it. p1 has no creatures: no declare_blockers decision is
+  raised (no legal blocker), but the declare blockers step still gives priority, hence the two extra pass pairs after
+  the declaration. 2 combat damage: p1 20 to 18. The token stays tapped (no vigilance). The monarch clause is not
+  modelled by the engine and is not asserted.

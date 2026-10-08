@@ -1,0 +1,61 @@
+id: boros-b-trap-cannot-target-itself-but-can-target-another-trap
+title: "Mindbreak Trap cannot target itself, but another Mindbreak Trap on the stack is a legal target"
+area: card
+cards: [Mindbreak Trap, Lightning Bolt, Island, Mountain]
+tags: [mindbreak-trap, cannot-target-itself, trap-on-trap, exile-spell, response, normal-cost, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: Mindbreak Trap, text: "Exile any number of target spells.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "115.5", text: "A spell or ability on the stack is an illegal target for itself.", verified: true}
+  - {kind: cr, ref: "701.13a", text: "To exile an object, move it to the exile zone from wherever it is.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Mindbreak Trap @trap1"]
+    battlefield: ["Island @is1", "Island @is2", "Island @is3", "Island @is4"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt", "Mindbreak Trap @trap2"]
+    battlefield: ["Mountain @mt", "Island @pi1", "Island @pi2", "Island @pi3", "Island @pi4"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@trap1", targets: ["@trap1"], pay: auto}}
+  - expect_illegal: {p0: {t: cast, card: "@trap1", targets: ["@bolt", "@trap1"], pay: auto}}
+  - p0: {t: cast, card: "@trap1", targets: ["@bolt"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@trap2", targets: ["@trap1"], pay: auto}
+  - label: trap-on-trap
+    check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@trap1", controller: p0, targets: ["@bolt"]}
+        - {kind: spell, card: "@trap2", controller: p1, targets: ["@trap1"]}
+  - resolve_top: true
+  - label: first-trap-exiled
+    check:
+      stack: [{kind: spell, card: "@bolt", controller: p1}]
+      priority: p1
+      p0: {exile: [Mindbreak Trap], graveyard: []}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 17
+      graveyard: []
+      exile: [Mindbreak Trap]
+    p1:
+      life: 20
+      graveyard: [Mindbreak Trap, Lightning Bolt]
+      exile: []
+notes: >
+  A spell on the stack is an illegal target for itself (115.5): the two probes (Trap targeting only itself, and Trap
+  targeting the Bolt and itself) are illegal and change nothing. The legal cast targets only the Bolt. p1 responds with its own
+  Trap, whose target is p0's Trap (a different spell, so legal); p1's Trap resolves first and exiles p0's Trap, so the
+  Bolt is never exiled and resolves (p0 20 to 17). Both Traps were paid at full price (each side has cast one spell
+  when the other casts, never three). A wrong engine lets a Trap exile itself or ignore a second Trap as a target.

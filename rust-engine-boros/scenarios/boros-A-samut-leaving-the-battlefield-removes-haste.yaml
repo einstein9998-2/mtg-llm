@@ -1,0 +1,52 @@
+id: boros-a-samut-leaving-the-battlefield-removes-haste
+title: "When Samut dies the creature that relied on his haste can no longer attack"
+area: card
+cards: ["Samut, Hazoret's Champion", Dragon's Rage Channeler, Lightning Bolt, Mountain]
+tags: [samut, haste, continuous-effect, removal, summoning-sickness, boros]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Samut, Hazoret's Champion", text: "Creatures you control have haste.", verified: false, note: "Not in Savecraft; text from two card sites per SCENARIO-BRIEF.md; entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "611.3b", text: "The effect applies at all times that the permanent generating it is on the battlefield", verified: true}
+  - {kind: cr, ref: "302.6", text: "A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 20
+    battlefield: ["Samut, Hazoret's Champion @samut", {card: "Dragon's Rage Channeler", as: drc, sick: true}]
+    library_pad: 10
+  p1:
+    life: 20
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @pm"]
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: "Dragon's Rage Channeler", keywords: [haste]}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@bolt", targets: ["@samut"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: samut-dead
+    check:
+      stack: []
+      p0:
+        graveyard: ["Samut, Hazoret's Champion"]
+        battlefield_contains: [{card: "Dragon's Rage Channeler", keywords_exclude: [haste]}]
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main2
+    p0:
+      life: 20
+      graveyard: ["Samut, Hazoret's Champion"]
+      battlefield: [{card: "Dragon's Rage Channeler", tapped: false}]
+    p1:
+      life: 20
+      graveyard: [Lightning Bolt]
+notes: >
+  Samut (2/2) dies to Lightning Bolt in p0's first main phase. The Channeler, which entered this turn, loses haste with
+  him, so it has no legal attack and combat is skipped by the engine (the advance would stop at a declaration if the
+  haste lingered). A wrong engine keeps haste as a locked-in effect.
