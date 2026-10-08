@@ -142,6 +142,8 @@ header { display: flex; flex-direction: column; gap: 10px; }
 .pill { font-family: var(--font-mono); font-size: 11px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
 /* free-text note on a position, shown above the options */
 .why { background: var(--accent-soft); border-radius: 6px; padding: 8px 12px; margin: 10px 16px 0; font-size: 13.5px; }
+.why.llm { background: var(--bot-soft); }
+.why.llm b { color: var(--bot); }
 .why b { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 2px; }
 .stack { background: var(--bot-soft); border-radius: 6px; padding: 8px 12px; margin: 0 16px; font-size: 13.5px; }
 .stack b { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--bot); margin-right: 8px; }
@@ -206,7 +208,18 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
   var timers = {};
   var cardKeys = {};
   var localRev = {};  // id -> number of local edits; a snapshot older than this is stale
-  function bump(id) { localRev[id] = Math.max(localRev[id] || 0, (answers[id] && answers[id].rev) || 0) + 1; }
+  // Every change is also stashed in localStorage until the database write succeeds, so closing the page (or the phone
+  // killing it) right after a tap or while typing a note cannot lose the answer: it is replayed on the next open.
+  var PENDING_KEY = 'tough-spots-pending-v1';
+  function pendingAll() { try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '{}') || {}; } catch (e) { return {}; } }
+  function stash(id, body) {
+    try { var all = pendingAll(); if (body) all[id] = body; else delete all[id]; localStorage.setItem(PENDING_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  function answerBody(id) {
+    var a = answers[id] || {};
+    return { pick: a.pick == null ? null : a.pick, pick_label: a.pick_label || '', flags: a.flags || {}, note: a.note || '', rev: localRev[id] || 0, updated: new Date().toISOString() };
+  }
+  function bump(id) { localRev[id] = Math.max(localRev[id] || 0, (answers[id] && answers[id].rev) || 0) + 1; stash(id, answerBody(id)); }
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function letter(i) { return String.fromCharCode(65 + i); }
@@ -439,7 +452,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       return '<button class="opt" data-pick="' + esc(p.id) + ':' + i + '" aria-pressed="' + chosen + '"><span class="ltr">' + letter(i) + '</span><span class="body"><span class="lbl">' + esc(o.label) + '</span>' + (badges ? '<span class="badges">' + badges + '</span>' : '') + nums + '</span></button>';
     }).join('');
     var reveal = '';
-    if (answered && p.source === 'llm-vs-llm' && !p.explanation) {
+    if (answered && p.source === 'llm-vs-llm') {
       var same = a.pick === p.llm_choice;
       reveal = '<div class="reveal">' + (same ? '<span class="agree">You and the LLM picked the same option.</span> ' : '') +
         'The LLM played <b>' + esc(letter(p.llm_choice) + '. ' + p.options[p.llm_choice].label) + '</b>.</div>';
@@ -455,7 +468,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     return '<article class="card" id="card-' + esc(p.id) + '">' +
       '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : (v.whose === 'your' ? 'Your' : 'Opponent\'s') + ' turn ' + Math.ceil((+v.turn) / 2) + ', ' + esc(v.step) + (p.on_play === true ? ' (you are on the play)' : p.on_play === false ? ' (you are on the draw)' : '')) + '</span><span class="meta">batch ' + esc(p.batch || 1) + ' · ' + (p.matchup ? esc(p.matchup) + ' (you play ' + esc(p.me_deck) + ') · ' : '') + esc(p.category) + '</span></div>' +
       (p.category === 'keep' ? '' : stepsBar(v)) + board(p, v) +
-      extra + (p.explanation ? '<div class="why"><b>Why this was flagged</b>' + esc(p.explanation) + '</div>' : '') + log +
+      extra + (p.explanation ? '<div class="why"><b>Why this was flagged</b>' + esc(p.explanation) + '</div>' : '') + (p.llm_reason ? '<div class="why llm"><b>Why the LLM chose ' + esc(letter(p.llm_choice)) + '</b>' + esc(p.llm_reason) + '</div>' : '') + log +
       '<div class="q">' + esc(p.question) + '</div><div class="opts">' + opts + '</div>' + reveal +
       '<div class="extras"><div class="flags">' + flag('either', 'Either is fine') + flag('cant_tell', "Can't tell from this view") + flag('rule', 'Make this a rule') + '</div>' +
       '<textarea id="note-' + esc(p.id) + '" data-note="' + esc(p.id) + '" placeholder="Why? (optional, one line is plenty)">' + (forKey ? '' : esc(a.note || '')) + '</textarea>' +
@@ -479,10 +492,11 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     if (s.busy) { s.again = true; return; }
     s.busy = true;
     var a = answers[id] || {};
-    var body = { pick: a.pick == null ? null : a.pick, pick_label: a.pick_label || '', flags: a.flags || {}, note: a.note || '', rev: localRev[id] || 0, updated: new Date().toISOString() };
+    var body = answerBody(id);
     setStatus(id, 'saving…');
     db.collection('answers').doc(id).set(body).then(function () {
       setStatus(id, 'saved');
+      if ((localRev[id] || 0) === body.rev) stash(id, null);
     }).catch(function (e) {
       setStatus(id, 'Could not save (' + (e && e.code || 'error') + ').');
     }).then(function () {
@@ -524,6 +538,12 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     timers[id] = setTimeout(function () { delete timers[id]; save(id); }, 900);
   });
 
+  // Write out any note still waiting on its typing pause when the page is hidden or closed.
+  function flushNotes() { Object.keys(timers).forEach(function (id) { clearTimeout(timers[id]); delete timers[id]; save(id); }); }
+  window.addEventListener('pagehide', flushNotes);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushNotes(); });
+  var replayed = false;
+
   render();
 
   if (!window.claude || !window.claude.use) { progText.textContent = 'open in claude.ai to load positions'; return; }
@@ -542,6 +562,18 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
         var r = next[id];
         if (answers[id] && (!r || (r.rev || 0) < localRev[id])) next[id] = answers[id];
       });
+      if (!replayed) {
+        // First snapshot: re-send answers an earlier visit stashed but never got confirmed.
+        replayed = true;
+        var pend = pendingAll();
+        Object.keys(pend).forEach(function (id) {
+          var r = next[id], p = pend[id];
+          if (p && (!r || (r.rev || 0) < (p.rev || 0))) {
+            next[id] = p; answers[id] = p; localRev[id] = p.rev || 1;
+            setTimeout(function () { save(id); }, 0);
+          } else { stash(id, null); }
+        });
+      }
       answers = next;
       render();
     }, function () {});
