@@ -120,7 +120,17 @@ fn label_for(s: &State, db: &CardDb, seat: Seat, o: &Opt) -> (ActionKind, Option
         }
         Opt::Mode(i) => (ActionKind::Mode, None, Some(i as u32), format!("Mode {}", i + 1)),
         Opt::Choice(i) => (ActionKind::Choice, None, Some(i as u32), format!("Option {}", i + 1)),
-        Opt::Activate { src, ability } => (ActionKind::ActivateAbility, Some(s.view_id(src, seat)), Some(ability as u32), format!("Activate {} ability {}", nm(src), ability)),
+        Opt::Activate { src, ability } => {
+            // The Oracle sentence tells apart a Class level-up from a fetch land's search ("ability 2" alone says nothing).
+            let txt = match db.def(s.def_of(src)).abilities.get(ability as usize) {
+                Some(mtg_core::ir::AbilityDef::Activated(ad)) if !ad.text.is_empty() => {
+                    let t: String = ad.text.chars().take(80).collect();
+                    format!(" — {t}")
+                }
+                _ => String::new(),
+            };
+            (ActionKind::ActivateAbility, Some(s.view_id(src, seat)), Some(ability as u32), format!("Activate {} ability {}{}", nm(src), ability, txt))
+        }
         Opt::Mana { src, ability, color, pick } => {
             let c = ['W', 'U', 'B', 'R', 'G', 'C'][color as usize];
             (ActionKind::ActivateMana, Some(s.view_id(src, seat)), Some(ability as u32 * 8 + color as u32), format!("Tap {} for {c}{}", nm(src), pick.map(|p| format!(", sacrificing {}", nm(p))).unwrap_or_default()))
@@ -153,6 +163,10 @@ fn decision_view(s: &State, db: &CardDb, p: &Pending, seat: Seat) -> Decision {
         DecisionKind::ChooseTarget { slot } => (ViewDecisionKind::ChooseTarget { slot }, format!("Choose target {}.", slot + 1)),
         DecisionKind::DeclareAttacker { creature } => (ViewDecisionKind::DeclareAttacker { creature: vid(creature) }, format!("Attack with {}?", name(db, s.def_of(creature)))),
         DecisionKind::DeclareBlocker { creature } => (ViewDecisionKind::DeclareBlocker { creature: vid(creature) }, format!("Block with {}?", name(db, s.def_of(creature)))),
+        DecisionKind::ChooseCards { purpose: purpose @ mtg_core::decision::CardsPurpose::Delve, remaining } => (
+            ViewDecisionKind::ChooseCards { purpose, remaining },
+            "Delve: exile graveyard cards one at a time, each one pays for one generic mana of the spell. Done is offered once the rest of the cost can be paid.".to_string(),
+        ),
         DecisionKind::ChooseCards { purpose, remaining } => (ViewDecisionKind::ChooseCards { purpose, remaining }, format!("Choose a card ({remaining} left): {purpose:?}.")),
         DecisionKind::May => (ViewDecisionKind::May, "Do it?".to_string()),
         DecisionKind::ChooseMode { chosen, .. } => (ViewDecisionKind::ChooseMode { chosen }, format!("Choose a mode ({chosen} chosen).")),
