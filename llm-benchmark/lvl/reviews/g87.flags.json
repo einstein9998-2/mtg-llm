@@ -1,0 +1,4 @@
+[
+  {"seat": "b", "seq": 29, "kind": "likely-mistake", "note": "Passed with FoW (Murktide pitch) while Veil of Summer was on the stack. Once Veil resolved, FoW was dead against Show and Tell. Forcing Veil, pitching Murktide, gives delirium (land, artifact, instant, creature), so the two Unholy Heats deal 6 and kill Acererak on his trigger. It was B's only live line."},
+  {"seat": "a", "seq": 4, "kind": "close", "note": "Turn-1 Brainstorm on the play with no fetch in play to shuffle (put back Atraxa and Misty), cast while B had no land so it could not be Dazed. The alternative was holding it for more information and casting it later, when Daze would be live."}
+]

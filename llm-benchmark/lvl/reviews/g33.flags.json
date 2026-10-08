@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 3, "kind": "close", "note": "Bottom after mulligan to 6 (Savannah, Strand, Ponder, FoW, Omniscience, Veil, Acererak): bottomed Omniscience. Alternative: bottom Veil, keeping Omniscience as a Show and Tell payoff (Omni then free Acererak loops) and as a second FoW pitch; without it FoW later had to pitch Atraxa."},
+  {"seat": "a", "seq": 68, "kind": "close", "note": "T6 at 15 life, no Show and Tell or Aluren in hand: Force of Will on a 6/6 Murktide (opp tapped out), pitching Atraxa, the only blue card and the only real payoff. Alternative: let it resolve and keep FoW+Atraxa for the combo turn, taking a 7-9 per turn clock."},
+  {"seat": "a", "seq": 78, "kind": "close", "note": "T7 with Island, Savannah, Hedge Maze untapped, no land in hand, hand Brainstorm, Veil, 2 Acererak: Brainstorm in main 1 (found 2 Show and Tell + Stock Up but left only 2 mana). Alternative: hold it for the opp's end step to keep 3 mana next turn; player calls main-phase a mistake, reviewer thinks digging for the land drop was right."},
+  {"seat": "b", "seq": 62, "kind": "close", "note": "T6 main 2: cast Murktide (delve 5 exiled DRC and Cutter, killing delirium) into an Alurentell hand of 5 with Savannah open. Alternative: wait a turn or bait first. It ate Force of Will plus Atraxa; B's report calls it greedy, reviewer thinks it was good."}
+]

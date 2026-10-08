@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 23, "kind": "likely-mistake", "note": "T4 second Ponder saw Strand, Petal, Aluren with Show and Tell already in hand and no creature: kept Aluren on top, no shuffle. Playbook says shuffle a creature-less look with a creature-dependent hand (~8/49 to hit Atraxa/Acererak); the cost is losing the known Petal that became turn-6 mana."},
+  {"seat": "a", "seq": 19, "kind": "close", "note": "T4 vs Boros curve (Guide, Ajani+Cat), no payoff in hand: Ponder off Tropical then tapped Hedge Maze (dig 3) vs Ancient Tomb + Stock Up (dig 5 a turn earlier, 2 life, Tomb exposed to Wasteland). Earlier Atraxa means Show and Tell on T6 at ~11 life instead of T8 at 1."},
+  {"seat": "a", "seq": 2, "kind": "close", "note": "Kept Tropical, Hedge Maze, Misty, Ponder, Stock Up, Show and Tell, Veil on the draw (no payoff, no protection that matters vs Boros). Looks like a keep by the route-to-payoff rule, but it needed two cards and lost to a T5-T7 Boros clock; worth Brady's view on the draw."},
+  {"seat": "a", "seq": 7, "kind": "close", "note": "T1 (game turn 2) played Tropical Island and Pondered instead of Misty for the basic Island; B Wastelanded Tropical on game turn 5. Fetch-basic-first keeps the dual, though the Maze would then be the target."}
+]

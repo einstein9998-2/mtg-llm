@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 7, "kind": "likely-mistake", "note": "T2 main 1 after Hedge Maze (Acererak known on top, Aluren in hand): passed with 2 Petals in hand. Better: cast both now, because Boros has 3 Spider-Woman (B held one) that would make next-turn Petals enter tapped and kill the turn-2 Aluren, and Boros has no game-1 artifact removal."},
+  {"seat": "b", "seq": 10, "kind": "close", "note": "T3 with 2 lands vs an Alurentell player who showed only Hedge Maze and held 7 cards: cast Ajani over Spider-Woman. Spider-Woman would have tapped both Petals next turn (A had only 2-3 land mana, no Aluren), buying a draw at about 9 Swords/Erode/Bombardment outs; Ajani's extra body and 2 life were irrelevant to the loss."}
+]

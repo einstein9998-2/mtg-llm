@@ -1,0 +1,4 @@
+[
+  {"seat": "b", "seq": 44, "kind": "likely-mistake", "note": "A's Aluren in play, Acererak on the stack, A out of Force: B passed with Guide of Souls and Amped Raptor (both free under Aluren) in hand. Guide then Raptor with the trigger on the stack discovers off energy (Swords/Erode/Bombardment); low equity vs A's spare Acererak, but B's only out."},
+  {"seat": "a", "seq": 11, "kind": "close", "note": "T1 Stock Up second pick after Atraxa (hand Tropical, S&T, Acererak): Misty (3rd land, 2nd green source for Aluren) vs Force of Will vs Stock Up. Took Misty; it became the Savannah that cast Aluren on turn 6."}
+]

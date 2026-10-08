@@ -1,0 +1,4 @@
+[
+  {"seat": "b", "seq": 23, "kind": "likely-mistake", "note": "T6 main 2, Wasteland untapped (also offered at prompts 17-22 and 24), opp (Alurentell) has Ancient Tomb, Hedge Maze, Tropical Island: passed. Better: Wasteland the Tropical Island; Maze and Trop were its only G sources and Aluren needs GG, so it could not cast Aluren next turn (it did, and looped Acererak to kill me)."},
+  {"seat": "a", "seq": 11, "kind": "close", "note": "T4, opp end step, opp has Voice of Victory and a Boros deck with 4 Wasteland: cracked Misty for Hedge Maze (surveil, untapped on my turn 5, where I cast nothing). Alternative: keep Misty uncracked as a Wasteland decoy until the Aluren turn (playbook: uncracked Misty costs nothing). Tension between two playbook rules when G sources are scarce."}
+]

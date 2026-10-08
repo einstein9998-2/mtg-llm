@@ -1,0 +1,4 @@
+[
+  {"seat": "b", "seq": 17, "kind": "likely-mistake", "note": "T3 with Plains + Plateau, after seeing A Brainstorm and cast 2 Petals early: cast Amped Raptor. Better: Goblin Bombardment, the one card that cannot be cast free under their Aluren. Keep Ajani, 2 Voice and Raptor to cast free in response to Acererak; 6+ bodies, sacrifice 5 on his enter trigger and the loop ends (A had no second Acererak)."},
+  {"seat": "a", "seq": 2, "kind": "close", "note": "On the draw vs an unknown deck: kept Misty, 2 Ancient Tomb, Brainstorm, Stock Up, Atraxa, Acererak, with no Aluren or Show and Tell and Misty as the only coloured source. It won (Brainstorm found Aluren + Petal), but it needs 2 cantrips to hit and one Wasteland on the fetched land cuts off GG."}
+]

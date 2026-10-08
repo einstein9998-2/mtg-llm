@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 1, "kind": "close", "note": "On the play: kept Tropical, Strand, Ancient Tomb, City, Brainstorm, 2 Stock Up (no payoff, no Show and Tell, no Force/Veil) against a blue deck. Three cantrips dig, but every dig spell runs into Daze/Force; is this a keep or a mulligan?"},
+  {"seat": "a", "seq": 65, "kind": "close", "note": "T9 facing a 6/6 Murktide with no enabler: hardcast Acererak with the battlefield Petal for a Cave Entrance scry vs holding Petal. The room let T11 reach Fungi Cavern (-4/-0 on Murktide), which made B need two spells for lethal. Is plan-F Acererak right here?"},
+  {"seat": "b", "seq": 26, "kind": "close", "note": "T3: Daze on A's tapped-out Stock Up, returning B's only land (Volcanic). Alternative: let the cantrip resolve and keep Daze and the land for Show and Tell. The bounce left B with no Island on A's next turn, when the second Stock Up resolved."},
+  {"seat": "b", "seq": 30, "kind": "close", "note": "T4: played Wasteland as the only land and sacrificed it at once on the tapped Ancient Tomb (Volcanic x2 in hand) vs replay Volcanic and hold Wasteland. It stopped A's T5 line of Island+Tomb+City (5 mana): Stock Up, Petal, Show and Tell for Atraxa, against a counterless B hand."}
+]

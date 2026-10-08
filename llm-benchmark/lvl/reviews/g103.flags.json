@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 48, "kind": "likely-mistake", "note": "T7 with exactly 3 mana, Show and Tell + Aluren + Acererak in hand, opp's only land tapped on its own turn and Daze already spent: cast Stock Up (dig for Tomb). Show and Tell putting in Aluren, then free Acererak, faces the same Daze/Force risk but wins on resolution (it would have won here, two turns early)."},
+  {"seat": "b", "seq": 54, "kind": "likely-mistake", "note": "T8 with exactly Volcanic + Island and Prismari Charm in hand, Aluren visible in opp's graveyard: tapped out for a delve-5 Murktide. Holding UR for Charm bounces Aluren in response to the free Acererak and stops the T9 kill; Murktide can wait for a third land (Delta in hand)."}
+]

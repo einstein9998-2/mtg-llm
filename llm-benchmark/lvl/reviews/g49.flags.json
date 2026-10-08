@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 53, "kind": "close", "note": "Turn 5: raw Show and Tell (payoff Omniscience + Acererak in hand, 1 spare vs Daze, no Veil/Force) into a 7-card UR hand that was tapped out. The alternative was Stock Up with the same mana (bait Force, dig for Veil, Show and Tell next turn). It was Forced (2 Forces spent) and A lost its only Show and Tell. Different from A's own flag 45 (Brainstorm first vs wait)."},
+  {"seat": "b", "seq": 65, "kind": "close", "note": "Wasteland target: Ancient Tomb vs Hedge Maze. B's report calls Maze the error (only green source for Veil), but A's Lotus Petal on the battlefield also makes G and A held a second Tomb. Reviewer thinks Tomb was right; please confirm."},
+  {"seat": "b", "seq": 83, "kind": "close", "note": "Turn 8, Murktide + Cutter out, hand Bolt/Daze/Misty: Bolt face main phase (Monk with haste, 12 damage, A 16 -> 4, B tapped out) vs hold R for an instant Bolt. Reviewer: tapping out was right with no Charm/Heat in hand; does the hold-U/R note apply only to Charm/Heat?"}
+]

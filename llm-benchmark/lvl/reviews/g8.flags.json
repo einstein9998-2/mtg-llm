@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 13, "kind": "close", "note": "T3, opp casts Cori-Steel Cutter (5 cards, Volcanic tapped but returnable for Daze, my Maze tapped): passed with 3 Force of Will in hand. Alternative: Force the Cutter pitching the third Force, which was discarded to hand size next turn anyway (prompt 35); the Cutter's Monks were the whole clock that killed me."},
+  {"seat": "b", "seq": 60, "kind": "close", "note": "T5, combo opp tapped out at 15 with 7 cards, my two Monks (3/3, 2/2) out, hand Daze + 2 Bolt: Bolted face (prowess +2). Alternative: keep both Bolts for reach and Goblin blockers later. Firing it baited Force pitching Force, which Daze beat: 15 -> 2, game."}
+]

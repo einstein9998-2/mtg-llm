@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 28, "kind": "likely-mistake", "note": "T4, 2 lands (Trop untapped), hand Hedge Maze, Boseiju, Ponder, 2 Stock Up, Show and Tell: played Boseiju before Ponder; better Ponder off Trop first, then Hedge Maze tapped (Boseiju's G had no use this turn), giving two untapped sources on T6 instead of one after the Wasteland."},
+  {"seat": "a", "seq": 25, "kind": "close", "note": "Opp T3 end step: spent the last Lotus Petal on Brainstorm vs holding it so T4 Trop + Boseiju (G only) + Petal casts Stock Up; as played Boseiju's mana sat idle on T4 and both Stock Ups stayed uncastable all game vs a Boros clock."},
+  {"seat": "a", "seq": 11, "kind": "close", "note": "On the draw vs Boros with 2 lands: turn-2 Stock Up with Trop + both Petals (about 89% to see a land; it whiffed) vs holding Petals for a T4 Stock Up or Show and Tell with a spare; was digging right against a fast clock with Wasteland?"},
+  {"seat": "a", "seq": 12, "kind": "close", "note": "Stock Up saw Petal, Brainstorm, Stock Up, Show and Tell, Acererak with Show and Tell and 2 Stock Up in hand, 1 land on board + Boseiju: took Petal + Brainstorm (mana + cheap dig) vs Stock Up or Acererak; A's report later called bottoming Acererak a mistake."}
+]

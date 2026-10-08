@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 24, "kind": "likely-mistake", "note": "Discarded Atraxa #2 to hand size (kept Trop, Strand, Misty); with no Acererak in hand it was the only Show and Tell payoff once Swords hit Atraxa #1. Discard Strand + spare Stock Up instead: A drew Show and Tell next turn with nothing to put in."},
+  {"seat": "a", "seq": 16, "kind": "close", "note": "Turn-2 (game turn 4) Show and Tell for Atraxa paying Ancient Tomb (19 to 17) into a tapped-out Boros with Voice of Victory; alternative was Trop and wait a turn. Atraxa was Swords'd, and those 2 life later meant 16 damage left A at 1."},
+  {"seat": "a", "seq": 20, "kind": "close", "note": "Atraxa reveal instant pick vs Boros: Force of Will over Brainstorm. Voice of Victory blanks Force on their turn; Force only protects the Acererak loop on A's turn, while Brainstorm digs for the missing Acererak."},
+  {"seat": "b", "seq": 18, "kind": "close", "note": "Put-in off the opponent's Show and Tell: Spider-Woman (their Petals and creatures enter tapped) over Amped Raptor (no discover when not cast); it tapped both of A's turn-6 Petals."}
+]

@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 25, "kind": "likely-mistake", "note": "T5 main 1 after playing Tropical (Island, Tundra, Tropical + Petal in hand = exactly {2}{G}{G}): cast Veil of Summer with nothing to protect, leaving 3 mana and one green, so Aluren was dead this turn. Better: pass holding Veil and Petal; next turn Tropical #2, Veil, then Aluren is uncounterable. A misread Aluren as {2}{G}."},
+  {"seat": "b", "seq": 35, "kind": "likely-mistake", "note": "T6 with only fetches as lands in hand plus Preordain: played Scalding Tarn first, then Cutter + Preordain, which found Wasteland after the land drop. Preordain first could put Wasteland down this turn on A's only green land (Tropical; Aluren needs GG), at the cost of the Cutter Monk. A's turn-7 Aluren depended on that Tropical."}
+]

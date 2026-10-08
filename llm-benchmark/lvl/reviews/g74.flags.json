@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 18, "kind": "likely-mistake", "note": "Chose Done after taking Aluren and Force from Atraxa, leaving Ponder, Lotus Petal, a land and Atraxa; playbook says take every card on the combo turn (backup if the loop is broken)."},
+  {"seat": "a", "seq": 19, "kind": "close", "note": "Cast Aluren under Omniscience before Acererak vs Boros; Omniscience alone loops at sorcery speed, while symmetric Aluren gives Boros free instant-speed Amped Raptor/Phlage (A held two free Forces, so it was fine)."},
+  {"seat": "b", "seq": 13, "kind": "close", "note": "Show and Tell put-in: Ocelot Pride (Guide +1 life, body) vs Wasteland (untapped, could kill Boseiju at instant speed); Ocelot right since Boseiju was already tapped and Omniscience was in."}
+]

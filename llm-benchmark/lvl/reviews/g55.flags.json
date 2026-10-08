@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 31, "kind": "close", "note": "Show and Tell (Aluren put-in, Acererak in hand) Dazed with no spare: Forced the Daze pitching Ponder (B Forced back) vs letting it go and keeping FoW + Ponder for the next Aluren; a resolved S&T wins now but FoW on Daze is a 2-for-1 against yourself"},
+  {"seat": "a", "seq": 8, "kind": "likely-mistake", "note": "T1 cracked Strand and cast Brainstorm main phase; holding the fetch and doing both at the opponent's T2 end step cost nothing and showed their turn first (Wasteland decoy too)"},
+  {"seat": "a", "seq": 7, "kind": "close", "note": "T1 fetch: Island vs Tropical Island with Savannah the only green card; Island dodges Wasteland, Tropical makes Aluren castable on T5 (Tomb + Trop + Savannah)"},
+  {"seat": "b", "seq": 14, "kind": "likely-mistake", "note": "One-land hand with DRC: cast Bauble first (no surveil) and later activated it on the opponent after Delta was cracked; better Delta, Volcanic, DRC, then Bauble for a surveil, and Bauble on self or held"}
+]

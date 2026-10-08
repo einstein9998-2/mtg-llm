@@ -1,0 +1,8 @@
+[
+  {"seat": "a", "seq": 40, "kind": "likely-mistake", "note": "Channeled Boseiju on a tapped Volcanic; B fetched an untapped Volcanic and the dead land was its 4th delve card, so Murktide cost exactly B's 3 t6 lands. Playing Boseiju as a land kept a second G source (no Misty+Tomb payment, 3 life, on the t9 Aluren)."},
+  {"seat": "b", "seq": 19, "kind": "likely-mistake", "note": "Ponder showed Prismari Charm, Daze, Island; B shuffled. Against Alurentell, Charm (bounces Aluren in response to Acererak) and Daze (Force pitch) are the anti-combo cards; Delta/Wasteland already covered lands."},
+  {"seat": "b", "seq": 28, "kind": "likely-mistake", "note": "Brainstorm put-back Daze (then Delta shuffle) over Bolt. Held, Daze is the blue pitch for FoW #74 on the t9 Aluren, which A could not have answered (A's FoW had no pitch)."},
+  {"seat": "b", "seq": 57, "kind": "close", "note": "Forced back A's Force on Murktide, pitching Preordain, its last blue card. Letting Murktide die keeps FoW+Preordain for Aluren (and no DRC surveil); forcing back got the 5/5 clock that put A to 10. Same spot as g79 b61, where not forcing back won."},
+  {"seat": "b", "seq": 60, "kind": "likely-mistake", "note": "DRC surveil put Prismari Charm (top card, B's t8 draw) into the graveyard for zero delirium (graveyard only instants). Charm with 3 Volcanics open bounces Aluren in response to the free Acererak and wins; this decided the game."},
+  {"seat": "b", "seq": 70, "kind": "likely-mistake", "note": "Wasteland on Ancient Tomb vs Hedge Maze. A's G sources were Maze + Misty; killing Maze leaves one G so Aluren (GG) is off on t9, while Show and Tell is castable either way. Tomb hit let the t9 Aluren happen."}
+]

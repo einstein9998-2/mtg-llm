@@ -1,0 +1,4 @@
+[
+  {"seat": "b", "seq": 30, "kind": "likely-mistake", "note": "T4 main 1, land drop already used (Wasteland), no counter in hand, combo opponent on 1 land: cast Brainstorm at sorcery speed and tapped out. Alternative: hold it for A's upkeep or in response to Show and Tell, digging for Force/Daze when it matters (Daze can return the tapped Volcanic). A resolved Show and Tell next turn."},
+  {"seat": "a", "seq": 47, "kind": "close", "note": "T5, Omniscience just resolved, only one Acererak in hand, no Force yet, opp 4 cards: cast Acererak first. Alternative per playbook bait rule: free Show and Tell #2 first (if Forced, Acererak is safe; if it resolves it puts Acererak in uncounterably), or free cantrips to find Force before starting the loop."}
+]

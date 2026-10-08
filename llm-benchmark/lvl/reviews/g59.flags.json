@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 54, "kind": "likely-mistake", "note": "Turn 7: passed with 3 lands, Show and Tell, Omniscience, 2 Force, 2 Veil, no land in hand; B: Volcanic tapped, Wasteland untapped, Daze spent. Jam Show and Tell for Omniscience with Force backup; waiting needed a land draw, and the visible Wasteland took Tropical at end step (hindsight: B's 2 Forces beat it anyway)."},
+  {"seat": "a", "seq": 88, "kind": "close", "note": "Turn 10: Force (pitching 2nd Force) on a delved 7/7 Murktide, then Veil after B's Force. Alternatives: Veil first via the Misty crack (stop if B Forces it and keep the Force pair for Show and Tell), or let Murktide resolve and protect Show and Tell. The crack also shuffled away the known Petal and Aluren."},
+  {"seat": "b", "seq": 53, "kind": "likely-mistake", "note": "Turn 6 main 2: held Wasteland (a second Wasteland known on top) vs A's 3 nonbasic lands and Show and Tell in hand; fired only at A's turn-7 end step. Wasteland Tropical now, before A untaps, so A has no 3-mana Show and Tell window; the Wasteland mana went unused on A's turn anyway."}
+]

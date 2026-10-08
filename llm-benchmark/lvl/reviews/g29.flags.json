@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 64, "kind": "likely-mistake", "note": "T6, B cast Cori-Steel Cutter (B had 1 Volcanic up and Daze; I had Hedge Maze open to pay). Holding FoW x2, Veil, Show and Tell, Atraxa: passed. Alternative: Force it pitching the 2nd FoW, still keeping FoW+Veil for next turn's Show and Tell. Passing let the Monk tokens take me 14->7 (5 after Tomb), in Bolt range; both FoW went unused all game."},
+  {"seat": "a", "seq": 19, "kind": "close", "note": "T3 with Hedge Maze untapped, Tomb + Brainstorm in hand, opp held Daze: played Ancient Tomb before Brainstorm, giving 2 spare to pay for Daze. Alternative per the cantrip-before-land rule: Brainstorm off Hedge Maze first (it drew Island, Boseiju), then choose the land, but unable to pay for Daze. Which wins when Daze is live?"}
+]

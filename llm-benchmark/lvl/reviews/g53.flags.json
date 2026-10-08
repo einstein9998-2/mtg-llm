@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 22, "kind": "likely-mistake", "note": "T3, Tomb on board and Ponder in hand: fetched Hedge Maze (enters tapped), so no Ponder this turn. Better: basic Island (also safe from Wasteland) and Ponder now; the Petal it likely finds gives two coloured sources for T5 Veil + Show and Tell with a spare Tomb, two turns before Cutter and the Monk mattered."},
+  {"seat": "a", "seq": 88, "kind": "close", "note": "T7 after the Show-and-Tell Atraxa, at 10 with Tomb + Tropical up and Veil active: tapped out for Stock Up (Tomb, to 8) to dig for Acererak (42%) vs Brainstorm off Tropical (27%, no life) and passing at 10 with a 7/7 lifelink blocker against DRC + Monk + red removal."},
+  {"seat": "b", "seq": 78, "kind": "close", "note": "T7 with one Force (Preordain/Ponder as pitch) against Veil of Summer, opp holding Tomb + Petal for Show and Tell: let Veil resolve and kept Force, which won the T8 Heat war. The playbook note says Force the Veil; here a Force on Veil would not have stopped Show and Tell."}
+]

@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 17, "kind": "likely-mistake", "note": "T4 Show and Tell resolving: put in Atraxa. Acererak was the known top card and A held Petal + Ponder, B tapped out: Aluren in, Petal-Ponder draws Acererak, free loop wins on turn 4. Atraxa got bounced by Karakas and the win came 4 turns later at 8 life."},
+  {"seat": "a", "seq": 8, "kind": "likely-mistake", "note": "T2 Brainstorm put-back: chose Acererak (then Ponder), keeping both Atraxas. The second Atraxa is dead with one Show and Tell; Acererak in hand makes a turn-4 Show and Tell for Aluren an immediate win."},
+  {"seat": "a", "seq": 42, "kind": "likely-mistake", "note": "T6 with Tundra + City + Petal up: played Tropical first, City sacrificed unused, Stock Up never cast. Stock Up off City + Tundra before the land drop was free (engine cannot float mana). Root of A's own flag p43."},
+  {"seat": "b", "seq": 14, "kind": "close", "note": "T3, A on one land (Tundra) after a turn-2 Brainstorm: cast Ajani instead of Wasteland on Tundra. Wasteland delays a mana-hungry combo deck (A still had City + Petal for Show and Tell); Ajani keeps the clock. Which is right vs an unknown blue deck?"}
+]

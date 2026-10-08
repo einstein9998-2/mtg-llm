@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 30, "kind": "likely-mistake", "note": "Turn 3: cast Stock Up with Maze+Island+Petal into a free Daze (opp Volcanic tapped) while Petal #7 sat in hand; casting Petal #7 first (offered at [1]) leaves a real pay-1 spare, or wait to turn 5 with 3 lands + Petal. Stock Up was the hand's only dig and was Dazed."},
+  {"seat": "a", "seq": 57, "kind": "likely-mistake", "note": "Misty cracked at opp end step for Tropical Island while Hedge Maze #2 was available (same colours, untaps for my turn, surveil 1 before the draw); with no payoff in hand the free surveil was worth more. Next draw was a dead second Show and Tell."},
+  {"seat": "a", "seq": 72, "kind": "likely-mistake", "note": "Opp end step, 11 life facing Murktide+DRC+Cutter, no payoff in hand: passed with Flooded Strand uncracked; cracking for Hedge Maze #2 surveils before the draw to dig for Atraxa/Omniscience for two Show and Tells. Strand was never cracked."},
+  {"seat": "b", "seq": 62, "kind": "likely-mistake", "note": "Turn 8 with 3 mana: cast DRC then Cori-Steel Cutter; Cutter first then DRC triggers flurry for a 2/2 haste trample Monk (8 damage instead of 6 and an extra body)."}
+]

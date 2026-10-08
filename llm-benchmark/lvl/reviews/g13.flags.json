@@ -1,0 +1,5 @@
+[
+  {"seat": "b", "seq": 10, "kind": "likely-mistake", "note": "Stuck on 1 land after Preordain, passed with Mishra's Bauble castable for free (never cast all game, also at 5, 11, 19, 22, 23); cracking it digs a card toward land 2 and adds an artifact for DRC/Heat delirium at no cost."},
+  {"seat": "b", "seq": 7, "kind": "close", "note": "1-land hand, Preordain saw Ponder + Murktide and bottomed both (random draw, about 35% land) instead of keeping Ponder on top; B already held two Brainstorms and could cast only one spell a turn."},
+  {"seat": "b", "seq": 20, "kind": "close", "note": "Brainstorm with 1 land and no fetch put back both Murktides, so the next two draws are known non-lands; alternative put back a Brainstorm and a DRC so the next Brainstorm can redraw them and dig deeper, though every put-back locks in two non-land draws without a shuffle."}
+]

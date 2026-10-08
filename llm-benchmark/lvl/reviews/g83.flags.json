@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 62, "kind": "likely-mistake", "note": "Cracked Misty at B's turn-4 end step (Hedge Maze) into an untapped Wasteland, shuffling away a known Petal on top. Better: hold it, draw the Petal on turn 5, cast the Petal, crack in main 1 for a dual and cast Show and Tell (Atraxa, Force backup) at once, paying with the dual before Wasteland can answer. Decided the game."},
+  {"seat": "a", "seq": 13, "kind": "close", "note": "Turn 1 on one land: sacrificed a Lotus Petal to cast Brainstorm, then put back both remaining Petals (a16-17). The alternative was to hold Brainstorm and the Petals for the combo turn. Was spending Petal mana on early cantrips right with this hand?"},
+  {"seat": "a", "seq": 112, "kind": "close", "note": "At 13 life, stuck on Island plus Petal with known Atraxa draws, A spent its only Force (pitching Stock Up) on Murktide rather than saving it to protect Show and Tell. B Forced back. A was dead on turn 10 either way."},
+  {"seat": "b", "seq": 30, "kind": "likely-mistake", "note": "Cracked both Mishra's Baubles on turn 2 (b30, b33) with no DRC in play and no fetch. Holding them for the turn-4 DRC would have given surveil triggers and earlier delirium. Low impact here."}
+]

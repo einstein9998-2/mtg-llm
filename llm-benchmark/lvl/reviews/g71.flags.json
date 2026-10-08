@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 35, "kind": "likely-mistake", "note": "T5: played Misty and cracked it main 1 (fetched Savannah) though the untapped Island paid for Ponder, vs a deck that had just Wastelanded Boseiju; better: Ponder off Island, keep Misty uncracked (Wasteland-proof) until the Show turn. Savannah died next turn and A stayed on 3 lands."},
+  {"seat": "a", "seq": 87, "kind": "likely-mistake", "note": "T8, own Force on the stack, Tropical untapped: cast Veil (tapping Tropical) and B Dazed the Force on top of Veil; better: pass holding Tropical to pay for Daze, Veil only in response to a Force. Lost Force, Atraxa and Veil to a 1/1 DRC."},
+  {"seat": "a", "seq": 60, "kind": "close", "note": "T7: cracked Misty for Tropical in main 1 before Ponder although Island paid for Ponder; keeping Misty uncracked still gives G for Veil at instant speed and dodges Wasteland. Tropical survived here, but it repeats the T5 pattern."},
+  {"seat": "b", "seq": 29, "kind": "close", "note": "T4 Preordain vs Alurentell: bottomed the deck's only Prismari Charm (answer to resolved Aluren/Atraxa) and kept Ponder; alternative keep Charm on top. Low cost here because A never resolved a permanent."}
+]

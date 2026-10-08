@@ -1,0 +1,6 @@
+[
+  {"seat": "b", "seq": 12, "kind": "likely-mistake", "note": "Turn 3: tapped Wasteland to cast Voice of Victory; Wasteland on Hedge Maze (A's only land) leaves A with Savannah+Petal = 2 mana on turn 4, so no Show and Tell for Atraxa until turn 6 and Boros gets two more attacks."},
+  {"seat": "b", "seq": 32, "kind": "close", "note": "Turn 5: Swords on the Show-and-Tell Atraxa precombat (+7 life, which left turn 7 at 14 power vs 18) vs holding W for Acererak; B had seen Show and Tell #2 and Acererak in A's hand but no Aluren/Omniscience."},
+  {"seat": "a", "seq": 22, "kind": "close", "note": "Atraxa reveal, creature pick: Acererak (needs Aluren/Omniscience, none in hand) vs a second Atraxa for the Show and Tell #2 already taken, against Boros with Swords; Acererak won when Omniscience was drawn."},
+  {"seat": "a", "seq": 27, "kind": "close", "note": "Main 2 at 8 cards with Petal and Brainstorm: passed and discarded Misty; Brainstorm cannot avoid the discard (hand size unchanged) but digs 3 deeper. Hold it for Boros's end step, or cast now? Discard Tomb or fetch?"}
+]

@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 33, "kind": "likely-mistake", "note": "T5, library top a known Force of Will (Brainstormed there on T3): cracked Misty main phase for Tropical before Show and Tell, shuffling the Force away; Show and Tell only needed Tomb + Island, and an uncracked Misty could still be cracked in response to Daze as the spare (A drew Omniscience on T7 instead of Force)."},
+  {"seat": "b", "seq": 20, "kind": "close", "note": "Opp T3: Alurentell cast Brainstorm with its only land tapped; B passed holding Daze, FoW x2, Murktide and three spare lands vs Daze (bouncing its only Volcanic, which costs little in a flooded hand). The Brainstorm found Tomb, Force and Stock Up; Daze was later dead against A's spare land and only served as Force fodder."},
+  {"seat": "b", "seq": 2, "kind": "close", "note": "Kept 2 Volcanic, Strand, Delta, Wasteland, Daze, FoW (five lands, two free counters, no threat or cantrip) on the draw vs mulligan; it traded Force for Force but never found pressure (one Murktide, pitched) and lost holding two Volcanics."}
+]

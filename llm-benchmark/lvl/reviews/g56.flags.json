@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 2, "kind": "close", "note": "Kept 7 on the draw: Strand, Ancient Tomb, Brainstorm, Ponder, Force of Will, Aluren, Atraxa (no Acererak or Show and Tell; one card from a combo, 8 outs). Alternative: mulligan. Lost to Boros T7 having seen 18 cards with no enabler; was the keep right or was the loss just variance?"},
+  {"seat": "a", "seq": 18, "kind": "close", "note": "T3 vs Boros (Guide out), Ajani on the stack, A has 1 Island and Force of Will with Brainstorm/Stock Up/Atraxa to pitch, no combo close: passed. Alternative: Force Ajani (Ajani plus Cat token; the Cat later flipped to a 4/3 flier and dealt 8). Is Force better spent on the clock than saved for Swords on Acererak?"},
+  {"seat": "a", "seq": 21, "kind": "likely-mistake", "note": "T4, Island untapped, hand 2 Ancient Tomb + Hedge Maze (all nonbasic), Stock Up known on top, B's Wasteland on the battlefield: cast Brainstorm then played Hedge Maze tapped (1 mana used; Wasteland then took the Maze, A's only green source). Better: Tomb + Stock Up (3 mana, see 5, keep Brainstorm); Wasteland takes one nonbasic anyway."}
+]

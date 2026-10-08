@@ -1,0 +1,8 @@
+RESULT: WON
+Turns: 14 (won on my 7th turn). Prompts: 159. odds/opp/sim calls: 2 (1 opp, 1 odds, 0 sim). Flags: 6 (prompts 13, 26, 45, 58, 73, 122).
+- Plan: kept 3 fetches + Tomb + Brainstorm/Stock Up/Veil, dug for Show and Tell + Atraxa. Ponder kept Show and Tell on top, Stock Up then Brainstorm found Atraxa on turn 2.
+- Key plays: Boseiju channel on Cori-Steel Cutter in response to their first spell (stopped flurry/haste); Show and Tell for Atraxa at 3 life (lifelink block 3-6+7 survived two turns); Veil of Summer before Show and Tell beat their Daze; Aluren + Acererak into Tomb of Annihilation; Atropal and Acererak attacked for lethal.
+- Mistakes: (1) turn 4 ended without cracking Misty at their end step (engine gave no stop), I was Wastelanded and went to 4 life, nearly dead. (2) Turn 10: Show and Tell for a second Atraxa is legendary, so the legend rule killed it (wasted Show and Tell, though it triggered a second reveal). (3) Turn 12: chose Oubliette, which also sacrificed my own Atraxa (creature, artifact, land); I had misremembered it as discard only.
+- Opponent surprises: DRC x3 with fast delirium (Wasteland on my Tomb on turn 3 left me at 2 mana), they passed with 5 open mana and 2 cards for two turns without casting anything (only a Daze into Veil).
+- Engine notes: Atraxa lifelink damage resolved simultaneously with combat damage (survived at exactly 3). Acererak bounce happens before the venture, so the first Tomb cast that reaches the last room still bounces; the next one stays. No bugs seen.
+- Tools: odds/opp calls were informational only; none changed a decision (Daze chance 27% did not stop me tapping out for Stock Up).

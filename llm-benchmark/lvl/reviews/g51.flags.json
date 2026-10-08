@@ -1,0 +1,4 @@
+[
+  {"seq": 12, "seat": "b", "kind": "likely-mistake", "note": "Turn 2 Preordain saw Volcanic and Daze: bottomed Daze and kept Volcanic on top. Keeping both (Volcanic first, then Daze) holds Daze for Alurentell's Veil; on turn 7 a Daze on Veil would have left A at 3 mana with no Aluren."},
+  {"seq": 53, "seat": "b", "kind": "likely-mistake", "note": "Turn 6: cast Cutter, then Bolted face (56) and tapped out while A had 3 lands, a Petal and 7 cards. Holding the 3 Volcanics keeps Bolt plus Heat (5 damage) for Acererak's trigger, and Veil does not stop red. Re-flagged here because B's own flag (seq 76) points at a forced pass."}
+]

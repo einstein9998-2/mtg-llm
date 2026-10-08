@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 7, "kind": "likely-mistake", "note": "T1 Ponder saw Island, Lotus Petal, Lotus Petal; hand Trop(played), 2 Petal, Aluren, Show and Tell, Omniscience, no creature or cantrip. Kept (no shuffle), locking dead draws for turns 1, 3, 5. Alternative: shuffle; Trop + 2 Petals already cast Show and Tell T3, and 3 random cards were ~75% to find a creature or cantrip. A never drew a creature and lost."},
+  {"seat": "b", "seq": 77, "kind": "likely-mistake", "note": "T12 Main 1 with Wasteland in hand, land drop unused, Alurentell on Island + 2 Ancient Tomb + Petal with Aluren out: passed (and never played it in Main 2). Alternative: Wasteland a Tomb to cut their mana; low impact here but a skipped land drop."}
+]

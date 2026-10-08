@@ -1,0 +1,6 @@
+[
+  {"seat": "a", "seq": 25, "kind": "likely-mistake", "note": "T3, Trop + Tomb untapped: passed with Stock Up castable, intending to cast it at their end step, but it is a sorcery. Casting it here digs a turn earlier, which likely means T5 Veil + Show and Tell for Atraxa at about 14 life instead of T7 at 4 life."},
+  {"seat": "a", "seq": 136, "kind": "close", "note": "T9, Aluren + Acererak in hand with mana for both: attacked with vigilant Atraxa first (B 17 to 10, A +7), then looped in main 2. The playbook says loop first and do not attack; here the attack looked free (no flier, B had 1 card, 1 R open). Does the rule still hold?"},
+  {"seat": "b", "seq": 68, "kind": "close", "note": "T6 land drop: Flooded Strand (fetched a third Volcanic) over Wasteland while A had Ancient Tomb out and 6 cards in hand. Wasteland on Tomb would have left A exactly Show and Tell + Veil on T7 with no Ponder; B's mana for Cutter + Bolt was the same either way."},
+  {"seat": "b", "seq": 94, "kind": "close", "note": "T7, A at 4 casting Show and Tell with Tundra, Petal and Boseiju open: Forced it, pitching the last blue card (Murktide), and Veil answered. The alternative was to let it resolve and keep the Force for Aluren later; Atraxa's lifelink was A's only out against B's board."}
+]

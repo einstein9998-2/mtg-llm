@@ -1,0 +1,7 @@
+[
+  {"seat": "b", "seq": 54, "kind": "likely-mistake", "note": "DRC surveil after Force-for-Force: binned Brainstorm, the only blue pitch for B's last Force (hand: FoW, 3 Cutter, Falls) and no delirium gain. Keeping it on top draws it turn 10, and Force pitching it counters A's tapped-out Aluren on turn 11; binning it lost the game."},
+  {"seat": "a", "seq": 7, "kind": "close", "note": "T1 Stock Up (Misty, Tomb, City, Stock Up, Aluren) with Acererak in hand: took Misty + Stock Up and bottomed Aluren. Misty + Aluren completes the Aluren-Acererak pair; Stock Up digs more. No cost here (2nd Aluren drawn T3)."},
+  {"seat": "a", "seq": 22, "kind": "close", "note": "T5 land: Ancient Tomb (casts Stock Up with Hedge Maze, but a known Wasteland deck took the first Tomb) vs Tundra (2 mana, nothing to cast). Chose Tomb; Stock Up found 2 fetches and B Wastelanded the Tomb next turn."},
+  {"seat": "a", "seq": 49, "kind": "close", "note": "T9 Show and Tell Dazed (A tapped out, Aluren + Acererak in hand): Forced the Daze pitching Atraxa (last blue card) vs let Show and Tell die and keep Force + Atraxa to protect Aluren next turn. B Forced back; the trade left B with no blue pitch."},
+  {"seat": "b", "seq": 30, "kind": "close", "note": "T6 with Falls + Wasteland and 3 Cutters in hand: Wastelanded A's Ancient Tomb (A at 3 mana, 7 cards) and cast DRC vs keep Wasteland as a land and cast Cutter. Delayed Show and Tell to T9 but left B on one land all game."}
+]

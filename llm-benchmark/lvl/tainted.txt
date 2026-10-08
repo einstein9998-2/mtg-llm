@@ -1,0 +1,1 @@
+g21	B saw A's opening hand via a stray show command; exclude from win-rate tables, A-side play still valid

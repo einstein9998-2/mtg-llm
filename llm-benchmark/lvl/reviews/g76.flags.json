@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 6, "kind": "likely-mistake", "note": "T2 one-land six with Aluren+Acererak, land drop is Hedge Maze (tapped): cast Lotus Petal to Ponder now. Alternative: hold Petal, Ponder off the untapped Maze on T4 before the land drop (same depth by T4). Turn 8 A had 3 lands after Wasteland; the saved Petal is the 4th mana for Aluren + free Acererak before Boros's T9 lethal."},
+  {"seat": "a", "seq": 17, "kind": "close", "note": "T3 vs Boros: passed on Force of Will (pitch the only blue card, Ponder) against Voice of Victory on the stack. After it resolves A can cast nothing on Boros turns, so Ajani/Scout are unanswerable; Voice dealt 6 of 19 and gave the red permanent for the Ajani kill. Cost: the Ponder that later found Strand. A died holding two Forces."},
+  {"seat": "b", "seq": 5, "kind": "close", "note": "T1 with no 1-drop (Plains, Mesa, Wasteland, Quarry, Voice, Scout, Ajani): played Plains and hid Wasteland, against the existing note 'with no 1-drop play Wasteland as the turn-1 land'. Hidden, it caught A's only Tropical on T5 before A untapped and held A to 3 mana; is hiding it better against a fetch/basic-aware combo deck?"}
+]

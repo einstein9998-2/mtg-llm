@@ -1,0 +1,4 @@
+[
+  {"seat": "a", "seq": 7, "kind": "close", "note": "T2 (first turn, on the draw), opp showed Plateau + Ocelot Pride: after Hedge Maze (tapped) cast Lotus Petal to Ponder. Alternative: hold the Petal for the combo turn. On turn 6 A died to Bombardment pings because every 3+ mana line needed Ancient Tomb life; one life-free mana would have allowed Show and Tell for Aluren at 11 life. Is Petal-Ponder on turn 1 right vs Boros?"},
+  {"seat": "a", "seq": 19, "kind": "close", "note": "T4 vs Ocelot, Raptor, Spider-Woman: Ancient Tomb + Stock Up (-2 life, found Aluren + Acererak) vs a cheaper dig (Tundra + Brainstorm). Stock Up was needed to have both pieces by turn 6, but those 2 life were exactly the margin: at 10 after paying for Aluren A survives 9 Bombardment pings and goes infinite. How much life is a Tomb Stock Up worth vs Boros?"}
+]

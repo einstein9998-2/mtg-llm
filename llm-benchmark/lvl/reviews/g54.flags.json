@@ -1,0 +1,5 @@
+[
+  {"seat": "a", "seq": 30, "kind": "likely-mistake", "note": "T4 Atraxa land pick vs Boros (4 Wasteland), board Island + Savannah, next-turn plan Show and Tell (Aluren needs 4 mana, uncastable next turn anyway): took Tropical Island over City of Traitors. Savannah was Wastelanded and A sat on 2 mana; Island + City would have cast Show and Tell -> Omniscience on T6 into a B hand of one land."},
+  {"seat": "a", "seq": 27, "kind": "close", "note": "T4 vs Boros, Island + Savannah + Petal, hand 2x Stock Up, Aluren, Show and Tell, Atraxa, B fully tapped out: tapped out for Show and Tell -> Atraxa (Swords'd next turn, Savannah Wastelanded) instead of Stock Up first. Reviewer thinks Show and Tell was right; Brady to confirm."},
+  {"seat": "b", "seq": 29, "kind": "close", "note": "Opponent's Show and Tell, B hand Wasteland, Swords, Ocelot Pride: put in Ocelot Pride rather than Wasteland (which could have killed Savannah at once on A's turn). Ocelot attacked a turn earlier and Wasteland still hit before A untapped."}
+]
