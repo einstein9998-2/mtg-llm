@@ -31,6 +31,7 @@ Each rule is a default. Read its "Breaks when:" before applying it; if the situa
 - **ST8** [P10] Show and Tell with Acererak in hand: put in Aluren, not Atraxa, then cast the free Acererak and loop. This includes a known Acererak on top with a cantrip and a spare mana to draw it. (Brady, LvL sign-off)
   Breaks when: Omniscience is also in hand: usually put in Omniscience (ST7, Brady 2026-10-08); against Boros with white open, weigh Swords first (Brady, LvL sign-off).
 - How the loop differs under Aluren and under Omniscience: aluren-and-the-loop.md AL2 and AL8.
+- Atraxa in play: attack with her against UR's Murktide (lifelink gains 7 even in a trade), vs-ur-cutter.md UR4; Veil does not protect her from Pyroblast, which is red, UR5.
 
 ## Under Omniscience (P2, P3, P12)
 
@@ -52,3 +53,5 @@ Each rule is a default. Read its "Breaks when:" before applying it; if the situa
   Breaks when: no known exception.
 - **ST15** [P3, P7] The card you pick first is usually the land you want untapped and green to cast Aluren next turn (Tropical Island). (Brady, tough spots batch 1)
   Breaks when: a Wasteland could hit a dual or City of Traitors might die: Forest is better (Brady, tough spots batch 1).
+- **ST18** [P3, P1] With Atraxa already on the battlefield, a second Atraxa runs into the legend rule (Brady): when a pick (Atraxa's reveal, a Stock Up) offers both, take Acererak over the second Atraxa. Brady: "we're trying to win with Aluren next turn". This is the not-the-combo-turn case beside ST13 (spare Acererak first) and ST14 (keep Acererak, drop a second Atraxa). (Brady, LLM-game tough spots, 2026-10-08)
+  Breaks when: no known exception from Brady. His reason is the Aluren win next turn. Casting a free second Atraxa under Omniscience for a fresh reveal is a different spot, still pending (PENDING.md, rule 11).

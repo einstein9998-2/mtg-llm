@@ -22,9 +22,9 @@ Each of our rules is a default. Read its "Breaks when:" before applying it; if t
 - Static Prison: Brady names it as the Boros counterplay to Omniscience; it is not in the current Boros list (decks/boros-aggro.txt). Brady: "we should probably switch to a more stock list". No deck list is changed here.
 - Sideboard plan for games 2 and 3: sideboarding.md.
 
-## Their pilot's notes (from LvL reviews; Brady signed off 2026-10-07)
+## Their pilot's notes (from LvL reviews; Brady signed off 2026-10-07; BOo10 from his LLM-game tough spots, 2026-10-08)
 
-These rules were written for the LLM playing Boros Aggro against Alurentell. Read them as what a well-played Boros will do to you (P12). If the opponent's notes are ever loaded from this file, this section is their copy, unchanged. As the opponent's rules they carry no "Breaks when:" clauses. In these notes "they" and "their" mean Alurentell (you) and "your" means the Boros player.
+These rules were written for the LLM playing Boros Aggro against Alurentell. Read them as what a well-played Boros will do to you (P12). If the opponent's notes are ever loaded from this file, this section is their copy, unchanged from the LvL reviews except BOo10 (new, from Brady's LLM-game tough spots), the only one that carries principle tags and a "Breaks when:" line. The others carry no "Breaks when:" clauses. In these notes "they" and "their" mean Alurentell (you) and "your" means the Boros player.
 
 - **BOo1** Wasteland: with no 1-drop, play it as the turn-1 land. Hit Ancient Tomb or their only blue or green dual, not an uncracked fetch. Use it before they untap, not after a spell. Never surveil Wasteland away while they are short of lands.
 - **BOo2** Keep W open (or Quarry plus a creature) for Swords on Acererak with his trigger on the stack, and fire on the first cast: each lap draws them a card.
@@ -35,3 +35,5 @@ These rules were written for the LLM playing Boros Aggro against Alurentell. Rea
 - **BOo7** Swords the Show-and-Tell Atraxa before attacking even though they gain 7, but count your removal against their Force, since Acererak needs an answer too.
 - **BOo8** Count to ten permanents for Ascend before the end step. Order Voice's sacrifice trigger first so Ocelot Pride copies the mobilize Warriors.
 - **BOo9** One pick per command: a scripted Bombardment loop once hit The Atropal instead of the player. (Also process-and-engine.md PE1.)
+- **BOo10** [P5] Attack first, then cast your spells in the second main phase. Brady: "attack first, then cast spells second main". (Brady, LLM-game tough spots, 2026-10-08, said of both Boros and UR Cutter, vs-ur-cutter.md URo11)
+  Breaks when: no known exception from Brady.

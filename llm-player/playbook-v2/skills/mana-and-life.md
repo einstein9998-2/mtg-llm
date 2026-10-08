@@ -7,8 +7,8 @@ Each rule is a default. Read its "Breaks when:" before applying it; if the situa
 ## Counting (P6)
 
 - **ML1** [P6] Count mana before planning. Show and Tell is {2}{U}; Aluren is {2}{G}{G}; Ancient Tomb counts as 2 and a Petal on the battlefield as one coloured mana. (Brady, LvL sign-off)
-  Breaks when: no known exception.
-- **ML2** [P6, P8] Cast Veil only if the combo spell is still castable this turn (Veil + Show and Tell = 4 mana, Veil + Aluren = 5 including GG). (Brady, LvL sign-off)
+  Breaks when: no known exception. Engine: floating mana (Carpet of Flowers) is spent first, on generic costs too, so cast the spell with a generic part first (process-and-engine.md EF12).
+- **ML2** [P6, P8] Cast Veil only if the combo spell is still castable this turn (Veil + Show and Tell = 4 mana, Veil + Aluren = 5 including GG), and know which spell that is before you cast Veil (protecting-the-combo.md PR19). (Brady, LvL sign-off; Brady, LLM-game tough spots, 2026-10-08)
   Breaks when: Veil is cast in response to their spell to save a permanent already in play, such as a Prismari Charm aimed at Aluren or Atraxa (PR8; a06, a32).
 - **ML3** [P6] Omniscience costs ten mana ({7}{U}{U}{U}). Count it before planning around a hardcast: two Ancient Tombs, six other lands and a Petal are needed; each Tomb tap costs 2 life, and the engine can still offer Tomb-only casts at 2 or 3 life (seen in LvL games g8 and g19), so check your life yourself (engine-oddities.md item 9, withdrawn as a bug). Show and Tell is the normal way to get it out. (observed)
   Breaks when: no known exception. Engine: the second night found the auto-payer taps Ancient Tomb even when a painless payment exists, so item 9 may need reopening (process-and-engine.md EF1).
@@ -27,6 +27,8 @@ Each rule is a default. Read its "Breaks when:" before applying it; if the situa
   Breaks when: against Spider-Woman or Thalia, cast Petals early (ML14); you are out of cantrips, have plenty of lands and are not spending mana this turn: Brady's most common Acererak hardcast turns a Petal and 2 life into a scry 1 (AL9).
 - **ML14** [P6, P12] Usually cast Lotus Petals as early as possible to play around Spider-Woman (Boros) or Thalia. Against Boros that means even before Spider-Woman is seen (g90, g104 missed it; g44, g108 did it). (Brady, 2026-10-08, on SYNTHESIS2 rule 19)
   Breaks when: you have a lot of lands (Brady, 2026-10-08).
+- **ML16** [P5, P6] When you will use a Lotus Petal's mana next turn, cast it in your second main phase this turn. Brady: "why not, lets us use the mana next turn". A Petal already on the battlefield is also the only Petal that pays for Daze (PR1). (Brady, LLM-game tough spots, 2026-10-08)
+  Breaks when: no known exception from Brady; the rule is for a Petal whose mana next turn uses (ML13). Against Spider-Woman or Thalia cast it earlier still (ML14).
 
 ## City of Traitors (P4, P6)
 
@@ -44,7 +46,7 @@ Each rule is a default. Read its "Breaks when:" before applying it; if the situa
 - **ML9** [P5, P7] Keeping Misty uncracked until the turn I need the mana costs nothing and gives Wasteland a decoy. (a41, a42)
   Breaks when: the turn you need the mana: crack it then.
 - **ML10** [P7] A basic fetched at their end step avoids Wasteland and gives me the mana on my own turn. (t22, t25)
-  Breaks when: no known exception.
+  Breaks when: a card you want sits known on top: fetch in your main phase after the draw instead; the uncracked fetch is still hidden from Wasteland through their turn (cantrips-and-shuffling.md CS19, Brady, m02 2026-10-08).
 - **ML11** [P7, P8] Opponent Wasteland: cast the key spell first with the lands that Wasteland can hit and hold the Petal back for Veil. (a32)
   Breaks when: no known exception.
 - **ML12** [P7] Do not channel Boseiju on a dual: they fetch an untapped replacement and the dead land is Murktide delve fuel. (Brady, 2026-10-08, conflict 4; g45, g81)
@@ -55,7 +57,8 @@ Judgment, not a rule (Brady: "Depends", 2026-10-08, conflict 12): once Wasteland
 
 ## Elsewhere
 
-- Paying for Daze (only an untapped land or a Petal already on the battlefield): protecting-the-combo.md PR1.
+- Paying for Daze (only an untapped land or a Petal already on the battlefield): protecting-the-combo.md PR1. Counting the Daze payment before a cantrip on a chain-of-spells turn: PR18.
+- Carpet of Flowers on turn 3 (its mana comes from their Islands, so Wasteland on your land does not cut it): sideboarding.md SB5.
 - Which land to take from Atraxa (Tropical Island or Forest): show-and-tell.md ST15.
 - Which land to fetch for Prismatic Ending (white: Tundra or Savannah only): vs-ur-cutter.md UR3. Veil before Show and Tell against Daze, and the land drop before or after Veil (a judgment call): protecting-the-combo.md PR17 and the note after it.
 - Spider-Woman makes Petals enter tapped: vs-boros.md BO3.

@@ -8,7 +8,7 @@ These are candidate rules from SYNTHESIS2 section 1 that Brady did not address i
 
 ## P2 See new cards
 - Rule 3: in a Ponder look, count a creature or enabler only if your hand can use it (Atraxa needs Show and Tell; Aluren needs Acererak).
-- Rule 4: with no shuffle coming, Brainstorm put-backs are your next draws: put back the lands for your next drops, not Force or its pitch; do not crack a fetch before redrawing a put-back land.
+- Rule 4: with no shuffle coming, Brainstorm put-backs are your next draws: put back the lands for your next drops, not Force or its pitch. (Its last clause, "do not crack a fetch before redrawing a put-back land", is now covered by Brady's ruling CS19 from the interactive match m02, 2026-10-08: with a card you want known on top, fetch after the draw.)
 - Rule 5: Brainstorm does not lower hand size; when discarding with Brainstorm in hand, keep a fetch over Ancient Tomb.
 
 ## P3 Keep what is unique or pays for Force

@@ -17,6 +17,10 @@ Each rule is a default. Read its "Breaks when:" before applying it; if the situa
 
 Turn 1, how the rules fit together (no new rule; checked after match m01): with no land in play nothing is castable before the land drop except off a Lotus Petal, and a Petal is not spent on a cantrip that could wait (mana-and-life.md ML13, cantrips-and-shuffling.md CS16), so the land (usually the fetch) comes first. Crack it only if this turn uses the mana (CS2, ML9), and fetch the colour the turn needs: white for Prismatic Ending on a turn-1 Dragon's Rage Channeler (vs-ur-cutter.md UR3). With one mana for a cantrip, cast Ponder, not Brainstorm (CS16, CS17).
 
+Turns 1 to 3 (Brady, interactive match m02, 2026-10-08): follow the plan you wrote down when you kept (opening-hand-and-mulligan.md OH10). In games 2 and 3 with Carpet of Flowers in the deck, that plan casts Carpet on turn 3 (sideboarding.md SB5), which decides the Ponder order (cantrips-and-shuffling.md CS18) and when to crack the fetch: after the draw when a known card you want is on top (CS19).
+
+Combat (no new rule here): Brady's "attack first, then cast spells second main" (same for Brainstorm) is written in the opponent pilot notes for the attacking side, UR Cutter and Boros (vs-ur-cutter.md URo11, vs-boros.md BOo10). It orders spells against combat; TS2 and URo4 order cantrips against the land drop, and both hold. It is not extended here to Alurentell's own Atraxa attacks (vs-ur-cutter.md UR4).
+
 ## Upkeep and main phase (P5)
 
 - **TS4** [P5] Never cast Brainstorm in your own upkeep. In general, wait as long as possible to cast a spell if waiting is free (it costs no mana, tempo or card), because you get more information (the draw, their plays, a land drop you may need). (Brady, tough spots batch 1)

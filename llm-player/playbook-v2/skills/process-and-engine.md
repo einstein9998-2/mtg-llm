@@ -28,7 +28,7 @@ Each rule is a default. Read its "Breaks when:" before applying it; if the situa
 
 ## Engine and menu facts (verified in reviews, not from Brady)
 
-These come from the second-night reviews (SYNTHESIS2 rules 20, 34, 35, 36 and section 4). They describe the engine and the harness, not strategy. [P14] unless marked.
+These come from the second-night reviews (SYNTHESIS2 rules 20, 34, 35, 36 and section 4); EF12 from the interactive match m02. They describe the engine and the harness, not strategy. [P14] unless marked.
 
 - **EF1** [P6, P14] The auto-payer taps Ancient Tomb (2 life) even when a painless payment exists. It killed the bot at 2 life in g65 and at 1 in g72; also g49, g52, g79, g105, g111. Count Tomb's 2 life on every cast while Tomb is untapped.
   Breaks when: no known exception.
@@ -51,4 +51,6 @@ These come from the second-night reviews (SYNTHESIS2 rules 20, 34, 35, 36 and se
 - **EF10** Mishra's Bauble's reveal is not shown to its controller (g57, g89). The summary-line counters (auto picks, odds, sim) are game-wide, not yours (g54, g55, g60, g61, g66, g89, g95, g109, g111).
   Breaks when: no known exception.
 - **EF11** The macro's pick budget can stop in the middle of a loop; restart it (g47, g64, g68, g84, g88, g92, g101, g103, g106, g109).
+  Breaks when: no known exception.
+- **EF12** [P6, P14] The automatic payment spends floating mana (for example Carpet of Flowers' mana) before lands, and spends it on generic costs too. So Carpet's 3 mana of one colour cannot pay the coloured pip of three separate spells: the first spell eats all of it. Cast first a spell whose generic part can soak up the floating mana, so the next coloured pip is paid from what is left. The m02 log also records that while mana was floating each spell had an extra menu option "pay generic from lands, keep floating mana"; when it is listed, it keeps the pool for the coloured pips. (Tool note from interactive match m02 game 2, 2026-10-08, in BRADY-RULINGS2.md; the menu option from the m02 log header)
   Breaks when: no known exception.

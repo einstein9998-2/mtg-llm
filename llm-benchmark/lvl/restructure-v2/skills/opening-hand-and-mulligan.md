@@ -1,6 +1,6 @@
 # Opening hand and mulligan
 
-Use when: deciding whether to keep an opening hand, and choosing what to bottom after a mulligan. In games 2 and 3 of a match the loser of the last game plays first: see sideboarding.md SB4.
+Use when: deciding whether to keep an opening hand, and choosing what to bottom after a mulligan. In games 2 and 3 of a match the loser of the last game plays first: see sideboarding.md SB4. Every keep starts with a written turn-1-to-3 plan (OH10).
 
 Each rule is a default. Read its "Breaks when:" before applying it; if the situation matches, follow the principle instead.
 
@@ -12,6 +12,8 @@ Each rule is a default. Read its "Breaks when:" before applying it; if the situa
   Breaks when: no known exception.
 - **OH9** [P1, P15] Count the cards that win, not the cards that dig. Brady counts all four combo cards as payoffs, and you need to assemble the right two (for example Show and Tell plus something to put in, or Aluren plus Acererak). A seven with combo cards but no pair it can complete, and at most one cantrip, is usually a mulligan even with Force of Will or five lands; but no keep or mulligan is "always" (Brady). (Brady, 2026-10-08, on SYNTHESIS2 rule 1 and conflict 2; losses g70, g79, g94, g107, g110, g112)
   Breaks when: you hold Brainstorm and lands and one land is a fetch: you can sometimes keep that even with no payoffs (Brady, 2026-10-08).
+- **OH10** [P1, P4, P6] Before you keep, write down the plan for the first two or three turns with this hand: what you play and cast on each turn, in what order (cantrip before the land, when the fetch shuffles), and what you hope to find. The hand is a keep only if that plan works. In games 2 and 3 with Carpet of Flowers in the deck, the plan includes Carpet on turn 3 (sideboarding.md SB5). Brady (as recorded in BRADY-RULINGS2.md): "write down the plan for the first two or three turns with the hand: what you play and cast on each turn, in what order (cantrip before land, fetch shuffles), and what you are hoping to find. A hand is a keep only if that plan works." (Brady, interactive match m02 game 2, 2026-10-08)
+  Breaks when: no known exception from Brady. It is how OH1 and OH9 are checked, not a different test.
 
 ## Keeps and mulligans Brady has ruled on
 
