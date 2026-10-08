@@ -1,0 +1,71 @@
+{
+ "_meta": {
+  "group": "B",
+  "note": "Entries to merge into reference/oracle.json (cards) and its tokens section. Retrieved with Savecraft card_search (exact name) on 2026-10-08. The Urza's lands and Planar Nexus entries are copied unchanged from rust-engine-tron/oracle-additions-C.json (already shipped with the Tron package) and are listed only so the scenarios validate stand-alone. P/T of creatures is in 'pt'. Creature cards outside the engine pool were removed after the first engine run (2026-10-08); only Pyrokinesis, Price of Progress, Boomerang Basics, Stormchaser's Talent, the three Urza's lands and the Otter token remain."
+ },
+ "cards": {
+  "Pyrokinesis": {
+   "name": "Pyrokinesis",
+   "mana_cost": "{4}{R}{R}",
+   "type_line": "Instant",
+   "oracle_text": "You may exile a red card from your hand rather than pay this spell's mana cost.\nPyrokinesis deals 4 damage divided as you choose among any number of target creatures.",
+   "source": "Savecraft card_search (exact name) and SCENARIO-BRIEF.md, 2026-10-08"
+  },
+  "Price of Progress": {
+   "name": "Price of Progress",
+   "mana_cost": "{1}{R}",
+   "type_line": "Instant",
+   "oracle_text": "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.",
+   "source": "Savecraft card_search (exact name), 2026-10-08"
+  },
+  "Boomerang Basics": {
+   "name": "Boomerang Basics",
+   "mana_cost": "{U}",
+   "type_line": "Sorcery — Lesson",
+   "oracle_text": "Return target nonland permanent to its owner's hand. If you controlled that permanent, draw a card.",
+   "source": "Savecraft card_search (exact name), 2026-10-08"
+  },
+  "Stormchaser's Talent": {
+   "name": "Stormchaser's Talent",
+   "mana_cost": "{U}",
+   "type_line": "Enchantment — Class",
+   "oracle_text": "(Gain the next level as a sorcery to add its ability.)\nWhen this Class enters, create a 1/1 blue and red Otter creature token with prowess.\n{3}{U}: Level 2\nWhen this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.\n{5}{U}: Level 3\nWhenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.",
+   "source": "Savecraft card_search (exact name), 2026-10-08"
+  },
+  "Urza's Tower": {
+   "name": "Urza's Tower",
+   "mana_cost": "",
+   "type_line": "Land — Urza's Tower",
+   "oracle_text": "{T}: Add {C}. If you control an Urza's Mine and an Urza's Power-Plant, add {C}{C}{C} instead.",
+   "source": "scryfall oracle supplied in SCENARIO-BRIEF.md (Savecraft), 2026-10-06"
+  },
+  "Urza's Mine": {
+   "name": "Urza's Mine",
+   "mana_cost": "",
+   "type_line": "Land — Urza's Mine",
+   "oracle_text": "{T}: Add {C}. If you control an Urza's Power-Plant and an Urza's Tower, add {C}{C} instead.",
+   "source": "Savecraft card_search (exact name), 2026-10-06"
+  },
+  "Urza's Power Plant": {
+   "name": "Urza's Power Plant",
+   "mana_cost": "",
+   "type_line": "Land — Urza's Power-Plant",
+   "oracle_text": "{T}: Add {C}. If you control an Urza's Mine and an Urza's Tower, add {C}{C} instead.",
+   "source": "Savecraft card_search (exact name), 2026-10-06"
+  }
+ },
+ "tokens": {
+  "Otter Token": {
+   "name": "Otter Token",
+   "type_line": "Token Creature — Otter",
+   "colors": [
+    "U",
+    "R"
+   ],
+   "pt": "1/1",
+   "text": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)",
+   "created_by": "Stormchaser's Talent",
+   "source": "Savecraft card_search token 'Otter' (1/1, blue and red, prowess), 2026-10-08"
+  }
+ }
+}

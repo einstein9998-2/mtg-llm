@@ -1,0 +1,50 @@
+id: ur-a-level-2-no-instant-or-sorcery-in-graveyard-no-trigger
+title: "Level 2 with no instant or sorcery card in your graveyard still reaches level 2; the trigger has no target and is removed from the stack"
+area: card
+cards: ["Stormchaser's Talent", Island, Lightning Bolt, Ocelot Pride]
+tags: [stormchasers-talent, class, level-up, becomes-level-2, no-legal-target, trigger-removed, ur-alternate]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "603.3d", text: "If a choice is required when the triggered ability goes on the stack but no legal choices can be made for it, or if a rule or a continuous effect otherwise makes the ability illegal, the ability is simply removed from the stack.", verified: true}
+  - {kind: cr, ref: "716.2a", text: "This Class’s level becomes N. Activate only if this Class is level N-1 and only as a sorcery", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 1}}
+      - "Island @is1"
+      - "Island @is2"
+      - "Island @is3"
+      - "Island @is4"
+    graveyard: ["Ocelot Pride @pride", "Island @isg"]
+    library_pad: 10
+  p1:
+    graveyard: ["Lightning Bolt @pbolt"]
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@talent", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: after-level-up
+    check:
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p0:
+        battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 2}}]
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Ocelot Pride, Island]
+    p1:
+      graveyard: [Lightning Bolt]
+notes: >
+  p0's graveyard holds a creature and a land only; the opponent's Lightning Bolt is not in "your graveyard". With no
+  legal target the level 2 trigger is removed from the stack (603.3d): no decision is raised, the stack is empty, and
+  the Talent is level 2 anyway. A wrong engine fails to level up without a target, offers the opponent's graveyard, or
+  leaves a trigger on the stack.

@@ -1,0 +1,44 @@
+id: ur-b-boomerang-basics-bounces-own-omniscience-free-cast-draws
+title: "Boomerang Basics cast free through Omniscience bounces Omniscience itself and draws; the second copy can no longer be cast free"
+area: card
+cards: [Boomerang Basics, Omniscience, Ponder]
+tags: [boomerang-basics, omniscience, free-cast, bounce, enchantment, you-controlled, draw-a-card, mask-validity]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: oracle, card: Omniscience, text: "You may cast spells from your hand without paying their mana costs.", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb1", "Boomerang Basics @bb2"]
+    battlefield: ["Omniscience @omni"]
+    library: ["Ponder"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@bb1", alt_cost: {free: omniscience}}]}}
+  - p0: {t: cast, card: "@bb1", alt_cost: {free: omniscience}, targets: ["@omni"]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p0: {t: cast, card: "@bb2", alt_cost: {free: omniscience}, targets: ["@omni"]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Boomerang Basics, Omniscience, Ponder]
+      graveyard: [Boomerang Basics]
+      battlefield: []
+    legal: {p0: {exclude: [{t: cast, card: "@bb2"}]}}
+notes: >
+  With Omniscience p0 casts the first Boomerang Basics without paying its mana cost, targeting Omniscience itself (a
+  permanent p0 controls). It resolves and returns Omniscience to hand and p0 draws Ponder. Omniscience is a hand card
+  now and has no mana-free power: casting the second Boomerang Basics, with the free permission or by mana, is not
+  legal (no lands, and the permission is gone). A wrong engine keeps the permission after the permanent has left, or
+  skips the draw.

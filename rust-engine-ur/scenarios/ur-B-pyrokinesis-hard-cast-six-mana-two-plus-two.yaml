@@ -1,0 +1,51 @@
+id: ur-b-pyrokinesis-hard-cast-six-mana-two-plus-two
+title: "Pyrokinesis hard cast for {4}{R}{R} deals 2 and 2 to two creatures (a 1/2 and a 2/2) and both die; the red card in hand is not exiled"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Mountain, Island, Guide of Souls, Containment Priest]
+tags: [pyrokinesis, hard-cast, mana-payment, colored-mana, divided-damage, two-targets]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "Pyrokinesis deals 4 damage divided as you choose among any number of target creatures.", verified: true}
+  - {kind: cr, ref: "601.2d", text: "If the spell requires the player to divide or distribute an effect (such as damage or counters) among one or more targets, the player announces the division. Each of these targets must receive at least one of whatever is being divided.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed. Regeneration can replace this event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Island @i1", "Island @i2", "Island @i3", "Island @i4"]
+    library_pad: 10
+  p1:
+    battlefield: ["Guide of Souls @sav", "Containment Priest @raven"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@pyro", alt_cost: null}, {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}}]}}
+  - p0: {t: cast, card: "@pyro", divide: {"@sav": 2, "@raven": 2}, pay: auto}
+  - label: on-stack
+    check:
+      stack: [{kind: spell, card: "@pyro", controller: p0}]
+      p0:
+        hand: [Lightning Bolt]
+        exile: []
+        battlefield: [{card: Mountain, tapped: true}, {card: Mountain, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: [Pyrokinesis]
+      exile: []
+    p1:
+      battlefield: []
+      graveyard: [Guide of Souls, Containment Priest]
+notes: >
+  Cast for its mana cost the spell needs {4}{R}{R}: both Mountains supply the two red, the four Islands the generic
+  part, so all six lands tap. The Bolt in hand is a legal alternative-cost card (the first check) but is not used, so it
+  stays in hand. Division 2 and 2 is exactly lethal for the 1/2 Guide of Souls and for the 2/2 Containment Priest (704.5g).
+  A wrong engine cannot pay the colored part, exiles a card although the mana cost was paid, or gives the first target
+  the whole 4.

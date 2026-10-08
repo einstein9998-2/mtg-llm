@@ -1,0 +1,59 @@
+id: ur-b-price-of-progress-city-of-traitors-trigger-response-still-counts
+title: "Playing a land makes City of Traitors sacrifice itself, but in response to that trigger p1's Price of Progress still counts City of Traitors: the active player takes 4"
+area: card
+cards: [Price of Progress, City of Traitors, Volcanic Island, Mountain]
+tags: [price-of-progress, nonbasic-land, city-of-traitors, play-land, triggered-ability, in-response, sacrifice, damage-to-each-player]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Price of Progress, text: "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.", verified: true}
+  - {kind: oracle, card: City of Traitors, text: "When you play another land, sacrifice this land.", verified: true}
+  - {kind: cr, ref: "603.3", text: "Once an ability has triggered, its controller puts it on the stack as an object that's not a card the next time a player would receive priority. See rule 117, \"Timing and Priority.\" The ability becomes the topmost object on the stack. It has the text of the ability that created it, and no other characteristics. It remains on the stack until it's countered, it resolves, a rule causes it to be removed from the stack, or an effect moves it elsewhere.", verified: true}
+  - {kind: cr, ref: "205.4c", text: "Any land with the supertype “basic” is a basic land. Any land that doesn’t have this supertype is a nonbasic land, even if it has a basic land type.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Mountain @newm"]
+    battlefield: ["City of Traitors @city", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    hand: ["Price of Progress @pop"]
+    battlefield: ["Mountain @pm1", "Mountain @pm2"]
+    library_pad: 10
+script:
+  - p0: {t: play_land, card: "@newm"}
+  - label: city-trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@city", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {lands_played: 1}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@pop", pay: auto}
+  - label: pop-above-trigger
+    check:
+      stack: [{kind: triggered, source: "@city"}, {kind: spell, card: "@pop", controller: p1}]
+  - resolve_top: true
+  - label: after-pop
+    check:
+      stack: [{kind: triggered, source: "@city"}]
+      p0: {life: 16, battlefield_contains: [{card: City of Traitors}]}
+      p1: {life: 20}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 16
+      battlefield: [{card: Volcanic Island}, {card: Mountain}]
+      graveyard: [City of Traitors]
+    p1:
+      life: 20
+      graveyard: [Price of Progress]
+notes: >
+  Playing a land is a special action and cannot be responded to, but City of Traitors' trigger uses the stack, so p1
+  can cast the instant while City of Traitors is still on the battlefield. p0 then controls two nonbasic lands (City of
+  Traitors and Volcanic Island; the new Mountain is basic) = 4 damage (20 to 16); p1 controls only Mountains and takes
+  0. Afterwards the trigger resolves and City of Traitors is sacrificed. A wrong engine sacrifices City as part of the
+  land play (before the trigger resolves) or lets p1 only respond after the sacrifice.

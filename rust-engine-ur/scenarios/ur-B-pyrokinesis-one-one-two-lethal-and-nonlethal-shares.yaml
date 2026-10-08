@@ -1,0 +1,40 @@
+id: ur-b-pyrokinesis-one-one-two-lethal-and-nonlethal-shares
+title: "Pyrokinesis 1/1/2: the 1/1 Ocelot Pride dies, the 1/2 Guide of Souls takes 1 and lives, the 2/2 Containment Priest takes 2 and dies"
+area: card
+cards: [Pyrokinesis, Lightning Bolt, Ocelot Pride, Guide of Souls, Containment Priest]
+tags: [pyrokinesis, divided-damage, one-one-two, three-targets, nonlethal-damage, lethal-damage, exactly-lethal]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Pyrokinesis, text: "Pyrokinesis deals 4 damage divided as you choose among any number of target creatures.", verified: true}
+  - {kind: cr, ref: "601.2d", text: "If the spell requires the player to divide or distribute an effect (such as damage or counters) among one or more targets, the player announces the division. Each of these targets must receive at least one of whatever is being divided.", verified: true}
+  - {kind: cr, ref: "120.3e", text: "Damage dealt to a creature by a source with neither wither nor infect causes that much damage to be marked on that creature.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed. Regeneration can replace this event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyrokinesis @pyro", "Lightning Bolt @bolt"]
+    library_pad: 10
+  p1:
+    battlefield: ["Ocelot Pride @pride", "Guide of Souls @guide", "Containment Priest @priest"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pyro", alt_cost: {exile_red_card: "@bolt"}, divide: {"@pride": 1, "@guide": 1, "@priest": 2}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Pyrokinesis]
+      exile: [Lightning Bolt]
+    p1:
+      battlefield: [{card: Guide of Souls, damage: 1, pt: [1, 2]}]
+      graveyard: [Ocelot Pride, Containment Priest]
+notes: >
+  Three targets with shares 1, 1 and 2 (601.2d: at least 1 each, total 4). Ocelot Pride (1/1) has exactly lethal
+  damage and dies. Guide of Souls (1/2) has 1 of 2 marked and survives with the damage kept (120.3e). Containment
+  Priest (2/2) has exactly lethal damage from its 2 and dies (704.5g). A wrong engine gives the unused point of
+  the surviving creature to another target, or kills the 1/2 with 1 damage.

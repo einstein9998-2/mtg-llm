@@ -1,0 +1,60 @@
+id: ur-a-talent-cast-triggers-prowess-on-existing-otter
+title: "Casting Stormchaser's Talent is a noncreature spell, so an Otter already on the battlefield gets +1/+1, but the Otter the Talent makes does not"
+area: card
+cards: ["Stormchaser's Talent", Island, "Otter Token"]
+tags: [stormchasers-talent, otter, prowess, noncreature-spell, enchantment-spell, trigger-timing, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "When this Class enters, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "702.108a", text: "“Prowess” means “Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.”", verified: true}
+  - {kind: cr, ref: "601.2i", text: "Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stormchaser's Talent @talent"]
+    battlefield:
+      - "Island @is1"
+      - {token: Otter Token, as: otter1}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@talent", pay: auto}
+  - label: prowess-trigger-above-the-spell
+    check:
+      stack:
+        - {kind: spell, card: "@talent", controller: p0}
+        - {kind: triggered, source: "@otter1", controller: p0}
+      p0: {battlefield_contains: [{token: Otter Token, alias: otter1, pt: [1, 1]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: prowess-resolved-talent-still-on-stack
+    check:
+      stack: [{kind: spell, card: "@talent", controller: p0}]
+      p0: {battlefield_contains: [{token: Otter Token, alias: otter1, pt: [2, 2]}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: enters-trigger-on-stack
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0, text_contains: "Otter"}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: []
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 1}}
+        - {card: Island, tapped: true}
+        - {token: Otter Token, pt: [2, 2], sick: false, keywords: [prowess]}
+        - {token: Otter Token, pt: [1, 1], sick: true, keywords: [prowess]}
+      spells_cast_this_turn: 1
+notes: >
+  The Talent is an enchantment spell, hence a noncreature spell: the old Otter's prowess triggers on cast and resolves
+  first (it is on top of the spell), leaving a 2/2 until end of turn. The enters trigger later makes a second Otter,
+  which did not exist when the spell was cast, so it stays 1/1. A wrong engine treats "noncreature" as "instant or
+  sorcery" (no pump), or pumps the new Otter.

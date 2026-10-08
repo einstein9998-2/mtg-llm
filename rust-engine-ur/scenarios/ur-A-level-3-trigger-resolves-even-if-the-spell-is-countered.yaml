@@ -1,0 +1,61 @@
+id: ur-a-level-3-trigger-resolves-even-if-the-spell-is-countered
+title: "The level 3 trigger is independent of its spell: Force of Will counters Lightning Bolt and the Otter is still created"
+area: card
+cards: ["Stormchaser's Talent", Mountain, Lightning Bolt, Force of Will, Brainstorm, "Otter Token"]
+tags: [stormchasers-talent, class, level-3, cast-trigger, force-of-will, counterspell, trigger-independent-of-source-spell, ur-alternate]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: cr, ref: "601.2i", text: "the spell becomes cast. Any abilities that trigger when a spell is cast or put onto the stack trigger at this time.", verified: true}
+  - {kind: cr, ref: "701.6a", text: "A countered spell is put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - "Mountain @mt"
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - label: trigger-above-bolt
+    check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - label: bolt-countered-trigger-remains
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0: {graveyard: [Lightning Bolt]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Lightning Bolt]
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {card: Mountain, tapped: true}
+        - {token: Otter Token, pt: [1, 1], sick: true}
+    p1:
+      life: 19
+      graveyard: [Force of Will]
+      exile: [Brainstorm]
+notes: >
+  The trigger happens when Bolt is cast (601.2i) and sits on the stack below Force of Will. Force of Will resolves first
+  and counters Bolt; once on the stack the triggered ability exists independently of the spell, so it still resolves and
+  makes the Otter. p1 pays 1 life and exiles Brainstorm as Force of Will's alternative cost (19 life). Bolt never resolves
+  (p1 stays at 19). A wrong engine ties the Otter to the spell resolving or removes the trigger with the spell.

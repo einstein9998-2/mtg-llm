@@ -1,0 +1,54 @@
+id: ur-b-boomerang-basics-owner-and-controller-differ-returns-to-owner
+title: "Boomerang Basics returns a permanent to its OWNER's hand: I draw for a stolen creature (controlled) but not for my own creature that p1 controls"
+area: card
+cards: [Boomerang Basics, Island, Ocelot Pride, Guide of Souls, Ponder, Brainstorm]
+tags: [boomerang-basics, bounce, owner-vs-controller, control-change, you-controlled, draw-a-card, no-draw]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "400.3", text: "If an object would go to any library, graveyard, or hand other than its owner’s, it goes to its owner’s corresponding zone.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb1", "Boomerang Basics @bb2"]
+    battlefield:
+      - "Island @i1"
+      - "Island @i2"
+      - {card: Guide of Souls, as: sav, controller: p1}
+    library: ["Ponder", "Brainstorm"]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Ocelot Pride, as: raven, controller: p0}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb1", targets: ["@raven"], pay: {tap: ["@i1"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: stolen-pride-bounced
+    check:
+      stack: []
+      p0: {hand: [Boomerang Basics, Ponder]}
+      p1: {hand: [Ocelot Pride], battlefield: [{card: Guide of Souls, controller: p1}]}
+  - p0: {t: cast, card: "@bb2", targets: ["@sav"], pay: {tap: ["@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder, Guide of Souls]
+      library_top: [Brainstorm]
+      graveyard: [Boomerang Basics, Boomerang Basics]
+    p1:
+      hand: [Ocelot Pride]
+      battlefield: []
+notes: >
+  Setup: p1 owns the Ocelot Pride and p0 controls it; p0 owns the Guide of Souls and p1 controls it. The first
+  Boomerang Basics returns the Pride to its owner p1 (400.3), and since p0 controlled it p0 draws Ponder. The second
+  returns the Guide of Souls to its owner p0's hand, but p0 did not control it, so there is no draw (Brainstorm stays on top).
+  The rule asks about control when the spell resolves, never ownership. A wrong engine draws for owned permanents, or
+  puts the card into the controller's hand.

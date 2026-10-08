@@ -1,0 +1,41 @@
+id: ur-b-price-of-progress-both-players-at-zero-is-a-draw
+title: "Price of Progress takes both players from 4 life to 0 at once (two nonbasic lands each): the game is a draw"
+area: card
+cards: [Price of Progress, Mountain, Island, Volcanic Island, Ancient Tomb, Tundra, Tropical Island]
+tags: [price-of-progress, nonbasic-land, lethal-damage, simultaneous, draw, game-over, state-based-actions, damage-to-each-player]
+derived_from: cr
+source:
+  - {kind: oracle, card: Price of Progress, text: "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.", verified: true}
+  - {kind: cr, ref: "704.5a", text: "If a player has 0 or less life, that player loses the game.", verified: true}
+  - {kind: cr, ref: "704.3", text: "Whenever a player would get priority (see rule 117, \"Timing and Priority\"), the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event. If any state-based actions are performed as a result of a check, the check is repeated; otherwise all triggered abilities that are waiting to be put on the stack are put on the stack, then the check is repeated. Once no more state-based actions have been performed as the result of a check and no triggered abilities are waiting to be put on the stack, the appropriate player gets priority. This process also occurs during the cleanup step (see rule 514), except that if no state-based actions are performed as the result of the step's first check and no triggered abilities are waiting to be put on the stack, then no player gets priority and the step ends.", verified: true}
+  - {kind: cr, ref: "104.4a", text: "If all the players remaining in a game lose simultaneously, the game is a draw.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    life: 4
+    hand: ["Price of Progress @pop"]
+    battlefield: ["Mountain @m", "Island @i", "Volcanic Island @volc", "Ancient Tomb @tomb"]
+    library_pad: 10
+  p1:
+    life: 4
+    battlefield: ["Tundra", "Tropical Island", "Island"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pop", pay: {tap: ["@m", "@i"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    game: {over: true, draw: true}
+    p0:
+      life: 0
+    p1:
+      life: 0
+notes: >
+  Each player controls exactly two nonbasic lands (p0: Volcanic Island and Ancient Tomb; p1: Tundra and Tropical
+  Island, the Island is basic), so each is dealt 4 and goes to 0 life. Price of Progress is one effect, so both life
+  totals change before state-based actions are checked, and the single check (704.3) makes both players lose
+  simultaneously, which is a draw (104.4a). A wrong engine applies damage player by player and declares the first
+  player (the caster, or the opponent) the loser or the winner.

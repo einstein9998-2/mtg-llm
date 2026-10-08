@@ -1,0 +1,105 @@
+id: ur-a-boomerang-own-talent-draws-and-recast-resets-to-level-1
+title: "Boomerang Basics on your own level 3 Talent: you draw, recasting it makes a fresh level 1 Talent with a new Otter, and Level 2 is offered again"
+area: card
+cards: ["Stormchaser's Talent", Boomerang Basics, Island, "Otter Token"]
+tags: [stormchasers-talent, class, boomerang-basics, bounce, level-reset, new-object, level-3, sorcery-cast-trigger, prowess, ur-alternate]
+derived_from: cr
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand. If you controlled that permanent, draw a card.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true}
+  - {kind: cr, ref: "400.7", text: "An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence.", verified: true}
+  - {kind: cr, ref: "716.2d", text: "If a rule or effect refers to a permanent’s level and that permanent doesn’t have a level, it is treated as though its level is 1.", verified: true}
+  - {kind: cr, ref: "702.108a", text: "“Prowess” means “Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - "Island @i1"
+      - "Island @i2"
+      - "Island @i3"
+      - "Island @i4"
+      - "Island @i5"
+      - "Island @i6"
+    library: ["Island @top"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@talent"], pay: {tap: ["@i1"]}}
+  - label: sorcery-cast-triggers-level-3
+    check:
+      stack:
+        - {kind: spell, card: "@bb", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+  - resolve_top: true
+  - resolve_top: true
+  - label: talent-bounced-and-card-drawn
+    check:
+      stack: []
+      p0:
+        hand: ["Stormchaser's Talent", Island]
+        graveyard: [Boomerang Basics]
+        battlefield_contains: [{token: Otter Token, pt: [1, 1]}]
+  - p0: {t: cast, card: "@talent", pay: {tap: ["@i2"]}}
+  - label: recast-pumps-the-otter
+    check:
+      stack:
+        - {kind: spell, card: "@talent", controller: p0}
+        - {kind: triggered, controller: p0}
+  - resolve_top: true
+  - resolve_top: true
+  - label: new-talent-new-trigger
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0, text_contains: "Otter"}]
+  - resolve_top: true
+  - label: level-1-again
+    check:
+      stack: []
+      p0:
+        battlefield_contains:
+          - {card: "Stormchaser's Talent", counters: {level: 1}}
+          - {token: Otter Token, pt: [2, 2], sick: true}
+          - {token: Otter Token, pt: [1, 1], sick: true}
+      legal:
+        p0:
+          include: [{t: activate, source: "@talent", ability: 0}]
+          exclude: [{t: activate, source: "@talent", ability: 1}]
+  - p0: {t: activate, source: "@talent", ability: 0, pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0:
+      decision: choose_target
+      slot: 0
+      answer: "@bb"
+      expect_options: {include: ["@bb"], count: 1}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Boomerang Basics]
+      graveyard: []
+      spells_cast_this_turn: 2
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 2}}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {token: Otter Token, pt: [2, 2]}
+        - {token: Otter Token, pt: [1, 1]}
+notes: >
+  Boomerang Basics is a sorcery cast at level 3: the Talent triggers (first Otter) before the bounce resolves. The
+  returned Talent is a new object (400.7) and a Class with no level counts as level 1 (716.2d), so after recasting it the
+  Otter trigger runs again (second Otter, 1/1; the first Otter is pumped by the Talent spell's prowess, an enchantment spell
+  being noncreature) and Level 2 is offered but Level 3 is not, even though its level was 3 before. The leveled-again
+  Talent then returns Boomerang Basics (the only instant or sorcery in the graveyard) via the level 2 trigger. p0 draws the
+  top Island for controlling the bounced Talent. Casting a creature or an enchantment would not have made an Otter at
+  level 3; only the sorcery did. A wrong engine keeps the old level counter, or forgets to draw.

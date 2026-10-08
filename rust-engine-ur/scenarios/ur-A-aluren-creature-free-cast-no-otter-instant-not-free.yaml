@@ -1,0 +1,62 @@
+id: ur-a-aluren-creature-free-cast-no-otter-instant-not-free
+title: "With Aluren and a level 3 Talent, a free creature spell triggers nothing and Lightning Bolt is not free; the paid Bolt makes an Otter"
+area: card
+cards: ["Stormchaser's Talent", Aluren, Ocelot Pride, Lightning Bolt, Mountain, "Otter Token"]
+tags: [stormchasers-talent, class, level-3, cast-trigger, aluren, free-cast, creature-spell, alurentell, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Aluren, text: "Any player may cast creature spells with mana value 3 or less without paying their mana costs and as though they had flash.", verified: true}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "702.108a", text: "“Prowess” means “Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Ocelot Pride @pride", "Lightning Bolt @bolt"]
+    battlefield:
+      - "Aluren @alu"
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - "Mountain @mt"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bolt", alt_cost: {free: aluren}, targets: [{player: p1}]}}
+  - p0: {t: cast, card: "@pride", alt_cost: {free: aluren}}
+  - label: free-creature-no-triggers
+    check:
+      stack: [{kind: spell, card: "@pride", controller: p0}]
+      p0: {battlefield_contains: [{card: Mountain, tapped: false}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}], pay: auto}
+  - label: paid-bolt-triggers
+    check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt]
+      spells_cast_this_turn: 2
+      battlefield:
+        - {card: Aluren}
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {card: Mountain, tapped: true}
+        - {card: Ocelot Pride, sick: true}
+        - {token: Otter Token, pt: [1, 1]}
+    p1: {life: 17}
+notes: >
+  Aluren makes only creature spells free; the instant still costs {R} (the free cast of Bolt is not offered). The free
+  Ocelot Pride is a creature spell: no Otter, no prowess, nothing on the stack but the spell, and the Mountain stays
+  untapped. The Mountain then pays for Bolt, which triggers the Talent: one Otter (Pride's presence does not matter).
+  A wrong engine lets Aluren free any spell, or triggers the Talent for the creature spell.

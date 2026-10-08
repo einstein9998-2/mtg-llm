@@ -1,0 +1,54 @@
+id: ur-b-price-of-progress-daze-paid-with-last-land-resolves
+title: "Daze (cast by returning an Island) on Price of Progress: the caster keeps one land untapped, pays {1}, and the spell resolves"
+area: card
+cards: [Price of Progress, Daze, Mountain, Island, Tundra]
+tags: [price-of-progress, daze, alternative-cost, counter-unless-pay, pay-yes, return-island, nonbasic-land]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Price of Progress, text: "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.", verified: true}
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player] doesn’t, [do something].”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Price of Progress @pop"]
+    battlefield: ["Mountain @m", "Island @i", "Island @i2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1", "Island @j2", "Tundra"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pop", pay: {tap: ["@m", "@i"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j2"}, targets: ["@pop"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: true, expect_options: {include: [true, false]}}
+  - label: daze-paid
+    check:
+      stack: [{kind: spell, card: "@pop", controller: p0}]
+      p0: {battlefield: [{card: Mountain, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]}
+      p1: {graveyard: [Daze], hand: [Island]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Price of Progress]
+    p1:
+      life: 18
+      hand: [Island]
+      graveyard: [Daze]
+notes: >
+  p0 leaves a third land untapped, so the "unless its controller pays {1}" choice is real: the prompt offers yes and no
+  and p0 pays (the last Island taps). Daze is then spent and Price of Progress is still on the stack; it resolves:
+  p0 controls no nonbasic land (0 damage), p1 controls Tundra (the Island that stayed is basic) and takes 2. The Island
+  p1 returned for Daze's alternative cost is in hand, and so is not counted anywhere. A wrong engine counters
+  anyway, or taps the wrong land, or skips the prompt.

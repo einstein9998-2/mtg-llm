@@ -1,6 +1,7 @@
 //! Replays a flagged position's action list and prints what the bot saw over the last few decisions
 //! (hand, known library top, events). Agent-side view only.
 //! Usage: replay <decks dir> <positions-private.jsonl> <id> [last N decisions]
+//! The matchup comes from the record's `me`/`opp` fields (default Alurentell vs UR Cutter).
 use mtg_agent::*;
 use mtg_core::decision::Status;
 use mtg_core::ids::Seat;
@@ -17,7 +18,8 @@ fn main() {
     let hist: Vec<(u8, usize)> = v["replay"].as_array().unwrap().iter().map(|x| (x[0].as_u64().unwrap() as u8, x[1].as_u64().unwrap() as usize)).collect();
     let db = mtg_cards::legacy::build();
     let (names, decks) = load_deck_dir(&db, dir);
-    let (me, opp) = (names.iter().position(|n| n == "alurentell").unwrap(), names.iter().position(|n| n == "ur-cutter").unwrap());
+    let find = |k: &str, dflt: &str| names.iter().position(|n| n == v[k].as_str().unwrap_or(dflt)).unwrap_or_else(|| panic!("deck {} not in {names:?}", v[k]));
+    let (me, opp) = (find("me", "alurentell"), find("opp", "ur-cutter"));
     let (d0, d1) = if bot == 0 { (&decks[me], &decks[opp]) } else { (&decks[opp], &decks[me]) };
     let mut g = Game::new(db.clone(), [d0, d1], gseed, GameConfig { first_player: Seat(first), ..GameConfig::default() });
     let names_of = |c: &[ViewCard]| c.iter().map(|x| x.name.clone()).collect::<Vec<_>>().join(", ");

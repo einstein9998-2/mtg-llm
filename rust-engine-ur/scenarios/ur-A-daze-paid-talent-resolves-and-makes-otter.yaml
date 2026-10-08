@@ -1,0 +1,56 @@
+id: ur-a-daze-paid-talent-resolves-and-makes-otter
+title: "Daze on Stormchaser's Talent: p0 pays {1} with a second Island, the Talent resolves and makes its Otter"
+area: card
+cards: ["Stormchaser's Talent", Island, Daze, "Otter Token"]
+tags: [stormchasers-talent, class, daze, counter-unless-pay, alternative-cost, return-island, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Daze, text: "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: oracle, card: Daze, text: "Counter target spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "118.12a", text: "“[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player doesn’t], [do something].”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stormchaser's Talent @talent"]
+    battlefield: ["Island @is1", "Island @is2"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@talent", pay: {tap: ["@is1"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@daze", alt_cost: {return_island: "@j1"}, targets: ["@talent"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: pay_for_daze, answer: true}
+  - label: daze-paid
+    check:
+      stack: [{kind: spell, card: "@talent", controller: p0}]
+      p0: {battlefield_contains: [{card: Island, tapped: true}, {card: Island, tapped: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 1}}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {token: Otter Token, pt: [1, 1]}
+    p1:
+      hand: [Island]
+      graveyard: [Daze]
+      battlefield: []
+notes: >
+  Daze's alternative cost returns p1's Island. When Daze resolves, p0 (the Talent's controller) is asked to pay {1}; the
+  untapped second Island pays it and the Talent stays on the stack, then resolves and makes the Otter. A wrong engine asks
+  the wrong player, counters anyway, or taps nothing.

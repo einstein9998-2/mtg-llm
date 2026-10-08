@@ -117,12 +117,12 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
 <main>
   <header>
     <h1>Alurentell tough spots</h1>
-    <p class="lede">Positions where the bot was unsure: the search could not separate the top options, or the network and the search disagreed. Pick what you would play. The bot's choice and its numbers appear after you answer.</p>
+    <p class="lede">Positions where the bot was unsure: the search could not separate the top options, or the network and the search disagreed. Pick what you would play. The bot's choice and its numbers appear after you answer. Positions marked "LLM game" come from Claude playing both sides, and show what the LLM played instead.</p>
     <div class="progress"><span id="prog-text">loading</span><div class="bar"><i id="prog-bar"></i></div></div>
     <nav class="tabs" id="tabs" aria-label="Positions"></nav>
   </header>
   <div class="how">
-    <b>How to answer.</b> Tap a letter. Optionally tick <b>Either is fine</b>, <b>Can't tell from this view</b> or <b>Make this a rule</b>, and add a line of why. Everything saves as you go and you can change an answer later. The bot saw exactly what is shown here (its hand and the public board), nothing about the opponent's hand.
+    <b>How to answer.</b> Tap a letter. Optionally tick <b>Either is fine</b>, <b>Can't tell from this view</b> or <b>Make this a rule</b>, and add a line of why. Everything saves as you go and you can change an answer later. The player saw exactly what is shown here (its hand and the public board), nothing about the opponent's hand.
   </div>
   <section id="cards" aria-live="polite"></section>
   <footer>Positions come from engine-v5 self-play, Alurentell (net-guided search, 64 iterations) against UR Cutter played by the same net. Win % figures are search estimates from the bot's side and are noisy to a few points.</footer>
@@ -229,7 +229,9 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       var chosen = a.pick === i;
       var badges = '';
       var nums = '';
-      if (answered) {
+      if (answered && p.source === 'llm-vs-llm') {
+        if (i === p.llm_choice) badges += '<span class="tag bot">the LLM played this</span>';
+      } else if (answered) {
         if (i === p.bot_choice) badges += '<span class="tag bot">bot played this</span>';
         if (i === p.deep_best) badges += '<span class="tag deep">deeper search prefers this</span>';
         nums = '<div class="nums"><span>net ' + o.net + '%<span class="meter"><i style="width:' + o.net + '%"></i></span></span><span>search ' + o.deep + '%<span class="meter"><i style="width:' + o.deep + '%"></i></span></span><span>est. win ' + (o.win == null ? 'n/a' : o.win + '%') + '</span></div>';
@@ -237,7 +239,11 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
       return '<button class="opt" data-pick="' + esc(p.id) + ':' + i + '" aria-pressed="' + chosen + '"><span class="ltr">' + letter(i) + '</span><span class="body"><span class="lbl">' + esc(o.label) + '</span>' + (badges ? '<span class="badges">' + badges + '</span>' : '') + nums + '</span></button>';
     }).join('');
     var reveal = '';
-    if (answered) {
+    if (answered && p.source === 'llm-vs-llm') {
+      var same = a.pick === p.llm_choice;
+      reveal = '<div class="reveal">' + (same ? '<span class="agree">You and the LLM picked the same option.</span> ' : '') +
+        'The LLM played <b>' + esc(letter(p.llm_choice) + '. ' + p.options[p.llm_choice].label) + '</b>.</div>';
+    } else if (answered) {
       var bot = letter(p.bot_choice) + '. ' + p.options[p.bot_choice].label;
       var same = a.pick === p.bot_choice;
       reveal = '<div class="reveal">' + (same ? '<span class="agree">You and the bot picked the same option.</span> ' : '') +
@@ -247,7 +253,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     var f = a.flags || {};
     function flag(k, t) { return '<button class="flag" data-flag="' + esc(p.id) + ':' + k + '" aria-pressed="' + (!!f[k]) + '">' + t + '</button>'; }
     return '<article class="card" id="card-' + esc(p.id) + '">' +
-      '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : (v.whose === 'your' ? 'Your' : 'Opponent\'s') + ' turn ' + Math.ceil((+v.turn) / 2) + ', ' + esc(v.step) + (p.on_play === true ? ' (you are on the play)' : p.on_play === false ? ' (you are on the draw)' : '')) + '</span><span class="meta">batch ' + esc(p.batch || 1) + ' · ' + esc(p.category) + '</span></div>' +
+      '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : (v.whose === 'your' ? 'Your' : 'Opponent\'s') + ' turn ' + Math.ceil((+v.turn) / 2) + ', ' + esc(v.step) + (p.on_play === true ? ' (you are on the play)' : p.on_play === false ? ' (you are on the draw)' : '')) + '</span><span class="meta">batch ' + esc(p.batch || 1) + ' · ' + (p.matchup ? esc(p.matchup) + ' (you play ' + esc(p.me_deck) + ') · ' : '') + esc(p.category) + '</span></div>' +
       lifeLine +
       '<div class="board"><div>' +
         zone('Your hand', v.hand, 'hand') + (v.lib_top && v.lib_top.length ? zone('Known top of your library (top first)', v.lib_top, 'known') : '') + (v.lib_bottom && v.lib_bottom.length ? zone('Known bottom of your library', v.lib_bottom, 'known') : '') + zone('Your battlefield', v.my_bf) + gy('Your graveyard', v.my_gy) +

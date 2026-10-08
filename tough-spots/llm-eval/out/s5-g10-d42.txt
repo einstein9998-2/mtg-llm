@@ -1,0 +1,2 @@
+ANSWER: B
+WHY: I have only 4 mana this turn, so Show and Tell would have no spare for Daze and no mana left for Veil. Playing the basic Forest now keeps Tomb safe from Wasteland and keeps Veil mana up on their turn. Next turn Tomb makes 5 mana: Veil first, then Show and Tell.

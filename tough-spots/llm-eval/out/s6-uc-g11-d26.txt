@@ -1,0 +1,2 @@
+ANSWER: B
+WHY: The opponent only has basic Islands, so Wasteland has no target, and Island is the right land drop to reach 3 mana for Bauble plus Murktide with delve next. Playing the land first keeps every follow-up (Bauble, Murktide, Force backup) open.

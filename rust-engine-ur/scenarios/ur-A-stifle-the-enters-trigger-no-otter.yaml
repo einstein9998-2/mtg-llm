@@ -1,0 +1,50 @@
+id: ur-a-stifle-the-enters-trigger-no-otter
+title: "Stifle on the Talent's enters trigger leaves a level 1 Talent with no Otter"
+area: card
+cards: ["Stormchaser's Talent", Island, Stifle]
+tags: [stormchasers-talent, class, stifle, counter-ability, enters-trigger, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "When this Class enters, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "701.6a", text: "To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t resolve and none of its effects occur.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Stormchaser's Talent @talent"]
+    battlefield: ["Island @is1"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @j1"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@talent", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@talent", nth: 0}], pay: auto}
+  - label: stifle-above-trigger
+    check:
+      stack:
+        - {kind: triggered, source: "@talent", controller: p0}
+        - {kind: spell, card: "@stifle", controller: p1}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 1}}
+        - {card: Island, tapped: true}
+    p1:
+      graveyard: [Stifle]
+      battlefield: [{card: Island, tapped: true}]
+notes: >
+  The enters trigger is an ordinary triggered ability and Stifle counters it: the Talent stays as a level 1 Class and
+  no token is created. (The first pass pair resolves the Talent spell; p0 passes with the trigger on the stack so that p1
+  gets priority to Stifle it.)

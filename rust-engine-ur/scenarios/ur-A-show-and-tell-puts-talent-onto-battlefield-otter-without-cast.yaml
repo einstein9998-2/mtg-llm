@@ -1,0 +1,55 @@
+id: ur-a-show-and-tell-puts-talent-onto-battlefield-otter-without-cast
+title: "Show and Tell puts Stormchaser's Talent onto the battlefield: it enters at level 1 and still creates an Otter although it was never cast"
+area: card
+cards: ["Stormchaser's Talent", Show and Tell, Island, Lightning Bolt, "Otter Token"]
+tags: [stormchasers-talent, class, show-and-tell, put-onto-battlefield, not-cast, enters-trigger, simultaneous-secret-choice, ur-alternate]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Show and Tell, text: "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.", verified: true}
+  - {kind: oracle, card: "Stormchaser's Talent", text: "When this Class enters, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield.", verified: true}
+  - {kind: cr, ref: "601.2a", text: "To propose the casting of a spell, a player first moves that card (or that copy of a card) from where it is to the stack.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @snt", "Stormchaser's Talent @talent"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3"]
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@snt", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: simultaneous_secret_choice, answer: "@talent"}
+  - label: enters-trigger
+    check:
+      stack: [{kind: triggered, source: "@talent", controller: p0, text_contains: "Otter"}]
+      p0:
+        battlefield_contains: [{card: "Stormchaser's Talent", counters: {level: 1}}]
+        spells_cast_this_turn: 1
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Show and Tell]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 1}}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {token: Otter Token, pt: [1, 1], sick: true}
+    p1:
+      hand: [Lightning Bolt]
+notes: >
+  Only Show and Tell is cast (one spell). The Talent is put onto the battlefield, where "enters" still triggers; it comes in
+  at level 1. p1 has no eligible card (an instant is not an artifact, creature, enchantment or land), so no decision is
+  raised for p1. A wrong engine ties the Otter to the cast, or puts the Class in at a higher level.

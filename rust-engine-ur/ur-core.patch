@@ -1,0 +1,326 @@
+diff -ruN '--exclude=target' base-engine/crates/mtg-cards/cards/ur.cards.ron engine/crates/mtg-cards/cards/ur.cards.ron
+--- base-engine/crates/mtg-cards/cards/ur.cards.ron	1970-01-01 00:00:00.000000000 +0000
++++ engine/crates/mtg-cards/cards/ur.cards.ron	2026-10-08 01:42:16.555867382 +0000
+@@ -0,0 +1,37 @@
++// UR Cutter alternate (Brady's list, 2026-10-07), RFC 0009. Oracle text per Savecraft card_search (Scryfall), 2026-10-07.
++// Kept apart from legacy.cards.ron so that the pinned real-pool snapshot and its goldens stay untouched.
++[
++  (name: "Otter Token", types: "CREATURE", colors: "U | R", subtypes: ["Otter"], pt: (1, 1), keywords: "PROWESS", is_token: true),
++  // A Class (CR 716): it enters with level 1; the level counter is the Class level. Level-up abilities are sorcery-speed
++  // activated abilities that need the previous level; level 3's static-style trigger needs level 3 or more.
++  (name: "Stormchaser's Talent", cost: "{U}", types: "ENCHANTMENT", subtypes: ["Class"], abilities: [
++    Class,
++    Triggered(text: "When this Class enters, create a 1/1 blue and red Otter creature token with prowess.", on: Enters(filter: (self_only: true)),
++      effect: CreateToken(token: "Otter Token", n: Const(1), who: You)),
++    Activated(text: "{3}{U}: Level 2", cost: [Mana("{3}{U}")], timing: Sorcery, cond: Cmp(Counters(This, Level), Eq, Const(1)),
++      effect: AddCounters(objs: One(This), kind: Level, n: Const(1))),
++    Triggered(text: "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.", on: ClassLevel(2),
++      targets: [(objects: (zone: Graveyard, types_any: "INSTANT | SORCERY", owner: You))], effect: MoveTo(objs: One(Target(0)), to: Hand)),
++    Activated(text: "{5}{U}: Level 3", cost: [Mana("{5}{U}")], timing: Sorcery, cond: Cmp(Counters(This, Level), Eq, Const(2)),
++      effect: AddCounters(objs: One(This), kind: Level, n: Const(1))),
++    Triggered(text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.",
++      on: SpellCast(caster: You, filter: (types_any: "INSTANT | SORCERY")), cond: Cmp(Counters(This, Level), Ge, Const(3)),
++      effect: CreateToken(token: "Otter Token", n: Const(1), who: You)),
++  ]),
++  // Divided damage is modelled as four target slots, one point each; a creature chosen in k slots takes k damage in one event (RFC 0009).
++  (name: "Pyrokinesis", cost: "{4}{R}{R}", types: "INSTANT", abilities: [
++    Spell(targets: [
++        (objects: (types_any: "CREATURE")),
++        (objects: (types_any: "CREATURE"), ascending: true),
++        (objects: (types_any: "CREATURE"), ascending: true),
++        (objects: (types_any: "CREATURE"), ascending: true),
++      ], effect: DamageSlots(per: Const(1), first: 0, n: 4)),
++    Alt(label: "exile a red card from your hand", key: "exile_red_card", cost: [ExileFromHand(zone: Hand, colors_any: "R")]),
++  ]),
++  (name: "Price of Progress", cost: "{1}{R}", types: "INSTANT", abilities: [
++    Spell(effect: Seq([
++      Damage(amount: Times(Const(2), Count(types_any: "LAND", supertypes_not: "BASIC", controller: You)), to: Player(You)),
++      Damage(amount: Times(Const(2), Count(types_any: "LAND", supertypes_not: "BASIC", controller: Opp)), to: Player(Opp)),
++    ])),
++  ]),
++]
+diff -ruN '--exclude=target' base-engine/crates/mtg-cards/src/legacy.rs engine/crates/mtg-cards/src/legacy.rs
+--- base-engine/crates/mtg-cards/src/legacy.rs	2026-10-06 21:47:00.000000000 +0000
++++ engine/crates/mtg-cards/src/legacy.rs	2026-10-08 01:35:31.563818443 +0000
+@@ -9,7 +9,9 @@
+ 
+ pub const STORM_CARDS: &str = include_str!("../cards/storm.cards.ron");
+ 
++pub const UR_CARDS: &str = include_str!("../cards/ur.cards.ron");
++
+ pub fn build() -> Arc<CardDb> {
+-    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS), ("storm.cards.ron", STORM_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
++    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS), ("storm.cards.ron", STORM_CARDS), ("ur.cards.ron", UR_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
+     Arc::new(db)
+ }
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/card.rs engine/crates/mtg-core/src/card.rs
+--- base-engine/crates/mtg-core/src/card.rs	2026-10-06 21:47:00.000000000 +0000
++++ engine/crates/mtg-core/src/card.rs	2026-10-08 01:31:37.223986174 +0000
+@@ -197,7 +197,7 @@
+                         None => Vec::new(),
+                     }
+                 }
+-                AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) | AbilityDef::Saga { .. } | AbilityDef::ExtraLandDrop | AbilityDef::SpellsUncounterable => Vec::new(),
++                AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) | AbilityDef::Saga { .. } | AbilityDef::ExtraLandDrop | AbilityDef::SpellsUncounterable | AbilityDef::Class => Vec::new(),
+             };
+             self.code.push(code);
+         }
+@@ -239,6 +239,8 @@
+     pub has_uncounterable_static: bool,
+     /// Some card is a Saga (RFC 0007).
+     pub has_saga: bool,
++    /// Some card is a Class (RFC 0009).
++    pub has_class: bool,
+     /// The dungeon cards, in definition order (the choices of a fresh venture).
+     pub dungeons: Vec<CardDefId>,
+ }
+@@ -267,6 +269,7 @@
+                 AbilityDef::ExtraLandDrop => self.has_extra_land = true,
+                 AbilityDef::SpellsUncounterable => self.has_uncounterable_static = true,
+                 AbilityDef::Saga { .. } => self.has_saga = true,
++                AbilityDef::Class => self.has_class = true,
+                 _ => {}
+             }
+         }
+@@ -325,7 +328,7 @@
+                     AbilityDef::Spell(s) => s.modes.iter().filter_map(|m| m.effect.as_ref()).for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+                     AbilityDef::Activated(ad) => ad.effect.iter().for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+                     AbilityDef::Triggered(t) => t.effect.iter().for_each(|e| crate::lint::tokens_used(e, &mut toks)),
+-                    AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) | AbilityDef::Saga { .. } | AbilityDef::ExtraLandDrop | AbilityDef::SpellsUncounterable => {}
++                    AbilityDef::Static(_) | AbilityDef::Alt(_) | AbilityDef::AddCost(_) | AbilityDef::Escalate(_) | AbilityDef::CostMod(_) | AbilityDef::Enters(_) | AbilityDef::Delve | AbilityDef::Replicate(_) | AbilityDef::Restrict(_) | AbilityDef::Permit(_) | AbilityDef::EntersChoice(_) | AbilityDef::Ascend | AbilityDef::DrawPlusOne | AbilityDef::EmptyDrawWins | AbilityDef::NoHandLimit | AbilityDef::CostFloor(_) | AbilityDef::Saga { .. } | AbilityDef::ExtraLandDrop | AbilityDef::SpellsUncounterable | AbilityDef::Class => {}
+                 }
+                 for t in toks {
+                     match self.id(t) {
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/cast.rs engine/crates/mtg-core/src/cast.rs
+--- base-engine/crates/mtg-core/src/cast.rs	2026-10-06 21:47:00.000000000 +0000
++++ engine/crates/mtg-core/src/cast.rs	2026-10-08 01:31:45.058675432 +0000
+@@ -238,7 +238,9 @@
+                     cx.s.cur_x = None;
+                     // Exclude the spell itself from stack targets (it is already on the stack).
+                     let chosen: Vec<Target> = e.targets.iter().copied().collect();
+-                    let mut opts: Vec<Opt> = cands.into_iter().filter(|t| *t != Target::Obj(f.obj) && !(spec.distinct && chosen.contains(t))).map(Opt::Target).collect();
++                    // RFC 0009: an "ascending" slot offers only targets not before the previous slot's target.
++                    let floor = if spec.ascending.0 && slot > 0 { chosen.get(slot as usize - 1).copied().filter(|t| *t != Target::None) } else { None };
++                    let mut opts: Vec<Opt> = cands.into_iter().filter(|t| *t != Target::Obj(f.obj) && !(spec.distinct && chosen.contains(t)) && floor.map_or(true, |fl| *t >= fl)).map(Opt::Target).collect();
+                     if spec.optional {
+                         opts.push(Opt::Done);
+                     }
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/ir.rs engine/crates/mtg-core/src/ir.rs
+--- base-engine/crates/mtg-core/src/ir.rs	2026-10-06 21:47:01.000000000 +0000
++++ engine/crates/mtg-core/src/ir.rs	2026-10-08 01:31:37.222412245 +0000
+@@ -202,6 +202,11 @@
+     /// "X target ...": the slot repeats X times (X as chosen when the spell is cast).
+     #[serde(default)]
+     pub x_count: bool,
++    /// RFC 0009 ("divided damage" slots): the target of this slot must not come before the target
++    /// chosen in the previous slot in the engine's fixed target order, so a division of N points is
++    /// offered once, not once per ordering. Written as a plain bool in card data.
++    #[serde(default)]
++    pub ascending: HashFalseFlag,
+ }
+ 
+ impl TargetSpec {
+@@ -209,7 +214,7 @@
+         TargetSpec { objects: Some(ObjFilter::on_battlefield(Types::CREATURE)), ..Default::default() }
+     }
+     pub fn any_target() -> TargetSpec {
+-        TargetSpec { objects: Some(ObjFilter::on_battlefield(Types::CREATURE | Types::PLANESWALKER)), players: Some(Rel::Any), optional: false, distinct: false, x_count: false }
++        TargetSpec { objects: Some(ObjFilter::on_battlefield(Types::CREATURE | Types::PLANESWALKER)), players: Some(Rel::Any), optional: false, distinct: false, x_count: false, ascending: HashFalseFlag(false) }
+     }
+     pub fn player() -> TargetSpec {
+         TargetSpec { players: Some(Rel::Any), ..Default::default() }
+@@ -633,6 +638,11 @@
+         filter: ObjFilter,
+         dest: ZoneKind,
+     },
++    // ---- RFC 0009 (UR alternate) ----
++    /// Divided damage (Pyrokinesis): the `n` target slots from `first` hold one point of damage
++    /// each (a creature chosen in k slots gets k points). Each distinct target that is still legal
++    /// is dealt `per` times its number of slots as a single damage event; illegal slots are lost.
++    DamageSlots { per: Expr, first: u8, n: u8 },
+ }
+ 
+ fn pref_you() -> PRef {
+@@ -983,6 +993,9 @@
+     OtherBecomesTarget { by: Rel, filter: ObjFilter },
+     /// The last counter of this kind was removed from the source ("when the last is removed", suspend).
+     LastCounterRemoved(CounterKind),
++    // ---- RFC 0009 (UR alternate) ----
++    /// A level counter brought this Class's level to at least `n` from below `n` ("when this Class becomes level n", CR 716.2).
++    ClassLevel(u8),
+ }
+ 
+ #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+@@ -1058,6 +1071,11 @@
+     ExtraLandDrop,
+     /// "Spells you control can't be countered." (Hexing Squelcher, while it is on the battlefield)
+     SpellsUncounterable,
++    // ---- RFC 0009 (UR alternate) ----
++    /// A Class (CR 716): it enters with a level counter (level 1). Level-ups are sorcery-speed
++    /// `Activated` abilities with a level condition; the level abilities are `Triggered` abilities
++    /// on `EventPat::ClassLevel` or abilities with a level condition.
++    Class,
+ }
+ 
+ /// "As long as <cond>, each spell that would cost less than `min` mana to cast costs `min` mana
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/lint.rs engine/crates/mtg-core/src/lint.rs
+--- base-engine/crates/mtg-core/src/lint.rs	2026-10-06 21:47:01.000000000 +0000
++++ engine/crates/mtg-core/src/lint.rs	2026-10-08 01:31:56.550376106 +0000
+@@ -133,6 +133,7 @@
+         Effect::CastFree(o) => o_(o),
+         Effect::ExileTargetUntilLeaves { target } => *target as i32,
+         Effect::ExileChoosePlay { n } => expr(n),
++        Effect::DamageSlots { per, first, n } => tmax(expr(per), *first as i32 + *n as i32 - 1),
+     }
+ }
+ 
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/ops.rs engine/crates/mtg-core/src/ops.rs
+--- base-engine/crates/mtg-core/src/ops.rs	2026-10-06 21:47:01.000000000 +0000
++++ engine/crates/mtg-core/src/ops.rs	2026-10-08 01:31:37.224326241 +0000
+@@ -302,6 +302,10 @@
+         if to == ZoneKind::Battlefield && !ceases && self.db.has_saga && self.db.def(def).abilities.iter().any(|a| matches!(a, AbilityDef::Saga { .. })) {
+             self.add_counters(nr, CounterKind::Lore, 1);
+         }
++        // A Class enters with level 1 (CR 716.3).
++        if to == ZoneKind::Battlefield && !ceases && self.db.has_class && self.db.def(def).abilities.iter().any(|a| matches!(a, AbilityDef::Class)) {
++            self.add_counters(nr, CounterKind::Level, 1);
++        }
+         if to == ZoneKind::Battlefield && !ceases && self.db.def(def).abilities.iter().any(|a| matches!(a, AbilityDef::EntersChoice(_))) {
+             self.s.enter_choices.push(nr);
+         }
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/resolve.rs engine/crates/mtg-core/src/resolve.rs
+--- base-engine/crates/mtg-core/src/resolve.rs	2026-10-06 21:47:01.000000000 +0000
++++ engine/crates/mtg-core/src/resolve.rs	2026-10-08 01:31:37.225192231 +0000
+@@ -404,6 +404,27 @@
+             }
+             Flow::Next
+         }
++        Effect::DamageSlots { per, first, n } => {
++            let per = cx.eval_expr(env, per).max(0) as u32;
++            let mut hits: Vec<(Target, u32)> = Vec::new();
++            for i in *first..*first + *n {
++                if let Some(t) = env.target(i) {
++                    match hits.iter_mut().find(|h| h.0 == t) {
++                        Some(h) => h.1 += per,
++                        None => hits.push((t, per)),
++                    }
++                }
++            }
++            for (t, amount) in hits {
++                if let Target::Obj(r) = t {
++                    if !cx.s.is_live(r) {
++                        continue;
++                    }
++                }
++                cx.deal_damage(src, t, amount, false);
++            }
++            Flow::Next
++        }
+         Effect::Draw { who, n } => {
+             if let Some(p) = cx.eval_p(env, *who) {
+                 let n = cx.eval_expr(env, n);
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/scenario.rs engine/crates/mtg-core/src/scenario.rs
+--- base-engine/crates/mtg-core/src/scenario.rs	2026-10-06 21:47:01.000000000 +0000
++++ engine/crates/mtg-core/src/scenario.rs	2026-10-08 01:52:09.164940384 +0000
+@@ -133,8 +133,13 @@
+                             o.damage = b.damage;
+                             o.chosen = b.chosen;
+                             o.entered_turn = if b.summoning_sick { sc.turn } else { 0 };
++                            // A counter the permanent already entered with (a Class's level 1, a Saga's first lore
++                            // counter) is set to the scenario's value, not added twice.
+                             for &(k2, n) in &b.counters {
+-                                o.counters.push((k2, n));
++                                match o.counters.iter_mut().find(|c| c.0 == k2) {
++                                    Some(c) => c.1 = n,
++                                    None => o.counters.push((k2, n)),
++                                }
+                             }
+                             nr
+                         }
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/trigger.rs engine/crates/mtg-core/src/trigger.rs
+--- base-engine/crates/mtg-core/src/trigger.rs	2026-10-06 21:47:01.000000000 +0000
++++ engine/crates/mtg-core/src/trigger.rs	2026-10-08 01:52:53.199817119 +0000
+@@ -61,7 +61,7 @@
+                 }
+             }
+         }
+-        let relevant = matches!(e, Event::ZoneChange { .. } | Event::SpellCast { .. } | Event::Drew { .. } | Event::StepBegan { .. } | Event::LandPlayed { .. } | Event::BecameTarget { .. } | Event::CountersChanged { kind: CounterKind::Lore | CounterKind::Time, .. } | Event::Blocked { .. } | Event::Attacks { .. } | Event::AttackersDeclared { .. } | Event::Damage { combat: true, .. });
++        let relevant = matches!(e, Event::ZoneChange { .. } | Event::SpellCast { .. } | Event::Drew { .. } | Event::StepBegan { .. } | Event::LandPlayed { .. } | Event::BecameTarget { .. } | Event::CountersChanged { kind: CounterKind::Lore | CounterKind::Time | CounterKind::Level, .. } | Event::Blocked { .. } | Event::Attacks { .. } | Event::AttackersDeclared { .. } | Event::Damage { combat: true, .. });
+         if !relevant || self.db.trig_zones == 0 {
+             return;
+         }
+@@ -270,6 +270,12 @@
+                 if *delta <= 0 || now < *n as i32 || now - *delta >= *n as i32 {
+                     return None;
+                 }
++            }
++            (EventPat::ClassLevel(n), Event::CountersChanged { obj, kind: CounterKind::Level, delta }) => {
++                let now = if *obj == src { self.s.obj(src).counter(CounterKind::Level) as i32 } else { return None };
++                if *delta <= 0 || now < *n as i32 || now - *delta >= *n as i32 {
++                    return None;
++                }
+             }
+             (EventPat::LastCounterRemoved(k), Event::CountersChanged { obj, kind, delta }) => {
+                 if *obj != src || kind != k || *delta >= 0 || self.s.obj(src).counter(*k) != 0 {
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/types.rs engine/crates/mtg-core/src/types.rs
+--- base-engine/crates/mtg-core/src/types.rs	2026-10-06 21:47:01.000000000 +0000
++++ engine/crates/mtg-core/src/types.rs	2026-10-08 01:29:54.690271939 +0000
+@@ -187,6 +187,8 @@
+     Other(u8),
+     /// A lore counter (Sagas, CR 714). Appended last so no existing discriminant moves.
+     Lore,
++    /// A level counter (Classes, CR 716). Appended last so no existing discriminant moves.
++    Level,
+ }
+ 
+ /// The closed table of subtypes in the pool. Index = bit position in `SubtypeSet`. The five basic
+@@ -202,6 +204,8 @@
+     "Karn", "Ugin", "Tezzeret", "Saga", "Tower", "Mine", "Power-Plant", "Spawn", "Scion", "Masticore", "Spacecraft", "Robot", "Cave", "Gate", "Lair", "Locus", "Sphere",
+     // RFC 0007 (Storm): after Tron's names ("Saga" is already above).
+     "Lesson", "Sorcerer",
++    // RFC 0009 (UR alternate): after Storm's names.
++    "Class", "Otter",
+ ];
+ 
+ /// Subtype set; bit `i` = `SUBTYPE_NAMES[i]`.
+diff -ruN '--exclude=target' base-engine/crates/mtg-spec/src/runner.rs engine/crates/mtg-spec/src/runner.rs
+--- base-engine/crates/mtg-spec/src/runner.rs	2026-10-06 21:47:01.000000000 +0000
++++ engine/crates/mtg-spec/src/runner.rs	2026-10-08 01:40:05.699799415 +0000
+@@ -238,6 +238,7 @@
+         // The One Ring's burden counters are `Other(0)` (RFC 0008).
+         "burden" => CounterKind::Other(0),
+         "lore" => CounterKind::Lore,
++        "level" => CounterKind::Level,
+         other => unsupported!("counter kind {other:?}"),
+     })
+ }
+@@ -1108,6 +1109,20 @@
+     /// Answers the sub-decisions of a cast/activation from the action's fields.
+     fn drive_cast(&mut self, seat: Seat, a: &J, stop_pick: bool) -> R<()> {
+         let mut targets: Vec<J> = a.get("targets").and_then(|x| x.as_array()).cloned().unwrap_or_default();
++        // `divide: {"@a": 3, "@b": 1}` (RFC 0009, Pyrokinesis): one target slot per point, in the engine's fixed
++        // (ascending) target order.
++        if let Some(d) = a.get("divide").and_then(|x| x.as_object()) {
++            let mut shares: Vec<(ObjRef, String, u64)> = Vec::new();
++            for (k, v) in d {
++                shares.push((self.obj_alias(k)?, k.clone(), v.as_u64().unwrap_or(0)));
++            }
++            shares.sort_by_key(|s| Target::Obj(s.0));
++            for (_, k, n) in shares {
++                for _ in 0..n {
++                    targets.push(J::String(k.clone()));
++                }
++            }
++        }
+         targets.reverse();
+         let mut modes: Vec<u64> = a.get("modes").and_then(|x| x.as_array()).map(|v| v.iter().filter_map(|x| x.as_u64()).collect()).unwrap_or_default();
+         modes.reverse();
+@@ -1165,7 +1180,7 @@
+                         if let Some(i) = p.options.iter().position(|o| *o == Opt::Done) {
+                             // An optional slot the script leaves empty.
+                             self.apply_opt(i)?;
+-                        } else if (p.options.len() == 1 && a.get("targets").is_none()) || self.lenient {
++                        } else if (p.options.len() == 1 && a.get("targets").is_none() && a.get("divide").is_none()) || self.lenient {
+                             self.apply_opt(0)?;
+                         } else {
+                             fail!("cast raised a target choice the action does not specify ({})", self.describe_opts(&p));

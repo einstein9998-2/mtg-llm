@@ -13,3 +13,29 @@ Built 2026-10-06 (thread "tough situations", Brady's ask). Agent-side only: buil
 How answers are used: (1) agreement rate between Brady and the bot on flagged positions is the first metric (held-out set); (2) once there are a few hundred labels they are mixed into policy training as extra targets (weight 1, or 0.5 for "either is fine", 0 for "can't tell"); (3) notes ticked "Make this a rule" are drafted into `llm-player/alurentell-playbook.md` for Brady's sign-off.
 
 Known limits: opponent is the net's Cutter (passive; it often sits on 7 cards), games run long; value estimates are noisy to a few points; the net was trained on the old Alurentell list (no Savannah/Orim's Chant yet).
+
+## Rules guard (`--rules`, 2026-10-07)
+`src/rules.rs` removes options the search may not pick, from Brady's batch 1 and 2 answers: no cantrip (Brainstorm, Ponder, Stock Up) in your own upkeep; in your own main phase with the stack empty and a land drop available, no passing and no committal spell (Show and Tell, Aluren, Atraxa, Acererak, Omniscience) before the land. Only the flagger bot uses it; the training and self-play bots do not.
+`rescore` re-runs the search on labeled positions with and without the guard (`rescore <decks> <net> batch1/labels.jsonl batch2/labels.jsonl`). It must be built against the engine the net was trained on (core-frozen-m5 initial import with the old Alurentell list), otherwise the replay and the net do not match.
+Result on 40 games vs UR Cutter with the m1 net (seed 51): guard off 27 wins, guard on 31 wins (noise about 7 games); the guard intervened about 5 times per game. On the 22 labeled positions agreement with Brady went from 8 to 9 (deep search) and stayed at 7 (quick search).
+
+## Several decks (batch 3, 2026-10-07)
+`build_multi_batch.py runs_dir out tag batch_no first_order` picks two positions per matchup run (`tough-spots --me A --opp B --out runs/A-vs-B`, pool8 net for both seats, old engine) and writes one batch with `matchup` and `me_deck` on each card; the answer page shows them. Batch 3 = 14 positions over Boros/BW Taxes, Dimir/UWx, Doomsday/Reanimator and UR Cutter (vs Alurentell), orders 27-40. The rules guard only applies when the bot plays Alurentell. `import_answers.py` now writes me/opp into the labels.
+
+## LLM player on the labeled positions (2026-10-07)
+`llm_prompts.py` writes a blinded prompt per labeled position (the card as Brady saw it, no bot numbers, no bot choice, no Brady note; Alurentell positions get the playbook as it was BEFORE his tough-spot review). One fresh Sonnet agent per position, one answer each (`llm-eval/out`, `results.tsv`). About 50k tokens per agent, 1.8M in all, most of it fixed agent overhead.
+Result on 36 labeled positions (batches 1 to 3): LLM agrees with Brady on 21 (58%); bot quick search 10 (28%), bot deep search 12 (33%). Alurentell only (23): LLM 14, bot 7. Other decks (13): LLM 7, bot 3.
+Where the LLM and the bot give the same answer (10), Brady agrees on 7. Where they differ (26), Brady sides with the LLM 14 times, with the bot 3 times, with neither 9.
+Caveat: the positions were flagged because the bot found them hard, so the bot's rate is biased low; 36 positions is a small sample.
+
+## Batch 4 (2026-10-07): Alurentell + X on the current engine
+26 positions, orders 41-66, ids s7-*: Alurentell vs UR Cutter, Boros, UWx, Dimir (UB), Reanimator, Doomsday (the Storm stand-in) and the mirror, and the same decks on the other side. Built on the CURRENT engine (176 defs, Orim's Chant, Brady's 75 of 2026-10-06) with the matching per-matchup nets (`*-m5chant-*net*.bin`), 20 games per matchup, the guard on for the Alurentell bot. Build: `CARGO_TARGET_DIR=... cargo build --release` in tough-spots against main's rust-engine; `build_multi_batch.py <runs> batch4 s7 4 41`. Storm and Tron have no engine on main and no net, so they are not in this batch. `rescore`/`replay` still assume the old engine and the Alurentell vs UR Cutter pair.
+
+## LLM-game positions (page orders 67 and up)
+
+Source: the overnight LLM-vs-LLM games (Alurentell vs UR Cutter and Boros, both sides, live engine, main deck only) from the "LLM player with net tool" thread. `seed_llm_games.py` turns that thread's `batch.json` and `batch-priority.json` into page cards: reviewer notes and game results are removed from the cards (hindsight would bias the answer) and kept in `llm-games/review-private.jsonl` with the replay seeds.
+
+- `llm-games/batch.json`: all 268 flagged positions, priority first (orders 67..113 are the 47 reviewer likely-mistake spots, 114..334 the player-unsure and reviewer-close ones).
+- Seeded on the page so far: orders 67..113 (the 47). The other 221 are staged in `batch.json`; to add them, write those cards to the `positions` collection.
+- Cards show "LLM game" instead of a batch number. After answering, the page shows which option the LLM played; there are no bot numbers.
+- To re-run: `seed_llm_games.py <src> <out> 67 --all`.

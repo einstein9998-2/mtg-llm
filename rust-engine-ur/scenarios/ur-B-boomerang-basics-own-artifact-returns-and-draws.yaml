@@ -1,0 +1,43 @@
+id: ur-b-boomerang-basics-own-artifact-returns-and-draws
+title: "Boomerang Basics on my own Cori-Steel Cutter (a nonland, noncreature permanent) returns it to my hand and draws a card"
+area: card
+cards: [Boomerang Basics, Island, Cori-Steel Cutter, Ocelot Pride, Ponder, Brainstorm]
+tags: [boomerang-basics, bounce, you-controlled, draw-a-card, artifact, nonland-permanent, sorcery]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Boomerang Basics, text: "Return target nonland permanent to its owner's hand.", verified: true}
+  - {kind: oracle, card: Boomerang Basics, text: "If you controlled that permanent, draw a card.", verified: true}
+  - {kind: cr, ref: "121.1", text: "A player draws a card by putting the top card of their library into their hand. This is done as a turn-based action during each player’s draw step. It may also be done as part of a cost or effect of a spell or ability.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Boomerang Basics @bb"]
+    battlefield: ["Island @isl", "Cori-Steel Cutter @cutter", "Ocelot Pride @pride"]
+    library: ["Ponder @pd", "Brainstorm @bs2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bb", targets: ["@cutter"], pay: auto}
+  - label: on-stack
+    check:
+      stack: [{kind: spell, card: "@bb", controller: p0, targets: ["@cutter"]}]
+      p0: {hand: []}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Cori-Steel Cutter, Ponder]
+      graveyard: [Boomerang Basics]
+      library_top: [Brainstorm]
+      library_count: 11
+      battlefield: [{card: Island, tapped: true}, {card: Ocelot Pride}]
+notes: >
+  The target may be any nonland permanent, creature or not. p0 controlled the Cutter when the spell resolved, so after
+  returning it to its owner's hand p0 draws a card (Ponder, the top card). The creature is untouched. A wrong engine
+  allows only creatures, or draws only for creatures, or draws before bouncing.

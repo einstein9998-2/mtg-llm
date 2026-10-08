@@ -1,0 +1,80 @@
+id: ur-a-level-3-storm-copy-is-not-cast-so-one-otter
+title: "At level 3 casting Flusterstorm with one storm copy creates one Otter: the copy is not cast"
+area: card
+cards: ["Stormchaser's Talent", Flusterstorm, Lightning Bolt, Island, Mountain, "Otter Token"]
+tags: [stormchasers-talent, class, level-3, cast-trigger, storm, copy-not-cast, order-triggers, ur-alternate]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Stormchaser's Talent", text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.", verified: true, note: "entry in oracle-additions-A.json"}
+  - {kind: oracle, card: Flusterstorm, text: "Counter target instant or sorcery spell unless its controller pays {1}.", verified: true}
+  - {kind: cr, ref: "707.10", text: "a copy of a spell isn’t cast and a copy of an activated ability isn’t activated.", verified: true}
+  - {kind: cr, ref: "702.40a", text: "“Storm” means “When you cast this spell, copy it for each other spell that was cast before it this turn.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Flusterstorm @flu"]
+    battlefield:
+      - {card: "Stormchaser's Talent", as: talent, counters: {level: 3}}
+      - "Island @is"
+    library_pad: 10
+  p1:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mountain @mt"]
+    library_pad: 10
+script:
+  - p1: {t: cast, card: "@bolt", targets: [{player: p0}], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@flu", targets: ["@bolt"], pay: auto}
+  - p0: {decision: order_triggers, answer: ["@flu", "@talent"]}
+  - label: storm-and-talent-triggers
+    check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@flu", controller: p0}
+        - {kind: triggered, source: "@flu", controller: p0}
+        - {kind: triggered, source: "@talent", controller: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: otter-made
+    check:
+      p0:
+        battlefield_contains: [{token: Otter Token, pt: [1, 1]}]
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: yes_no, purpose: change_targets, answer: false}
+  - label: copy-on-stack
+    check:
+      stack:
+        - {kind: spell, card: "@bolt", controller: p1}
+        - {kind: spell, card: "@flu", controller: p0}
+        - {kind: spell, card: Flusterstorm, copy: true, controller: p0, targets: ["@bolt"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Flusterstorm]
+      spells_cast_this_turn: 1
+      battlefield:
+        - {card: "Stormchaser's Talent", counters: {level: 3}}
+        - {card: Island, tapped: true}
+        - {token: Otter Token, pt: [1, 1]}
+    p1:
+      life: 20
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Mountain, tapped: true}]
+notes: >
+  Bolt was cast first (by p1), so storm makes one copy. p0 orders the storm trigger below the Talent trigger; whichever
+  order, there is exactly one Otter at the end (a copy of a spell is not cast, 707.10, so the copy does not trigger the
+  Talent). The Talent trigger resolves first (Otter), then storm creates the copy (p0 keeps the target: yes_no false,
+  the usual copy-retarget shape, adapter-owned). The copy resolves first: p1 has no untapped land (Mountain tapped for
+  Bolt), so there is no payment prompt (the no-prompt-when-unable convention) and Bolt is countered; the original
+  Flusterstorm then has an illegal target and does not resolve (608.2b), going to the graveyard. p0's spells_cast_this_turn
+  is 1 (the copy is not cast). A wrong engine counts the copy as a cast and makes a second Otter.

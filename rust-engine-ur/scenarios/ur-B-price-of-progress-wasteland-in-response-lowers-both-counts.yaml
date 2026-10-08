@@ -1,0 +1,52 @@
+id: ur-b-price-of-progress-wasteland-in-response-lowers-both-counts
+title: "In response to Price of Progress p1 Wastelands the caster's Volcanic Island: the caster takes 0, p1 (who sacrificed Wasteland) takes 2 for Tundra only"
+area: card
+cards: [Price of Progress, Mountain, Island, Volcanic Island, Wasteland, Tundra]
+tags: [price-of-progress, nonbasic-land, wasteland, sacrifice-cost, destroy-in-response, damage-to-each-player]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Price of Progress, text: "Price of Progress deals damage to each player equal to twice the number of nonbasic lands that player controls.", verified: true}
+  - {kind: oracle, card: Wasteland, text: "{T}, Sacrifice this land: Destroy target nonbasic land.", verified: true}
+  - {kind: cr, ref: "205.4c", text: "Any land with the supertype “basic” is a basic land. Any land that doesn’t have this supertype is a nonbasic land, even if it has a basic land type.", verified: true}
+  - {kind: cr, ref: "601.2h", text: "The player pays the total cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Price of Progress @pop"]
+    battlefield: ["Mountain @m", "Island @i", "Volcanic Island @volc"]
+    library_pad: 10
+  p1:
+    battlefield: ["Wasteland @w", "Tundra @tun", "Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pop", pay: {tap: ["@m", "@i"]}}
+  - p0: {t: pass}
+  - p1: {t: activate, source: "@w", ability: 1, targets: ["@volc"]}
+  - label: wasteland-on-stack
+    check:
+      stack: [{kind: spell, card: "@pop"}, {kind: activated, source: "@w"}]
+      p1: {graveyard: [Wasteland], battlefield: [{card: Tundra}, {card: Island}]}
+  - resolve_top: true
+  - label: volcanic-destroyed
+    check:
+      stack: [{kind: spell, card: "@pop"}]
+      p0: {graveyard: [Volcanic Island]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Volcanic Island, Price of Progress]
+    p1:
+      life: 18
+      battlefield: [{card: Tundra}, {card: Island}]
+      graveyard: [Wasteland]
+notes: >
+  Wasteland's sacrifice is a cost, so p1's own nonbasic count drops from two to one immediately, and its ability
+  destroys the caster's only nonbasic land before Price of Progress resolves. Counting happens on resolution: p0 has
+  0 nonbasic lands (Mountain and Island are basic) and takes nothing, p1 has 1 (Tundra) and takes 2. A wrong engine
+  fixes the counts when the spell is cast, or counts the Wasteland that has already been sacrificed.

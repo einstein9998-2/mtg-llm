@@ -1,0 +1,2 @@
+ANSWER: A
+WHY: The Vial trigger on the stack is the upkeep tick that takes it from 0 to 1 counter, and I have no MV 0 creature, so activating now does nothing. I should pass and let the counter resolve, then play a land and use Vial for a 1-drop later.
