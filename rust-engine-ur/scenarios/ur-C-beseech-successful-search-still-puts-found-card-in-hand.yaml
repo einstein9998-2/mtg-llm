@@ -1,0 +1,75 @@
+id: ur-c-beseech-successful-search-still-puts-found-card-in-hand
+title: "Control case: bargained Beseech the Mirror finds Tendrils of Agony, declines the free cast, and exactly that card goes to hand while the earlier Eldrazi Scion stays on the battlefield"
+area: card
+cards: [Beseech the Mirror, Warping Wail, Ancient Tomb, Lotus Petal, Tendrils of Agony, Island, Swamp, Eldrazi Scion Token]
+tags: [beseech-the-mirror, bargain, search-succeeds, only-the-found-card, put-into-hand, decline-free-cast, token, eldrazi-scion, warping-wail, control-case]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Beseech the Mirror, text: "Search your library for a card, exile it face down, then shuffle.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less.", verified: true}
+  - {kind: oracle, card: Beseech the Mirror, text: "Put the exiled card into your hand if it wasn't cast this way.", verified: true}
+  - {kind: oracle, card: Warping Wail, text: "Create a 1/1 colorless Eldrazi Scion creature token.", verified: true}
+  - {kind: cr, ref: "701.23d", text: "If a player is searching a hidden zone simply for a quantity of cards, such as “a card” or “three cards,” that player must find that many cards (or as many as possible, if the zone doesn’t contain enough cards).", verified: true}
+  - {kind: cr, ref: "701.24b", text: "In such cases, the found cards aren’t included in the shuffle, even though they remain in the library at that time. Rather, all the cards in that library except those are shuffled. Abilities that trigger when a library is shuffled will still trigger.", verified: true}
+  - {kind: cr, ref: "400.7j", text: "If an effect causes an object to move to a public zone, other parts of that effect can find that object. If the cost of a spell or ability causes an object to move to a public zone, that spell or ability’s effects can find that object.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Warping Wail @ww", "Beseech the Mirror @bes"]
+    battlefield: ["Ancient Tomb @tomb", "Swamp @s1", "Swamp @s2", "Swamp @s3", "Swamp @s4", "Lotus Petal @petal"]
+    library: ["Island @i1", "Tendrils of Agony @tend", "Island @i2"]
+  p1:
+    library_pad: 10
+random: any
+script:
+  - p0: {t: cast, card: "@ww", modes: [3], pay: {tap: ["@tomb"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - label: scion-made
+    check:
+      stack: []
+      p0:
+        life: 18
+        graveyard: [Warping Wail]
+        battlefield_contains: [{token: Eldrazi Scion Token, pt: [1, 1], types: [Creature]}]
+  - p0: {t: cast, card: "@bes", bargained: true, sacrifice: ["@petal"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: search, found: "@tend"}
+  - p0: {decision: yes_no, purpose: cast_exiled_card, answer: false}
+expect:
+  - at: after_script
+    game: {over: false}
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      hand: [Tendrils of Agony]
+      library_count: 2
+      exile: []
+      graveyard: [Warping Wail, Beseech the Mirror, Lotus Petal]
+      spells_cast_this_turn: 2
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {card: Swamp, tapped: true}
+        - {token: Eldrazi Scion Token, controller: p0, pt: [1, 1]}
+    p1:
+      life: 20
+      hand: []
+      exile: []
+      graveyard: []
+      battlefield: []
+notes: >
+  Control case for the two failed-search scenarios (same setup as ur-c-beseech-failed-search-leaves-earlier-token, but the
+  library holds Island, Tendrils of Agony, Island). An engine that fixes the bug by never putting anything into hand would
+  fail here. Beseech was bargained (Lotus Petal sacrificed), the search finds Tendrils of Agony (mana value 4, castable
+  free), p0 declines the free cast, so the exiled card goes to hand ("if it wasn't cast this way"). Exactly one card is in
+  hand: Tendrils (Beseech is on the stack/graveyard, Wail resolved). Nothing else follows: the Scion token stays on the
+  battlefield as a 1/1, the Petal stays in the graveyard, nothing is left in exile, Tendrils is not cast (spells cast this
+  turn: Wail and Beseech = 2). The found card is excluded from the shuffle (701.24b); the library keeps the two Islands (the
+  order after the shuffle is not asserted).

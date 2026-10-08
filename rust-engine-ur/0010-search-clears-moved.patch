@@ -1,0 +1,35 @@
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/libfx.rs engine/crates/mtg-core/src/libfx.rs
+--- base-engine/crates/mtg-core/src/libfx.rs	2026-10-06 21:47:01.278855000 +0000
++++ engine/crates/mtg-core/src/libfx.rs	2026-10-08 02:59:02.957812831 +0000
+@@ -382,13 +382,18 @@
+         order_stages(self, seat, aux, sc)
+     }
+ 
+-    pub(crate) fn fx_search(&mut self, env: &Env, who: PRef, filter: &ObjFilter, aux: &mut u16) -> Wait {
++    pub(crate) fn fx_search(&mut self, env: &Env, who: PRef, filter: &ObjFilter, dest: ZoneKind, aux: &mut u16) -> Wait {
+         let seat = match self.eval_p(env, who) {
+             Some(s) => s,
+             None => return false,
+         };
+         match *aux {
+             0 => {
++                if dest == ZoneKind::Exile {
++                    // The next instruction reads the found card through `Moved` (Beseech the Mirror). A search that
++                    // finds nothing must not leave an earlier effect's moved objects there for it to move instead.
++                    self.s.moved.clear();
++                }
+                 self.refresh();
+                 let cands: Vec<ObjRef> = self.s.players[seat.idx()].library.iter().rev().copied().filter(|&r| self.lib_card_matches(env, filter, r)).collect();
+                 for &r in &cands {
+diff -ruN '--exclude=target' base-engine/crates/mtg-core/src/resolve.rs engine/crates/mtg-core/src/resolve.rs
+--- base-engine/crates/mtg-core/src/resolve.rs	2026-10-08 02:11:03.243570000 +0000
++++ engine/crates/mtg-core/src/resolve.rs	2026-10-08 02:59:02.957259048 +0000
+@@ -1179,7 +1179,7 @@
+         Effect::PutBack(n) => wait(cx.fx_put_back(env, n, aux, sc)),
+         Effect::Reorder(n) => wait(cx.fx_reorder(env, n, aux, sc)),
+         Effect::LookTake { look, take } => wait(cx.fx_look_take(env, look, *take, aux, sc)),
+-        Effect::Search { who, filter, .. } | Effect::SearchNoShuffle { who, filter, .. } => wait(cx.fx_search(env, *who, filter, aux)),
++        Effect::Search { who, filter, dest, .. } | Effect::SearchNoShuffle { who, filter, dest, .. } => wait(cx.fx_search(env, *who, filter, *dest, aux)),
+         Effect::Shuffle(who) => {
+             if let Some(p) = cx.eval_p(env, *who) {
+                 cx.shuffle_library(p);

@@ -1,0 +1,47 @@
+{
+ "_meta": {
+  "group": "C",
+  "note": "Entries to merge into reference/oracle.json cards{} and tokens{}; text from Savecraft card_search (Scryfall oracle), retrieved 2026-10-08. Identical to the Storm A (Beseech the Mirror, Tendrils of Agony, Boomerang Basics) and Tron C (Warping Wail) entries, repeated so these scenarios validate stand-alone. The Eldrazi Scion token text is the Scryfall token text ('Sacrifice this creature: Add {C}.'); the Tron package spells it 'this token'."
+ },
+ "cards": {
+  "Beseech the Mirror": {
+   "name": "Beseech the Mirror",
+   "mana_cost": "{1}{B}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Bargain (You may sacrifice an artifact, enchantment, or token as you cast this spell.)\nSearch your library for a card, exile it face down, then shuffle. If this spell was bargained, you may cast the exiled card without paying its mana cost if that spell's mana value is 4 or less. Put the exiled card into your hand if it wasn't cast this way.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-08"
+  },
+  "Warping Wail": {
+   "name": "Warping Wail",
+   "mana_cost": "{1}{C}",
+   "type_line": "Instant",
+   "oracle_text": "({C} represents colorless mana.)\nChoose one —\n• Exile target creature with power or toughness 1 or less.\n• Counter target sorcery spell.\n• Create a 1/1 colorless Eldrazi Scion creature token. It has \"Sacrifice this token: Add {C}.\"",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-08"
+  },
+  "Boomerang Basics": {
+   "name": "Boomerang Basics",
+   "mana_cost": "{U}",
+   "type_line": "Sorcery — Lesson",
+   "oracle_text": "Return target nonland permanent to its owner's hand. If you controlled that permanent, draw a card.",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-08"
+  },
+  "Tendrils of Agony": {
+   "name": "Tendrils of Agony",
+   "mana_cost": "{2}{B}{B}",
+   "type_line": "Sorcery",
+   "oracle_text": "Target player loses 2 life and you gain 2 life.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)",
+   "source": "scryfall oracle via Savecraft card_search, retrieved 2026-10-08"
+  }
+ },
+ "tokens": {
+  "Eldrazi Scion Token": {
+   "name": "Eldrazi Scion Token",
+   "type_line": "Token Creature — Eldrazi Scion",
+   "colors": [],
+   "pt": "1/1",
+   "text": "Sacrifice this creature: Add {C}.",
+   "created_by": "Warping Wail (mode 3)",
+   "source": "Savecraft card_search token 'Eldrazi Scion' (1/1, colorless) and the Warping Wail Oracle text, 2026-10-08"
+  }
+ }
+}
