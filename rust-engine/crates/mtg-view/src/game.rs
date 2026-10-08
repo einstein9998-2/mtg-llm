@@ -177,6 +177,19 @@ impl Game {
         &self.db
     }
 
+    /// Names the permanents `seat` wants to pay with (601.2h), by that seat's own view ids: the
+    /// automatic payment prefers them over everything else and falls back to the rest if they
+    /// cannot pay. Ids that are not permanents on the battlefield are ignored; an empty list
+    /// clears the preference. Lasts until the caller clears it.
+    pub fn set_pay_hint(&mut self, seat: Seat, vids: &[ViewId]) {
+        let refs: Vec<ObjRef> = if vids.is_empty() {
+            Vec::new()
+        } else {
+            self.state.battlefield().iter().copied().filter(|&r| vids.contains(&self.state.view_id(r, seat))).collect()
+        };
+        self.state.scenario_pay_hint(refs);
+    }
+
     #[cfg(feature = "diff-harness")]
     pub fn raw_state(&self) -> &State {
         &self.state
