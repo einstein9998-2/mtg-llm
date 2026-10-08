@@ -102,3 +102,14 @@ Source and numbers: tough-spots/batch1 (bot agreed with Brady on 3 of 9 answered
 - Mulligan: Two surveil lands toward Acererak or Atraxa or more cantrips, with live Force, is a keep (close). Stock Up on turn 1 that likely finds a permanent mana source is a keep (close). One land with Ponder is a mulligan unless you know the opponent is Storm or Reanimator (then keep). No permanent coloured source or no cantrips with one land is a mulligan.
 
 Source: tough-spots/batch2 (bot agreed with Brady on 4 of 14 answered positions; 2 more declined as moot).
+
+## Rules from Brady's review of the LLM-vs-LLM games (2026-10-08)
+
+- Omniscience or Aluren in play: Acererak is free, so cast every Acererak you hold. The LLM passed with Omniscience out and Acererak in hand and Brady said "we should probably win the game with Acererak" (positions 70 and 71).
+- Pick Acererak when you hold Omniscience and need the second piece (Stock Up pick with Omniscience x2 and Atraxa in hand: "helps us win"). When Atraxa is already on the battlefield, take Acererak over a second Atraxa (legend rule): "we're trying to win with Aluren next turn".
+- Do not complete Tomb of Annihilation unless the opponent has a lock piece (see the first section). Brady's notes on two LLM positions were "this is the wrong dungeon" and "why do we have the Atropal": the LLM had chosen rooms that completed Tomb. Pick Lost Mine rooms.
+- Lotus Petal: cast it in main 2 when the mana will be used next turn ("why not, lets us use the mana next turn").
+- Boros and UR Cutter (the attacking side): attack first, then cast spells in second main ("attack first, then cast spells second main"; same for Brainstorm).
+- With Veil of Summer, know what you cast after it. Brady asked "what are we casting after Veil or is this just a bait" when the LLM cast Veil with nothing to follow.
+
+Source: tough-spots/llm-games (Brady agreed with the LLM on 2 of 14 answered positions; these were the reviewer's likely-mistake spots; 2 more declined as moot because of the dungeon mistake).
