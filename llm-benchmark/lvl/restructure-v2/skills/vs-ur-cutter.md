@@ -18,7 +18,7 @@ Each of our rules is a default. Read its "Breaks when:" before applying it; if t
 - Daze and what pays for it: protecting-the-combo.md PR1, PR2. Their tapped-out window: PR3. Spare mana or Veil: PR5, PR7. Do not tap out for Aluren into Daze: PR4.
 - Wasteland: mana-and-life.md ML6 to ML11.
 - Free Force of Will against an artifact feeds their delirium: protecting-the-combo.md PR12. Their turn-1 fetch puts a land in their graveyard toward delirium too (URo10).
-- Veil first, before your land drop and Petal, against Daze: protecting-the-combo.md PR17.
+- Veil before Show and Tell against Daze; the land drop before or after Veil is a judgment call: protecting-the-combo.md PR17 and the note after it.
 - Under Omniscience, bait with the redundant spell; they answered Goblin tokens with Unholy Heat: show-and-tell.md ST10.
 - Orim's Chant against blue decks is a turn-of-the-combo tool: protecting-the-combo.md PR14.
 - A Show and Tell put-in land can open up their Pyroblast: show-and-tell.md ST17.

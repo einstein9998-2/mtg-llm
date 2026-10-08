@@ -57,6 +57,6 @@ Judgment, not a rule (Brady: "Depends", 2026-10-08, conflict 12): once Wasteland
 
 - Paying for Daze (only an untapped land or a Petal already on the battlefield): protecting-the-combo.md PR1.
 - Which land to take from Atraxa (Tropical Island or Forest): show-and-tell.md ST15.
-- Which land to fetch for Prismatic Ending (white: Tundra or Savannah only): vs-ur-cutter.md UR3. Veil before the land drop and the Petal against Daze: protecting-the-combo.md PR17.
+- Which land to fetch for Prismatic Ending (white: Tundra or Savannah only): vs-ur-cutter.md UR3. Veil before Show and Tell against Daze, and the land drop before or after Veil (a judgment call): protecting-the-combo.md PR17 and the note after it.
 - Spider-Woman makes Petals enter tapped: vs-boros.md BO3.
 - City of Traitors over a basic against Reanimator: mirror-and-other-matchups.md MM4.

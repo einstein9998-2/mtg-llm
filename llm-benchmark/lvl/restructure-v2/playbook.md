@@ -2,7 +2,7 @@
 
 Read this every game. It holds the deck's plan and the principles every decision comes from. For the details of a situation, read the skill file the index at the end names. Every rule in a skill file is tagged with the principle it applies (P1 to P15): it is that principle worked out for one situation.
 
-Sources: rules marked "Brady" are his (tips 2026-10-06, tough-spot reviews 2026-10-06 and 2026-10-07, LvL sign-off 2026-10-07, rulings on the second-night synthesis 2026-10-08, comments on match m01 2026-10-08). Game ids are evidence: a = games against the Forge AI, t = the with-tools batch, g = LLM against LLM, m = a best-of-three match (m01: against UR Cutter). Candidate rules Brady has not ruled on are in PENDING.md, not in the skills.
+Sources: rules marked "Brady" are his (tips 2026-10-06, tough-spot reviews 2026-10-06 and 2026-10-07, LvL sign-off 2026-10-07, rulings on the second-night synthesis 2026-10-08, comments on match m01 and answers to its open questions 2026-10-08). Game ids are evidence: a = games against the Forge AI, t = the with-tools batch, g = LLM against LLM, m = a best-of-three match (m01: against UR Cutter). Candidate rules Brady has not ruled on are in PENDING.md, not in the skills.
 
 ## How to use this
 
@@ -23,11 +23,11 @@ Cantrips (Brainstorm, Ponder, Stock Up, Mishra's Bauble, Hedge Maze) dig for the
 1. **Have a route to a payoff.** Keep hands and make plays that lead to a resolved Show and Tell or Aluren with something to put in or loop.
    Why: Brady counts all four combo cards as payoffs, and you need to assemble the right two. Hands that need two more cards (a creature plus an enabler) lose to Force of Will, Daze and Wasteland.
 2. **See as many new cards as possible; shuffle only when the cards you already know are worse than a random card.**
-   Why: cantrips are how the deck finds its pieces. Brady: sometimes you Brainstorm and you like all of the cards, so you do not need to shuffle. The other side (Brady, m01): "Brainstorm gets better if we can shuffle away 2 cards with a fetch", so cast Ponder first and do not Brainstorm on turn 1 without a shuffle.
+   Why: cantrips are how the deck finds its pieces. Brady: sometimes you Brainstorm and you like all of the cards, so you do not need to shuffle. The other side (Brady, m01): "Brainstorm gets better if we can shuffle away 2 cards with a fetch", so do not Brainstorm on turn 1 without a shuffle. With two lands: Brainstorm off the land in play, then play and crack the fetch, then Ponder; with one land you have no fetch until next turn, so Ponder first.
 3. **Keep what is unique to the combo or pays for Force of Will; give up duplicates and dead cards; take everything that is free.**
    Why: a second Atraxa or a spare land is replaceable, your only Aluren or Acererak and your last pitch card are not. This covers put-backs, Stock Up and Atraxa picks, discards and bottoms.
 4. **Play a land every turn: dig before the land drop, commit after it.**
-   Why (Brady): a skipped land drop makes every later decision in the turn wrong; cantrips may find the land, and a land played first gives away information. Veil of Summer against Daze is the exception: it goes before the land (P8).
+   Why (Brady): a skipped land drop makes every later decision in the turn wrong; cantrips may find the land, and a land played first gives away information. Veil of Summer against Daze may go before or after the land: Brady calls them similar (P8).
 5. **Wait as long as waiting is free; act as soon as waiting costs something.**
    Why (Brady): waiting gets you the draw, their plays and a land drop, but this is not dawdling: a window against Daze or Force, unused mana or a turn are real costs.
 6. **Count mana and life before you plan; life is mana.**
@@ -35,7 +35,7 @@ Cantrips (Brainstorm, Ponder, Stock Up, Mishra's Bauble, Hedge Maze) dig for the
 7. **Keep your mana safe from Wasteland: basics and fetches first, nonbasics later, a second green source.**
    Why: opponents hold several Wastelands and fire them in a burst; losing the only green dual once made Aluren uncastable for the rest of the game.
 8. **Beat free counters with spare mana or Veil of Summer, and check whether they can pay for them.**
-   Why: spare mana beats Daze and Veil beats Force of Will; Daze is live only while they control an Island-typed land. Brady (m01): "veil, then play fetch petal show": Veil first plays around Daze and hides how much mana you have.
+   Why: spare mana beats Daze and Veil beats Force of Will; Daze is live only while they control an Island-typed land. Brady (m01): "veil, then play fetch petal show": Veil first plays around Daze and hides how much mana you have. Playing the land before Veil plays around extra copies of Daze instead; which is better is unclear (Brady).
 9. **A resolved Show and Tell wins: jam it with protection, dig when you have no payoff or protection.**
    Why (Brady): a protected Show and Tell will not get better by waiting, and a raw one into Force of Will hands them a surveil and delirium.
 10. **With Aluren or Omniscience and Acererak, loop now on Lost Mine; go through Tomb of Annihilation only to beat a lock piece.**

@@ -2,7 +2,7 @@
 
 Version 1: /home/claude/work/llm2/restructure/. Version 2: this folder. Authority: /home/claude/work/llm2/BRADY-RULINGS2.md (Brady, 2026-10-08). "Conflict n" is SYNTHESIS2 section 2 item n; "rule n" is SYNTHESIS2 section 1 rule n; "P4 comment" etc. are Brady's lines under "Reactions to the candidate rules".
 
-Counts: 123 rules in the skill files (92 from version 1, 31 new), every one with a "Breaks when:" line; 44 name a specific exception, 79 say "no known exception". The opponent pilot notes (URo1 to URo9, BOo1 to BOo9) are the opponent's copy and were left unchanged, without "Breaks when:". (These counts are before match m01; the "Match m01 comments" section at the end updates them, and changes URo4 and adds URo10.)
+Counts: 123 rules in the skill files (92 from version 1, 31 new), every one with a "Breaks when:" line; 44 name a specific exception, 79 say "no known exception". The opponent pilot notes (URo1 to URo9, BOo1 to BOo9) are the opponent's copy and were left unchanged, without "Breaks when:". (These counts are before match m01; the "Match m01 comments" section updates them, and changes URo4 and adds URo10; the "Brady's answers to the m01 open questions" section at the end updates them again.)
 
 ## 1. Changes rule by rule
 
@@ -184,16 +184,43 @@ Counts after m01: 127 rules in the skill files (4 new: CS16, CS17, PR17, UR3); 4
 | PR17 (Veil before the land drop) and TS2, P4 (land before a committal spell) | Reconciled: PR17 is TS2's Breaks-when and the exception in P4's Why. |
 | PR17 and ML2 (Veil only if the combo is still castable) | Agree in m01 game 1 turn 3: Island plus Tropical Island plus Petal is Show and Tell after a Veil off Hedge Maze. If Veil is Dazed and you pay, the combo may not be castable that turn; ST4 already says "If it is Dazed, pay 1 and draw". |
 | URo4 (UR Brainstorm before the land) and URo5 (UR Brainstorm at your end step once you can reach 4 mana) | Agree: URo5 is about not tapping out on your own turn from 4 mana on; URo4 is the main-phase order. Not changed. |
-| CS1, CS4 and CS17; ST2, ST4 and PR17 | Conflict: open questions 1 and 2 below. |
+| CS1, CS4 and CS17; ST2, ST4 and PR17 | Conflict: open questions 1 and 2 below (both answered by Brady, 2026-10-08 03:14Z; see the last section). |
 
 ### Open questions for Brady (not guessed)
 
-1. Same-turn order of Ponder, Brainstorm and a fetch. CS1 quotes Brady (2026-10-07): "Brainstorm, then fetch, then Ponder", and CS4 (Brady LvL "with a fetch in hand, weave it in so Ponder sees fresh cards"; a43 "Cast Brainstorm before Ponder so Ponder's shuffle clears the put-backs") says Brainstorm first. In m01 Brady said "we should ponder before brainstorm. Brainstorm gets better if we can shuffle away 2 cards with a fetch." The m01 spot had one mana and no fetch left, so CS17 is written for the one-cantrip turn only. When all three fit in one turn, is it Ponder, Brainstorm, crack (m01) or Brainstorm, crack, Ponder (CS1)?
-2. Veil before or after the land drop. ST2 (tough spots batch 1: "play the land, cast Veil of Summer first") and ST4 (batch 2: "land (Ancient Tomb), Veil of Summer, then Show and Tell") play the land before Veil. In m01 Brady said "veil, then play fetch petal show", with Veil paid by a land already in play (Hedge Maze). Is Veil before the land the default whenever the lands in play can pay for it, with ST2 and ST4 being spots where the new land was needed for Veil's mana? PR17 is written for the m01 case: Veil off the lands already in play.
-3. CS16 says "no known exception". Brady's "especially without a shuffle" suggests a turn-1 Brainstorm is unnecessary even with a shuffle (for example a Petal-paid Brainstorm with an uncracked fetch). Should CS16 drop "when no shuffle is available"?
+1. Answered (Brady, 2026-10-08 03:14Z): "brainstorm fetch ponder is when you have 2 lands: one land already for the brainstorm, then play fetch and fetch and cast ponder. With just one land you don't have the fetch until next turn, so ponder." Applied in CS1, CS4 and CS17 (last section). The question was: same-turn order of Ponder, Brainstorm and a fetch. CS1 quotes Brady (2026-10-07): "Brainstorm, then fetch, then Ponder", and CS4 (Brady LvL "with a fetch in hand, weave it in so Ponder sees fresh cards"; a43 "Cast Brainstorm before Ponder so Ponder's shuffle clears the put-backs") says Brainstorm first. In m01 Brady said "we should ponder before brainstorm. Brainstorm gets better if we can shuffle away 2 cards with a fetch." The m01 spot had one mana and no fetch left, so CS17 is written for the one-cantrip turn only. When all three fit in one turn, is it Ponder, Brainstorm, crack (m01) or Brainstorm, crack, Ponder (CS1)?
+2. Answered (Brady, 2026-10-08 03:14Z): "they're similar, land first plays around extra copies of daze, but holding the land obscures information. Unclear which is better" Applied as a judgment note, not a rule, after PR17 (last section). The question was: Veil before or after the land drop. ST2 (tough spots batch 1: "play the land, cast Veil of Summer first") and ST4 (batch 2: "land (Ancient Tomb), Veil of Summer, then Show and Tell") play the land before Veil. In m01 Brady said "veil, then play fetch petal show", with Veil paid by a land already in play (Hedge Maze). Is Veil before the land the default whenever the lands in play can pay for it, with ST2 and ST4 being spots where the new land was needed for Veil's mana? PR17 is written for the m01 case: Veil off the lands already in play.
+3. Still open. CS16 says "no known exception". Brady's "especially without a shuffle" suggests a turn-1 Brainstorm is unnecessary even with a shuffle (for example a Petal-paid Brainstorm with an uncracked fetch). Should CS16 drop "when no shuffle is available"?
 
 ### Not changed
 
 - PENDING.md rule 4 ("with no shuffle coming, Brainstorm put-backs are your next draws...") is close to CS16 and CS17 but goes further (what to put back); left in PENDING.md, since this task edits only playbook.md, skills/*.md and CHANGES.md.
 - The UR Cutter pilot's own strategy files (outside this folder, for example the LvL copies of vs-ur-cutter.md) still have the old URo4 and no URo10.
 - MAPPING.md and MAPPING-v2.md were not updated for the new rule ids.
+
+## Brady's answers to the m01 open questions (2026-10-08 03:14Z)
+
+Source: Brady's answers (2026-10-08 03:14Z) to m01 open questions 1 and 2, verbatim:
+1. "brainstorm fetch ponder is when you have 2 lands: one land already for the brainstorm, then play fetch and fetch and cast ponder. With just one land you don't have the fetch until next turn, so ponder."
+2. "they're similar, land first plays around extra copies of daze, but holding the land obscures information. Unclear which is better"
+
+Open question 3 (CS16 wording "without a shuffle") is still open.
+
+| Rule or place | What changed | Brady line that caused it |
+|---|---|---|
+| CS1 | "Brainstorm, then fetch, then Ponder" is now the two-land line: one land in play pays for Brainstorm, then play the fetch, crack it and cast Ponder after the shuffle; Brady's answer quoted. Breaks-when adds: with only one land, no fetch until next turn, so Ponder first (CS17) | Answer 1 |
+| Paragraph after CS1 | "Open question since m01" replaced: two lands, Brainstorm, fetch, Ponder (CS1, CS4); one land, Ponder first (CS17) | Answer 1 |
+| CS4 | Rule spells out the two-land order (Brainstorm off the land in play, then fetch, then Ponder). Breaks-when: "Brady's m01 order is Ponder first" replaced by: only one land, cast Ponder first (CS17) | Answer 1 |
+| CS17 | Now "With one land, Ponder before Brainstorm"; Brady's "With just one land you don't have the fetch until next turn, so ponder." added. Breaks-when was "no known exception from Brady" plus the open note; now: two lands, then Brainstorm, fetch, Ponder (CS1, CS4) | Answer 1 |
+| playbook.md P2 Why | "cast Ponder first" now split: two lands, Brainstorm, fetch, Ponder; one land, Ponder first | Answer 1 |
+| protecting-the-combo.md judgment note (new, after the PR9 paragraph) | Land drop before or after Veil, when Veil goes before Show and Tell: similar; land first plays around extra copies of Daze, holding the land obscures information; unclear which is better. Weigh it each time | Answer 2 |
+| PR9 | "first" now says "before Show and Tell"; the 95%+ is about Veil before Show and Tell; pointer to the judgment note for the land drop. Breaks-when unchanged | Answer 2 |
+| PR17 | No longer the single right order: Veil before Show and Tell (not after it resolves); Brady's m01 line (Veil, fetch, Petal, Show and Tell) is "one good order", land first (ST2, ST4) is about as good. Breaks-when unchanged | Answer 2 |
+| PR9 summary paragraph | Open-question pointer replaced by the judgment note; ST2 added beside ST4 | Answer 2 |
+| ST2 | "cast Veil of Summer first" now "before Show and Tell"; Breaks-when adds a pointer to the judgment note | Answer 2 |
+| ST4 | Rule no longer fixes the land first: Veil, then Show and Tell, with the land (Ancient Tomb) before Veil (batch 2) or after it (m01, PR17). Breaks-when: open-question sentence replaced by Brady's answer; still "no known exception" | Answer 2 |
+| TS2 Breaks-when | "Veil goes first, before the land drop" now "can go before the land drop"; land first is about as good; pointer to the judgment note | Answer 2 |
+| mana-and-life.md "Elsewhere", vs-ur-cutter.md "Rules that matter most" | Pointers to PR17 reworded: Veil before Show and Tell; land before or after Veil is a judgment call | Answer 2 |
+| playbook.md P4 and P8 Why; sources line | P4: Veil may go before or after the land (was "the exception: it goes before the land"); P8: land first plays around extra copies of Daze, unclear which is better; sources name the answers. 71 lines, unchanged count | Answers 1 and 2 |
+
+Counts after the answers: 127 rules in the skill files, no new rule ids; 48 name a specific exception (CS17 changed from "no known exception"), 79 say "no known exception". Judgment notes: three (conflict 12 in mana-and-life.md; conflict 14 and the Veil-and-land note in protecting-the-combo.md). MAPPING.md and MAPPING-v2.md were not updated.
