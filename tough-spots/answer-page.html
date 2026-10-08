@@ -20,6 +20,10 @@
   --good: #1b7a45;
   --good-soft: #dcf2e4;
   --opp: #8a2f3b;
+  --crit: #b3261e;
+  --crit-soft: #fbdcd9;
+  --felt: #e7ebf1;
+  --c-w: #efe6bd; --c-u: #3f7fd0; --c-b: #5d4a6b; --c-r: #d4533a; --c-g: #3d9a5b; --c-c: #aab2c0;
   --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -28,13 +32,15 @@
   :root:not([data-theme="light"]) {
     --bg: #0f131b; --surface: #171c27; --surface-2: #1d2331; --fg: #e8ecf3; --muted: #98a3b7; --line: #2a3243;
     --accent: #7ea1ff; --accent-fg: #0b1020; --accent-soft: #1f2c52; --bot: #f0b95a; --bot-soft: #382a10;
-    --good: #62d28f; --good-soft: #14301f; --opp: #f08a97; color-scheme: dark;
+    --good: #62d28f; --good-soft: #14301f; --opp: #f08a97; --crit: #ff8a80; --crit-soft: #3d1a18; --felt: #121722;
+    --c-w: #cfc690; --c-u: #5b94dc; --c-b: #8d77a0; --c-r: #e0674f; --c-g: #55b073; --c-c: #7b8497; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0f131b; --surface: #171c27; --surface-2: #1d2331; --fg: #e8ecf3; --muted: #98a3b7; --line: #2a3243;
   --accent: #7ea1ff; --accent-fg: #0b1020; --accent-soft: #1f2c52; --bot: #f0b95a; --bot-soft: #382a10;
-  --good: #62d28f; --good-soft: #14301f; --opp: #f08a97; color-scheme: dark;
+  --good: #62d28f; --good-soft: #14301f; --opp: #f08a97; --crit: #ff8a80; --crit-soft: #3d1a18; --felt: #121722;
+  --c-w: #cfc690; --c-u: #5b94dc; --c-b: #8d77a0; --c-r: #e0674f; --c-g: #55b073; --c-c: #7b8497; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 20px 64px; }
@@ -60,24 +66,81 @@ header { display: flex; flex-direction: column; gap: 10px; }
 .card-head .num { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
 .card-head .when { font-weight: 500; }
 .card-head .meta { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-.life { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px 0; font-family: var(--font-mono); font-size: 13px; }
-.life .you b { color: var(--accent); }
-.land { padding: 0 8px; border-radius: 3px; background: var(--surface-2); }
-.land.open { background: var(--good-soft); color: var(--good); }
-.land.done { color: var(--muted); }
-.life .opp b { color: var(--opp); }
-.board { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; padding: 12px 16px; }
-.board > div { min-width: 0; }
-@media (max-width: 640px) { .board { grid-template-columns: 1fr; } }
-.zone { margin-bottom: 10px; }
-.zone .lab { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
-.chips { display: flex; flex-wrap: wrap; gap: 4px; }
-.chip { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; font-size: 13px; line-height: 1.4; }
-.chip small { color: var(--muted); font-size: 11px; }
-.chip.tapped { opacity: .6; }
-.chip.known { background: var(--bot-soft); border-color: transparent; }
-.chip.hand { background: var(--accent-soft); border-color: transparent; font-weight: 500; }
-.gy { font-size: 12.5px; color: var(--muted); }
+/* Board: opponent above, you below, the stack in the middle. Each permanent is a small card tile with a color stripe
+   (from the mana cost), its type, cost pips and power/toughness. Tapped cards are dimmed and marked, not rotated, so names stay readable. */
+.side { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; padding: 10px 16px; }
+.side.opp { border-bottom: 1px solid var(--line); }
+.side.me { border-top: 1px solid var(--line); }
+.who { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.lifebox { display: flex; flex-direction: column; gap: 3px; min-width: 96px; }
+.lifebox b { font-family: var(--font-display); font-size: 28px; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; }
+.side.me .lifebox b { color: var(--accent); }
+.side.opp .lifebox b { color: var(--opp); }
+.lifebox b.low { color: var(--crit); }
+.lifebar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.lifebar i { display: block; height: 100%; background: var(--accent); }
+.side.opp .lifebar i { background: var(--opp); }
+.lifebox b.low + .lifebar i { background: var(--crit); }
+.stat { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+.stat b { color: var(--fg); font-weight: 500; }
+.backs { display: inline-flex; gap: 3px; align-items: center; }
+.back { width: 16px; height: 22px; border-radius: 2px; border: 1px solid var(--line); background: repeating-linear-gradient(45deg, var(--surface-2) 0 3px, var(--line) 3px 4px); }
+.landnote { padding: 0 8px; border-radius: 3px; background: var(--surface-2); }
+.landnote.open { background: var(--good-soft); color: var(--good); }
+.landnote.done { color: var(--muted); }
+.pool { display: inline-flex; gap: 3px; align-items: center; }
+.steps { display: flex; gap: 2px; padding: 0 16px 10px; }
+.step { flex: 1 1 0; min-width: 0; text-align: center; font-family: var(--font-mono); font-size: 10.5px; padding: 3px 0; border-radius: 3px; background: var(--surface-2); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: clip; }
+.step.on { background: var(--accent); color: var(--accent-fg); font-weight: 500; }
+.step.on.theirs { background: var(--opp); color: var(--bg); }
+.field { background: var(--felt); display: flex; flex-direction: column; }
+.half { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; }
+.row { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.lab { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); display: flex; gap: 10px; align-items: baseline; }
+.lab em { font-style: normal; text-transform: none; letter-spacing: 0; color: var(--fg); }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px; }
+.none { font-size: 12.5px; color: var(--muted); align-self: center; }
+.tile { position: relative; width: 128px; height: 110px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 9px 7px 5px 7px; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.tile .stripe { position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--stripe, var(--c-c)); }
+.tile .top { display: flex; justify-content: space-between; align-items: center; gap: 4px; min-height: 14px; }
+.tile .ty { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0; color: var(--muted); }
+.tile .nm { font-size: 12.5px; font-weight: 600; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.tile .kw { font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .bot { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; }
+.tile .st { display: flex; flex-wrap: wrap; gap: 3px; min-width: 0; }
+.tile .bd { font-family: var(--font-mono); font-size: 9.5px; padding: 0 4px; border-radius: 3px; background: var(--surface-2); color: var(--muted); }
+.tile .bd.hurt { background: var(--crit-soft); color: var(--crit); }
+.tile .bd.up { background: var(--good-soft); color: var(--good); }
+.tile .pt { font-family: var(--font-display); font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; background: var(--surface-2); }
+.tile.land { width: 86px; height: 56px; padding: 8px 6px 4px; gap: 1px; }
+.tile.land .nm { font-size: 11px; font-weight: 500; line-height: 1.15; overflow-wrap: normal; }
+.tile.land .top { min-height: 11px; }
+.tile.hand { width: 128px; height: 84px; border-color: var(--accent); background: var(--accent-soft); }
+.tile.mini { width: auto; height: auto; padding: 3px 7px 3px 10px; flex-direction: row; align-items: center; border-radius: 4px; }
+.tile.mini .stripe { inset: 0 auto 0 0; width: 4px; height: auto; }
+.tile.mini .nm { font-size: 12px; font-weight: 500; display: block; }
+.tile.known { height: 84px; background: var(--bot-soft); border-color: transparent; }
+.tile .idx { font-family: var(--font-mono); font-size: 10px; color: var(--bot); }
+.tile.tapped { opacity: .55; filter: saturate(.4); }
+.tile.tapped:not(.land)::after { content: "tapped"; position: absolute; right: 4px; top: 6px; font-family: var(--font-mono); font-size: 9px; color: var(--muted); background: var(--surface); padding: 0 3px; }
+.tile.sick .nm::after { content: " zz"; font-weight: 400; color: var(--muted); font-size: 10.5px; }
+.pip { display: inline-grid; place-items: center; width: 12px; height: 12px; border-radius: 50%; font-family: var(--font-mono); font-size: 8px; font-weight: 600; line-height: 1; color: #151b26; background: var(--c-c); }
+.pip.W { background: var(--c-w); } .pip.U { background: var(--c-u); color: #fff; } .pip.B { background: var(--c-b); color: #fff; } .pip.R { background: var(--c-r); color: #fff; } .pip.G { background: var(--c-g); color: #fff; }
+.pips { display: inline-flex; gap: 1px; }
+.mid { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 8px 16px; background: var(--bot-soft); border-block: 1px solid var(--line); }
+.mid > b { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--bot); }
+.mid .tile.mini { background: var(--surface); }
+.mid .sep { color: var(--muted); }
+.mid .sub { font-size: 11px; color: var(--muted); margin-left: 6px; }
+.divider { height: 1px; background: var(--line); }
+.piles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; padding: 10px 16px 12px; }
+.piles > div { min-width: 0; }
+@media (max-width: 640px) { .piles { grid-template-columns: 1fr; } }
+.piles details summary { cursor: pointer; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 2px 0; }
+.piles .tiles { gap: 4px; padding-top: 4px; }
+.piles details + details { margin-top: 8px; }
+.pill { font-family: var(--font-mono); font-size: 11px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+/* free-text note on a position, shown above the options */
 .stack { background: var(--bot-soft); border-radius: 6px; padding: 8px 12px; margin: 0 16px; font-size: 13.5px; }
 .stack b { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--bot); margin-right: 8px; }
 details.log { margin: 10px 16px 0; font-size: 13px; color: var(--muted); }
@@ -146,19 +209,156 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function letter(i) { return String.fromCharCode(65 + i); }
 
-  function chip(text, cls) {
-    text = text.replace(/PlusOnex(\d+)/, '+1/+1 counters ×$1').replace(/MinusOnex(\d+)/, '-1/-1 counters ×$1');
-    var m = text.match(/^(.*?)((?: \(tapped\)| \(summoning sick\)| \[[^\]]*\]| <[^>]*>| \d+\/\d+| [A-Za-z]+x\d+| dmg \d+)*)$/);
-    var name = m ? m[1] : text, rest = m ? m[2].trim() : '';
-    var tapped = /\(tapped\)/.test(text);
-    return '<span class="chip ' + (cls || '') + (tapped ? ' tapped' : '') + '">' + esc(name) + (rest ? ' <small>' + esc(rest.replace(/\(tapped\)/, 'tapped')) + '</small>' : '') + '</span>';
+  // name -> {t: type, c: mana cost}, printed by `cardinfo` from the engine's card database
+  var CARDS = /*CARDINFO*/{"Abrade":{"c":"{1}{R}","t":"instant"},"Acererak the Archlich":{"c":"{2}{B}","t":"creature"},"Aether Vial":{"c":"{1}","t":"artifact"},"Ajani, Nacatl Pariah":{"c":"{1}{W}","t":"creature"},"Aluren":{"c":"{2}{G}{G}","t":"enchantment"},"Amped Raptor":{"c":"{1}{R}","t":"creature"},"Ancient Tomb":{"c":"","t":"land"},"Animate Dead":{"c":"{1}{B}","t":"enchantment"},"Archon of Cruelty":{"c":"{6}{B}{B}","t":"creature"},"Arid Mesa":{"c":"","t":"land"},"Atraxa, Grand Unifier":{"c":"{3}{W}{U}{B}{G}","t":"creature"},"Badlands":{"c":"","t":"land"},"Barrowgoyf":{"c":"{2}{B}","t":"creature"},"Bilbo, Thief in the Night":{"c":"{1}{U}","t":"creature"},"Bitter Triumph":{"c":"{1}{B}","t":"instant"},"Bloodstained Mire":{"c":"","t":"land"},"Boggart Trawler":{"c":"{2}{B}","t":"creature"},"Boseiju, Who Endures":{"c":"","t":"land"},"Brainstorm":{"c":"{U}","t":"instant"},"Brazen Borrower":{"c":"{1}{U}{U}","t":"creature"},"Cabal Therapy":{"c":"{B}","t":"sorcery"},"Carpet of Flowers":{"c":"{G}","t":"enchantment"},"Cavern of Souls":{"c":"","t":"land"},"City of Traitors":{"c":"","t":"land"},"Cloak and Dagger, Entwined":{"c":"{1}{W}{B}","t":"creature"},"Collective Brutality":{"c":"{1}{B}","t":"sorcery"},"Consider":{"c":"{U}","t":"instant"},"Consign to Memory":{"c":"{U}","t":"instant"},"Containment Priest":{"c":"{1}{W}","t":"creature"},"Cori-Steel Cutter":{"c":"{1}{R}","t":"artifact"},"Dark Ritual":{"c":"{B}","t":"instant"},"Daze":{"c":"{1}{U}","t":"instant"},"Deafening Silence":{"c":"{W}","t":"enchantment"},"Defense Grid":{"c":"{2}","t":"artifact"},"Dismember":{"c":"{1}{B/P}{B/P}","t":"instant"},"Disruptor Flute":{"c":"{2}","t":"artifact"},"Doomsday":{"c":"{B}{B}{B}","t":"sorcery"},"Dragon's Rage Channeler":{"c":"{R}","t":"creature"},"Dungeon of the Mad Mage":{"c":"","t":"other"},"Duress":{"c":"{B}","t":"sorcery"},"Edge of Autumn":{"c":"{1}{G}","t":"sorcery"},"Elegant Parlor":{"c":"","t":"land"},"Erode":{"c":"{W}","t":"instant"},"Faerie Macabre":{"c":"{1}{B}{B}","t":"creature"},"Faithless Looting":{"c":"{R}","t":"sorcery"},"Fatal Push":{"c":"{B}","t":"instant"},"Flickerwisp":{"c":"{1}{W}{W}","t":"creature"},"Flooded Strand":{"c":"","t":"land"},"Flow State":{"c":"{1}{U}","t":"sorcery"},"Flusterstorm":{"c":"{U}","t":"instant"},"Force of Negation":{"c":"{1}{U}{U}","t":"instant"},"Force of Will":{"c":"{3}{U}{U}","t":"instant"},"Forest":{"c":"","t":"land"},"Gaddock Teeg":{"c":"{W}{G}","t":"creature"},"Goblin Bombardment":{"c":"{1}{R}","t":"enchantment"},"Grafdigger's Cage":{"c":"{1}","t":"artifact"},"Griselbrand":{"c":"{4}{B}{B}{B}{B}","t":"creature"},"Guide of Souls":{"c":"{W}","t":"creature"},"Hedge Maze":{"c":"","t":"land"},"Hide on the Ceiling":{"c":"{X}{U}","t":"instant"},"Hydroblast":{"c":"{U}","t":"instant"},"Island":{"c":"","t":"land"},"Jace, Wielder of Mysteries":{"c":"{1}{U}{U}{U}","t":"planeswalker"},"Kaito, Bane of Nightmares":{"c":"{2}{U}{B}","t":"planeswalker"},"Karakas":{"c":"","t":"land"},"Koma, World-Eater":{"c":"{3}{U}{U}{G}{G}","t":"creature"},"Lavinia, Azorius Renegade":{"c":"{W}{U}","t":"creature"},"Lazotep Quarry":{"c":"","t":"land"},"Lightning Bolt":{"c":"{R}","t":"instant"},"Lion's Eye Diamond":{"c":"","t":"artifact"},"Loran of the Third Path":{"c":"{2}{W}","t":"creature"},"Lost Mine of Phandelver":{"c":"","t":"other"},"Lotus Petal":{"c":"","t":"artifact"},"Magus of the Moon":{"c":"{2}{R}","t":"creature"},"Marsh Flats":{"c":"","t":"land"},"Massacre":{"c":"{2}{B}{B}","t":"sorcery"},"Meltdown":{"c":"{X}{R}","t":"sorcery"},"Meticulous Archive":{"c":"","t":"land"},"Mishra's Bauble":{"c":"","t":"artifact"},"Misty Rainforest":{"c":"","t":"land"},"Moonshadow":{"c":"{B}","t":"creature"},"Mountain":{"c":"","t":"land"},"Murktide Regent":{"c":"{5}{U}{U}","t":"creature"},"Nethergoyf":{"c":"{B}","t":"creature"},"Nihil Spellbomb":{"c":"{1}","t":"artifact"},"Null Rod":{"c":"{2}","t":"artifact"},"Ocelot Pride":{"c":"{W}","t":"creature"},"Omniscience":{"c":"{7}{U}{U}{U}","t":"enchantment"},"Orcish Bowmasters":{"c":"{1}{B}","t":"creature"},"Orim's Chant":{"c":"{W}","t":"instant"},"Overlord of the Balemurk":{"c":"{3}{B}{B}","t":"creature"},"Path to Exile":{"c":"{W}","t":"instant"},"Personal Tutor":{"c":"{U}","t":"sorcery"},"Phelia, Exuberant Shepherd":{"c":"{1}{W}","t":"creature"},"Phlage, Titan of Fire's Fury":{"c":"{1}{W}{R}","t":"creature"},"Plains":{"c":"","t":"land"},"Plateau":{"c":"","t":"land"},"Polluted Delta":{"c":"","t":"land"},"Ponder":{"c":"{U}","t":"sorcery"},"Preordain":{"c":"{U}","t":"sorcery"},"Prismari Charm":{"c":"{U}{R}","t":"instant"},"Prismatic Ending":{"c":"{X}{W}","t":"sorcery"},"Prismatic Vista":{"c":"","t":"land"},"Pyroblast":{"c":"{R}","t":"instant"},"Pyroclasm":{"c":"{1}{R}","t":"sorcery"},"Quantum Riddler":{"c":"{3}{U}{U}","t":"creature"},"Raph & Mikey, Troublemakers":{"c":"{5}{R/G}{R/G}","t":"creature"},"Raucous Theater":{"c":"","t":"land"},"Reanimate":{"c":"{B}","t":"sorcery"},"Recruiter of the Guard":{"c":"{2}{W}","t":"creature"},"Samwise the Stouthearted":{"c":"{1}{W}","t":"creature"},"Sand Scout":{"c":"{1}{W}","t":"creature"},"Savannah":{"c":"","t":"land"},"Scalding Tarn":{"c":"","t":"land"},"Scrubland":{"c":"","t":"land"},"Shadowy Backstreet":{"c":"","t":"land"},"Shallow Grave":{"c":"{1}{B}","t":"instant"},"Show and Tell":{"c":"{2}{U}","t":"sorcery"},"Skyclave Apparition":{"c":"{1}{W}{W}","t":"creature"},"Snow-Covered Island":{"c":"","t":"land"},"Snow-Covered Plains":{"c":"","t":"land"},"Snow-Covered Swamp":{"c":"","t":"land"},"Snuff Out":{"c":"{3}{B}","t":"instant"},"Solitude":{"c":"{3}{W}{W}","t":"creature"},"Spider-Woman, Stunning Savior":{"c":"{1}{W/U}","t":"creature"},"Stifle":{"c":"{U}","t":"instant"},"Stock Up":{"c":"{2}{U}","t":"sorcery"},"Street Wraith":{"c":"{3}{B}{B}","t":"creature"},"Stronghold Gambit":{"c":"{1}{R}","t":"sorcery"},"Surgical Extraction":{"c":"{B/P}","t":"instant"},"Swamp":{"c":"","t":"land"},"Swords to Plowshares":{"c":"{W}","t":"instant"},"Tamiyo, Inquisitive Student":{"c":"{U}","t":"creature"},"Thassa's Oracle":{"c":"{U}{U}","t":"creature"},"Thoughtseize":{"c":"{B}","t":"sorcery"},"Thundering Falls":{"c":"","t":"land"},"Tomb of Annihilation":{"c":"","t":"other"},"Triumph of Saint Katherine":{"c":"{4}{W}","t":"creature"},"Tropical Island":{"c":"","t":"land"},"Tundra":{"c":"","t":"land"},"Undercity Sewers":{"c":"","t":"land"},"Underground Sea":{"c":"","t":"land"},"Unholy Heat":{"c":"{R}","t":"instant"},"Unmask":{"c":"{3}{B}","t":"sorcery"},"Veil of Summer":{"c":"{G}","t":"instant"},"Verdant Catacombs":{"c":"","t":"land"},"Voice of Victory":{"c":"{1}{W}","t":"creature"},"Volcanic Island":{"c":"","t":"land"},"Wasteland":{"c":"","t":"land"},"White Orchid Phantom":{"c":"{W}{W}","t":"creature"},"Windswept Heath":{"c":"","t":"land"},"Witch Enchanter":{"c":"{3}{W}","t":"creature"},"Wrath of the Skies":{"c":"{X}{W}{W}","t":"sorcery"}}/*END*/;
+  var LAND_COLORS = { 'Plains': 'W', 'Island': 'U', 'Swamp': 'B', 'Mountain': 'R', 'Forest': 'G', 'Tundra': 'WU', 'Underground Sea': 'UB', 'Badlands': 'BR', 'Taiga': 'RG',
+    'Savannah': 'GW', 'Scrubland': 'WB', 'Volcanic Island': 'UR', 'Bayou': 'BG', 'Plateau': 'RW', 'Tropical Island': 'UG', 'Hedge Maze': 'UG', 'Flooded Strand': 'WU',
+    'Polluted Delta': 'UB', 'Misty Rainforest': 'UG', 'Scalding Tarn': 'UR', 'Wooded Foothills': 'RG', 'Bloodstained Mire': 'BR', 'Windswept Heath': 'GW', 'Marsh Flats': 'WB',
+    'Arid Mesa': 'RW', 'Verdant Catacombs': 'BG' };
+  var STEPS = [['Untap', 'Untap'], ['Upkeep', 'Upkeep'], ['Draw', 'Draw'], ['Main 1', 'Main 1'], ['Combat', 'Combat'], ['Main 2', 'Main 2'], ['End', 'End']];
+  function stepIndex(step) {
+    if (/combat|attackers|blockers|damage/i.test(step)) return 4;
+    if (/^Main 1/.test(step)) return 3;
+    if (/^Main 2/.test(step)) return 5;
+    if (/^(End|Cleanup)/.test(step)) return 6;
+    for (var i = 0; i < 3; i++) if (step === STEPS[i][0]) return i;
+    return -1;
   }
-  function zone(label, items, cls) {
-    return '<div class="zone"><div class="lab">' + esc(label) + '</div><div class="chips">' +
-      (items && items.length ? items.map(function (t) { return chip(t, cls); }).join('') : '<span class="gy">none</span>') + '</div></div>';
+
+  function parseItem(src) {
+    var s = String(src), n = 1, m = s.match(/^(\d+)x (.*)$/);
+    if (m) { n = +m[1]; s = m[2]; }
+    var cut = s.search(/ (?:\d+\/\d+|\[|\(|<|PlusOnex|MinusOnex|dmg \d|[A-Za-z]+x\d+)/);
+    var name = cut < 0 ? s : s.slice(0, cut), rest = cut < 0 ? '' : s.slice(cut);
+    var it = { n: n, name: name, tapped: /\(tapped\)/.test(rest), sick: /\(summoning sick\)/.test(rest), raw: src, rest: rest.trim() };
+    var pt = rest.match(/(-?\d+)\/(-?\d+)/); if (pt) it.pt = pt[0];
+    var ty = rest.match(/\[([^\]]*)\]/); if (ty) it.tag = ty[1];
+    var kw = rest.match(/<([^>]*)>/); if (kw) it.kw = kw[1];
+    var dm = rest.match(/dmg (\d+)/); if (dm) it.dmg = dm[1];
+    var pl = rest.match(/PlusOnex(\d+)/); if (pl) it.plus = pl[1];
+    var mi = rest.match(/MinusOnex(\d+)/); if (mi) it.minus = mi[1];
+    it.counters = [];
+    (rest.replace(/<[^>]*>/g, '').match(/\b[A-Za-z]+x\d+\b/g) || []).forEach(function (c) { if (!/^(PlusOne|MinusOne)x/.test(c)) it.counters.push(c.replace(/x(\d+)/, ' ×$1')); });
+    it.notes = [];
+    (rest.match(/\(([^)]*)\)/g) || []).forEach(function (c) { var t = c.slice(1, -1); if (t !== 'tapped' && t !== 'summoning sick') it.notes.push(t); });
+    var info = CARDS[name];
+    it.cost = info ? info.c : '';
+    it.type = info ? info.t : (it.tag || (LAND_COLORS[name] ? 'land' : ''));
+    return it;
   }
-  function gy(label, items) {
-    return '<div class="zone"><div class="lab">' + esc(label) + '</div><div class="gy">' + (items && items.length ? esc(items.join(', ')) : 'empty') + '</div></div>';
+  function colorsOf(it) {
+    if (it.type === 'land') return LAND_COLORS[it.name] || '';
+    var seen = '';
+    (it.cost.match(/[WUBRG]/g) || []).forEach(function (c) { if (seen.indexOf(c) < 0) seen += c; });
+    return seen;
+  }
+  function stripeCss(cols) {
+    if (!cols) return 'var(--c-c)';
+    var v = { W: 'var(--c-w)', U: 'var(--c-u)', B: 'var(--c-b)', R: 'var(--c-r)', G: 'var(--c-g)' };
+    if (cols.length === 1) return v[cols];
+    var step = 100 / cols.length;
+    return 'linear-gradient(90deg,' + cols.split('').map(function (c, i) { return v[c] + ' ' + (i * step) + '% ' + ((i + 1) * step) + '%'; }).join(',') + ')';
+  }
+  function pips(cost) {
+    var out = (cost.match(/\{[^}]+\}/g) || []).map(function (t) {
+      var x = t.slice(1, -1), c = /^[WUBRG]$/.test(x) ? x : (/^[WUBRG]\/P$/.test(x) ? x[0] : '');
+      return '<span class="pip ' + c + '">' + esc(c ? x.replace('/P', 'φ') : x) + '</span>';
+    }).join('');
+    return out ? '<span class="pips" title="' + esc(cost) + '">' + out + '</span>' : '';
+  }
+  // One card tile. kind: 'perm', 'land', 'hand', 'mini' (name only, for graveyards and the stack), 'known' (known library card).
+  function tile(it, kind, extra) {
+    var isLand = it.type === 'land';
+    var cls = ['tile', kind === 'perm' && isLand ? 'land' : kind, it.tapped ? 'tapped' : '', it.sick ? 'sick' : ''].join(' ');
+    var title = it.name + (it.cost ? ' ' + it.cost : '') + (it.type ? ' (' + it.type + ')' : '') + (it.kw ? ' — ' + it.kw : '') + (it.rest && !it.kw ? ' ' + it.rest : '');
+    var stripe = '<i class="stripe" style="--stripe:' + stripeCss(colorsOf(it)) + '"></i>';
+    if (kind === 'mini') return '<span class="' + cls + '" title="' + esc(title) + '">' + stripe + '<span class="nm">' + esc(it.name) + (it.n > 1 ? ' ×' + it.n : '') + '</span></span>';
+    if (kind === 'perm' && isLand) return '<div class="' + cls + '" title="' + esc(title) + '">' + stripe + '<div class="top"><span class="ty">' + (it.tapped ? 'tapped' : '') + '</span></div><div class="nm">' + esc(it.name) + '</div></div>';
+    var bd = [];
+    if (it.plus) bd.push('<span class="bd up">+1/+1 ×' + esc(it.plus) + '</span>');
+    if (it.minus) bd.push('<span class="bd hurt">−1/−1 ×' + esc(it.minus) + '</span>');
+    it.counters.forEach(function (c) { bd.push('<span class="bd up">' + esc(c) + '</span>'); });
+    if (it.dmg) bd.push('<span class="bd hurt">dmg ' + esc(it.dmg) + '</span>');
+    it.notes.forEach(function (c) { bd.push('<span class="bd">' + esc(c) + '</span>'); });
+    return '<div class="' + cls + '" title="' + esc(title) + '">' + stripe +
+      '<div class="top"><span class="ty">' + esc(extra && extra.idx ? '' : (it.type || '')) + (extra && extra.idx ? '<span class="idx">#' + extra.idx + '</span>' : '') + '</span>' + pips(it.cost) + '</div>' +
+      '<div class="nm">' + esc(it.name) + '</div>' +
+      (it.kw ? '<div class="kw">' + esc(it.kw.replace(/ \| /g, ', ')) + '</div>' : '') +
+      '<div class="bot"><span class="st">' + bd.join('') + '</span>' + (it.pt ? '<span class="pt">' + esc(it.pt) + '</span>' : '') + '</div></div>';
+  }
+  // Expands "3x Island" into three tiles (up to 6, then one tile with a count in its name).
+  function expand(items, kind, extra) {
+    var out = [];
+    (items || []).forEach(function (src) {
+      var it = parseItem(src);
+      var k = it.n > 6 ? 1 : it.n;
+      if (it.n > 6) it.name += ' ×' + it.n;
+      for (var i = 0; i < k; i++) out.push({ it: it, kind: kind });
+    });
+    return out;
+  }
+  function tiles(list, emptyText) {
+    return '<div class="tiles">' + (list.length ? list.map(function (x) { return tile(x.it, x.kind, x.extra); }).join('') : '<span class="none">' + esc(emptyText || 'none') + '</span>') + '</div>';
+  }
+  function battlefield(items) {
+    var all = expand(items, 'perm');
+    var lands = all.filter(function (x) { return x.it.type === 'land'; });
+    var other = all.filter(function (x) { return x.it.type !== 'land'; });
+    return { lands: lands, other: other, free: lands.filter(function (x) { return !x.it.tapped; }).length };
+  }
+  function pile(label, items) {
+    var list = (items || []).map(parseItem);
+    var count = list.reduce(function (n, x) { return n + x.n; }, 0);
+    return '<details' + (count && count <= 12 ? ' open' : '') + '><summary>' + esc(label) + ' (' + count + ')</summary><div class="tiles">' +
+      (list.length ? list.map(function (it) { return tile(it, 'mini'); }).join('') : '<span class="none">empty</span>') + '</div></details>';
+  }
+  function stackBand(stack) {
+    if (!stack || !stack.length) return '';
+    return '<div class="mid"><b>On the stack</b>' + stack.map(function (t) {
+      var it = parseItem(t), sub = it.rest.replace(/^\(ability\)\s*/, 'ability ').replace(/controlled by you/, '· yours').replace(/controlled by opponent/, '· opponent\'s');
+      return '<span class="tile mini"><i class="stripe" style="--stripe:' + stripeCss(colorsOf(it)) + '"></i><span class="nm">' + esc(it.name) + '</span>' + (sub ? '<span class="sub">' + esc(sub) + '</span>' : '') + '</span>';
+    }).join('<span class="sep">→</span>') + '</div>';
+  }
+  function lifeBox(life, opp) {
+    var pct = Math.max(0, Math.min(20, life)) / 20 * 100;
+    return '<div class="lifebox"><span class="who">' + (opp ? 'Opponent' : 'You') + '</span><b class="' + (life <= 5 ? 'low' : '') + '">' + life + '</b><span class="lifebar"><i style="width:' + pct + '%"></i></span></div>';
+  }
+  function stepsBar(v) {
+    var cur = stepIndex(v.step);
+    return '<div class="steps" aria-label="Step: ' + esc(v.step) + '">' + STEPS.map(function (s, i) {
+      return '<span class="step' + (i === cur ? ' on' + (v.whose === 'your' ? '' : ' theirs') : '') + '">' + s[1] + '</span>';
+    }).join('') + '</div>';
+  }
+  function poolPips(pool) {
+    var letters = ['W', 'U', 'B', 'R', 'G', 'C'], out = '';
+    (pool || []).forEach(function (n, i) { for (var k = 0; k < n; k++) out += '<span class="pip ' + (letters[i] === 'C' ? '' : letters[i]) + '">' + letters[i] + '</span>'; });
+    return out ? '<span class="stat">floating <span class="pool">' + out + '</span></span>' : '';
+  }
+  function board(p, v) {
+    if (p.category === 'keep') {
+      return '<div class="half"><div class="row"><div class="lab">Your opening hand <em>' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards</em></div>' + tiles(expand(v.hand, 'hand'), 'empty') + '</div></div>';
+    }
+    var opp = battlefield(v.opp_bf), me = battlefield(v.my_bf);
+    var known = (v.opp_known_hand || []);
+    var backs = Math.max(0, v.opp_hand - known.length), backHtml = '';
+    for (var i = 0; i < Math.min(backs, 12); i++) backHtml += '<span class="back"></span>';
+    var designs = [v.opp_desig && ['Opponent', v.opp_desig], v.my_desig && ['You', v.my_desig]].filter(Boolean).map(function (d) { return '<span class="pill">' + esc(d[0] + ': ' + d[1].replace(/^dungeon /, '')) + '</span>'; }).join('');
+    var oppSide = '<div class="side opp">' + lifeBox(v.opp_life, true) +
+      '<span class="stat">hand <span class="backs">' + backHtml + '</span><b>' + v.opp_hand + '</b></span>' +
+      '<span class="stat">library <b>' + v.opp_lib + '</b></span>' + designs + '</div>';
+    var oppKnown = known.length ? '<div class="row"><div class="lab">Opponent hand, known to you</div>' + tiles(expand(known, 'known')) + '</div>' : '';
+    var field = '<div class="field"><div class="half">' + oppKnown +
+      '<div class="row"><div class="lab">Opponent permanents</div>' + tiles(opp.other, 'no permanents') + '</div>' +
+      '<div class="row"><div class="lab">Opponent lands <em>' + opp.free + ' untapped</em></div>' + tiles(opp.lands, 'no lands') + '</div></div>' +
+      stackBand(v.stack) +
+      '<div class="half"><div class="row"><div class="lab">Your lands <em>' + me.free + ' untapped</em></div>' + tiles(me.lands, 'no lands') + '</div>' +
+      '<div class="row"><div class="lab">Your permanents</div>' + tiles(me.other, 'no permanents') + '</div></div></div>';
+    var mySide = '<div class="side me">' + lifeBox(v.my_life, false) + '<span class="stat">library <b>' + v.my_lib + '</b></span>' + landNote(p, v) + poolPips(v.pool) + '</div>';
+    var hand = '<div class="half"><div class="row"><div class="lab">Your hand <em>' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards</em></div>' + tiles(expand(v.hand, 'hand'), 'empty') + '</div>' +
+      (v.lib_top && v.lib_top.length ? '<div class="row"><div class="lab">Known top of your library <em>top first</em></div><div class="tiles">' + v.lib_top.map(function (t, i) { return tile(parseItem(t), 'known', { idx: i + 1 }); }).join('') + '</div></div>' : '') +
+      (v.lib_bottom && v.lib_bottom.length ? '<div class="row"><div class="lab">Known bottom of your library</div>' + tiles(expand(v.lib_bottom, 'known')) + '</div>' : '') + '</div>';
+    var piles = '<div class="piles"><div>' + pile('Your graveyard', v.my_gy) + (v.my_exile && v.my_exile.length ? pile('Your exile', v.my_exile) : '') + '</div><div>' + pile('Opponent graveyard', v.opp_gy) + (v.opp_exile && v.opp_exile.length ? pile('Opponent exile', v.opp_exile) : '') + '</div></div>';
+    return oppSide + field + mySide + hand + piles;
   }
 
   function render() {
@@ -217,9 +417,7 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
   function cardHtml(p, idx, forKey) {
     var v = p.view, a = answers[p.id] || {};
     var answered = a.pick != null;
-    var lifeLine = '<div class="life"><span class="you">You <b>' + v.my_life + '</b> life · library ' + v.my_lib + '</span>' + landNote(p, v) + '<span class="opp">Opponent <b>' + v.opp_life + '</b> life · ' + v.opp_hand + ' cards in hand · library ' + v.opp_lib + '</span></div>';
     var extra = p.extra_info ? '<div class="stack"><b>Note</b>' + esc(p.extra_info) + '</div>' : '';
-    var stack = v.stack && v.stack.length ? '<div class="stack"><b>On the stack</b>' + esc(v.stack.join(' → ')) + '</div>' : '';
     var log = '';
     if (p.game_log && p.game_log.length > 3) {
       log = '<details class="log"><summary>What happened this game (' + p.game_log.length + ' events)</summary><ol>' +
@@ -254,12 +452,8 @@ footer { color: var(--muted); font-size: 13px; max-width: 65ch; }
     function flag(k, t) { return '<button class="flag" data-flag="' + esc(p.id) + ':' + k + '" aria-pressed="' + (!!f[k]) + '">' + t + '</button>'; }
     return '<article class="card" id="card-' + esc(p.id) + '">' +
       '<div class="card-head"><span class="num">Position ' + (idx + 1) + '</span><span class="when">' + (p.category === 'keep' ? 'Opening hand, ' + esc(v.whose) + ' (' + (v.hand || []).reduce(function (n, t) { return n + (parseInt(t, 10) || 1); }, 0) + ' cards)' : (v.whose === 'your' ? 'Your' : 'Opponent\'s') + ' turn ' + Math.ceil((+v.turn) / 2) + ', ' + esc(v.step) + (p.on_play === true ? ' (you are on the play)' : p.on_play === false ? ' (you are on the draw)' : '')) + '</span><span class="meta">batch ' + esc(p.batch || 1) + ' · ' + (p.matchup ? esc(p.matchup) + ' (you play ' + esc(p.me_deck) + ') · ' : '') + esc(p.category) + '</span></div>' +
-      lifeLine +
-      '<div class="board"><div>' +
-        zone('Your hand', v.hand, 'hand') + (v.lib_top && v.lib_top.length ? zone('Known top of your library (top first)', v.lib_top, 'known') : '') + (v.lib_bottom && v.lib_bottom.length ? zone('Known bottom of your library', v.lib_bottom, 'known') : '') + zone('Your battlefield', v.my_bf) + gy('Your graveyard', v.my_gy) +
-      '</div><div>' +
-        zone('Opponent battlefield', v.opp_bf) + gy('Opponent graveyard', v.opp_gy) + (v.opp_exile && v.opp_exile.length ? gy('Opponent exile', v.opp_exile) : '') +
-      '</div></div>' + extra + stack + log +
+      (p.category === 'keep' ? '' : stepsBar(v)) + board(p, v) +
+      extra + log +
       '<div class="q">' + esc(p.question) + '</div><div class="opts">' + opts + '</div>' + reveal +
       '<div class="extras"><div class="flags">' + flag('either', 'Either is fine') + flag('cant_tell', "Can't tell from this view") + flag('rule', 'Make this a rule') + '</div>' +
       '<textarea id="note-' + esc(p.id) + '" data-note="' + esc(p.id) + '" placeholder="Why? (optional, one line is plenty)">' + (forKey ? '' : esc(a.note || '')) + '</textarea>' +
