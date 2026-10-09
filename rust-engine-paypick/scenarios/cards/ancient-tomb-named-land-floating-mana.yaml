@@ -1,0 +1,26 @@
+id: ancient-tomb-autopay-uses-floating-mana
+title: "Naming one land to pay with still spends floating mana on the generic part, instead of tapping Ancient Tomb (and its 2 damage)"
+area: card
+cards: [Show and Tell, Tropical Island, Ancient Tomb, Island, Carpet of Flowers]
+tags: [ancient-tomb, payment]
+derived_from: oracle
+setup:
+  turn: 4
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Show and Tell @st"]
+    battlefield: ["Tropical Island @ti", "Ancient Tomb @tomb", {card: Ancient Tomb, tapped: true}, {card: Island, tapped: true}, "Carpet of Flowers"]
+    mana_pool: {G: 2}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@st", pay: {tap: ["@ti"]}}
+expect:
+  - at: after_script
+    p0:
+      life: 20
+      battlefield: [{card: Tropical Island, tapped: true}, {card: Ancient Tomb, tapped: false}, {card: Ancient Tomb, tapped: true}, {card: Island, tapped: true}, {card: Carpet of Flowers}]
+notes: >
+  {2}{U}: Tropical Island pays {U}; the two floating {G} pay the generic. Ancient Tomb must stay untapped and deal no damage.
