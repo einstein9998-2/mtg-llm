@@ -1,0 +1,47 @@
+id: tron2-a-bahamut-costs-exactly-nine-mana-with-trinisphere-out-eight-lands-are-not-enough
+title: "With Trinisphere on the battlefield Summon: Bahamut still costs {9}: eight Islands cannot cast it, a ninth land (played from hand) can"
+area: card
+cards: ["Summon: Bahamut", Island, Trinisphere, "Phelia, Exuberant Shepherd"]
+tags: [summon-bahamut, saga, saga-creature, trinisphere, cost-increase, mana-payment, mask-validity, land-drop]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Trinisphere, text: "each spell that would cost less than three mana to cast costs three mana to cast", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The player determines the total cost of the spell. Usually this is just the mana cost. Some spells have additional or alternative costs. Some effects may increase or reduce the cost to pay, or may provide other alternative costs. Costs may include paying mana, tapping permanents, sacrificing permanents, discarding cards, and so on. The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions. If multiple cost reductions apply, the player may apply them in any order. If the mana component of the total cost is reduced to nothing by cost reduction effects, it is considered to be {0}. It can’t be reduced to less than {0}. Once the total cost is determined, any effects that directly affect the total cost are applied. Then the resulting total cost becomes “locked in.” If effects would change the total cost after this time, they have no effect.", verified: true}
+  - {kind: cr, ref: "202.3", text: ". The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Summon: Bahamut @bah", "Island @i9"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6", "Island @i7", "Island @i8", "Trinisphere @tri"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@bah", pay: auto}}
+  - p0: {t: play_land, card: "@i9"}
+  - p0: {t: cast, card: "@bah", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@ph"}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      lands_played: 1
+      battlefield_contains:
+        - {card: "Summon: Bahamut", counters: {lore: 1}}
+        - {card: Trinisphere, tapped: false}
+        - {card: Island, tapped: true}
+    p1:
+      graveyard: ["Phelia, Exuberant Shepherd"]
+      battlefield: []
+notes: >
+  Trinisphere raises only spells that would cost LESS than three; a {9} spell is unchanged. Eight Islands cannot pay nine, the
+  ninth land makes the cast legal, and all nine Islands are used (Trinisphere is an artifact with no mana ability and is not
+  tapped). A wrong engine adds a tax to every spell or lets the cast through with eight lands.

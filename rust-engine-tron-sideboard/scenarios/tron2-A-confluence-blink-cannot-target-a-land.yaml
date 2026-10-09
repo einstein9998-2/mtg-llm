@@ -1,0 +1,41 @@
+id: tron2-a-confluence-blink-mode-cannot-target-a-land-but-can-target-a-nonland-artifact
+title: "Eldrazi Confluence's exile-and-return mode says nonland permanent: no land (Island, Ancient Tomb, Urza's Saga) can be targeted, a Voltaic Key can"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, "Urza's Saga", Voltaic Key, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, blink, targeting, nonland, land, mask-validity, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Island @pi", {card: "Urza's Saga", as: saga, counters: {lore: 1}}, "Voltaic Key @key"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@conf", modes: [9], targets: ["@i1"], pay: {tap: ["@tomb", "@i1", "@i2"]}}}
+  - expect_illegal: {p0: {t: cast, card: "@conf", modes: [9], targets: ["@tomb"], pay: {tap: ["@tomb", "@i1", "@i2"]}}}
+  - expect_illegal: {p0: {t: cast, card: "@conf", modes: [9], targets: ["@pi"], pay: {tap: ["@tomb", "@i1", "@i2"]}}}
+  - expect_illegal: {p0: {t: cast, card: "@conf", modes: [9], targets: ["@saga"], pay: {tap: ["@tomb", "@i1", "@i2"]}}}
+  - p0: {t: cast, card: "@conf", modes: [9], targets: ["@key"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Eldrazi Confluence]
+    p1:
+      battlefield_contains:
+        - {card: Voltaic Key, tapped: true}
+        - {card: "Urza's Saga", counters: {lore: 1}}
+        - {card: Island, tapped: false}
+notes: >
+  "Nonland permanent": a basic land, a nonbasic land and an Enchantment Land (Urza's Saga, which is a land) are all illegal
+  targets, whichever player controls them (the mode says "nonland"). Voltaic Key is a legal target and returns tapped. The brief expected "blinking a land puts it back tapped"; the
+  Oracle text rules that out, so this scenario asserts the real rule instead.

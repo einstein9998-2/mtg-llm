@@ -1,0 +1,44 @@
+// Colorless Tron sideboard completion (Brady, 2026-10-09), RFC 0014. Oracle text per Savecraft card_search (Scryfall), 2026-10-09.
+// Kept apart from tron.cards.ron so that file and its package stay as applied. The Eldrazi Scion token is in tron.cards.ron.
+[
+  // Eldrazi Confluence: "Choose three. You may choose the same mode more than once." The mode chooser only offers distinct modes,
+  // so the ten possible multisets of three modes (pump, blink, Scion) are ten modes, each with one target slot per pump or blink
+  // instance (700.2d: each instance has its own target, and several may name the same permanent). Instances resolve in printed order.
+  (name: "Eldrazi Confluence", cost: "{2}{C}{C}", types: "INSTANT", abilities: [
+    Spell(choose: (1, 1), modes: [
+      (label: "Choose three: +3/-3 x3", targets: [(objects: (types_any: "CREATURE")), (objects: (types_any: "CREATURE")), (objects: (types_any: "CREATURE"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Continuous(objs: One(Target(1)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Continuous(objs: One(Target(2)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn)])),
+      (label: "Choose three: +3/-3 x2, exile and return x1", targets: [(objects: (types_any: "CREATURE")), (objects: (types_any: "CREATURE")), (objects: (types_not: "LAND"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Continuous(objs: One(Target(1)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Seq([Exile(One(Target(2))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)])])),
+      (label: "Choose three: +3/-3 x2, Scion x1", targets: [(objects: (types_any: "CREATURE")), (objects: (types_any: "CREATURE"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Continuous(objs: One(Target(1)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
+      (label: "Choose three: +3/-3 x1, exile and return x2", targets: [(objects: (types_any: "CREATURE")), (objects: (types_not: "LAND")), (objects: (types_not: "LAND"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Seq([Exile(One(Target(1))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), Seq([Exile(One(Target(2))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)])])),
+      (label: "Choose three: +3/-3 x1, exile and return x1, Scion x1", targets: [(objects: (types_any: "CREATURE")), (objects: (types_not: "LAND"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Seq([Exile(One(Target(1))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
+      (label: "Choose three: +3/-3 x1, Scion x2", targets: [(objects: (types_any: "CREATURE"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
+      (label: "Choose three: exile and return x3", targets: [(objects: (types_not: "LAND")), (objects: (types_not: "LAND")), (objects: (types_not: "LAND"))], effect: Seq([Seq([Exile(One(Target(0))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), Seq([Exile(One(Target(1))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), Seq([Exile(One(Target(2))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)])])),
+      (label: "Choose three: exile and return x2, Scion x1", targets: [(objects: (types_not: "LAND")), (objects: (types_not: "LAND"))], effect: Seq([Seq([Exile(One(Target(0))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), Seq([Exile(One(Target(1))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
+      (label: "Choose three: exile and return x1, Scion x2", targets: [(objects: (types_not: "LAND"))], effect: Seq([Seq([Exile(One(Target(0))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
+      (label: "Choose three: Scion x3", effect: Seq([CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
+    ]),
+  ]),
+  // Protection from multicolored is the PROT_MULTICOLORED keyword (targeting, damage and blocking; enchanting and equipping are not modeled).
+  // "Sacrifice unless you discard": the controller chooses to discard (when able) or the Masticore is sacrificed. Discarding starts a reflexive
+  // trigger (ability 1) bounded by the discarded card's mana value.
+  (name: "Argentum Masticore", cost: "{5}", types: "ARTIFACT | CREATURE", subtypes: ["Phyrexian", "Masticore"], pt: (5, 5), keywords: "FIRST_STRIKE | PROT_MULTICOLORED", abilities: [
+    Triggered(text: "At the beginning of your upkeep, sacrifice this creature unless you discard a card.", on: BeginStep(step: Upkeep, whose: You),
+      effect: MayElse(who: You, can: Cmp(CardsInHand(You), Ge, Const(1)), then: DiscardReflexive(ability: 1), els: Sacrifice(One(This)))),
+    Triggered(text: "When you discard a card this way, destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.", on: Delayed,
+      targets: [(objects: (types_not: "LAND", controller: Opp, cmc_x_max: true))], effect: Destroy(One(Target(0)))),
+  ]),
+  // The two global effects are static flags read where colors are read and where mana is paid (restrict-style abilities, RFC 0014).
+  (name: "Mycosynth Lattice", cost: "{6}", types: "ARTIFACT", abilities: [
+    Static(layer: L4, applies_to: (), effect: AddTypes("ARTIFACT")),
+    Restrict(what: ColorlessEverything),
+    Restrict(what: ManaAsAnyColor),
+  ]),
+  (name: "Summon: Bahamut", cost: "{9}", types: "ENCHANTMENT | CREATURE", subtypes: ["Saga", "Dragon"], pt: (9, 9), keywords: "FLYING", abilities: [
+    Saga(last: 4),
+    Triggered(text: "I — Destroy up to one target nonland permanent.", on: Chapter(1), targets: [(objects: (types_not: "LAND"), optional: true)], effect: Destroy(One(Target(0)))),
+    Triggered(text: "II — Destroy up to one target nonland permanent.", on: Chapter(2), targets: [(objects: (types_not: "LAND"), optional: true)], effect: Destroy(One(Target(0)))),
+    Triggered(text: "III — Draw two cards.", on: Chapter(3), effect: Draw(who: You, n: Const(2))),
+    Triggered(text: "IV — Mega Flare — This creature deals damage equal to the total mana value of other permanents you control to each opponent.", on: Chapter(4),
+      effect: Damage(amount: SumCmc(controller: You, not_self: true), to: Player(Opp))),
+  ]),
+]

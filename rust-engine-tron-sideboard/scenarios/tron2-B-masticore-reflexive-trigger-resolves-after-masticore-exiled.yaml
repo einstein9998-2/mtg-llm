@@ -1,0 +1,60 @@
+id: tron2-b-masticore-reflexive-trigger-resolves-after-masticore-exiled
+title: "In response to the reflexive trigger p1 exiles Argentum Masticore with Swords to Plowshares: the trigger still resolves and destroys its target"
+area: card
+cards: [Argentum Masticore, Lightning Bolt, Swords to Plowshares, Plains, Voltaic Key, Null Rod]
+tags: [argentum-masticore, reflexive-trigger, ability-independent-of-source, swords-to-plowshares, protection-multicolored, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "When you discard a card this way, destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "702.16b", text: "A permanent or player with protection can’t be targeted by spells with the stated quality and can’t be targeted by abilities from a source with the stated quality.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl", "Voltaic Key @key", "Null Rod @rod"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: discard_to_keep_masticore, answer: true}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@bolt"]}
+  - p0: {decision: choose_target, slot: 0, answer: "@key"}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@mast"], pay: {tap: ["@pl"]}}
+  - check:
+      stack:
+        - {kind: triggered, source: "@mast", controller: p0, targets: ["@key"]}
+        - {kind: spell, card: "@stp", controller: p1, targets: ["@mast"]}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@mast", controller: p0, targets: ["@key"]}]
+      p0: {life: 25, battlefield: [], exile: [Argentum Masticore]}
+      p1: {battlefield_contains: [{card: Voltaic Key}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 25
+      hand: []
+      graveyard: [Lightning Bolt]
+      exile: [Argentum Masticore]
+      battlefield: []
+    p1:
+      battlefield: [{card: Plains, tapped: true}, {card: Null Rod}]
+      graveyard: [Swords to Plowshares, Voltaic Key]
+notes: >
+  Swords to Plowshares is mono-white, so protection from multicolored does not stop p1 from targeting the Masticore. Once
+  the reflexive trigger is on the stack it exists independently of its source (113.7a): after the Masticore is exiled
+  (p0 gains 5 life = its power) the trigger still resolves and the Voltaic Key (target chosen when the trigger went on
+  the stack) is destroyed. The discarded card's mana value was fixed when the discard happened. A wrong engine
+  counters the trigger when its source leaves, or re-checks the bound against a card that is no longer there.

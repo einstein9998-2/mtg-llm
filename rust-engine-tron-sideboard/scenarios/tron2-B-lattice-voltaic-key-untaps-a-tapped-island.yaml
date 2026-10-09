@@ -1,0 +1,43 @@
+id: tron2-b-lattice-voltaic-key-untaps-a-tapped-island
+title: "Under Mycosynth Lattice Voltaic Key can target and untap a tapped Island, because the Island is an artifact"
+area: card
+cards: [Mycosynth Lattice, Voltaic Key, Island]
+tags: [mycosynth-lattice, voltaic-key, artifacts, lands, targeting, untap, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All permanents are artifacts in addition to their other types.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Voltaic Key, text: "{1}, {T}: Untap target artifact.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - "Mycosynth Lattice @lat"
+      - "Voltaic Key @key"
+      - {card: Island, as: is1, tapped: true}
+      - "Island @is2"
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@key", ability: 0, targets: ["@is1"], pay: {tap: ["@is2"]}}
+  - check:
+      stack: [{kind: activated, source: "@key", controller: p0, targets: ["@is1"]}]
+      p0: {battlefield_contains: [{card: Voltaic Key, tapped: true}, {card: Island, tapped: true}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Mycosynth Lattice}
+        - {card: Voltaic Key, tapped: true}
+        - {card: Island, tapped: false, types: [Land, Artifact]}
+        - {card: Island, tapped: true}
+notes: >
+  Voltaic Key's "target artifact" accepts any permanent while Lattice is out. The tapped Island is a legal target and is
+  untapped when the ability resolves; the Key (tapped as a cost) and the second Island (tapped to pay {1}) stay tapped.
+  Without Lattice the Island would not be a legal target. A wrong engine ignores the added type when checking target
+  legality.

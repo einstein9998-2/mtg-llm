@@ -1,0 +1,57 @@
+id: tron2-a-confluence-blink-own-etb-creature-triggers-again-and-returns-tapped-and-sick
+title: "Eldrazi Confluence blinking p0's own Quantum Riddler: it returns tapped and summoning sick, its enters trigger draws a card again, and two Eldrazi Scions are made"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Quantum Riddler, Brainstorm, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, blink, new-object, etb-trigger, enters-tapped, summoning-sickness, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.", verified: true}
+  - {kind: oracle, card: Quantum Riddler, text: "When this creature enters, draw a card.", verified: true}
+  - {kind: cr, ref: "400.7", text: ". An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+  - {kind: cr, ref: "603.6a", text: "Enters-the-battlefield abilities trigger when a permanent enters the battlefield. These are written, \"When [this object] enters, . . . \" or \"Whenever a [type] enters, . . .\" Each time an event puts one or more permanents onto the battlefield, all permanents on the battlefield (including the newcomers) are checked for any enters-the-battlefield triggers that match the event.", verified: true}
+  - {kind: cr, ref: "302.6", text: ". A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began. A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf", Island, Island]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2", "Quantum Riddler @qr"]
+    library: [Brainstorm]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0: {battlefield_contains: [{card: Quantum Riddler, tapped: false, sick: false}]}
+  - p0: {t: cast, card: "@conf", modes: [9], targets: ["@qr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "draw"}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        hand: [Island, Island]
+        battlefield_contains: [{card: Quantum Riddler, tapped: true, sick: true, pt: [4, 6], controller: p0}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      hand: [Island, Island, Brainstorm]
+      graveyard: [Eldrazi Confluence]
+      exile: []
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Quantum Riddler, tapped: true, sick: true, pt: [4, 6]}
+        - {token: Eldrazi Scion Token, pt: [1, 1], tapped: false}
+        - {token: Eldrazi Scion Token, pt: [1, 1], tapped: false}
+notes: >
+  Multiset 8 (blink x1, Scion x2) is `modes: [9]`; the only target slot is the blink's. The Riddler is exiled and returned
+  as a new object (400.7): tapped, summoning sick, and its enters trigger goes on the stack and draws a card
+  (Brainstorm, the top card). The hand holds two cards when the trigger resolves, so Quantum Riddler's draw replacement
+  ("one or fewer cards in hand") does not add a second card. The two Scions come from the mode instances without targets and
+  enter untapped. A wrong engine returns the Riddler untapped or not sick, or skips the enters trigger.

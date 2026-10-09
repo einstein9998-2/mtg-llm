@@ -1,0 +1,59 @@
+id: tron2-a-confluence-blink-in-response-to-swords-the-removal-fizzles-on-the-new-object
+title: "p1 casts Swords to Plowshares on p0's Quantum Riddler; Eldrazi Confluence blinks it in response, so Swords has no legal target and p0 gains nothing"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Quantum Riddler, Swords to Plowshares, Plains, Brainstorm, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, blink, new-object, response, swords-to-plowshares, fizzle, etb-trigger, eldrazi-scion]
+derived_from: cr
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "400.7", text: ". An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf", Island, Island]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2", "Quantum Riddler @qr"]
+    library: [Brainstorm]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@qr"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@conf", modes: [9], targets: ["@qr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack:
+        - {kind: spell, card: "@stp", controller: p1}
+        - {kind: triggered, controller: p0, text_contains: "draw"}
+      p0: {battlefield_contains: [{card: Quantum Riddler, tapped: true, sick: true}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      hand: [Island, Island, Brainstorm]
+      graveyard: [Eldrazi Confluence]
+      exile: []
+      battlefield_contains: [{card: Quantum Riddler, tapped: true}, {token: Eldrazi Scion Token}, {token: Eldrazi Scion Token}]
+    p1:
+      graveyard: [Swords to Plowshares]
+      battlefield: [{card: Plains, tapped: true}]
+notes: >
+  p0 has priority first and passes with an empty stack so p1 can act; p1 casts Swords on the Riddler; p0 responds with Confluence
+  (multiset 8, `modes: [9]`, blink the same Riddler). Confluence resolves first: the Riddler returns as a new object (400.7), its
+  enters trigger goes on the stack above Swords. After the trigger resolves (Brainstorm drawn), Swords finds its only target
+  gone (the old object) and does not resolve (608.2b): the Riddler stays and p0 gains no life (18, not 22). A wrong engine
+  keeps tracking the old object across the blink and exiles the new Riddler.

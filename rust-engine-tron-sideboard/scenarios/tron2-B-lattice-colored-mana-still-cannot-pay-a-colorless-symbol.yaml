@@ -1,0 +1,39 @@
+id: tron2-b-lattice-colored-mana-still-cannot-pay-a-colorless-symbol
+title: "Under Mycosynth Lattice colored mana still cannot pay {C}: Warping Wail ({1}{C}) is not castable with Islands, even with {U} floating"
+area: card
+cards: [Mycosynth Lattice, Warping Wail, Island]
+tags: [mycosynth-lattice, mana-as-any-color, colorless-symbol, warping-wail, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "Players may spend mana as though it were mana of any color.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "107.4c", text: "The colorless mana symbol {C} is used to represent one colorless mana, and also to represent a cost that can be paid only with one colorless mana.", verified: true}
+  - {kind: cr, ref: "609.4b", text: "If an effect allows a player to spend mana “as though it were mana of any [type or color],” this affects only how the player may", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Warping Wail @wail"]
+    battlefield: ["Mycosynth Lattice @lat", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@wail", modes: [3]}}
+  - p0: {t: activate, source: "@i1", ability: 0, choose_color: U}
+  - check:
+      p0: {mana_pool: {U: 1}}
+  - expect_illegal: {p0: {t: cast, card: "@wail", modes: [3]}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Warping Wail]
+      mana_pool: {U: 1}
+      battlefield: [{card: Mycosynth Lattice}, {card: Island, tapped: true}, {card: Island, tapped: false}]
+notes: >
+  Lattice changes how mana may be spent as though it were any COLOR; colorless is not a color (105.4 / 105.2c), so {U}
+  can pay the generic {1} but nothing but colorless mana can pay {C}. With two Islands, or with one Island tapped and {U}
+  floating, Warping Wail cannot be cast. The next scenarios show colorless mana paying colored symbols. A wrong engine
+  treats "any color" as "any mana including a {C} requirement".

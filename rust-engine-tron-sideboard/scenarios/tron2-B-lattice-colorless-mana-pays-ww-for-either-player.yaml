@@ -1,0 +1,52 @@
+id: tron2-b-lattice-colorless-mana-pays-ww-for-either-player
+title: "Under Mycosynth Lattice (opponent's) Grim Monolith's colorless mana pays {W}{W} for White Orchid Phantom; the outcome does not depend on the seat"
+area: card
+cards: [Mycosynth Lattice, White Orchid Phantom, Grim Monolith]
+tags: [mycosynth-lattice, mana-as-any-color, colorless-mana, both-players, white-orchid-phantom, grim-monolith, symmetric, tron-sideboard]
+derived_from: oracle
+symmetric: true
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "Players may spend mana as though it were mana of any color.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Grim Monolith, text: "{T}: Add {C}{C}{C}.", verified: true}
+  - {kind: cr, ref: "609.4b", text: "If an effect allows a player to spend mana “as though it were mana of any [type or color],” this affects only how the player may", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["White Orchid Phantom @wop"]
+    battlefield: ["Grim Monolith @gm"]
+    library_pad: 10
+  p1:
+    battlefield: ["Mycosynth Lattice @lat"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@wop"}]}}
+  - p0: {t: cast, card: "@wop", pay: {tap: ["@gm"]}}
+  - check:
+      stack: [{kind: spell, card: "@wop", controller: p0}]
+      p0: {battlefield: [{card: Grim Monolith, tapped: true}]}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@wop", controller: p0, text_contains: "nonbasic"}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield:
+        - {card: Grim Monolith, tapped: true}
+        - {card: White Orchid Phantom, types: [Creature, Artifact], keywords: [flying, first strike], sick: true}
+    p1:
+      battlefield: [{card: Mycosynth Lattice}]
+notes: >
+  Grim Monolith adds {C}{C}{C}: no white mana exists, but Lattice (controlled by p1) lets p0 spend colorless mana on
+  {W}{W}, so White Orchid Phantom is castable and resolves (the extra {C} is just lost). There are no lands on the
+  battlefield, so the "destroy up to one target nonbasic land" enters trigger ("up to one" lets it go on the stack with
+  zero targets, 603.3d only removes a trigger that needs a target it cannot have) is on the stack with no target and
+  resolves doing nothing. The creature is also an artifact. `symmetric: true` runs the scenario with the seats swapped: Lattice
+  works for both players regardless of who controls it. A wrong engine applies the mana effect only to Lattice's
+  controller.

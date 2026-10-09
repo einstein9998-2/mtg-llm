@@ -1,0 +1,55 @@
+id: tron2-b-masticore-discard-mv-one-bounds-the-target
+title: "Discarding Lightning Bolt (mana value 1) to Argentum Masticore: the reflexive trigger may target only opposing nonland permanents with mana value 1 or less"
+area: card
+cards: [Argentum Masticore, Lightning Bolt, Island, Lotus Petal, Mishra's Bauble, Voltaic Key, Null Rod]
+tags: [argentum-masticore, upkeep-trigger, reflexive-trigger, mana-value-bound, discard, targeting, opponents-permanent-only, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "When you discard a card this way, destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "603.12", text: "A resolving spell or ability may allow or instruct a player to take an action and create a triggered ability that triggers “when [a player] [does or doesn’t]” take that action or “when [something happens] this way.”", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "701.8a", text: "To destroy a permanent, move it from the battlefield to its owner’s graveyard.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    hand: ["Lightning Bolt @bolt", "Island @isl_h"]
+    battlefield: ["Argentum Masticore @mast", "Lotus Petal @mypetal"]
+    library_pad: 10
+  p1:
+    battlefield: ["Mishra's Bauble @bauble", "Voltaic Key @key", "Null Rod @rod", "Island @isl_b"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: discard_to_keep_masticore, answer: true}
+  - p0: {decision: choose_cards, purpose: discard, expect_options: {include: ["@bolt", "@isl_h"], count: 2}, answer: ["@bolt"]}
+  - p0:
+      decision: choose_target
+      slot: 0
+      expect_options: {include: ["@bauble", "@key"], exclude: ["@rod", "@isl_b", "@mypetal", "@mast"], count: 2}
+      answer: "@key"
+  - check:
+      stack: [{kind: triggered, source: "@mast", controller: p0, targets: ["@key"]}]
+      p0: {hand: [Island], graveyard: [Lightning Bolt], battlefield: [{card: Argentum Masticore}, {card: Lotus Petal}]}
+      p1: {battlefield_contains: [{card: Voltaic Key}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island]
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Argentum Masticore}, {card: Lotus Petal}]
+    p1:
+      battlefield: [{card: Mishra's Bauble}, {card: Null Rod}, {card: Island}]
+      graveyard: [Voltaic Key]
+notes: >
+  p0 discards Lightning Bolt (mana value 1) rather than the Island. The reflexive trigger's target is chosen as it goes on
+  the stack (603.3d) from opposing nonland permanents with mana value <= 1: Mishra's Bauble (0) and Voltaic Key (1) are
+  offered; Null Rod (2) is too expensive, the opposing Island is a land, and p0's own Lotus Petal (0) and the Masticore
+  are not "an opponent controls". The Key is destroyed; the Masticore stays since the discard happened. Wrong engines:
+  allow any nonland permanent, include p0's own permanents, offer lands, use <= instead of the discarded card's value
+  as the bound, or put the trigger on the stack before the discard.

@@ -1,0 +1,43 @@
+id: tron2-b-masticore-upkeep-decline-discard-sacrificed-hand-kept
+title: "Argentum Masticore's upkeep trigger with a card in hand: p0 may decline to discard, then the Masticore is sacrificed and the hand is kept"
+area: card
+cards: [Argentum Masticore, Lightning Bolt, Null Rod]
+tags: [argentum-masticore, upkeep-trigger, sacrifice-unless, discard, optional, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "At the beginning of your upkeep, sacrifice this creature unless you discard a card.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player doesn’t], [do something].”", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+  p1:
+    battlefield: ["Null Rod @rod"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: discard_to_keep_masticore, answer: false}
+expect:
+  - at: after_script
+    turn: 3
+    phase: upkeep
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      battlefield: []
+      graveyard: [Argentum Masticore]
+    p1:
+      battlefield: [{card: Null Rod}]
+      graveyard: []
+notes: >
+  With a card in hand the "unless you discard a card" clause is a choice for p0 (118.12a: "[A player may do something
+  else]. If [that player doesn't], [do something]"). p0 declines: the Masticore is sacrificed, the Lightning Bolt stays in
+  hand (nothing was discarded), and there is no reflexive trigger, so the opposing Null Rod (legal for a discard of MV 2
+  or more) is untouched. A wrong engine discards automatically, or never offers the option to decline.

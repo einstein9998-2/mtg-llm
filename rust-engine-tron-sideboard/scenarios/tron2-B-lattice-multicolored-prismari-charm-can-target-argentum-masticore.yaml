@@ -1,0 +1,37 @@
+id: tron2-b-lattice-multicolored-prismari-charm-can-target-argentum-masticore
+title: "Under Mycosynth Lattice the Prismari Charm spell is colorless, so it can target Argentum Masticore (no spell is multicolored)"
+area: card
+cards: [Mycosynth Lattice, Argentum Masticore, Prismari Charm, Island, Mountain]
+tags: [mycosynth-lattice, argentum-masticore, protection-from-multicolored, spells-are-colorless, targeting, bounce, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All cards that aren't on the battlefield, spells, and permanents are colorless.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Argentum Masticore, text: "First strike, protection from multicolored", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "702.16b", text: "A permanent or player with protection can’t be targeted by spells with the stated quality and can’t be targeted by abilities from a source with the stated quality.", verified: true}
+  - {kind: cr, ref: "105.2c", text: "A colorless object has no color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm"]
+    battlefield: ["Mycosynth Lattice @lat", "Island @is1", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@charm", modes: [3], targets: ["@mast"], pay: {tap: ["@is1", "@m1"]}}
+  - check:
+      stack: [{kind: spell, card: "@charm", controller: p0, targets: ["@mast"]}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Prismari Charm]}
+    p1: {hand: [Argentum Masticore], battlefield: []}
+notes: >
+  Contrast with the Charm scenario without Lattice, where this cast is illegal: the Charm spell ({U}{R}) is colorless
+  while on the stack, so it has no stated quality "multicolored" and protection from multicolored does not stop it. The
+  Masticore returns to its owner's hand. A wrong engine checks the printed colors of the spell.

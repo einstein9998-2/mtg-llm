@@ -1,0 +1,46 @@
+id: tron2-b-masticore-spell-countered-by-force-of-will-force-of-negation-cannot-target
+title: "Force of Negation cannot target the Argentum Masticore creature spell, but Force of Will pitching Brainstorm counters it"
+area: card
+cards: [Argentum Masticore, Force of Will, Force of Negation, Brainstorm, Island]
+tags: [argentum-masticore, counterspell, force-of-will, force-of-negation, noncreature-spell, alternative-cost, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Force of Negation, text: "Counter target noncreature spell.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Argentum Masticore @mast"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Negation @fon", "Force of Will @fow", "Brainstorm @bs", "Island @extra"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@mast", pay: {tap: ["@i1", "@i2", "@i3", "@i4", "@i5"]}}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fon", alt_cost: {exile_blue_card: "@bs"}, targets: ["@mast"]}}
+  - check:
+      legal: {p1: {include: [{t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}}], exclude: [{t: cast, card: "@fon", targets: ["@mast"]}]}}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@mast"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Argentum Masticore]
+      battlefield: [{card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1:
+      life: 19
+      hand: [Force of Negation, Island]
+      exile: [Brainstorm]
+      graveyard: [Force of Will]
+notes: >
+  The Masticore is a creature spell, so Force of Negation (a noncreature-spell counter, here via its free alternative
+  cost on p0's turn) has no legal target: casting it at the Masticore is illegal and nothing changes. Force of Will
+  pitching Brainstorm (1 life) counters it: the Masticore goes to the graveyard and never reaches the battlefield, so its
+  upkeep trigger never exists. That the Masticore is a creature spell comes from its type line (Artifact Creature) in
+  oracle-additions-B.json.

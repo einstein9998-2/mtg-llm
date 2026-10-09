@@ -1,0 +1,48 @@
+id: tron2-b-masticore-discard-three-mana-card-bounds-at-three
+title: "Discarding Dismember (mana value 3) to Argentum Masticore: Trinisphere (3) and Null Rod (2) are legal targets, Karn (4) and a land are not"
+area: card
+cards: [Argentum Masticore, Dismember, Trinisphere, Null Rod, "Karn, the Great Creator", Island]
+tags: [argentum-masticore, upkeep-trigger, reflexive-trigger, mana-value-bound, phyrexian-mana, planeswalker, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: oracle, card: Dismember, text: "({B/P} can be paid with either {B} or 2 life.)", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    hand: ["Dismember @dis"]
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri", "Null Rod @rod", {card: "Karn, the Great Creator", as: karn, counters: {loyalty: 5}}, "Island @isl_b"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: discard_to_keep_masticore, answer: true}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@dis"]}
+  - p0:
+      decision: choose_target
+      slot: 0
+      expect_options: {include: ["@tri", "@rod"], exclude: ["@karn", "@isl_b"], count: 2}
+      answer: "@tri"
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Dismember]
+      battlefield: [{card: Argentum Masticore}]
+    p1:
+      battlefield: [{card: Null Rod}, {card: "Karn, the Great Creator", counters: {loyalty: 5}}, {card: Island}]
+      graveyard: [Trinisphere]
+notes: >
+  Dismember {1}{B/P}{B/P} has mana value 3 (each hybrid Phyrexian symbol counts 1). Trinisphere (3) and Null Rod (2) are
+  legal; Karn the Great Creator (mana value 4) is a nonland permanent but too expensive; the Island is a land. The bound
+  is "less than or equal to", so the equal-value Trinisphere is included (a "less than" bug drops it). Karn's static
+  ability (opposing artifacts' activated abilities) is irrelevant to a triggered ability and does not interfere.

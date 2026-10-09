@@ -1,0 +1,45 @@
+id: tron2-a-confluence-pump-three-times-on-one-creature-kills-it
+title: "Eldrazi Confluence choosing the +3/-3 mode three times on one creature gives -9 toughness and kills a 7/7"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, "Atraxa, Grand Unifier"]
+tags: [eldrazi-confluence, modal, same-mode-repeated, pump, minus-toughness, state-based-action, instant]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Choose three. You may choose the same mode more than once.", verified: true}
+  - {kind: oracle, card: Eldrazi Confluence, text: "Target creature gets +3/-3 until end of turn.", verified: true}
+  - {kind: cr, ref: "700.2d", text: "If a player is allowed to choose more than one mode for a modal spell or ability, that player normally can’t choose the same mode more than once. However, some modal spells include the instruction “You may choose the same mode more than once.” If a particular mode is chosen multiple times, the spell is treated as if that mode appeared that many times in sequence. If that mode requires a target, the same player or object may be chosen as the target for each of those modes, or different targets may be chosen.", verified: true}
+  - {kind: cr, ref: "704.5f", text: "If a creature has toughness 0 or less, it’s put into its owner’s graveyard. Regeneration can’t replace this event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Atraxa, Grand Unifier @atr"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@conf", modes: [1], targets: ["@atr", "@atr", "@atr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - check:
+      stack: [{kind: spell, card: "@conf", controller: p0}]
+      p1: {battlefield: [{card: "Atraxa, Grand Unifier", pt: [7, 7]}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Eldrazi Confluence]
+      battlefield: [{card: Ancient Tomb, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1:
+      battlefield: []
+      graveyard: ["Atraxa, Grand Unifier"]
+notes: >
+  The three "pump" instances all name Atraxa (700.2d: the same object may be chosen as the target of each instance). Together
+  they give +9/-9: a 7/7 becomes 16/-2 and is put into the graveyard by the toughness-0 state-based action. The mode is the
+  brief's multiset 0 (pump x3), written as `modes: [1]` because the schema's cast `modes` are 1-based (brief index + 1).
+  Ancient Tomb pays {C}{C} and deals 2 damage to p0 (18); the two Islands pay the generic {2}. A wrong engine applies
+  only one instance per distinct target, leaving a 10/4.

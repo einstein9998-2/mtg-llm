@@ -1,0 +1,48 @@
+id: tron2-b-masticore-damage-from-multicolored-creature-is-prevented
+title: "Multicolored Gaddock Teeg (6/6 with four counters) deals no combat damage to blocking Argentum Masticore after first strike"
+area: card
+cards: [Argentum Masticore, Gaddock Teeg]
+tags: [argentum-masticore, protection, protection-from-multicolored, damage-prevention, first-strike, combat, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "First strike, protection from multicolored", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "702.16e", text: "Any damage that would be dealt by sources that have the stated quality to a permanent or player with protection is prevented.", verified: true}
+  - {kind: cr, ref: "105.2b", text: "A multicolored object is two or more of the five colors.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: [{card: Gaddock Teeg, as: teeg, counters: {"+1/+1": 4}}]
+    library_pad: 10
+  p1:
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@teeg", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@mast", attacker: "@teeg"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      p0: {battlefield: [{card: Gaddock Teeg, pt: [6, 6], damage: 5}]}
+      p1: {battlefield: [{card: Argentum Masticore, damage: 0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, battlefield: [{card: Gaddock Teeg, damage: 5}]}
+    p1: {life: 20, battlefield: [{card: Argentum Masticore, damage: 0}], graveyard: []}
+notes: >
+  Gaddock Teeg ({G}{W}) is multicolored. Protection does not stop a multicolored creature from being blocked BY the
+  Masticore (702.16f only restricts blocking of the protected attacker), but any damage Teeg would deal to the Masticore
+  is prevented (702.16e). Masticore's first strike puts 5 on Teeg (6/6, survives); in the regular step Teeg's 6 damage to
+  the 5-toughness Masticore is prevented, so the Masticore has no damage and lives. Wrong engines: protection only on
+  targeting (the Masticore would die), or Teeg unable to attack into it.

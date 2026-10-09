@@ -1,0 +1,47 @@
+id: tron2-b-lattice-multicolored-creature-damage-to-argentum-masticore-not-prevented
+title: "Under Mycosynth Lattice Gaddock Teeg is colorless, so the damage it deals to Argentum Masticore is not prevented and the Masticore dies"
+area: card
+cards: [Mycosynth Lattice, Argentum Masticore, Gaddock Teeg]
+tags: [mycosynth-lattice, argentum-masticore, protection-from-multicolored, permanents-are-colorless, damage, combat, first-strike, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All cards that aren't on the battlefield, spells, and permanents are colorless.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "702.16e", text: "Any damage that would be dealt by sources that have the stated quality to a permanent or player with protection is prevented.", verified: true}
+  - {kind: cr, ref: "702.7b", text: "After that step, instead of proceeding to the end of combat step, the phase gets a second combat damage step.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Mycosynth Lattice @lat", {card: Gaddock Teeg, as: teeg, counters: {"+1/+1": 4}}]
+    library_pad: 10
+  p1:
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@teeg", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@mast", attacker: "@teeg"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      p0: {battlefield_contains: [{card: Gaddock Teeg, pt: [6, 6], damage: 5}]}
+      p1: {battlefield: [{card: Argentum Masticore, damage: 0}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {battlefield_contains: [{card: Gaddock Teeg, damage: 5}]}
+    p1: {battlefield: [], graveyard: [Argentum Masticore]}
+notes: >
+  The mirror of the Teeg scenario without Lattice (where Teeg's 6 damage to the Masticore is prevented). Under Lattice
+  Teeg is colorless, not multicolored, so protection from multicolored prevents nothing: after the Masticore's first-strike
+  5 damage (Teeg is a 6/6 and survives) Teeg deals 6 to the 5-toughness Masticore, which dies. A wrong engine uses the
+  printed color of the damage source.

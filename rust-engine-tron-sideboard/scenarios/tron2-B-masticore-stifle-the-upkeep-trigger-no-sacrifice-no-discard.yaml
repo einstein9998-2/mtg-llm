@@ -1,0 +1,44 @@
+id: tron2-b-masticore-stifle-the-upkeep-trigger-no-sacrifice-no-discard
+title: "Stifle on Argentum Masticore's upkeep trigger: no sacrifice, no discard, no destroy; the Masticore and p0's hand are untouched"
+area: card
+cards: [Argentum Masticore, Lightning Bolt, Stifle, Island, Null Rod]
+tags: [argentum-masticore, upkeep-trigger, stifle, counter-ability, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "At the beginning of your upkeep, sacrifice this creature unless you discard a card.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Stifle, text: "Counter target activated or triggered ability.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+  p1:
+    hand: ["Stifle @stifle"]
+    battlefield: ["Island @isl", "Null Rod @rod"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stifle", targets: [{trigger_of: "@mast"}], pay: {tap: ["@isl"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 3
+    phase: upkeep
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      graveyard: []
+      battlefield: [{card: Argentum Masticore}]
+    p1:
+      graveyard: [Stifle]
+      battlefield: [{card: Island, tapped: true}, {card: Null Rod}]
+notes: >
+  With the upkeep trigger countered, nothing in its text happens: p0 is never asked to discard, the Masticore is not
+  sacrificed (it simply survives this upkeep), and no reflexive trigger exists, so Null Rod is untouched. Wrong engines:
+  sacrifice the Masticore as a cost of the trigger, or still ask for the discard.

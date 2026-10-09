@@ -1,0 +1,58 @@
+id: tron2-b-lattice-all-permanents-are-artifacts-in-addition-to-their-types
+title: "Mycosynth Lattice makes every permanent of both players an artifact in addition to its other types: lands, creatures, tokens, planeswalkers"
+area: card
+cards: [Mycosynth Lattice, Island, Mountain, Containment Priest, Goblin Token, "Karn, the Great Creator", Null Rod]
+tags: [mycosynth-lattice, type-changing, artifacts, lands, tokens, planeswalker, layer-4, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All permanents are artifacts in addition to their other types.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "613.1d", text: "Layer 4: Type-changing effects are applied.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield:
+      - "Mycosynth Lattice @lat"
+      - "Island @is"
+      - "Containment Priest @cp"
+      - {token: Goblin Token, as: gob}
+      - {card: "Karn, the Great Creator", as: karn, counters: {loyalty: 5}}
+    library_pad: 10
+  p1:
+    battlefield: ["Mountain @mtn", "Null Rod @rod"]
+    library_pad: 10
+script:
+  - check:
+      p0:
+        battlefield:
+          - {card: Mycosynth Lattice, types: [Artifact]}
+          - {card: Island, types: [Land, Artifact]}
+          - {card: Containment Priest, types: [Creature, Artifact]}
+          - {token: Goblin Token, types: [Creature, Artifact]}
+          - {card: "Karn, the Great Creator", types: [Planeswalker, Artifact]}
+      p1:
+        battlefield:
+          - {card: Mountain, types: [Land, Artifact]}
+          - {card: Null Rod, types: [Artifact]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield:
+        - {card: Mycosynth Lattice, types: [Artifact]}
+        - {card: Island, types: [Land, Artifact]}
+        - {card: Containment Priest, types: [Creature, Artifact], pt: [2, 2]}
+        - {token: Goblin Token, types: [Creature, Artifact]}
+        - {card: "Karn, the Great Creator", types: [Planeswalker, Artifact], counters: {loyalty: 5}}
+    p1:
+      battlefield:
+        - {card: Mountain, types: [Land, Artifact]}
+        - {card: Null Rod, types: [Artifact]}
+notes: >
+  The type set is exact: Lattice adds Artifact without removing anything, to both players' permanents. The opponent's
+  Mountain and the controller's Island are Land + Artifact, a creature and a creature token are Creature + Artifact, and a
+  planeswalker is Planeswalker + Artifact. Existing artifacts (Lattice itself, Null Rod) are unchanged. Karn's static
+  ability does not matter here (no abilities are activated). Karn is chosen to show the planeswalker case; the scenarios
+  that follow use the artifact-ness of lands.

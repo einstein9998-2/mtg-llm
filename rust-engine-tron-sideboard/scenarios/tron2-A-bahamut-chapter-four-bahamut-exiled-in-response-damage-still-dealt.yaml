@@ -1,0 +1,56 @@
+id: tron2-a-bahamut-chapter-four-still-deals-its-damage-when-bahamut-is-exiled-in-response
+title: "Swords to Plowshares exiles Bahamut with chapter IV on the stack: p0 gains 9, and the chapter ability still resolves and deals 6 damage"
+area: card
+cards: ["Summon: Bahamut", Grim Monolith, "Karn, the Great Creator", Swords to Plowshares, Plains]
+tags: [summon-bahamut, saga, saga-creature, chapter-ability, mana-value, damage-to-player, response, swords-to-plowshares, ability-independent-of-source, last-known-information]
+derived_from: cr
+source:
+  - {kind: oracle, card: "Summon: Bahamut", text: "IV — Mega Flare — This creature deals damage equal to the total mana value of other permanents you control to each opponent.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "113.7a", text: "Once activated or triggered, an ability exists on the stack independently of its source. Destruction or removal of the source after that time won’t affect the ability. Note that some abilities cause a source to do something (for example, “This creature deals 1 damage to any target”) rather than the ability doing anything directly. In these cases, any activated or triggered ability that references information about the source for use while announcing an activated ability or putting a triggered ability on the stack checks that information when the ability is put onto the stack. Otherwise, it will check that information when it resolves. In both instances, if the source is no longer in the zone it’s expected to be in at that time, its last known information is used. The source can still perform the action even though it no longer exists.", verified: true}
+  - {kind: cr, ref: "608.2h", text: "If an effect requires information from the game (such as the number of creatures on the battlefield), the answer is determined only once, when the effect is applied. If the effect requires information from a specific object, including the source of the ability itself, the effect uses the current information of that object if it’s in the public zone it was expected to be in; if it’s no longer in that zone, or if the effect has moved it from a public zone to a hidden zone, the effect uses the object’s last known information. See rule 113.7a. If an ability states that an object does something, it’s the object as it exists—or as it most recently existed—that does it, not the ability.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main2
+  p0:
+    battlefield:
+      - {card: "Summon: Bahamut", as: bah, counters: {lore: 3}, sick: false}
+      - "Grim Monolith @gm"
+      - {card: "Karn, the Great Creator", as: karn, counters: {loyalty: 4}}
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl"]
+    library_pad: 10
+script:
+  - advance: {to: draw, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: main1
+      stack: [{kind: triggered, source: "@bah", controller: p0}]
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@bah"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@bah", controller: p0}]
+      p0: {life: 29, exile: ["Summon: Bahamut"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 29
+      exile: ["Summon: Bahamut"]
+      battlefield: [{card: Grim Monolith}, {card: "Karn, the Great Creator"}]
+    p1:
+      life: 14
+      graveyard: [Swords to Plowshares]
+notes: >
+  Once triggered, the chapter IV ability exists on the stack independently of its source (113.7a). Swords exiles Bahamut
+  (a 9/9 creature, so its controller p0 gains 9: 29). The ability resolves using the source's last known information
+  (608.2h) and still deals damage equal to the total mana value of the OTHER permanents p0 controls: Grim Monolith 2 + Karn 4
+  = 6, so p1 goes 20 -> 14. A wrong engine drops the ability when the source leaves the battlefield.

@@ -1,0 +1,40 @@
+id: tron2-b-lattice-karn-plus-one-targets-a-land-which-dies-as-zero-zero
+title: "Under Mycosynth Lattice Karn's +1 can target a land (a noncreature artifact): it becomes a 0/0 artifact creature and dies"
+area: card
+cards: [Mycosynth Lattice, "Karn, the Great Creator", Island]
+tags: [mycosynth-lattice, karn-the-great-creator, loyalty-ability, becomes-creature, mana-value, zero-toughness, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All permanents are artifacts in addition to their other types.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.", verified: true}
+  - {kind: cr, ref: "202.3", text: "The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "704.5f", text: "If a creature has toughness 0 or less, it’s put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    battlefield: ["Mycosynth Lattice @lat", {card: "Karn, the Great Creator", as: karn, counters: {loyalty: 4}}, "Island @is"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@karn", ability: 0, targets: ["@is"]}
+  - check:
+      stack: [{kind: activated, source: "@karn", controller: p0, targets: ["@is"]}]
+      p0: {battlefield_contains: [{card: "Karn, the Great Creator", counters: {loyalty: 5}}, {card: Island, types: [Land, Artifact]}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Island]
+      battlefield:
+        - {card: Mycosynth Lattice}
+        - {card: "Karn, the Great Creator", counters: {loyalty: 5}}
+notes: >
+  While Lattice is out the Island is a noncreature artifact, so it is a legal target of Karn's +1. The ability makes it an
+  artifact creature with power and toughness equal to its mana value; a land has mana value 0, so it is a 0/0 creature and
+  is put into the graveyard as a state-based action (704.5f) once the ability resolves. Without Lattice the Island is not
+  a legal target at all. Wrong engines: refuse the target, or leave a 0/0 land creature on the battlefield.

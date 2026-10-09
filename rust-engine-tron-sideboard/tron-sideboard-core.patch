@@ -1,0 +1,441 @@
+diff -ruN a/crates/mtg-cards/cards/tron-sideboard.cards.ron b/crates/mtg-cards/cards/tron-sideboard.cards.ron
+--- a/crates/mtg-cards/cards/tron-sideboard.cards.ron	1970-01-01 00:00:00.000000000 +0000
++++ b/crates/mtg-cards/cards/tron-sideboard.cards.ron	2026-10-09 21:44:34.797757325 +0000
+@@ -0,0 +1,44 @@
++// Colorless Tron sideboard completion (Brady, 2026-10-09), RFC 0014. Oracle text per Savecraft card_search (Scryfall), 2026-10-09.
++// Kept apart from tron.cards.ron so that file and its package stay as applied. The Eldrazi Scion token is in tron.cards.ron.
++[
++  // Eldrazi Confluence: "Choose three. You may choose the same mode more than once." The mode chooser only offers distinct modes,
++  // so the ten possible multisets of three modes (pump, blink, Scion) are ten modes, each with one target slot per pump or blink
++  // instance (700.2d: each instance has its own target, and several may name the same permanent). Instances resolve in printed order.
++  (name: "Eldrazi Confluence", cost: "{2}{C}{C}", types: "INSTANT", abilities: [
++    Spell(choose: (1, 1), modes: [
++      (label: "Choose three: +3/-3 x3", targets: [(objects: (types_any: "CREATURE")), (objects: (types_any: "CREATURE")), (objects: (types_any: "CREATURE"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Continuous(objs: One(Target(1)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Continuous(objs: One(Target(2)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn)])),
++      (label: "Choose three: +3/-3 x2, exile and return x1", targets: [(objects: (types_any: "CREATURE")), (objects: (types_any: "CREATURE")), (objects: (types_not: "LAND"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Continuous(objs: One(Target(1)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Seq([Exile(One(Target(2))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)])])),
++      (label: "Choose three: +3/-3 x2, Scion x1", targets: [(objects: (types_any: "CREATURE")), (objects: (types_any: "CREATURE"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Continuous(objs: One(Target(1)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
++      (label: "Choose three: +3/-3 x1, exile and return x2", targets: [(objects: (types_any: "CREATURE")), (objects: (types_not: "LAND")), (objects: (types_not: "LAND"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Seq([Exile(One(Target(1))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), Seq([Exile(One(Target(2))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)])])),
++      (label: "Choose three: +3/-3 x1, exile and return x1, Scion x1", targets: [(objects: (types_any: "CREATURE")), (objects: (types_not: "LAND"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), Seq([Exile(One(Target(1))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
++      (label: "Choose three: +3/-3 x1, Scion x2", targets: [(objects: (types_any: "CREATURE"))], effect: Seq([Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(3, -3), until: EndOfTurn), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
++      (label: "Choose three: exile and return x3", targets: [(objects: (types_not: "LAND")), (objects: (types_not: "LAND")), (objects: (types_not: "LAND"))], effect: Seq([Seq([Exile(One(Target(0))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), Seq([Exile(One(Target(1))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), Seq([Exile(One(Target(2))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)])])),
++      (label: "Choose three: exile and return x2, Scion x1", targets: [(objects: (types_not: "LAND")), (objects: (types_not: "LAND"))], effect: Seq([Seq([Exile(One(Target(0))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), Seq([Exile(One(Target(1))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
++      (label: "Choose three: exile and return x1, Scion x2", targets: [(objects: (types_not: "LAND"))], effect: Seq([Seq([Exile(One(Target(0))), MoveTo(objs: One(Moved(0)), to: Battlefield, tapped: true)]), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
++      (label: "Choose three: Scion x3", effect: Seq([CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You), CreateToken(token: "Eldrazi Scion Token", n: Const(1), who: You)])),
++    ]),
++  ]),
++  // Protection from multicolored is the PROT_MULTICOLORED keyword (targeting, damage and blocking; enchanting and equipping are not modeled).
++  // "Sacrifice unless you discard": the controller chooses to discard (when able) or the Masticore is sacrificed. Discarding starts a reflexive
++  // trigger (ability 1) bounded by the discarded card's mana value.
++  (name: "Argentum Masticore", cost: "{5}", types: "ARTIFACT | CREATURE", subtypes: ["Phyrexian", "Masticore"], pt: (5, 5), keywords: "FIRST_STRIKE | PROT_MULTICOLORED", abilities: [
++    Triggered(text: "At the beginning of your upkeep, sacrifice this creature unless you discard a card.", on: BeginStep(step: Upkeep, whose: You),
++      effect: MayElse(who: You, can: Cmp(CardsInHand(You), Ge, Const(1)), then: DiscardReflexive(ability: 1), els: Sacrifice(One(This)))),
++    Triggered(text: "When you discard a card this way, destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.", on: Delayed,
++      targets: [(objects: (types_not: "LAND", controller: Opp, cmc_x_max: true))], effect: Destroy(One(Target(0)))),
++  ]),
++  // The two global effects are static flags read where colors are read and where mana is paid (restrict-style abilities, RFC 0014).
++  (name: "Mycosynth Lattice", cost: "{6}", types: "ARTIFACT", abilities: [
++    Static(layer: L4, applies_to: (), effect: AddTypes("ARTIFACT")),
++    Restrict(what: ColorlessEverything),
++    Restrict(what: ManaAsAnyColor),
++  ]),
++  (name: "Summon: Bahamut", cost: "{9}", types: "ENCHANTMENT | CREATURE", subtypes: ["Saga", "Dragon"], pt: (9, 9), keywords: "FLYING", abilities: [
++    Saga(last: 4),
++    Triggered(text: "I — Destroy up to one target nonland permanent.", on: Chapter(1), targets: [(objects: (types_not: "LAND"), optional: true)], effect: Destroy(One(Target(0)))),
++    Triggered(text: "II — Destroy up to one target nonland permanent.", on: Chapter(2), targets: [(objects: (types_not: "LAND"), optional: true)], effect: Destroy(One(Target(0)))),
++    Triggered(text: "III — Draw two cards.", on: Chapter(3), effect: Draw(who: You, n: Const(2))),
++    Triggered(text: "IV — Mega Flare — This creature deals damage equal to the total mana value of other permanents you control to each opponent.", on: Chapter(4),
++      effect: Damage(amount: SumCmc(controller: You, not_self: true), to: Player(Opp))),
++  ]),
++]
+diff -ruN a/crates/mtg-cards/src/legacy.rs b/crates/mtg-cards/src/legacy.rs
+--- a/crates/mtg-cards/src/legacy.rs	2026-10-08 14:03:58.223641000 +0000
++++ b/crates/mtg-cards/src/legacy.rs	2026-10-09 20:23:28.235931110 +0000
+@@ -7,6 +7,8 @@
+ 
+ pub const TRON_CARDS: &str = include_str!("../cards/tron.cards.ron");
+ 
++pub const TRON_SIDE_CARDS: &str = include_str!("../cards/tron-sideboard.cards.ron");
++
+ pub const STORM_CARDS: &str = include_str!("../cards/storm.cards.ron");
+ 
+ pub const UR_CARDS: &str = include_str!("../cards/ur.cards.ron");
+@@ -14,6 +16,6 @@
+ pub const BOROS_CARDS: &str = include_str!("../cards/boros.cards.ron");
+ 
+ pub fn build() -> Arc<CardDb> {
+-    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS), ("storm.cards.ron", STORM_CARDS), ("ur.cards.ron", UR_CARDS), ("boros.cards.ron", BOROS_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
++    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS), ("tron-sideboard.cards.ron", TRON_SIDE_CARDS), ("storm.cards.ron", STORM_CARDS), ("ur.cards.ron", UR_CARDS), ("boros.cards.ron", BOROS_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
+     Arc::new(db)
+ }
+diff -ruN a/crates/mtg-cards/tests/tron_side_load.rs b/crates/mtg-cards/tests/tron_side_load.rs
+--- a/crates/mtg-cards/tests/tron_side_load.rs	1970-01-01 00:00:00.000000000 +0000
++++ b/crates/mtg-cards/tests/tron_side_load.rs	2026-10-09 20:23:28.239909487 +0000
+@@ -0,0 +1,7 @@
++#[test]
++fn tron_sideboard_loads() {
++    let db = mtg_cards::legacy::build();
++    for n in ["Eldrazi Confluence", "Argentum Masticore", "Mycosynth Lattice", "Summon: Bahamut"] {
++        assert!(db.id(n).is_some(), "{n}");
++    }
++}
+diff -ruN a/crates/mtg-core/src/combat.rs b/crates/mtg-core/src/combat.rs
+--- a/crates/mtg-core/src/combat.rs	2026-10-06 12:36:34.928364000 +0000
++++ b/crates/mtg-core/src/combat.rs	2026-10-09 20:21:28.846294971 +0000
+@@ -50,6 +50,10 @@
+         if a.keywords.contains(Keywords::UNBLOCKABLE) {
+             return false;
+         }
++        // Protection from multicolored: can't be blocked by multicolored creatures (702.16f).
++        if a.keywords.contains(Keywords::PROT_MULTICOLORED) && b.colors.bits().count_ones() >= 2 {
++            return false;
++        }
+         if a.keywords.contains(Keywords::FLYING) && !b.keywords.intersects(Keywords::FLYING | Keywords::REACH) {
+             return false;
+         }
+diff -ruN a/crates/mtg-core/src/decision.rs b/crates/mtg-core/src/decision.rs
+--- a/crates/mtg-core/src/decision.rs	2026-10-06 21:47:00.859906000 +0000
++++ b/crates/mtg-core/src/decision.rs	2026-10-09 21:44:34.795850582 +0000
+@@ -117,6 +117,9 @@
+     // RFC 0007 (Storm)
+     /// Imprint (Chrome Mox): the card exiled from hand; `Done` declines.
+     Imprint,
++    // RFC 0014 (Tron sideboard)
++    /// Like `DiscardEffect`, then a reflexive trigger carries the discarded card's mana value.
++    DiscardReflexive,
+ }
+ 
+ impl CardsPurpose {
+diff -ruN a/crates/mtg-core/src/derive.rs b/crates/mtg-core/src/derive.rs
+--- a/crates/mtg-core/src/derive.rs	2026-10-06 21:47:00.869533000 +0000
++++ b/crates/mtg-core/src/derive.rs	2026-10-09 20:22:45.580773319 +0000
+@@ -104,6 +104,25 @@
+                 }
+             }
+         }
++        // Mycosynth Lattice: global flags read by `chars` (cards outside the battlefield) and the payment planner.
++        self.s.lattice = 0;
++        if self.db.has_restrict {
++            for i in 0..n {
++                let o = &self.s.objs[self.s.battlefield[i].slot as usize];
++                if o.phased {
++                    continue;
++                }
++                for a in &self.db.def(o.def).abilities {
++                    if let AbilityDef::Restrict(r) = a {
++                        match r.what {
++                            Restriction::ColorlessEverything => self.s.lattice |= 1,
++                            Restriction::ManaAsAnyColor => self.s.lattice |= 2,
++                            _ => {}
++                        }
++                    }
++                }
++            }
++        }
+         statics.sort_by_key(|&(l, ts, r, ai)| (l, ts, r.slot, ai));
+         let mut insts: Vec<usize> = (0..self.s.effects.len()).collect();
+         insts.sort_by_key(|&i| (self.s.effects[i].layer, self.s.effects[i].ts));
+@@ -186,6 +205,12 @@
+                 }
+             }
+         }
++        if self.s.lattice & 1 != 0 {
++            for i in 0..n {
++                let r = self.s.battlefield[i];
++                self.s.derived[r.slot as usize].colors = Colors::empty();
++            }
++        }
+     }
+ 
+     /// Would `obj` (about to enter the battlefield) have lost its abilities as it enters, given the
+@@ -279,7 +304,11 @@
+             debug_assert!(!self.s.derived_dirty, "stale derived cache read for {r:?}");
+             self.s.derived[r.slot as usize]
+         } else {
+-            base_chars(self.db.def(o.def))
++            let mut c = base_chars(self.db.def(o.def));
++            if self.s.lattice & 1 != 0 {
++                c.colors = Colors::empty();
++            }
++            c
+         }
+     }
+ 
+diff -ruN a/crates/mtg-core/src/eval.rs b/crates/mtg-core/src/eval.rs
+--- a/crates/mtg-core/src/eval.rs	2026-10-09 21:44:08.770115863 +0000
++++ b/crates/mtg-core/src/eval.rs	2026-10-09 21:44:15.405087224 +0000
+@@ -100,6 +100,10 @@
+             Expr::X => env.x,
+             Expr::EventAmount => env.cap.amount,
+             Expr::Count(f) => self.select(env, f).len() as i32,
++            Expr::SumCmc(f) => {
++                let objs = self.select(env, f);
++                objs.into_iter().map(|r| self.db.def(self.s.obj(r).def).mana_value() as i32).sum()
++            }
+             Expr::Life(p) => self.eval_p(env, *p).map(|s| self.s.players[s.idx()].life).unwrap_or(0),
+             Expr::CardsInHand(p) => self.eval_p(env, *p).map(|s| self.s.players[s.idx()].hand.len() as i32).unwrap_or(0),
+             Expr::CardsInLibrary(p) => self.eval_p(env, *p).map(|s| self.s.players[s.idx()].library.len() as i32).unwrap_or(0),
+diff -ruN a/crates/mtg-core/src/ir.rs b/crates/mtg-core/src/ir.rs
+--- a/crates/mtg-core/src/ir.rs	2026-10-09 21:44:08.769676397 +0000
++++ b/crates/mtg-core/src/ir.rs	2026-10-09 21:44:34.796510052 +0000
+@@ -300,6 +300,9 @@
+     Min(Box<Expr>, Box<Expr>),
+     HalfDown(Box<Expr>),
+     HalfUp(Box<Expr>),
++    /// Total mana value of the objects matching the filter (RFC 0014: Summon: Bahamut's Mega Flare).
++    /// Appended last so no existing discriminant (and so no card-database hash) moves.
++    SumCmc(ObjFilter),
+ }
+ 
+ #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+@@ -648,6 +651,11 @@
+     /// Fight (CR 701.12): the creatures in target slots `a` and `b` each deal damage equal to their
+     /// power to the other. Nothing happens unless both are still creatures on the battlefield.
+     Fight { a: u8, b: u8 },
++    // ---- RFC 0014 (Tron sideboard) ----
++    /// The controller discards a card, then ability `ability` of the source triggers as a reflexive
++    /// trigger ("when you discard a card this way") whose captured amount is the discarded card's
++    /// mana value (read back with `EventAmount`; a target filter with `cmc_x_max` is bounded by it).
++    DiscardReflexive { ability: u8 },
+ }
+ 
+ fn pref_you() -> PRef {
+@@ -1139,6 +1147,13 @@
+     /// Creatures with power greater than the number of cards in the permanent controller's hand
+     /// can't attack (Ensnaring Bridge). `who` is ignored: it binds every creature.
+     AttackPowerOverHand,
++    /// "All cards that aren't on the battlefield, spells, and permanents are colorless" (Mycosynth
++    /// Lattice, RFC 0014). `who` is ignored: it binds every object.
++    ColorlessEverything,
++    /// "Players may spend mana as though it were mana of any color" (Mycosynth Lattice, RFC 0014).
++    /// `who` is ignored: it binds every player. Colorless mana still can't pay for colored mana
++    /// of the wrong kind of cost ({C} needs colorless mana).
++    ManaAsAnyColor,
+ }
+ 
+ /// "You may cast <spells> without paying their mana costs (and with flash)". Casting this way is
+diff -ruN a/crates/mtg-core/src/legal.rs b/crates/mtg-core/src/legal.rs
+--- a/crates/mtg-core/src/legal.rs	2026-10-06 21:47:01.275555000 +0000
++++ b/crates/mtg-core/src/legal.rs	2026-10-09 21:44:34.797435808 +0000
+@@ -140,7 +140,10 @@
+             if mask == 0 {
+                 continue;
+             }
+-            if c.types.contains(Types::CREATURE) && o_entered >= self.s.turn.own_turn[seat.idx()] && !c.keywords.contains(Keywords::HASTE) {
++            // Summoning sickness (302.6) only stops abilities whose cost includes {T}: an Eldrazi Scion
++            // token made this turn can be sacrificed for mana at once (RFC 0014).
++            let no_tap = ability != 255 && !sac && matches!(&def.abilities[ability as usize], AbilityDef::Activated(ad) if !ad.cost.iter().any(|c| matches!(c, CostItem::TapSelf)));
++            if c.types.contains(Types::CREATURE) && o_entered >= self.s.turn.own_turn[seat.idx()] && !c.keywords.contains(Keywords::HASTE) && !no_tap {
+                 continue;
+             }
+             let mut pref = extra + if c.supertypes.contains(Supertypes::BASIC) { 0 } else { 1 } + if consumes { 8 } else { 0 };
+@@ -269,11 +272,11 @@
+             for c in 0..6 {
+                 bare.0[c] = usable[c];
+             }
+-            plan_payment(cost.pips, cost.hyb, generic, &bare, &ms)
++            self.pay_plan_lat(cost.pips, cost.hyb, generic, &bare, &ms)
+         };
+         let mut pay = match hinted {
+             Some(p) => p,
+-            None => match plan_payment(cost.pips, cost.hyb, generic, &pool, &ms) {
++            None => match self.pay_plan_lat(cost.pips, cost.hyb, generic, &pool, &ms) {
+                 Some(p) => p,
+                 None => self.plan_with_filters(cost, generic, &pool, &srcs)?,
+             },
+@@ -285,6 +288,30 @@
+         Some((pay, srcs))
+     }
+ 
++    /// `plan_payment`, with Mycosynth Lattice's "spend mana as though it were mana of any color"
++    /// applied when it is on the battlefield: every source can pay a colored symbol, and floating
++    /// colorless mana can too. A {C} symbol still needs colorless mana (it is a specific type of
++    /// mana, not a color).
++    fn pay_plan_lat(&self, pips: [u8; 6], hyb: [u8; 10], generic: u32, pool: &ManaPool, ms: &[ManaSource]) -> Option<Payment> {
++        if self.s.lattice & 2 == 0 {
++            return plan_payment(pips, hyb, generic, pool, ms);
++        }
++        let ms2: SmallVec<[ManaSource; 16]> = ms.iter().map(|m| ManaSource { colors: m.colors | 0b11111, ..*m }).collect();
++        let mut p2 = pips;
++        let mut pool2 = *pool;
++        let mut used_c = 0u8;
++        for c in 0..5 {
++            let left = p2[c].saturating_sub(pool.0[c]);
++            let take = left.min(pool2.0[5]);
++            p2[c] -= take;
++            pool2.0[5] -= take;
++            used_c += take;
++        }
++        let mut pay = plan_payment(p2, hyb, generic, &pool2, &ms2)?;
++        pay.pool_used[5] += used_c;
++        Some(pay)
++    }
++
+     /// Second attempt when the plain payment fails: `k` filter sources (Planar Nexus) are tapped as
+     /// the "{1}" of their filter ability, each turning one other source into a mana of any color
+     /// (net: two permanents make one colored mana). Tries k = 1, 2, ... and converts the sources
+@@ -313,7 +340,7 @@
+                     ms.push(ManaSource { tag: i as u32, colors, pref: s.pref });
+                 }
+             }
+-            if let Some(mut p) = plan_payment(cost.pips, cost.hyb, generic, pool, &ms) {
++            if let Some(mut p) = self.pay_plan_lat(cost.pips, cost.hyb, generic, pool, &ms) {
+                 // Every filter source is tapped, whether or not its converted source was used.
+                 for &f in removed {
+                     p.taps.push((f as u32, ManaColor::C));
+@@ -627,6 +654,10 @@
+                     if k.contains(Keywords::HEXPROOF) && o.controller != ctrl {
+                         return false;
+                     }
++                    // Protection from multicolored: a multicolored source can't target it (702.16b).
++                    if k.contains(Keywords::PROT_MULTICOLORED) && src_colors.bits().count_ones() >= 2 {
++                        return false;
++                    }
+                     if o.controller != ctrl && self.chars(r).hexproof_from.intersects(src_colors) {
+                         return false;
+                     }
+diff -ruN a/crates/mtg-core/src/lint.rs b/crates/mtg-core/src/lint.rs
+--- a/crates/mtg-core/src/lint.rs	2026-10-09 21:44:08.770708336 +0000
++++ b/crates/mtg-core/src/lint.rs	2026-10-09 21:44:15.405235677 +0000
+@@ -111,7 +111,7 @@
+         Effect::PutChosen { who, cmc, .. } => tmax(p(who), cmc.as_ref().map(expr).unwrap_or(-1)),
+         Effect::ExileGraveyard { who } => p(who),
+         Effect::GainEnergy { who, n } | Effect::LoseEnergy { who, n } => tmax(p(who), expr(n)),
+-        Effect::Reflexive { .. } | Effect::DelayMoved { .. } | Effect::LinkedToken { .. } => -1,
++        Effect::Reflexive { .. } | Effect::DiscardReflexive { .. } | Effect::DelayMoved { .. } | Effect::LinkedToken { .. } => -1,
+         Effect::ExileLinked(o) | Effect::CopyToken(o) => objs(o),
+         Effect::EachPutFromHand { .. } | Effect::Venture | Effect::MarkUsed(_) | Effect::AllowCastMoved | Effect::TapAttackMoved => -1,
+         Effect::ExilePlay { n } | Effect::DrawRevealCast { n } => expr(n),
+diff -ruN a/crates/mtg-core/src/ops.rs b/crates/mtg-core/src/ops.rs
+--- a/crates/mtg-core/src/ops.rs	2026-10-08 02:11:03.209080000 +0000
++++ b/crates/mtg-core/src/ops.rs	2026-10-09 20:21:28.847504981 +0000
+@@ -543,6 +543,14 @@
+                 if !self.s.is_live(t) {
+                     return Outcome::Prevented;
+                 }
++                // Protection from multicolored: damage from a multicolored source is prevented (702.16e).
++                if self.chars(t).keywords.contains(Keywords::PROT_MULTICOLORED) {
++                    if let Some(src) = source.filter(|&s| self.s.is_live(s)) {
++                        if self.chars(src).colors.bits().count_ones() >= 2 {
++                            return Outcome::Prevented;
++                        }
++                    }
++                }
+                 let is_creature = self.chars(t).types.contains(Types::CREATURE);
+                 if self.chars(t).types.contains(Types::PLANESWALKER) {
+                     // 120.3c: damage to a planeswalker removes that many loyalty counters.
+diff -ruN a/crates/mtg-core/src/read.rs b/crates/mtg-core/src/read.rs
+--- a/crates/mtg-core/src/read.rs	2026-10-06 21:47:01.512351000 +0000
++++ b/crates/mtg-core/src/read.rs	2026-10-09 20:22:45.578871247 +0000
+@@ -406,7 +406,7 @@
+             exile_plays, moved, name_choice, enter_choices, batch, effects, player_fx, exile, turn, combat, frames, pending, next_decision,
+             ts_counter, result, cfg, pay_hint, spell_lki,
+             // Not rules state: caches, knowledge (own hash), RNG (own hash), bookkeeping.
+-            derived: _, derived_dirty: _, knowledge: _, vids: _, next_vid: _, rng: _, n_cards: _, events: _, steps: _,
++            derived: _, derived_dirty: _, lattice: _, knowledge: _, vids: _, next_vid: _, rng: _, n_cards: _, events: _, steps: _,
+         } = self;
+         debug_assert!(batch.depth == 0, "a simultaneous-change batch must not be open at a hash point");
+         let mut h = Fx64::default();
+diff -ruN a/crates/mtg-core/src/resolve.rs b/crates/mtg-core/src/resolve.rs
+--- a/crates/mtg-core/src/resolve.rs	2026-10-09 21:44:08.771367109 +0000
++++ b/crates/mtg-core/src/resolve.rs	2026-10-09 21:44:15.405587114 +0000
+@@ -1514,6 +1514,23 @@
+             }
+             Flow::Next
+         }
++        Effect::DiscardReflexive { ability } => {
++            if *aux == 0 {
++                let p = env.controller;
++                if cx.s.players[p.idx()].hand.is_empty() {
++                    return Flow::Next;
++                }
++                let opts = card_options(cx, p, &cx.s.players[p.idx()].hand.clone());
++                ask(cx, p, DecisionKind::ChooseCards { purpose: CardsPurpose::DiscardReflexive, remaining: 1 }, opts);
++                return Flow::Await;
++            }
++            if let Some(source) = env.source {
++                let def = cx.s.stack.last().map(|e| e.def).unwrap_or(cx.s.objs[source.slot as usize].def);
++                let cap = Captured { amount: sc[0] as i32 - 1, ..Captured::default() };
++                cx.s.pending_triggers.push(PendingTrigger { source, def, ability: *ability, controller: env.controller, cap });
++            }
++            Flow::Next
++        }
+         Effect::Reflexive { ability } => {
+             if let Some(source) = env.source {
+                 let def = cx.s.stack.last().map(|e| e.def).unwrap_or(cx.s.objs[source.slot as usize].def);
+@@ -1983,6 +2000,13 @@
+             f.aux += 1; // one more discarded; the op re-evaluates how many are left
+             Next::Stay
+         }
++        (DecisionKind::ChooseCards { purpose: CardsPurpose::DiscardReflexive, .. }, Opt::Card(r)) => {
++            let mv = cx.db.def(cx.s.obj(r).def).mana_value() as u16;
++            cx.move_zone(r, ZoneKind::Graveyard, MoveOpts::default());
++            f.sc[0] = mv + 1; // mana value plus one, so zero means "nothing discarded"
++            f.aux = 1;
++            Next::Stay
++        }
+         (DecisionKind::ChooseCards { purpose: CardsPurpose::SacrificeEffect, .. }, Opt::Card(r)) => {
+             cx.move_zone(r, ZoneKind::Graveyard, MoveOpts::default());
+             f.aux = 1;
+diff -ruN a/crates/mtg-core/src/stabilize.rs b/crates/mtg-core/src/stabilize.rs
+--- a/crates/mtg-core/src/stabilize.rs	2026-10-03 21:41:57.135573000 +0000
++++ b/crates/mtg-core/src/stabilize.rs	2026-10-09 21:44:34.797673618 +0000
+@@ -72,7 +72,12 @@
+                 if (f.slot as usize) < specs.len() {
+                     cx.refresh();
+                     let spec = &specs[f.slot as usize];
++                    // A reflexive trigger's "mana value X or less" bound is the captured amount (RFC 0014).
++                    if spec.objects.as_ref().map_or(false, |o| o.cmc_x_max.0) {
++                        cx.s.cur_x = Some(pt.cap.amount.clamp(0, 255) as u8);
++                    }
+                     let cands: Vec<Target> = cx.legal_targets(spec, pt.controller, Some(pt.source)).into_iter().filter(|t| !(spec.distinct && f.targets.contains(t))).collect();
++                    cx.s.cur_x = None;
+                     if cands.is_empty() {
+                         if spec.optional {
+                             f.targets.push(Target::None);
+diff -ruN a/crates/mtg-core/src/state.rs b/crates/mtg-core/src/state.rs
+--- a/crates/mtg-core/src/state.rs	2026-10-06 21:47:01.710495000 +0000
++++ b/crates/mtg-core/src/state.rs	2026-10-09 21:44:34.796302328 +0000
+@@ -396,6 +396,9 @@
+     pub(crate) next_decision: [u32; 2],
+     pub(crate) derived: Vec<Chars>,
+     pub(crate) derived_dirty: bool,
++    /// Cache beside `derived`: bit 0 = all objects are colorless, bit 1 = mana may be spent as any
++    /// color (Mycosynth Lattice, RFC 0014). Recomputed with the derived characteristics.
++    pub(crate) lattice: u8,
+     pub(crate) knowledge: Vec<CardKnow>,
+     pub(crate) vids: Vec<[ViewId; 2]>,
+     pub(crate) next_vid: [u32; 2],
+@@ -542,6 +545,7 @@
+             next_decision: [1, 1],
+             derived: vec![Chars::default(); n],
+             derived_dirty: true,
++            lattice: 0,
+             knowledge: vec![CardKnow::default(); n],
+             vids: vec![[ViewId::NONE; 2]; n],
+             next_vid: [1, 1],
+diff -ruN a/crates/mtg-core/src/types.rs b/crates/mtg-core/src/types.rs
+--- a/crates/mtg-core/src/types.rs	2026-10-08 02:11:03.385937000 +0000
++++ b/crates/mtg-core/src/types.rs	2026-10-09 20:21:28.845286890 +0000
+@@ -121,6 +121,9 @@
+         const NO_UNTAP      = 1 << 20;
+         /// "Can't be blocked" (Manifold Key grants it until end of turn).
+         const UNBLOCKABLE   = 1 << 21;
++        /// Protection from multicolored (Argentum Masticore): can't be targeted, blocked or damaged by
++        /// multicolored sources (702.16b, 702.16e, 702.16f; enchanting and equipping are not modeled).
++        const PROT_MULTICOLORED = 1 << 22;
+     }
+ }
+ 
+diff -ruN a/crates/mtg-spec/src/runner.rs b/crates/mtg-spec/src/runner.rs
+--- a/crates/mtg-spec/src/runner.rs	2026-10-08 14:03:58.449732000 +0000
++++ b/crates/mtg-spec/src/runner.rs	2026-10-09 20:46:47.293175981 +0000
+@@ -1383,6 +1383,10 @@
+                 let want = if yes { Opt::Yes } else { Opt::No };
+                 self.choose("yes_no", |_, o| *o == want)
+             }
++            "choose_target" if a["answer"].is_null() => {
++                // "Up to" targets: a null answer declines the slot.
++                self.choose("decline", |_, o| *o == Opt::Done)
++            }
+             "choose_target" => {
+                 let t = self.target_of(&a["answer"])?;
+                 match p.options.iter().position(|o| *o == Opt::Target(t)) {

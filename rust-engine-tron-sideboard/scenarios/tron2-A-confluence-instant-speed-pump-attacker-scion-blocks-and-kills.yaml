@@ -1,0 +1,58 @@
+id: tron2-a-confluence-in-opponents-declare-attackers-pumps-attacker-new-scion-blocks-and-kills-it
+title: "Eldrazi Confluence in p1's declare attackers step: the attacking 3/4 becomes 6/1, a new Scion token blocks it and kills it"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Street Wraith, Ocelot Pride, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, pump, instant-speed, combat, declare-blockers, token, summoning-sickness, opponents-turn]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Target creature gets +3/-3 until end of turn.", verified: true}
+  - {kind: oracle, card: Eldrazi Confluence, text: 'Create a 1/1 colorless Eldrazi Scion creature token with "Sacrifice this token: Add {C}."', verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed. Regeneration can replace this event.", verified: true}
+  - {kind: cr, ref: "509.1a", text: "The defending player chooses which creatures they control, if any, will block. The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: begin_combat
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Street Wraith @wr", "Ocelot Pride @op"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@wr", target: {player: p0}}]}
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@conf", modes: [3], targets: ["@wr", "@op"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - bind: {as: scion, find: {name: "Eldrazi Scion Token", controller: p0}}
+  - check:
+      phase: declare_attackers
+      p1:
+        battlefield: [{card: Street Wraith, pt: [6, 1], attacking: true}]
+        graveyard: [Ocelot Pride]
+      p0: {battlefield_contains: [{token: Eldrazi Scion Token, pt: [1, 1], sick: true, tapped: false}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: declare_blockers, blocks: [{blocker: "@scion", attacker: "@wr"}]}
+  - advance: {to: main2, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main2
+    stack: []
+    p0:
+      life: 18
+      battlefield: [{card: Ancient Tomb, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1:
+      life: 20
+      graveyard: [Ocelot Pride, Street Wraith]
+      battlefield: []
+notes: >
+  Multiset 2 (pump x2, Scion x1) is `modes: [3]`: the pumps go on the attacking Wraith (6/1) and on Ocelot Pride (dies); the
+  single Scion has no target, so it can be bound. A token created this turn is summoning sick but can block (509.1a has no such
+  restriction). The Scion deals 1 damage to the 1-toughness Wraith (704.5g) while the Wraith deals 6 to the Scion: both die, p0
+  takes no combat damage (18 after the Tomb). A wrong engine does not let the new token block, or leaves the Wraith 3/4.

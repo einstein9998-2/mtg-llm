@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "group": "tron2-A",
+    "note": "Entries to merge into reference/oracle.json cards{}; text from Savecraft card_search (Scryfall oracle), retrieved 2026-10-09. Group A adds Eldrazi Confluence and Summon: Bahamut. The Eldrazi Scion Token entry is already in rust-engine-tron/oracle-additions-C.json (tokens)."
+  },
+  "cards": {
+    "Eldrazi Confluence": {
+      "name": "Eldrazi Confluence",
+      "mana_cost": "{2}{C}{C}",
+      "type_line": "Instant",
+      "oracle_text": "Choose three. You may choose the same mode more than once.\n• Target creature gets +3/-3 until end of turn.\n• Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.\n• Create a 1/1 colorless Eldrazi Scion creature token with \"Sacrifice this token: Add {C}.\"",
+      "source": "scryfall oracle via Savecraft card_search (exact name), retrieved 2026-10-09"
+    },
+    "Summon: Bahamut": {
+      "name": "Summon: Bahamut",
+      "mana_cost": "{9}",
+      "type_line": "Enchantment Creature — Saga Dragon",
+      "pt": "9/9",
+      "oracle_text": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)\nI, II — Destroy up to one target nonland permanent.\nIII — Draw two cards.\nIV — Mega Flare — This creature deals damage equal to the total mana value of other permanents you control to each opponent.\nFlying",
+      "source": "scryfall oracle via Savecraft card_search (exact name), retrieved 2026-10-09"
+    }
+  }
+}

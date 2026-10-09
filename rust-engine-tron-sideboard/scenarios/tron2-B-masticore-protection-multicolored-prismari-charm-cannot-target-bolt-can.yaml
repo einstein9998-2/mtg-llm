@@ -1,0 +1,42 @@
+id: tron2-b-masticore-protection-multicolored-prismari-charm-cannot-target-bolt-can
+title: "Argentum Masticore's protection from multicolored: Prismari Charm (blue-red) cannot target it in any mode, mono-red Lightning Bolt can"
+area: card
+cards: [Argentum Masticore, Prismari Charm, Lightning Bolt, Volcanic Island, Mountain, Island]
+tags: [argentum-masticore, protection, protection-from-multicolored, targeting, multicolored-spell, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "First strike, protection from multicolored", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "702.16b", text: "A permanent or player with protection can’t be targeted by spells with the stated quality and can’t be targeted by abilities from a source with the stated quality.", verified: true}
+  - {kind: cr, ref: "105.2b", text: "A multicolored object is two or more of the five colors.", verified: true}
+  - {kind: cr, ref: "202.2", text: "An object is the color or colors of the mana symbols in its mana cost, regardless of the color of its frame.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Prismari Charm @charm", "Lightning Bolt @bolt"]
+    battlefield: ["Island @is1", "Mountain @m1", "Volcanic Island @vi"]
+    library_pad: 10
+  p1:
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [3], targets: ["@mast"]}}
+  - expect_illegal: {p0: {t: cast, card: "@charm", modes: [2], targets: ["@mast"]}}
+  - p0: {t: cast, card: "@bolt", targets: ["@mast"], pay: {tap: ["@vi"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Prismari Charm]
+      graveyard: [Lightning Bolt]
+    p1:
+      battlefield: [{card: Argentum Masticore, damage: 3}]
+notes: >
+  Prismari Charm's mana cost {U}{R} makes it a multicolored spell (105.2b, 202.2), so protection from multicolored stops
+  it from targeting the Masticore: neither the bounce mode (3) nor the damage mode (2) can name it. Lightning Bolt is
+  mono-red: the Masticore can be targeted and takes 3 damage (5 toughness, survives; first strike is irrelevant to
+  spells). Modes are 1-based in printed order. Wrong engines: treat "multicolored" as any non-colorless color, or only
+  check creature sources.

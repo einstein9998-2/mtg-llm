@@ -1,0 +1,42 @@
+id: tron2-a-confluence-scion-mode-three-times-makes-three-colorless-1-1-eldrazi-scions
+title: "Eldrazi Confluence choosing the Scion mode three times (no targets) makes three summoning-sick 1/1 colorless Eldrazi Scion creatures"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, same-mode-repeated, eldrazi-scion, token, no-targets, summoning-sickness]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: 'Create a 1/1 colorless Eldrazi Scion creature token with "Sacrifice this token: Add {C}."', verified: true}
+  - {kind: cr, ref: "700.2d", text: "If a player is allowed to choose more than one mode for a modal spell or ability, that player normally can’t choose the same mode more than once. However, some modal spells include the instruction “You may choose the same mode more than once.” If a particular mode is chosen multiple times, the spell is treated as if that mode appeared that many times in sequence. If that mode requires a target, the same player or object may be chosen as the target for each of those modes, or different targets may be chosen.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@conf", modes: [10], targets: [], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - check:
+      stack: [{kind: spell, card: "@conf", controller: p0}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Eldrazi Confluence]
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {token: Eldrazi Scion Token, pt: [1, 1], types: [Creature], subtypes: [Eldrazi, Scion], colors: [], sick: true, tapped: false}
+        - {token: Eldrazi Scion Token, pt: [1, 1], types: [Creature], subtypes: [Eldrazi, Scion], colors: [], sick: true, tapped: false}
+        - {token: Eldrazi Scion Token, pt: [1, 1], types: [Creature], subtypes: [Eldrazi, Scion], colors: [], sick: true, tapped: false}
+notes: >
+  Multiset 9 (Scion x3) is `modes: [10]`; no instance has a target (`targets: []`). Three tokens enter, one per instance (700.2d:
+  the mode counts as appearing three times in sequence), each a 1/1 colorless Eldrazi Scion creature, untapped and summoning
+  sick. A wrong engine makes one token for the one chosen mode.
