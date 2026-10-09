@@ -15,9 +15,9 @@
              for c in 0..6 {
                  bare.0[c] = usable[c];
              }
--            plan_payment(cost.pips, cost.hyb, generic, &bare, &ms)
+-            self.pay_plan_lat(cost.pips, cost.hyb, generic, &bare, &ms)
 +            let named: SmallVec<[ManaSource; 16]> = ms.iter().filter(|m| self.s.pay_hint.contains(&srcs[m.tag as usize].obj)).copied().collect();
-+            plan_payment(cost.pips, cost.hyb, generic, &bare, &named)
++            self.pay_plan_lat(cost.pips, cost.hyb, generic, &bare, &named)
          };
          let mut pay = match hinted {
              Some(p) => p,

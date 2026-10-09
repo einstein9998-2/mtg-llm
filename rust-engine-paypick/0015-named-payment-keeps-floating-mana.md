@@ -1,4 +1,4 @@
-# RFC 0014: A named payment source no longer pulls in unnamed lands while floating mana could pay
+# RFC 0015: A named payment source no longer pulls in unnamed lands while floating mana could pay
 
 Status: draft; implemented and tested in a scratch copy of the live engine; independent review pending
 Author: Chant and Petal thread (Brady: "fix the tomb bug", 2026-10-09)
@@ -10,6 +10,8 @@ Cause: `plan_cost_with` (legal.rs) built the "hinted" plan from `ms`, the list o
 
 ## Change
 `mtg-core/src/legal.rs`, `plan_cost_with`: the hinted attempt uses only sources in `pay_hint`. If they cannot pay alone, the normal plan runs (pool first for generic, named sources preferred by `pref`, unnamed only if still needed), so the example now taps Tropical Island for {U} and spends {G}{G} on the generic part. One function, 3 lines.
+
+Ordering: the patch is made on top of RFC 0014 (tron sideboard, #21): the named-source attempt goes through `pay_plan_lat`, so Mycosynth Lattice's "any color" still applies to a named-source plan.
 
 ## Impact
 - State layout, IR, card database, goldens: none. `ENGINE_CORE_VERSION` unchanged.
