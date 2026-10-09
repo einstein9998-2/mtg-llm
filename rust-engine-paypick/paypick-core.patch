@@ -1,0 +1,23 @@
+--- a/crates/mtg-core/src/legal.rs	2026-10-09 20:59:55.106131140 +0000
++++ b/crates/mtg-core/src/legal.rs	2026-10-09 22:01:08.099589304 +0000
+@@ -261,7 +261,9 @@
+         }
+         // A named payment source (601.2h: the player chooses what to pay with) is honored before
+         // floating mana: plan from the named sources alone, and fall back to the pool only if
+-        // they cannot pay.
++        // they cannot pay. The unnamed sources stay out of the first attempt, so a named land that
++        // cannot pay everything never pulls in an unnamed one (Ancient Tomb's 2 damage) while
++        // floating mana could cover the rest; the fallback prefers named sources via `pref`.
+         let hinted = if self.s.pay_hint.is_empty() {
+             None
+         } else {
+@@ -269,7 +271,8 @@
+             for c in 0..6 {
+                 bare.0[c] = usable[c];
+             }
+-            self.pay_plan_lat(cost.pips, cost.hyb, generic, &bare, &ms)
++            let named: SmallVec<[ManaSource; 16]> = ms.iter().filter(|m| self.s.pay_hint.contains(&srcs[m.tag as usize].obj)).copied().collect();
++            self.pay_plan_lat(cost.pips, cost.hyb, generic, &bare, &named)
+         };
+         let mut pay = match hinted {
+             Some(p) => p,
