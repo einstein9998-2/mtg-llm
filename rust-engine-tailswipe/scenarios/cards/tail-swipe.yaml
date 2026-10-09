@@ -1,0 +1,154 @@
+id: tail-swipe-main-phase-atraxa-lifelink
+title: "Tail Swipe in its controller's main phase pumps +1/+1, Atraxa fights a Channeler, kills it and gains life equal to her power"
+area: card
+cards: [Tail Swipe, Tropical Island, "Atraxa, Grand Unifier", "Dragon's Rage Channeler"]
+tags: [tail-swipe, fight, lifelink]
+derived_from: oracle
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Tail Swipe @ts"]
+    battlefield: ["Tropical Island @ti", {card: "Atraxa, Grand Unifier", as: atx}]
+    library_pad: 10
+  p1:
+    battlefield: [{card: "Dragon's Rage Channeler", as: drc}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: ["@atx", "@drc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 28
+      graveyard: [Tail Swipe]
+      battlefield: [{card: Tropical Island, tapped: true}, {card: "Atraxa, Grand Unifier", pt: [8, 8], damage: 1}]
+    p1:
+      life: 20
+      battlefield: []
+      graveyard: ["Dragon's Rage Channeler"]
+notes: >
+  Cast in p0's main phase, so Atraxa gets +1/+1 (8/8) before the fight; she deals 8 to the Channeler and takes 1.
+  Lifelink gains 8 (20 -> 28), which is the point of the test: the damage is dealt by Atraxa, not by the spell.
+---
+id: tail-swipe-opponent-turn-no-pump
+title: "Tail Swipe cast on the opponent's turn gives no +1/+1 but still fights"
+area: card
+cards: [Tail Swipe, Tropical Island, "Atraxa, Grand Unifier", "Dragon's Rage Channeler"]
+tags: [tail-swipe, fight, lifelink]
+derived_from: oracle
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    hand: ["Tail Swipe @ts"]
+    battlefield: ["Tropical Island @ti", {card: "Atraxa, Grand Unifier", as: atx}]
+    library_pad: 10
+  p1:
+    battlefield: [{card: "Dragon's Rage Channeler", as: drc}]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: cast, card: "@ts", targets: ["@atx", "@drc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 27
+      battlefield: [{card: Tropical Island, tapped: true}, {card: "Atraxa, Grand Unifier", pt: [7, 7], damage: 1}]
+    p1:
+      battlefield: []
+      graveyard: ["Dragon's Rage Channeler"]
+notes: >
+  Not p0's turn, so no pump: Atraxa is 7/7 and gains 7.
+---
+id: tail-swipe-combat-phase-no-pump
+title: "Tail Swipe cast in its controller's own combat phase gives no +1/+1 (not a main phase)"
+area: card
+cards: [Tail Swipe, Tropical Island, "Atraxa, Grand Unifier", "Dragon's Rage Channeler"]
+tags: [tail-swipe, fight]
+derived_from: oracle
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Tail Swipe @ts"]
+    battlefield: ["Tropical Island @ti", {card: "Atraxa, Grand Unifier", as: atx}]
+    library_pad: 10
+  p1:
+    battlefield: [{card: "Dragon's Rage Channeler", as: drc}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: ["@atx", "@drc"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      life: 27
+      battlefield: [{card: Tropical Island, tapped: true}, {card: "Atraxa, Grand Unifier", pt: [7, 7], damage: 1}]
+    p1:
+      graveyard: ["Dragon's Rage Channeler"]
+notes: Beginning of combat is not a main phase.
+---
+id: tail-swipe-pump-saves-acererak
+title: "Tail Swipe pump in main phase lets a 5/5 Acererak survive a fight with a 5/5 Murktide that dies"
+area: card
+cards: [Tail Swipe, Tropical Island, "Acererak the Archlich", "Murktide Regent"]
+tags: [tail-swipe, fight, pump]
+derived_from: oracle
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Tail Swipe @ts"]
+    battlefield: ["Tropical Island @ti", {card: "Acererak the Archlich", as: ace}]
+    library_pad: 10
+  p1:
+    battlefield: [{card: Murktide Regent, as: murk, counters: {"+1/+1": 2}}]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@ts", targets: ["@ace", "@murk"], pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    p0:
+      battlefield: [{card: Tropical Island, tapped: true}, {card: "Acererak the Archlich", pt: [6, 6], damage: 5}]
+    p1:
+      battlefield: []
+      graveyard: ["Murktide Regent"]
+notes: Murktide with two counters is 5/5 and deals 5; Acererak is 6/6 after the pump and survives with 5 damage.
+---
+id: tail-swipe-both-targets-yours-illegal
+title: "Tail Swipe cannot name two creatures you control"
+area: card
+cards: [Tail Swipe, Tropical Island, "Atraxa, Grand Unifier", "Acererak the Archlich"]
+tags: [tail-swipe, targets]
+derived_from: oracle
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Tail Swipe @ts"]
+    battlefield: ["Tropical Island @ti", {card: "Atraxa, Grand Unifier", as: atx}, {card: "Acererak the Archlich", as: ace}]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@ts", targets: ["@atx", "@ace"], pay: auto}}
+expect:
+  - at: after_script
+    p0: {hand: ["Tail Swipe"]}
+notes: Second target must be a creature you don't control.
