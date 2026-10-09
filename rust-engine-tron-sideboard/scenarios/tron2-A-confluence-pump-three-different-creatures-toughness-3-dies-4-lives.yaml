@@ -1,0 +1,40 @@
+id: tron2-a-confluence-pump-three-different-creatures-toughness-3-dies-toughness-4-lives
+title: "Eldrazi Confluence +3/-3 on three different creatures: a 1/3 and a 1/1 die, a 3/4 survives as a 6/1"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, "Thassa's Oracle", Street Wraith, Ocelot Pride]
+tags: [eldrazi-confluence, modal, pump, minus-toughness, toughness-boundary, state-based-action, per-instance-targets]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Target creature gets +3/-3 until end of turn.", verified: true}
+  - {kind: cr, ref: "700.2d", text: "If a player is allowed to choose more than one mode for a modal spell or ability, that player normally can’t choose the same mode more than once. However, some modal spells include the instruction “You may choose the same mode more than once.” If a particular mode is chosen multiple times, the spell is treated as if that mode appeared that many times in sequence. If that mode requires a target, the same player or object may be chosen as the target for each of those modes, or different targets may be chosen.", verified: true}
+  - {kind: cr, ref: "704.5f", text: "If a creature has toughness 0 or less, it’s put into its owner’s graveyard. Regeneration can’t replace this event.", verified: true}
+  - {kind: cr, ref: "704.5g", text: "If a creature has toughness greater than 0, it has damage marked on it, and the total damage marked on it is greater than or equal to its toughness, that creature has been dealt lethal damage and is destroyed. Regeneration can replace this event.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Thassa's Oracle @orc", "Street Wraith @wr", "Ocelot Pride @op"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@conf", modes: [1], targets: ["@orc", "@wr", "@op"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Eldrazi Confluence]
+    p1:
+      battlefield: [{card: Street Wraith, pt: [6, 1], damage: 0}]
+      graveyard: ["Thassa's Oracle", Ocelot Pride]
+notes: >
+  Three instances, three different targets (multiset 0, `modes: [1]`). Thassa's Oracle (1/3) becomes 4/0 and Ocelot Pride (1/1)
+  becomes 4/-2: both go to the graveyard (704.5f). Street Wraith (3/4) becomes 6/1 and lives (toughness above zero, no damage
+  marked). A wrong engine kills the Wraith, or applies the pumps in the wrong slots (the target list is in printed order of
+  the instances).

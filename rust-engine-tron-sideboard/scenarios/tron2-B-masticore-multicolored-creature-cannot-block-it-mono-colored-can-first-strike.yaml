@@ -1,0 +1,53 @@
+id: tron2-b-masticore-multicolored-creature-cannot-block-it-mono-colored-can-first-strike
+title: "Attacking Argentum Masticore cannot be blocked by multicolored Lavinia; mono-white Containment Priest can block and dies to first strike without dealing damage"
+area: card
+cards: [Argentum Masticore, "Lavinia, Azorius Renegade", Containment Priest]
+tags: [argentum-masticore, protection, protection-from-multicolored, blocking, first-strike, combat, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "First strike, protection from multicolored", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "702.16f", text: "Attacking creatures with protection can’t be blocked by creatures that have the stated quality.", verified: true}
+  - {kind: cr, ref: "702.7b", text: "If at least one attacking or blocking creature has first strike or double strike (see rule 702.4) as the combat damage step begins, the only creatures that assign combat damage in that step are those with first strike or double strike.", verified: true}
+  - {kind: cr, ref: "105.2b", text: "A multicolored object is two or more of the five colors.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+  p1:
+    battlefield: ["Lavinia, Azorius Renegade @lav", "Containment Priest @cp"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@mast", target: {player: p1}}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - expect_illegal: {p1: {decision: declare_blockers, blocks: [{blocker: "@lav", attacker: "@mast"}]}}
+  - p1: {decision: declare_blockers, blocks: [{blocker: "@cp", attacker: "@mast"}]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: first_strike_damage
+      p0: {battlefield: [{card: Argentum Masticore, damage: 0}]}
+      p1: {battlefield: [{card: "Lavinia, Azorius Renegade"}], graveyard: [Containment Priest]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    phase: combat_damage
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {life: 20, battlefield: [{card: Argentum Masticore, damage: 0, tapped: true}]}
+    p1:
+      life: 20
+      battlefield: [{card: "Lavinia, Azorius Renegade", damage: 0}]
+      graveyard: [Containment Priest]
+notes: >
+  Lavinia ({W}{U}) is multicolored, so she cannot block a creature with protection from multicolored (702.16f); the
+  declaration with her as a blocker is rejected. Containment Priest ({1}{W}) is monocolored and may block. The Masticore's
+  first strike (5 damage) kills the 2/2 Priest in the first-strike damage step, before the Priest deals regular damage,
+  so the Masticore takes no damage at all; the blocked Masticore deals nothing to p1 (still 20). Wrong engines: allow the
+  multicolored block, ignore first strike, or let the dead Priest deal damage.

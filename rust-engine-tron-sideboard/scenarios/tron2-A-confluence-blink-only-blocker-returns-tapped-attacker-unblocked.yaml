@@ -1,0 +1,55 @@
+id: tron2-a-confluence-blink-only-untapped-blocker-after-attackers-returns-tapped-cannot-block
+title: "Eldrazi Confluence cast in the declare attackers step blinks p1's only potential blocker: it returns tapped, p1 has no block to declare, and the 5/5 lifelinker connects"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Triumph of Saint Katherine, "Phelia, Exuberant Shepherd", Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, blink, enters-tapped, combat, declare-blockers, instant-speed, lifelink, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.", verified: true}
+  - {kind: cr, ref: "509.1a", text: "The defending player chooses which creatures they control, if any, will block. The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.", verified: true}
+  - {kind: cr, ref: "400.7", text: ". An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: begin_combat
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2", "Triumph of Saint Katherine @tri"]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@tri", target: {player: p1}}]}
+  - check:
+      phase: declare_attackers
+      pending: {actor: p0, kind: priority}
+      p0: {battlefield_contains: [{card: Triumph of Saint Katherine, tapped: true, attacking: true}]}
+  - p0: {t: cast, card: "@conf", modes: [9], targets: ["@ph"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+  - check:
+      phase: declare_attackers
+      p1: {battlefield: [{card: "Phelia, Exuberant Shepherd", tapped: true, controller: p1}]}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    phase: main2
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 23
+      battlefield_contains:
+        - {card: Triumph of Saint Katherine, tapped: true}
+        - {token: Eldrazi Scion Token}
+        - {token: Eldrazi Scion Token}
+    p1:
+      life: 15
+      battlefield: [{card: "Phelia, Exuberant Shepherd", tapped: true}]
+notes: >
+  Phelia is p1's only creature and untapped when Triumph attacks, so a block would be possible. p0 casts Confluence (multiset 8,
+  `modes: [9]`) in the declare attackers step; Phelia is exiled and returns tapped (new object), and a tapped creature cannot
+  block (509.1a). No declare_blockers decision is raised for p1 (no legal blocker), so `advance` passes through and the 5/5
+  lifelink attacker deals 5 damage: p1 20 -> 15, p0 18 (Ancient Tomb) + 5 = 23. A wrong engine returns Phelia untapped
+  (a block decision appears and `advance` fails) or tapped but still able to block.

@@ -1,0 +1,43 @@
+id: tron2-b-lattice-snuff-out-black-creature-is-nonblack-cast-with-islands
+title: "Under Mycosynth Lattice Snuff Out ({3}{B}) is cast with four Islands and destroys Street Wraith, which is colorless and so nonblack"
+area: card
+cards: [Mycosynth Lattice, Snuff Out, Street Wraith, Island]
+tags: [mycosynth-lattice, color-change, permanents-are-colorless, mana-as-any-color, snuff-out, nonblack, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All cards that aren't on the battlefield, spells, and permanents are colorless.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mycosynth Lattice, text: "Players may spend mana as though it were mana of any color.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Snuff Out, text: "Destroy target nonblack creature. It can't be regenerated.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Snuff Out @so"]
+    battlefield: ["Mycosynth Lattice @lat", "Island @i1", "Island @i2", "Island @i3", "Island @i4"]
+    library_pad: 10
+  p1:
+    battlefield: ["Street Wraith @sw"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@so", targets: ["@sw"], pay: {tap: ["@i1", "@i2", "@i3", "@i4"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 20
+      graveyard: [Snuff Out]
+      battlefield:
+        - {card: Mycosynth Lattice}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+    p1: {battlefield: [], graveyard: [Street Wraith]}
+notes: >
+  Street Wraith ({3}{B}{B}) is black as a card, but the permanent is colorless, hence "nonblack", so it is a legal target.
+  Snuff Out's {B} is paid with an Island's {U} (any color), so the hard cast works with four Islands and no Swamp (no
+  life is paid: the alternative cost is not used). A wrong engine uses the printed color for the target restriction, or
+  demands B mana.

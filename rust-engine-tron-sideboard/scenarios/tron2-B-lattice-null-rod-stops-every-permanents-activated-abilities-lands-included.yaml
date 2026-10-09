@@ -1,0 +1,47 @@
+id: tron2-b-lattice-null-rod-stops-every-permanents-activated-abilities-lands-included
+title: "Under Mycosynth Lattice Null Rod stops the activated abilities of every permanent, including a land's mana ability and Wasteland's sacrifice ability"
+area: card
+cards: [Mycosynth Lattice, Null Rod, Island, Wasteland, Volcanic Island, Lightning Bolt]
+tags: [mycosynth-lattice, null-rod, artifacts, lands, mana-ability, cant-activate, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All permanents are artifacts in addition to their other types.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Null Rod, text: "Activated abilities of artifacts can't be activated.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mycosynth Lattice @lat", "Null Rod @rod", "Island @is", "Wasteland @w"]
+    library_pad: 10
+  p1:
+    battlefield: ["Volcanic Island @vi"]
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@is", ability: 0, choose_color: U}}
+  - expect_illegal: {p0: {t: activate, source: "@w", ability: 0}}
+  - expect_illegal: {p0: {t: activate, source: "@w", ability: 1, targets: ["@vi"]}}
+  - expect_illegal: {p0: {t: cast, card: "@bolt", targets: [{player: p1}]}}
+expect:
+  - at: after_script
+    turn: 3
+    phase: main1
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Lightning Bolt]
+      mana_pool: {}
+      battlefield:
+        - {card: Mycosynth Lattice}
+        - {card: Null Rod}
+        - {card: Island, tapped: false}
+        - {card: Wasteland, tapped: false}
+    p1:
+      battlefield: [{card: Volcanic Island, tapped: false}]
+notes: >
+  Null Rod ("Activated abilities of artifacts can't be activated", no exception for mana abilities) applies to every
+  artifact, and Lattice makes every permanent one. So p0's own Island and Wasteland cannot be tapped for mana, Wasteland's
+  "{T}, Sacrifice" ability (index 1, targeting the opposing nonbasic Volcanic Island) cannot be activated, and the Bolt
+  cannot be paid for. A wrong engine exempts lands (as non-artifacts) or mana abilities.

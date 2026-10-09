@@ -1,0 +1,48 @@
+id: tron2-a-confluence-countered-by-force-of-will-no-pump-no-token
+title: "Force of Will counters Eldrazi Confluence (pump x2 + Scion): both targets keep their stats and no Scion is made"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Force of Will, Brainstorm, "Thassa's Oracle", Street Wraith, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, force-of-will, counterspell, alternative-cost, pitch-spell, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Target creature gets +3/-3 until end of turn.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "Counter target spell.", verified: true}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+  - {kind: cr, ref: "700.2d", text: "If a player is allowed to choose more than one mode for a modal spell or ability, that player normally can’t choose the same mode more than once. However, some modal spells include the instruction “You may choose the same mode more than once.” If a particular mode is chosen multiple times, the spell is treated as if that mode appeared that many times in sequence. If that mode requires a target, the same player or object may be chosen as the target for each of those modes, or different targets may be chosen.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    battlefield: ["Thassa's Oracle @orc", "Street Wraith @wr"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@conf", modes: [3], targets: ["@orc", "@wr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@conf"]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Eldrazi Confluence]
+      battlefield: [{card: Ancient Tomb, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1:
+      life: 19
+      hand: []
+      exile: [Brainstorm]
+      graveyard: [Force of Will]
+      battlefield: [{card: "Thassa's Oracle", pt: [1, 3]}, {card: Street Wraith, pt: [3, 4]}]
+notes: >
+  Multiset 2 (pump x2, Scion x1) is `modes: [3]`. Force of Will (pitching Brainstorm, 1 life) counters Confluence on the stack,
+  so none of its three instances is performed: Thassa's Oracle and Street Wraith are unchanged and p0 has no token (the
+  battlefield list is exact). A wrong engine applies the spell's effects despite the counter, or counters only the targeted
+  part and still makes the Scion.

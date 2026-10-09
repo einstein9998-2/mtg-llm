@@ -1,0 +1,49 @@
+id: tron2-a-bahamut-chapter-three-draws-two-cards-and-the-counter-is-not-added-on-the-opponents-turn
+title: "Summon: Bahamut at two lore counters: no counter on p1's turn or in p0's draw step, a third after the draw step, and chapter III draws two more cards"
+area: card
+cards: ["Summon: Bahamut", Ponder, Brainstorm, Consider]
+tags: [summon-bahamut, saga, saga-creature, lore-counter, turn-based-action, chapter-ability, draw, draw-step]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Summon: Bahamut", text: "III — Draw two cards.", verified: true}
+  - {kind: cr, ref: "714.3b", text: "As a player’s precombat main phase begins, that player puts a lore counter on each Saga they control with one or more chapter abilities. This turn-based action doesn’t use the stack.", verified: true}
+  - {kind: cr, ref: "714.4", text: "If the number of lore counters on a Saga permanent with one or more chapter abilities is greater than or equal to its final chapter number, and it isn’t the source of a chapter ability that has triggered but not yet left the stack, that Saga’s controller sacrifices it. This state-based action doesn’t use the stack.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: [{card: "Summon: Bahamut", as: bah, counters: {lore: 2}, sick: false}]
+    library: [Ponder, Brainstorm, Consider]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: draw, of: p0}
+  - check:
+      turn: 5
+      phase: draw
+      p0:
+        hand: [Ponder]
+        battlefield: [{card: "Summon: Bahamut", counters: {lore: 2}}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: main1
+      stack: [{kind: triggered, source: "@bah", controller: p0}]
+      p0:
+        hand: [Ponder]
+        battlefield: [{card: "Summon: Bahamut", counters: {lore: 3}}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Ponder, Brainstorm, Consider]
+      battlefield: [{card: "Summon: Bahamut", counters: {lore: 3}, pt: [9, 9]}]
+notes: >
+  Chapter III has no target, so nothing is chosen when it is put on the stack. The counter stays at 2 through p1's turn and p0's
+  draw step (the draw step's draw is Ponder), becomes 3 as the precombat main phase begins (714.3b), and the resolved
+  chapter draws Brainstorm and Consider. Bahamut is not sacrificed yet (3 is less than the final chapter number 4, 714.4).
+  A wrong engine draws one card, or adds a counter on the opponent's turn.

@@ -1,0 +1,53 @@
+id: tron2-a-bahamut-cast-enters-as-sick-9-9-flying-saga-creature-with-lore-counter-chapter-one-destroys
+title: "Summon: Bahamut cast for {9} enters as a summoning-sick 9/9 flying Enchantment Creature with a lore counter; chapter I targets only nonland permanents and destroys the chosen one"
+area: card
+cards: ["Summon: Bahamut", Island, Trinisphere, "Phelia, Exuberant Shepherd"]
+tags: [summon-bahamut, saga, saga-creature, lore-counter, chapter-ability, etb-trigger, destroy, up-to-one-target, nonland, summoning-sickness, flying]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Summon: Bahamut", text: "I, II — Destroy up to one target nonland permanent.", verified: true}
+  - {kind: oracle, card: "Summon: Bahamut", text: "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)", verified: true}
+  - {kind: cr, ref: "714.3a", text: "As a Saga without the read ahead ability enters the battlefield, its controller puts a lore counter on it. As a Saga with the read ahead ability enters the battlefield, its controller chooses a number from one to that Saga’s final chapter number. That Saga enters the battlefield with the chosen number of lore counters on it. (See rule 702.155, “Read Ahead.”)", verified: true}
+  - {kind: cr, ref: "714.2b", text: "“{rN}—[Effect]” means “When one or more lore counters are put onto this Saga, if the number of lore counters on it was less than N and became at least N, [effect].”", verified: true}
+  - {kind: cr, ref: "302.6", text: ". A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began. A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Summon: Bahamut @bah"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6", "Island @i7", "Island @i8", "Island @i9"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri", "Phelia, Exuberant Shepherd @ph", "Island @pi"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bah", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@tri", expect_options: {include: ["@tri", "@ph"], exclude: ["@pi", "@i1"]}}
+  - check:
+      stack: [{kind: triggered, source: "@bah", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p0:
+        battlefield_contains:
+          - {card: "Summon: Bahamut", types: [Enchantment, Creature], subtypes: [Saga, Dragon], keywords: [flying], pt: [9, 9], counters: {lore: 1}, sick: true, tapped: false}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield_contains:
+        - {card: "Summon: Bahamut", counters: {lore: 1}, pt: [9, 9]}
+    p1:
+      graveyard: [Trinisphere]
+      battlefield: [{card: "Phelia, Exuberant Shepherd"}, {card: Island}]
+notes: >
+  The Saga enters with one lore counter (714.3a), chapter I triggers at once (714.2b) and, as the trigger is put on the
+  stack, p0 chooses its target. Only nonland permanents are offered: p1's Trinisphere and Phelia (and Bahamut itself, which is
+  a nonland permanent); p1's Island and p0's own Islands are not. It is a creature and a Saga at once (types Enchantment and
+  Creature, subtypes Saga and Dragon), a 9/9 with flying, and summoning sick because it came under p0's control this turn.
+  Trinisphere (the opponent's) does not raise the {9} cost. A wrong engine puts no counter, triggers late, offers lands, or
+  makes it a non-creature.

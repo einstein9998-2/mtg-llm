@@ -1,0 +1,53 @@
+id: tron2-a-confluence-blink-an-attacking-creature-removes-it-from-combat
+title: "Eldrazi Confluence cast in p1's declare attackers step blinks the attacking Street Wraith: it returns tapped and not attacking, so p0 takes no damage"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Street Wraith, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, blink, new-object, combat, removed-from-combat, instant-speed, opponents-turn, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.", verified: true}
+  - {kind: cr, ref: "400.7", text: ". An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: begin_combat
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Street Wraith @wr"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@wr", target: {player: p0}}]}
+  - p1: {t: pass}
+  - check:
+      phase: declare_attackers
+      pending: {actor: p0, kind: priority}
+      p1: {battlefield: [{card: Street Wraith, attacking: true, tapped: true}]}
+  - p0: {t: cast, card: "@conf", modes: [9], targets: ["@wr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: []
+      p1: {battlefield: [{card: Street Wraith, attacking: false, tapped: true, sick: true}]}
+  - advance: {to: main2, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main2
+    stack: []
+    p0:
+      life: 18
+      graveyard: [Eldrazi Confluence]
+      battlefield_contains: [{token: Eldrazi Scion Token}, {token: Eldrazi Scion Token}]
+    p1:
+      life: 20
+      battlefield: [{card: Street Wraith, tapped: true}]
+notes: >
+  The Wraith attacked p0 (no Swamp, so swampwalk is irrelevant). In the declare attackers step p0, holding priority after p1
+  passes, casts Confluence (`modes: [9]`) on it. The returned Wraith is a new object (400.7): it is not an attacker, so
+  combat damage is not dealt and p0 stays at 18 (the Ancient Tomb's 2 damage only). p1's own priority passes: p1 passes after
+  declaring, then p0 acts. A wrong engine keeps the returned permanent in combat and takes 3 damage.

@@ -1,0 +1,51 @@
+id: tron2-a-confluence-pump-lasts-until-end-of-turn-then-wears-off
+title: "Eldrazi Confluence +3/-3 on a 3/4 makes it 6/1 through p0's end step and it is a 3/4 again when p1's turn begins (with two Scions made by the same spell)"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Street Wraith, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, pump, until-end-of-turn, cleanup, eldrazi-scion, token]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Target creature gets +3/-3 until end of turn.", verified: true}
+  - {kind: oracle, card: Eldrazi Confluence, text: 'Create a 1/1 colorless Eldrazi Scion creature token with "Sacrifice this token: Add {C}."', verified: true}
+  - {kind: cr, ref: "700.2d", text: "If a player is allowed to choose more than one mode for a modal spell or ability, that player normally can’t choose the same mode more than once. However, some modal spells include the instruction “You may choose the same mode more than once.” If a particular mode is chosen multiple times, the spell is treated as if that mode appeared that many times in sequence. If that mode requires a target, the same player or object may be chosen as the target for each of those modes, or different targets may be chosen.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    battlefield: ["Street Wraith @wr"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@conf", modes: [6], targets: ["@wr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+  - check:
+      p1: {battlefield: [{card: Street Wraith, pt: [6, 1]}]}
+      p0:
+        battlefield_contains:
+          - {token: Eldrazi Scion Token, pt: [1, 1], sick: true}
+          - {token: Eldrazi Scion Token, pt: [1, 1], sick: true}
+  - advance: {to: end, of: p0}
+  - check:
+      p1: {battlefield: [{card: Street Wraith, pt: [6, 1]}]}
+  - advance: {to: main1, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    active: p1
+    phase: main1
+    stack: []
+    p1:
+      battlefield: [{card: Street Wraith, pt: [3, 4], damage: 0}]
+    p0:
+      battlefield_contains:
+        - {token: Eldrazi Scion Token, pt: [1, 1]}
+        - {token: Eldrazi Scion Token, pt: [1, 1]}
+notes: >
+  Multiset 5 (pump x1, Scion x2) is `modes: [6]`; the only target slot is the pump's. The pump is still on Street Wraith at
+  p0's end step (6/1) and is gone once the cleanup step has ended it ("until end of turn"): 3/4 at the start of p1's main
+  phase. The two Scion tokens (instances without targets) stay. The Scions are summoning sick, so p0 has no attacker and
+  `advance` raises no declaration. A wrong engine leaves the creature pumped for the next turn.

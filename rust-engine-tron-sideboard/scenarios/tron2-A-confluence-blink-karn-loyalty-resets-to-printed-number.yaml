@@ -1,0 +1,55 @@
+id: tron2-a-confluence-blink-karn-loyalty-goes-back-to-the-printed-number-and-plus-one-works-again
+title: "Eldrazi Confluence blinking a 2-loyalty Karn: it returns tapped with its printed starting loyalty (5), and a second +1 this turn takes it to 6"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, "Karn, the Great Creator", Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, blink, planeswalker, loyalty, new-object, once-per-turn, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.", verified: true}
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.", verified: true}
+  - {kind: cr, ref: "306.5b", text: "A planeswalker has the intrinsic ability “This permanent enters with a number of loyalty counters on it equal to its printed loyalty number.” This ability creates a replacement effect (see rule 614.1c).", verified: true}
+  - {kind: cr, ref: "606.3", text: ". A player may activate a loyalty ability of a permanent they control any time they have priority and the stack is empty during a main phase of their turn, but only if no player has previously activated a loyalty ability of that permanent that turn.", verified: true}
+  - {kind: cr, ref: "400.7", text: ". An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+  - {kind: ruling, card: "Karn, the Great Creator", text: "Karn, the Great Creator has starting loyalty 5.", verified: false, note: "printed loyalty recalled from the card, not retrieved: the Oracle data used here holds no loyalty; it is the only recalled fact in this scenario"}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield:
+      - "Ancient Tomb @tomb"
+      - "Island @i1"
+      - "Island @i2"
+      - {card: "Karn, the Great Creator", as: karn, counters: {loyalty: 1}}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@karn", ability: 0, targets: []}
+  - resolve_top: true
+  - check:
+      p0: {battlefield_contains: [{card: "Karn, the Great Creator", counters: {loyalty: 2}}]}
+  - expect_illegal: {p0: {t: activate, source: "@karn", ability: 0, targets: []}}
+  - p0: {t: cast, card: "@conf", modes: [9], targets: ["@karn"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+  - bind: {as: karn2, find: {name: "Karn, the Great Creator", controller: p0}}
+  - check:
+      p0: {battlefield_contains: [{card: "Karn, the Great Creator", tapped: true, counters: {loyalty: 5}}]}
+  - p0: {t: activate, source: "@karn2", ability: 0, targets: []}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Eldrazi Confluence]
+      battlefield_contains:
+        - {card: "Karn, the Great Creator", tapped: true, counters: {loyalty: 6}}
+        - {token: Eldrazi Scion Token}
+        - {token: Eldrazi Scion Token}
+notes: >
+  Karn (1 loyalty) uses its +1 (2 loyalty) and cannot activate again (606.3). Confluence (multiset 8, `modes: [9]`) blinks it:
+  a new object (400.7) enters with its printed loyalty (306.5b), tapped. As a new permanent it has not activated this turn, so
+  +1 is legal again and goes to 6. The printed 5 is recalled (verified: false), everything else follows from the CR. A
+  wrong engine returns Karn with 2 loyalty, or still treats the loyalty ability as used.

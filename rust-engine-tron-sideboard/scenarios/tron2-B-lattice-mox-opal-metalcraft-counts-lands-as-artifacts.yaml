@@ -1,0 +1,38 @@
+id: tron2-b-lattice-mox-opal-metalcraft-counts-lands-as-artifacts
+title: "Under Mycosynth Lattice Mox Opal has metalcraft with only Lattice, itself and one land: playing the land turns it on"
+area: card
+cards: [Mycosynth Lattice, Mox Opal, Island]
+tags: [mycosynth-lattice, mox-opal, metalcraft, artifacts, lands, count-artifacts, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All permanents are artifacts in addition to their other types.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mox Opal, text: "Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Island @is_h"]
+    battlefield: ["Mycosynth Lattice @lat", "Mox Opal @opal"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: activate, source: "@opal", ability: 0, choose_color: W}}
+  - p0: {t: play_land, card: "@is_h"}
+  - p0: {t: activate, source: "@opal", ability: 0, choose_color: W}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      mana_pool: {W: 1}
+      lands_played: 1
+      battlefield:
+        - {card: Mycosynth Lattice}
+        - {card: Mox Opal, tapped: true}
+        - {card: Island, types: [Land, Artifact]}
+notes: >
+  Before the land drop p0 controls two artifacts (Lattice, Mox Opal): no metalcraft, so Mox Opal cannot be tapped. Playing
+  an Island adds a third artifact (the land is an artifact under Lattice), so metalcraft is on and Mox Opal makes {W}.
+  A wrong engine counts only printed artifacts, or evaluates metalcraft once.

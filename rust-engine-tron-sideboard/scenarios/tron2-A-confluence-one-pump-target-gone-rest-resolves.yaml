@@ -1,0 +1,53 @@
+id: tron2-a-confluence-one-of-two-pump-targets-exiled-in-response-other-pump-and-scion-happen
+title: "Swords to Plowshares exiles one of Confluence's two pump targets in response: the other still gets +3/-3 and the Scion is still made"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Swords to Plowshares, Plains, "Thassa's Oracle", Street Wraith, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, partial-fizzle, target-legality, swords-to-plowshares, response, eldrazi-scion]
+derived_from: cr
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Target creature gets +3/-3 until end of turn.", verified: true}
+  - {kind: oracle, card: Swords to Plowshares, text: "Exile target creature. Its controller gains life equal to its power.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "Illegal targets, if any, won’t be affected by parts of a resolving spell’s effect for which they’re illegal. Other parts of the effect for which those targets are not illegal may still affect them.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl", "Thassa's Oracle @orc", "Street Wraith @wr"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@conf", modes: [3], targets: ["@orc", "@wr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@wr"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@conf", controller: p0}]
+      pending: {actor: p0, kind: priority}
+      p1: {life: 23, exile: [Street Wraith]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Eldrazi Confluence]
+      battlefield_contains: [{token: Eldrazi Scion Token, pt: [1, 1]}]
+    p1:
+      life: 23
+      exile: [Street Wraith]
+      graveyard: ["Thassa's Oracle", Swords to Plowshares]
+      battlefield: [{card: Plains, tapped: true}]
+notes: >
+  Multiset 2 (pump x2, Scion x1). p1 responds by exiling Street Wraith (it gains 3 life from its power: 23). When Confluence
+  resolves its first pump target (Thassa's Oracle) is still legal, so the spell resolves (608.2b: it fizzles only if ALL
+  targets are illegal): the Oracle gets +3/-3 (4/0) and dies, the Wraith's pump does nothing, and the Scion instance (no
+  target) still creates its token. A wrong engine fizzles the whole spell (no Scion, Oracle alive) when any target is illegal.

@@ -1,0 +1,42 @@
+id: tron2-b-masticore-discard-no-legal-target-trigger-removed-masticore-stays
+title: "Argentum Masticore: discarding with no legal target removes the reflexive trigger; the Masticore stays and p0's own cheap permanents are never targets"
+area: card
+cards: [Argentum Masticore, Lightning Bolt, Null Rod, Island, Lotus Petal, Voltaic Key]
+tags: [argentum-masticore, upkeep-trigger, reflexive-trigger, no-legal-target, own-permanents, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "When you discard a card this way, destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "603.3d", text: "If a choice is required when the triggered ability goes on the stack but no legal choices can be made for it, or if a rule or a continuous effect otherwise makes the ability illegal, the ability is simply removed from the stack.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Argentum Masticore @mast", "Lotus Petal @mypetal", "Voltaic Key @mykey"]
+    library_pad: 10
+  p1:
+    battlefield: ["Null Rod @rod", "Island @isl_b"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - resolve_top: true
+  - p0: {decision: yes_no, purpose: discard_to_keep_masticore, answer: true}
+  - p0: {decision: choose_cards, purpose: discard, answer: ["@bolt"]}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      graveyard: [Lightning Bolt]
+      battlefield: [{card: Argentum Masticore}, {card: Lotus Petal}, {card: Voltaic Key}]
+    p1:
+      battlefield: [{card: Null Rod}, {card: Island}]
+      graveyard: []
+notes: >
+  Lightning Bolt has mana value 1. The only opposing permanents are Null Rod (2) and an Island (a land); p0's own Lotus
+  Petal (0) and Voltaic Key (1) match the value bound but are not "an opponent controls". So the reflexive trigger has no
+  legal target and is removed from the stack (603.3d) with no decision raised. The discard still happened (Bolt is in the
+  graveyard) and the Masticore stays: the "unless you discard" clause was satisfied. Wrong engines: sacrifice anyway, ask
+  for a target among p0's own permanents, or leave an unresolvable trigger on the stack.

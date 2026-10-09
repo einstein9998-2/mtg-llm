@@ -1,0 +1,49 @@
+id: tron2-b-lattice-floating-colorless-mana-pays-colored-symbols
+title: "Under Mycosynth Lattice {C}{C}{C} floating in the pool pays White Orchid Phantom's {W}{W}, leaving {C}"
+area: card
+cards: [Mycosynth Lattice, White Orchid Phantom, Grim Monolith]
+tags: [mycosynth-lattice, mana-as-any-color, mana-pool, floating-mana, white-orchid-phantom, grim-monolith, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "Players may spend mana as though it were mana of any color.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Grim Monolith, text: "{T}: Add {C}{C}{C}.", verified: true}
+  - {kind: cr, ref: "609.4b", text: "If an effect allows a player to spend mana “as though it were mana of any [type or color],” this affects only how the player may", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["White Orchid Phantom @wop"]
+    battlefield: ["Mycosynth Lattice @lat", "Grim Monolith @gm"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: activate, source: "@gm", ability: 0}
+  - check:
+      p0: {mana_pool: {C: 3}}
+  - p0: {t: cast, card: "@wop"}
+  - check:
+      stack: [{kind: spell, card: "@wop", controller: p0}]
+      p0: {mana_pool: {C: 1}, battlefield: [{card: Mycosynth Lattice}, {card: Grim Monolith, tapped: true}]}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, source: "@wop", controller: p0, text_contains: "nonbasic"}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield:
+        - {card: Mycosynth Lattice}
+        - {card: Grim Monolith, tapped: true}
+        - {card: White Orchid Phantom, sick: true}
+notes: >
+  The mana is produced first and sits in the pool as {C}{C}{C}; casting White Orchid Phantom spends two of it on the two
+  {W} symbols (Lattice), leaving {C} in the pool until the step ends (mana pools empty at the end of each step). This
+  differs from paying with lands directly: the engine must apply the "as though any color" permission to pool mana. A
+  wrong engine only allows it when tapping sources during payment.
+  The Phantom's enters trigger ("destroy up to one target nonbasic land") goes on the stack with no target (there are no
+  lands) and is resolved in the script.
