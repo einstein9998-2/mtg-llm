@@ -1,4 +1,4 @@
-# RFC 0013: Colorless Tron sideboard (Eldrazi Confluence, Argentum Masticore, Mycosynth Lattice, Summon: Bahamut)
+# RFC 0014: Colorless Tron sideboard (Eldrazi Confluence, Argentum Masticore, Mycosynth Lattice, Summon: Bahamut)
 
 Status: proposed (this PR). Not applied to the live engine.
 Author: Tron sideboard thread. Scenarios: two separate agents wrote them from Oracle text and the CR only (notes in `SCENARIO-NOTES-A.md`, `-B.md`).

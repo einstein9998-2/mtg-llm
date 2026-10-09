@@ -81,4 +81,4 @@ RFC 0008 (`rust-engine-tron/0008-colorless-tron.md`) and the patch (`rust-engine
 
 ## Status 2026-10-09 (sideboard completed)
 
-RFC 0013 (`rust-engine-tron-sideboard/`) adds the four missing sideboard cards: Eldrazi Confluence (as ten modes, one per multiset of three), Argentum Masticore (protection from multicolored, upkeep discard with a reflexive destroy), Mycosynth Lattice and Summon: Bahamut. With it `colorless-tron.txt` loads as 60 + 15 in the engine. Still not modeled: Karn -2, Ugin -11, Extinguisher Battleship station, Mishra's Research Desk unearth and expiry.
+RFC 0014 (`rust-engine-tron-sideboard/`) adds the four missing sideboard cards: Eldrazi Confluence (as ten modes, one per multiset of three), Argentum Masticore (protection from multicolored, upkeep discard with a reflexive destroy), Mycosynth Lattice and Summon: Bahamut. With it `colorless-tron.txt` loads as 60 + 15 in the engine. Still not modeled: Karn -2, Ugin -11, Extinguisher Battleship station, Mishra's Research Desk unearth and expiry.

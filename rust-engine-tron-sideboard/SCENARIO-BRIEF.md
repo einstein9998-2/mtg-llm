@@ -1,6 +1,6 @@
 # Brief for the Tron-sideboard scenario writers (2026-10-09)
 
-You write executable spec scenarios (rulings-as-spec) for the four sideboard cards of Brady's Colorless Tron that the Rust engine did not have (RFC 0013). You are NOT the implementer. **Do not read anything under `<work>/rust-engine/crates/`, any `*.patch`, any `*.cards.ron`.** Write only from the Oracle text below, the Comprehensive Rules and rulings.
+You write executable spec scenarios (rulings-as-spec) for the four sideboard cards of Brady's Colorless Tron that the Rust engine did not have (RFC 0014). You are NOT the implementer. **Do not read anything under `<work>/rust-engine/crates/`, any `*.patch`, any `*.cards.ron`.** Write only from the Oracle text below, the Comprehensive Rules and rulings.
 
 (`<work>` = `/tmp/claude-0/-home-claude-mtg-llm/9ff37e88-b3a0-5de8-9369-f3934845364d/scratchpad/work`.)
 

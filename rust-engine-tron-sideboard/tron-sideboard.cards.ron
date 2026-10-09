@@ -1,4 +1,4 @@
-// Colorless Tron sideboard completion (Brady, 2026-10-09), RFC 0013. Oracle text per Savecraft card_search (Scryfall), 2026-10-09.
+// Colorless Tron sideboard completion (Brady, 2026-10-09), RFC 0014. Oracle text per Savecraft card_search (Scryfall), 2026-10-09.
 // Kept apart from tron.cards.ron so that file and its package stay as applied. The Eldrazi Scion token is in tron.cards.ron.
 [
   // Eldrazi Confluence: "Choose three. You may choose the same mode more than once." The mode chooser only offers distinct modes,
@@ -27,7 +27,7 @@
     Triggered(text: "When you discard a card this way, destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.", on: Delayed,
       targets: [(objects: (types_not: "LAND", controller: Opp, cmc_x_max: true))], effect: Destroy(One(Target(0)))),
   ]),
-  // The two global effects are static flags read where colors are read and where mana is paid (restrict-style abilities, RFC 0013).
+  // The two global effects are static flags read where colors are read and where mana is paid (restrict-style abilities, RFC 0014).
   (name: "Mycosynth Lattice", cost: "{6}", types: "ARTIFACT", abilities: [
     Static(layer: L4, applies_to: (), effect: AddTypes("ARTIFACT")),
     Restrict(what: ColorlessEverything),

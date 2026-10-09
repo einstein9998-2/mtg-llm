@@ -1,8 +1,8 @@
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-cards/cards/tron-sideboard.cards.ron b/crates/mtg-cards/cards/tron-sideboard.cards.ron
+diff -ruN a/crates/mtg-cards/cards/tron-sideboard.cards.ron b/crates/mtg-cards/cards/tron-sideboard.cards.ron
 --- a/crates/mtg-cards/cards/tron-sideboard.cards.ron	1970-01-01 00:00:00.000000000 +0000
-+++ b/crates/mtg-cards/cards/tron-sideboard.cards.ron	2026-10-09 20:25:02.096362071 +0000
++++ b/crates/mtg-cards/cards/tron-sideboard.cards.ron	2026-10-09 21:44:34.797757325 +0000
 @@ -0,0 +1,44 @@
-+// Colorless Tron sideboard completion (Brady, 2026-10-09), RFC 0013. Oracle text per Savecraft card_search (Scryfall), 2026-10-09.
++// Colorless Tron sideboard completion (Brady, 2026-10-09), RFC 0014. Oracle text per Savecraft card_search (Scryfall), 2026-10-09.
 +// Kept apart from tron.cards.ron so that file and its package stay as applied. The Eldrazi Scion token is in tron.cards.ron.
 +[
 +  // Eldrazi Confluence: "Choose three. You may choose the same mode more than once." The mode chooser only offers distinct modes,
@@ -31,7 +31,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-cards/cards/tr
 +    Triggered(text: "When you discard a card this way, destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.", on: Delayed,
 +      targets: [(objects: (types_not: "LAND", controller: Opp, cmc_x_max: true))], effect: Destroy(One(Target(0)))),
 +  ]),
-+  // The two global effects are static flags read where colors are read and where mana is paid (restrict-style abilities, RFC 0013).
++  // The two global effects are static flags read where colors are read and where mana is paid (restrict-style abilities, RFC 0014).
 +  (name: "Mycosynth Lattice", cost: "{6}", types: "ARTIFACT", abilities: [
 +    Static(layer: L4, applies_to: (), effect: AddTypes("ARTIFACT")),
 +    Restrict(what: ColorlessEverything),
@@ -46,7 +46,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-cards/cards/tr
 +      effect: Damage(amount: SumCmc(controller: You, not_self: true), to: Player(Opp))),
 +  ]),
 +]
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-cards/src/legacy.rs b/crates/mtg-cards/src/legacy.rs
+diff -ruN a/crates/mtg-cards/src/legacy.rs b/crates/mtg-cards/src/legacy.rs
 --- a/crates/mtg-cards/src/legacy.rs	2026-10-08 14:03:58.223641000 +0000
 +++ b/crates/mtg-cards/src/legacy.rs	2026-10-09 20:23:28.235931110 +0000
 @@ -7,6 +7,8 @@
@@ -66,7 +66,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-cards/src/lega
 +    let db = mtg_dsl::build_db(&[("legacy.cards.ron", LEGACY_CARDS), ("tron.cards.ron", TRON_CARDS), ("tron-sideboard.cards.ron", TRON_SIDE_CARDS), ("storm.cards.ron", STORM_CARDS), ("ur.cards.ron", UR_CARDS), ("boros.cards.ron", BOROS_CARDS)]).unwrap_or_else(|e| panic!("legacy pool failed to load: {e}"));
      Arc::new(db)
  }
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-cards/tests/tron_side_load.rs b/crates/mtg-cards/tests/tron_side_load.rs
+diff -ruN a/crates/mtg-cards/tests/tron_side_load.rs b/crates/mtg-cards/tests/tron_side_load.rs
 --- a/crates/mtg-cards/tests/tron_side_load.rs	1970-01-01 00:00:00.000000000 +0000
 +++ b/crates/mtg-cards/tests/tron_side_load.rs	2026-10-09 20:23:28.239909487 +0000
 @@ -0,0 +1,7 @@
@@ -77,7 +77,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-cards/tests/tr
 +        assert!(db.id(n).is_some(), "{n}");
 +    }
 +}
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/combat.rs b/crates/mtg-core/src/combat.rs
+diff -ruN a/crates/mtg-core/src/combat.rs b/crates/mtg-core/src/combat.rs
 --- a/crates/mtg-core/src/combat.rs	2026-10-06 12:36:34.928364000 +0000
 +++ b/crates/mtg-core/src/combat.rs	2026-10-09 20:21:28.846294971 +0000
 @@ -50,6 +50,10 @@
@@ -91,20 +91,20 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/comba
          if a.keywords.contains(Keywords::FLYING) && !b.keywords.intersects(Keywords::FLYING | Keywords::REACH) {
              return false;
          }
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/decision.rs b/crates/mtg-core/src/decision.rs
+diff -ruN a/crates/mtg-core/src/decision.rs b/crates/mtg-core/src/decision.rs
 --- a/crates/mtg-core/src/decision.rs	2026-10-06 21:47:00.859906000 +0000
-+++ b/crates/mtg-core/src/decision.rs	2026-10-09 21:08:09.030992122 +0000
++++ b/crates/mtg-core/src/decision.rs	2026-10-09 21:44:34.795850582 +0000
 @@ -117,6 +117,9 @@
      // RFC 0007 (Storm)
      /// Imprint (Chrome Mox): the card exiled from hand; `Done` declines.
      Imprint,
-+    // RFC 0013 (Tron sideboard)
++    // RFC 0014 (Tron sideboard)
 +    /// Like `DiscardEffect`, then a reflexive trigger carries the discarded card's mana value.
 +    DiscardReflexive,
  }
  
  impl CardsPurpose {
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/derive.rs b/crates/mtg-core/src/derive.rs
+diff -ruN a/crates/mtg-core/src/derive.rs b/crates/mtg-core/src/derive.rs
 --- a/crates/mtg-core/src/derive.rs	2026-10-06 21:47:00.869533000 +0000
 +++ b/crates/mtg-core/src/derive.rs	2026-10-09 20:22:45.580773319 +0000
 @@ -104,6 +104,25 @@
@@ -159,9 +159,9 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/deriv
          }
      }
  
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/eval.rs b/crates/mtg-core/src/eval.rs
---- a/crates/mtg-core/src/eval.rs	2026-10-06 01:48:39.061827000 +0000
-+++ b/crates/mtg-core/src/eval.rs	2026-10-09 20:21:53.766618750 +0000
+diff -ruN a/crates/mtg-core/src/eval.rs b/crates/mtg-core/src/eval.rs
+--- a/crates/mtg-core/src/eval.rs	2026-10-09 21:44:08.770115863 +0000
++++ b/crates/mtg-core/src/eval.rs	2026-10-09 21:44:15.405087224 +0000
 @@ -100,6 +100,10 @@
              Expr::X => env.x,
              Expr::EventAmount => env.cap.amount,
@@ -173,24 +173,24 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/eval.
              Expr::Life(p) => self.eval_p(env, *p).map(|s| self.s.players[s.idx()].life).unwrap_or(0),
              Expr::CardsInHand(p) => self.eval_p(env, *p).map(|s| self.s.players[s.idx()].hand.len() as i32).unwrap_or(0),
              Expr::CardsInLibrary(p) => self.eval_p(env, *p).map(|s| self.s.players[s.idx()].library.len() as i32).unwrap_or(0),
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/ir.rs b/crates/mtg-core/src/ir.rs
---- a/crates/mtg-core/src/ir.rs	2026-10-08 02:11:03.108323000 +0000
-+++ b/crates/mtg-core/src/ir.rs	2026-10-09 21:08:09.030573769 +0000
+diff -ruN a/crates/mtg-core/src/ir.rs b/crates/mtg-core/src/ir.rs
+--- a/crates/mtg-core/src/ir.rs	2026-10-09 21:44:08.769676397 +0000
++++ b/crates/mtg-core/src/ir.rs	2026-10-09 21:44:34.796510052 +0000
 @@ -300,6 +300,9 @@
      Min(Box<Expr>, Box<Expr>),
      HalfDown(Box<Expr>),
      HalfUp(Box<Expr>),
-+    /// Total mana value of the objects matching the filter (RFC 0013: Summon: Bahamut's Mega Flare).
++    /// Total mana value of the objects matching the filter (RFC 0014: Summon: Bahamut's Mega Flare).
 +    /// Appended last so no existing discriminant (and so no card-database hash) moves.
 +    SumCmc(ObjFilter),
  }
  
  #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
-@@ -643,6 +646,11 @@
-     /// each (a creature chosen in k slots gets k points). Each distinct target that is still legal
-     /// is dealt `per` times its number of slots as a single damage event; illegal slots are lost.
-     DamageSlots { per: Expr, first: u8, n: u8 },
-+    // ---- RFC 0013 (Tron sideboard) ----
+@@ -648,6 +651,11 @@
+     /// Fight (CR 701.12): the creatures in target slots `a` and `b` each deal damage equal to their
+     /// power to the other. Nothing happens unless both are still creatures on the battlefield.
+     Fight { a: u8, b: u8 },
++    // ---- RFC 0014 (Tron sideboard) ----
 +    /// The controller discards a card, then ability `ability` of the source triggers as a reflexive
 +    /// trigger ("when you discard a card this way") whose captured amount is the discarded card's
 +    /// mana value (read back with `EventAmount`; a target filter with `cmc_x_max` is bounded by it).
@@ -198,30 +198,30 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/ir.rs
  }
  
  fn pref_you() -> PRef {
-@@ -1134,6 +1142,13 @@
+@@ -1139,6 +1147,13 @@
      /// Creatures with power greater than the number of cards in the permanent controller's hand
      /// can't attack (Ensnaring Bridge). `who` is ignored: it binds every creature.
      AttackPowerOverHand,
 +    /// "All cards that aren't on the battlefield, spells, and permanents are colorless" (Mycosynth
-+    /// Lattice, RFC 0013). `who` is ignored: it binds every object.
++    /// Lattice, RFC 0014). `who` is ignored: it binds every object.
 +    ColorlessEverything,
-+    /// "Players may spend mana as though it were mana of any color" (Mycosynth Lattice, RFC 0013).
++    /// "Players may spend mana as though it were mana of any color" (Mycosynth Lattice, RFC 0014).
 +    /// `who` is ignored: it binds every player. Colorless mana still can't pay for colored mana
 +    /// of the wrong kind of cost ({C} needs colorless mana).
 +    ManaAsAnyColor,
  }
  
  /// "You may cast <spells> without paying their mana costs (and with flash)". Casting this way is
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/legal.rs b/crates/mtg-core/src/legal.rs
+diff -ruN a/crates/mtg-core/src/legal.rs b/crates/mtg-core/src/legal.rs
 --- a/crates/mtg-core/src/legal.rs	2026-10-06 21:47:01.275555000 +0000
-+++ b/crates/mtg-core/src/legal.rs	2026-10-09 20:46:39.474468935 +0000
++++ b/crates/mtg-core/src/legal.rs	2026-10-09 21:44:34.797435808 +0000
 @@ -140,7 +140,10 @@
              if mask == 0 {
                  continue;
              }
 -            if c.types.contains(Types::CREATURE) && o_entered >= self.s.turn.own_turn[seat.idx()] && !c.keywords.contains(Keywords::HASTE) {
 +            // Summoning sickness (302.6) only stops abilities whose cost includes {T}: an Eldrazi Scion
-+            // token made this turn can be sacrificed for mana at once (RFC 0013).
++            // token made this turn can be sacrificed for mana at once (RFC 0014).
 +            let no_tap = ability != 255 && !sac && matches!(&def.abilities[ability as usize], AbilityDef::Activated(ad) if !ad.cost.iter().any(|c| matches!(c, CostItem::TapSelf)));
 +            if c.types.contains(Types::CREATURE) && o_entered >= self.s.turn.own_turn[seat.idx()] && !c.keywords.contains(Keywords::HASTE) && !no_tap {
                  continue;
@@ -292,10 +292,10 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/legal
                      if o.controller != ctrl && self.chars(r).hexproof_from.intersects(src_colors) {
                          return false;
                      }
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/lint.rs b/crates/mtg-core/src/lint.rs
---- a/crates/mtg-core/src/lint.rs	2026-10-08 02:11:03.229939000 +0000
-+++ b/crates/mtg-core/src/lint.rs	2026-10-09 20:22:07.370671720 +0000
-@@ -110,7 +110,7 @@
+diff -ruN a/crates/mtg-core/src/lint.rs b/crates/mtg-core/src/lint.rs
+--- a/crates/mtg-core/src/lint.rs	2026-10-09 21:44:08.770708336 +0000
++++ b/crates/mtg-core/src/lint.rs	2026-10-09 21:44:15.405235677 +0000
+@@ -111,7 +111,7 @@
          Effect::PutChosen { who, cmc, .. } => tmax(p(who), cmc.as_ref().map(expr).unwrap_or(-1)),
          Effect::ExileGraveyard { who } => p(who),
          Effect::GainEnergy { who, n } | Effect::LoseEnergy { who, n } => tmax(p(who), expr(n)),
@@ -304,7 +304,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/lint.
          Effect::ExileLinked(o) | Effect::CopyToken(o) => objs(o),
          Effect::EachPutFromHand { .. } | Effect::Venture | Effect::MarkUsed(_) | Effect::AllowCastMoved | Effect::TapAttackMoved => -1,
          Effect::ExilePlay { n } | Effect::DrawRevealCast { n } => expr(n),
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/ops.rs b/crates/mtg-core/src/ops.rs
+diff -ruN a/crates/mtg-core/src/ops.rs b/crates/mtg-core/src/ops.rs
 --- a/crates/mtg-core/src/ops.rs	2026-10-08 02:11:03.209080000 +0000
 +++ b/crates/mtg-core/src/ops.rs	2026-10-09 20:21:28.847504981 +0000
 @@ -543,6 +543,14 @@
@@ -322,7 +322,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/ops.r
                  let is_creature = self.chars(t).types.contains(Types::CREATURE);
                  if self.chars(t).types.contains(Types::PLANESWALKER) {
                      // 120.3c: damage to a planeswalker removes that many loyalty counters.
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/read.rs b/crates/mtg-core/src/read.rs
+diff -ruN a/crates/mtg-core/src/read.rs b/crates/mtg-core/src/read.rs
 --- a/crates/mtg-core/src/read.rs	2026-10-06 21:47:01.512351000 +0000
 +++ b/crates/mtg-core/src/read.rs	2026-10-09 20:22:45.578871247 +0000
 @@ -406,7 +406,7 @@
@@ -334,10 +334,10 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/read.
          } = self;
          debug_assert!(batch.depth == 0, "a simultaneous-change batch must not be open at a hash point");
          let mut h = Fx64::default();
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/resolve.rs b/crates/mtg-core/src/resolve.rs
---- a/crates/mtg-core/src/resolve.rs	2026-10-08 03:13:10.823363000 +0000
-+++ b/crates/mtg-core/src/resolve.rs	2026-10-09 20:22:07.372338634 +0000
-@@ -1500,6 +1500,23 @@
+diff -ruN a/crates/mtg-core/src/resolve.rs b/crates/mtg-core/src/resolve.rs
+--- a/crates/mtg-core/src/resolve.rs	2026-10-09 21:44:08.771367109 +0000
++++ b/crates/mtg-core/src/resolve.rs	2026-10-09 21:44:15.405587114 +0000
+@@ -1514,6 +1514,23 @@
              }
              Flow::Next
          }
@@ -361,7 +361,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/resol
          Effect::Reflexive { ability } => {
              if let Some(source) = env.source {
                  let def = cx.s.stack.last().map(|e| e.def).unwrap_or(cx.s.objs[source.slot as usize].def);
-@@ -1969,6 +1986,13 @@
+@@ -1983,6 +2000,13 @@
              f.aux += 1; // one more discarded; the op re-evaluates how many are left
              Next::Stay
          }
@@ -375,14 +375,14 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/resol
          (DecisionKind::ChooseCards { purpose: CardsPurpose::SacrificeEffect, .. }, Opt::Card(r)) => {
              cx.move_zone(r, ZoneKind::Graveyard, MoveOpts::default());
              f.aux = 1;
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/stabilize.rs b/crates/mtg-core/src/stabilize.rs
+diff -ruN a/crates/mtg-core/src/stabilize.rs b/crates/mtg-core/src/stabilize.rs
 --- a/crates/mtg-core/src/stabilize.rs	2026-10-03 21:41:57.135573000 +0000
-+++ b/crates/mtg-core/src/stabilize.rs	2026-10-09 20:22:07.375891890 +0000
++++ b/crates/mtg-core/src/stabilize.rs	2026-10-09 21:44:34.797673618 +0000
 @@ -72,7 +72,12 @@
                  if (f.slot as usize) < specs.len() {
                      cx.refresh();
                      let spec = &specs[f.slot as usize];
-+                    // A reflexive trigger's "mana value X or less" bound is the captured amount (RFC 0013).
++                    // A reflexive trigger's "mana value X or less" bound is the captured amount (RFC 0014).
 +                    if spec.objects.as_ref().map_or(false, |o| o.cmc_x_max.0) {
 +                        cx.s.cur_x = Some(pt.cap.amount.clamp(0, 255) as u8);
 +                    }
@@ -391,15 +391,15 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/stabi
                      if cands.is_empty() {
                          if spec.optional {
                              f.targets.push(Target::None);
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/state.rs b/crates/mtg-core/src/state.rs
+diff -ruN a/crates/mtg-core/src/state.rs b/crates/mtg-core/src/state.rs
 --- a/crates/mtg-core/src/state.rs	2026-10-06 21:47:01.710495000 +0000
-+++ b/crates/mtg-core/src/state.rs	2026-10-09 20:22:45.578361398 +0000
++++ b/crates/mtg-core/src/state.rs	2026-10-09 21:44:34.796302328 +0000
 @@ -396,6 +396,9 @@
      pub(crate) next_decision: [u32; 2],
      pub(crate) derived: Vec<Chars>,
      pub(crate) derived_dirty: bool,
 +    /// Cache beside `derived`: bit 0 = all objects are colorless, bit 1 = mana may be spent as any
-+    /// color (Mycosynth Lattice, RFC 0013). Recomputed with the derived characteristics.
++    /// color (Mycosynth Lattice, RFC 0014). Recomputed with the derived characteristics.
 +    pub(crate) lattice: u8,
      pub(crate) knowledge: Vec<CardKnow>,
      pub(crate) vids: Vec<[ViewId; 2]>,
@@ -412,7 +412,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/state
              knowledge: vec![CardKnow::default(); n],
              vids: vec![[ViewId::NONE; 2]; n],
              next_vid: [1, 1],
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/types.rs b/crates/mtg-core/src/types.rs
+diff -ruN a/crates/mtg-core/src/types.rs b/crates/mtg-core/src/types.rs
 --- a/crates/mtg-core/src/types.rs	2026-10-08 02:11:03.385937000 +0000
 +++ b/crates/mtg-core/src/types.rs	2026-10-09 20:21:28.845286890 +0000
 @@ -121,6 +121,9 @@
@@ -425,7 +425,7 @@ diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-core/src/types
      }
  }
  
-diff -ruN '--exclude=target' '--exclude=__pycache__' a/crates/mtg-spec/src/runner.rs b/crates/mtg-spec/src/runner.rs
+diff -ruN a/crates/mtg-spec/src/runner.rs b/crates/mtg-spec/src/runner.rs
 --- a/crates/mtg-spec/src/runner.rs	2026-10-08 14:03:58.449732000 +0000
 +++ b/crates/mtg-spec/src/runner.rs	2026-10-09 20:46:47.293175981 +0000
 @@ -1383,6 +1383,10 @@
