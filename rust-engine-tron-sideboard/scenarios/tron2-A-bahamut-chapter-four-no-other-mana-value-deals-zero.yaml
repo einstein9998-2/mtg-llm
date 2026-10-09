@@ -1,0 +1,42 @@
+id: tron2-a-bahamut-chapter-four-with-only-lands-and-tokens-deals-zero-damage-and-is-sacrificed
+title: "Summon: Bahamut chapter IV with only lands and a token besides itself deals 0 damage; the Saga is still sacrificed"
+area: card
+cards: ["Summon: Bahamut", Island, Eldrazi Scion Token]
+tags: [summon-bahamut, saga, saga-creature, chapter-ability, mana-value, damage-to-player, zero-damage, sacrifice-sba, tokens-mana-value-zero]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Summon: Bahamut", text: "IV — Mega Flare — This creature deals damage equal to the total mana value of other permanents you control to each opponent.", verified: true}
+  - {kind: cr, ref: "202.3", text: ". The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "714.4", text: "If the number of lore counters on a Saga permanent with one or more chapter abilities is greater than or equal to its final chapter number, and it isn’t the source of a chapter ability that has triggered but not yet left the stack, that Saga’s controller sacrifices it. This state-based action doesn’t use the stack.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main2
+  p0:
+    battlefield:
+      - {card: "Summon: Bahamut", as: bah, counters: {lore: 3}, sick: false}
+      - "Island @i1"
+      - "Island @i2"
+      - {token: Eldrazi Scion Token, as: tok}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - advance: {to: draw, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      stack: [{kind: triggered, source: "@bah", controller: p0}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Summon: Bahamut"]
+      battlefield: [{card: Island}, {card: Island}, {token: Eldrazi Scion Token}]
+    p1:
+      life: 20
+notes: >
+  Lands have no mana cost (mana value 0) and neither do tokens (202.3), and Bahamut itself is excluded ("other permanents"),
+  so the total is 0 and p1 is unharmed. The Saga is still sacrificed (714.4). A wrong engine adds Bahamut's own 9.

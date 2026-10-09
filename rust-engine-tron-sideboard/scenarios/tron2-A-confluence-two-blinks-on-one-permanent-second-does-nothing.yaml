@@ -1,0 +1,52 @@
+id: tron2-a-confluence-two-blink-instances-on-the-same-permanent-the-second-does-nothing
+title: "Eldrazi Confluence naming Quantum Riddler for both blink instances: only the first works (the Riddler is a new object), so it draws once and returns once"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Quantum Riddler, Brainstorm, Ponder, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, same-mode-repeated, blink, new-object, illegal-target, etb-trigger, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.", verified: true}
+  - {kind: oracle, card: Quantum Riddler, text: "When this creature enters, draw a card.", verified: true}
+  - {kind: cr, ref: "700.2d", text: "If a player is allowed to choose more than one mode for a modal spell or ability, that player normally can’t choose the same mode more than once. However, some modal spells include the instruction “You may choose the same mode more than once.” If a particular mode is chosen multiple times, the spell is treated as if that mode appeared that many times in sequence. If that mode requires a target, the same player or object may be chosen as the target for each of those modes, or different targets may be chosen.", verified: true}
+  - {kind: cr, ref: "400.7", text: ". An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+  - {kind: cr, ref: "608.2b", text: "If the spell or ability specifies targets, it checks whether the targets are still legal. A target that’s no longer in the zone it was in when it was targeted is illegal. Other changes to the game state may cause a target to no longer be legal; for example, its characteristics may have changed or an effect may have changed the text of the spell. If the source of an ability has left the zone it was in, its last known information is used during this process. If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard. Otherwise, the spell or ability will resolve normally. Illegal targets, if any, won’t be affected by parts of a resolving spell’s effect for which they’re illegal. Other parts of the effect for which those targets are not illegal may still affect them. If the spell or ability creates any continuous effects that affect game rules (see rule 613.11), those effects don’t apply to illegal targets. If part of the effect requires information about an illegal target, it fails to determine any such information. Any part of the effect that requires that information won’t happen.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf", Island, Island]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2", "Quantum Riddler @qr"]
+    library: [Brainstorm, Ponder]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@conf", modes: [8], targets: ["@qr", "@qr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+  - check:
+      stack: [{kind: triggered, controller: p0, text_contains: "draw"}]
+      p0:
+        hand: [Island, Island]
+        battlefield_contains: [{card: Quantum Riddler, tapped: true, sick: true}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: [Island, Island, Brainstorm]
+      library_top: [Ponder]
+      exile: []
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Quantum Riddler, tapped: true, sick: true}
+        - {token: Eldrazi Scion Token}
+notes: >
+  Multiset 7 (blink x2, Scion x1) is `modes: [8]`; both target slots name the same Riddler (700.2d allows it). When the spell
+  resolves both targets are legal, so it resolves. The first instance returns the Riddler as a new object (400.7); the second
+  instance's target (the old object) is no longer in the zone it was in, so it is illegal and does nothing (608.2b): one enters
+  trigger, one card drawn (Brainstorm; Ponder stays on top), and the Riddler is tapped once (not exiled and returned a second
+  time). A wrong engine blinks twice and draws two cards, or rejects the double target.

@@ -1,0 +1,57 @@
+id: tron2-a-confluence-blink-twice-counters-are-lost-and-equipment-falls-off
+title: "Eldrazi Confluence blinking two of p0's own permanents: a creature loses its +1/+1 counter, an equipped creature returns unequipped (the Equipment stays), and a Scion is made"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Ocelot Pride, "Phelia, Exuberant Shepherd", Cori-Steel Cutter, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, blink, new-object, counters-lost, equipment, state-based-action, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Exile target nonland permanent, then return it to the battlefield tapped under its owner's control.", verified: true}
+  - {kind: oracle, card: Cori-Steel Cutter, text: "Equipped creature gets +1/+1 and has trample and haste.", verified: true}
+  - {kind: cr, ref: "122.2", text: "Counters on an object are not retained if that object moves from one zone to another. The counters are not “removed”; they simply cease to exist. See rule 400.7.", verified: true}
+  - {kind: cr, ref: "400.7", text: ". An object that moves from one zone to another becomes a new object with no memory of, or relation to, its previous existence. This rule has the following exceptions.", verified: true}
+  - {kind: cr, ref: "301.5c", text: "An Equipment that’s also a creature can’t equip a creature unless that Equipment has reconfigure (see rule 702.151, “Reconfigure”). An Equipment that loses the subtype “Equipment” can’t equip a creature. An Equipment can’t equip itself. An Equipment that equips an illegal or nonexistent permanent becomes unattached from that permanent but remains on the battlefield. (This is a state-based action. See rule 704.) An Equipment can’t equip more than one creature. If a spell or ability would cause an Equipment to equip more than one creature, the Equipment’s controller chooses which creature it equips.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield:
+      - "Ancient Tomb @tomb"
+      - "Island @i1"
+      - "Island @i2"
+      - {card: Ocelot Pride, as: pride, counters: {"+1/+1": 1}}
+      - {card: "Phelia, Exuberant Shepherd", as: ph}
+      - {card: Cori-Steel Cutter, as: cutter, attached_to: "@ph"}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - check:
+      p0:
+        battlefield_contains:
+          - {card: Ocelot Pride, pt: [2, 2], counters: {"+1/+1": 1}}
+          - {card: "Phelia, Exuberant Shepherd", pt: [3, 3], keywords: [trample, haste]}
+          - {card: Cori-Steel Cutter, attached_to: "@ph"}
+  - p0: {t: cast, card: "@conf", modes: [8], targets: ["@pride", "@ph"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: [Eldrazi Confluence]
+      battlefield:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Ocelot Pride, pt: [1, 1], counters: {}, tapped: true, sick: true}
+        - {card: "Phelia, Exuberant Shepherd", pt: [2, 2], tapped: true, sick: true}
+        - {card: Cori-Steel Cutter, attached_to: null, tapped: false}
+        - {token: Eldrazi Scion Token, pt: [1, 1]}
+notes: >
+  Multiset 7 (blink x2, Scion x1) is `modes: [8]`; target slots are the two blinks in order (Pride, then Phelia). Both come back
+  as new objects (400.7): the +1/+1 counter ceases to exist (122.2) so Ocelot Pride is a 1/1, and Phelia returns with nothing
+  attached, so the Equipment is unattached and stays on the battlefield (301.5c), untapped. Both creatures return tapped
+  and summoning sick. The Cutter's flurry does not trigger (Confluence is the first spell this turn). A wrong engine keeps the
+  counter or keeps the Cutter attached to the new Phelia.

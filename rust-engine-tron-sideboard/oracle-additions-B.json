@@ -1,0 +1,22 @@
+{
+ "_meta": {
+  "group": "B",
+  "note": "Entries to merge into reference/oracle.json cards{}. Oracle text retrieved with Savecraft card_search (Scryfall oracle data), exact-name search, 2026-10-09."
+ },
+ "cards": {
+  "Argentum Masticore": {
+   "name": "Argentum Masticore",
+   "mana_cost": "{5}",
+   "type_line": "Artifact Creature — Phyrexian Masticore",
+   "oracle_text": "First strike, protection from multicolored\nAt the beginning of your upkeep, sacrifice this creature unless you discard a card. When you discard a card this way, destroy target nonland permanent an opponent controls with mana value less than or equal to the mana value of the discarded card.",
+   "source": "Savecraft card_search (Scryfall oracle data), 2026-10-09"
+  },
+  "Mycosynth Lattice": {
+   "name": "Mycosynth Lattice",
+   "mana_cost": "{6}",
+   "type_line": "Artifact",
+   "oracle_text": "All permanents are artifacts in addition to their other types.\nAll cards that aren't on the battlefield, spells, and permanents are colorless.\nPlayers may spend mana as though it were mana of any color.",
+   "source": "Savecraft card_search (Scryfall oracle data), 2026-10-09"
+  }
+ }
+}

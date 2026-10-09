@@ -1,0 +1,36 @@
+id: tron2-b-lattice-consign-to-memory-counters-a-red-spell-as-colorless
+title: "Under Mycosynth Lattice Consign to Memory can counter Lightning Bolt, because every spell is colorless"
+area: card
+cards: [Mycosynth Lattice, Consign to Memory, Lightning Bolt, Mountain, Island]
+tags: [mycosynth-lattice, color-change, spells-are-colorless, consign-to-memory, counterspell, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All cards that aren't on the battlefield, spells, and permanents are colorless.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Consign to Memory, text: "Counter target triggered ability or colorless spell.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mycosynth Lattice @lat", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Consign to Memory @ctm"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@ctm", targets: ["@bolt"], pay: {tap: ["@isl"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1: {life: 20, graveyard: [Consign to Memory]}
+notes: >
+  The red Lightning Bolt is a colorless spell while Lattice is out, so it is a legal target of Consign to Memory and is
+  countered: p1 stays at 20. Without Lattice a red spell is not a legal target (the mirror image of the Hydroblast
+  scenario). A wrong engine uses the printed color to decide target legality.

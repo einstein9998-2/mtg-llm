@@ -1,0 +1,38 @@
+id: tron2-b-lattice-pyroblast-cannot-destroy-a-blue-permanent-it-is-colorless
+title: "Under Mycosynth Lattice Pyroblast's destroy mode does nothing to a blue permanent, because permanents are colorless"
+area: card
+cards: [Mycosynth Lattice, Pyroblast, "Thassa's Oracle", Mountain]
+tags: [mycosynth-lattice, color-change, permanents-are-colorless, pyroblast, color-check, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All cards that aren't on the battlefield, spells, and permanents are colorless.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Pyroblast, text: "Destroy target permanent if it's blue.", verified: true}
+  - {kind: cr, ref: "105.2c", text: "A colorless object has no color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Pyroblast @pb"]
+    battlefield: ["Mountain @m1"]
+    library_pad: 10
+  p1:
+    battlefield: ["Mycosynth Lattice @lat", "Thassa's Oracle @oracle"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@pb", modes: [2], targets: ["@oracle"]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Pyroblast]}
+    p1:
+      battlefield:
+        - {card: Mycosynth Lattice}
+        - {card: "Thassa's Oracle", types: [Creature, Artifact], damage: 0}
+      graveyard: []
+notes: >
+  Thassa's Oracle ({U}{U}) is blue as a card, but the permanent is colorless under Lattice, so "destroy target permanent if
+  it's blue" does nothing: the Oracle stays (and is a Creature + Artifact). The Lattice is controlled by the opponent: it
+  affects every permanent of both players. A wrong engine evaluates the printed color of the permanent.

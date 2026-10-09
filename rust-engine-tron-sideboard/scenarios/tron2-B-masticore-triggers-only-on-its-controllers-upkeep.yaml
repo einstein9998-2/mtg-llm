@@ -1,0 +1,61 @@
+id: tron2-b-masticore-triggers-only-on-its-controllers-upkeep
+title: "Argentum Masticore controlled by p1: nothing happens at p0's upkeep; at p1's upkeep p1 decides, and the target is one of p0's permanents"
+area: card
+cards: [Argentum Masticore, Daze, Lotus Petal, Voltaic Key, Null Rod]
+tags: [argentum-masticore, upkeep-trigger, your-upkeep, opponent-perspective, reflexive-trigger, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "At the beginning of your upkeep, sacrifice this creature unless you discard a card.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Argentum Masticore, text: "destroy target nonland permanent an opponent controls", verified: true, note: "entry in oracle-additions-B.json"}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    battlefield: ["Voltaic Key @key", "Null Rod @rod", "Lotus Petal @p0petal"]
+    library_pad: 10
+  p1:
+    hand: ["Daze @daze"]
+    battlefield: ["Argentum Masticore @mast", "Lotus Petal @p1petal"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 3
+      phase: upkeep
+      stack: []
+      pending: {actor: p0, kind: priority}
+      p1: {hand: [Daze], battlefield_contains: [{card: Argentum Masticore}]}
+  - advance: {to: upkeep, of: p1}
+  - check:
+      turn: 4
+      phase: upkeep
+      stack: [{kind: triggered, source: "@mast", controller: p1}]
+  - resolve_top: true
+  - p1: {decision: yes_no, purpose: discard_to_keep_masticore, answer: true}
+  - p1: {decision: choose_cards, purpose: discard, answer: ["@daze"]}
+  - p1:
+      decision: choose_target
+      slot: 0
+      expect_options: {include: ["@key", "@rod", "@p0petal"], exclude: ["@p1petal", "@mast"], count: 3}
+      answer: "@rod"
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 4
+    phase: upkeep
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: []
+      graveyard: [Daze]
+      battlefield: [{card: Argentum Masticore}, {card: Lotus Petal}]
+    p0:
+      battlefield: [{card: Voltaic Key}, {card: Lotus Petal}]
+      graveyard: [Null Rod]
+notes: >
+  "Your upkeep" means the Masticore's controller's upkeep: at p0's upkeep (turn 3) there is no trigger and p1 keeps the
+  Masticore and Daze. At p1's own upkeep p1 gets the yes/no and discards Daze (mana value 2). "An opponent" is relative
+  to the trigger's controller, so the candidates are p0's Voltaic Key, Null Rod and Lotus Petal, never p1's own Petal.
+  Null Rod (2) is destroyed. Wrong engines: trigger at every upkeep, ask p0 for the decisions, or use "opponent" relative
+  to the card's owner.

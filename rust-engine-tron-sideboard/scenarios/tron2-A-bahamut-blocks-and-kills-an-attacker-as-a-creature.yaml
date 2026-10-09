@@ -1,0 +1,44 @@
+id: tron2-a-bahamut-is-a-creature-and-blocks-with-its-nine-power
+title: "The Saga creature Summon: Bahamut blocks p1's Street Wraith on p1's turn and kills it, taking 3 damage"
+area: card
+cards: ["Summon: Bahamut", Street Wraith]
+tags: [summon-bahamut, saga, saga-creature, combat, declare-blockers, creature-type-on-battlefield, damage]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Summon: Bahamut", text: "Flying", verified: true}
+  - {kind: cr, ref: "509.1a", text: "The defending player chooses which creatures they control, if any, will block. The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.", verified: true}
+  - {kind: cr, ref: "702.9b", text: "A creature with flying can’t be blocked except by creatures with flying and/or reach. A creature with flying can block a creature with or without flying. (See rule 509, “Declare Blockers Step,” and rule 702.17, “Reach.”)", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: begin_combat
+  p0:
+    battlefield: [{card: "Summon: Bahamut", as: bah, counters: {lore: 2}}]
+    library_pad: 10
+  p1:
+    battlefield: ["Street Wraith @wr"]
+    library_pad: 10
+script:
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p1: {decision: declare_attackers, attacks: [{creature: "@wr", target: {player: p0}}]}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - p0: {decision: declare_blockers, blocks: [{blocker: "@bah", attacker: "@wr"}], expect_options: {include: ["@bah"]}}
+  - advance: {to: main2, of: p1}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main2
+    stack: []
+    p0:
+      life: 20
+      battlefield: [{card: "Summon: Bahamut", counters: {lore: 2}, damage: 3, tapped: false}]
+    p1:
+      life: 20
+      graveyard: [Street Wraith]
+      battlefield: []
+notes: >
+  Bahamut is both a Saga and a creature, so it is offered as a blocker. Street Wraith (3/4) is blocked by the 9/9, takes 9
+  and dies; Bahamut takes 3 and survives (its lore counters, 2, are untouched on p1's turn). A wrong engine does not treat
+  a Saga permanent as a creature able to block.

@@ -1,0 +1,47 @@
+id: tron2-b-masticore-upkeep-empty-hand-sacrificed
+title: "Argentum Masticore's upkeep trigger with no card in hand: it is sacrificed, no decision, no reflexive trigger"
+area: card
+cards: [Argentum Masticore, Null Rod, Island]
+tags: [argentum-masticore, upkeep-trigger, sacrifice-unless, discard, empty-hand, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Argentum Masticore, text: "At the beginning of your upkeep, sacrifice this creature unless you discard a card.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "118.12a", text: "Some spells, activated abilities, and triggered abilities read, “[Do something] unless [a player does something else].” This means the same thing as “[A player may do something else]. If [that player doesn’t], [do something].”", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard.", verified: true}
+setup:
+  turn: 2
+  active: p1
+  phase: end
+  p0:
+    battlefield: ["Argentum Masticore @mast"]
+    library_pad: 10
+  p1:
+    battlefield: ["Null Rod @rod"]
+    library_pad: 10
+script:
+  - advance: {to: upkeep, of: p0}
+  - check:
+      turn: 3
+      phase: upkeep
+      stack: [{kind: triggered, source: "@mast", controller: p0, text_contains: "sacrifice"}]
+      p0: {hand: [], battlefield: [{card: Argentum Masticore}]}
+  - resolve_top: true
+expect:
+  - at: after_script
+    turn: 3
+    phase: upkeep
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      hand: []
+      battlefield: []
+      graveyard: [Argentum Masticore]
+    p1:
+      battlefield: [{card: Null Rod}]
+      graveyard: []
+notes: >
+  The upkeep comes before the draw step, so p0's hand is empty when the trigger resolves. "Sacrifice unless you discard"
+  (118.12a) cannot be satisfied with no card to discard, so the Masticore is sacrificed. No yes/no is raised (the rules give
+  the player no choice), and since nothing was discarded the "when you discard a card this way" reflexive trigger never
+  exists: the opposing Null Rod (a legal target for MV 2 or less had a card been discarded) is untouched and the stack is
+  empty after the resolution. A wrong engine asks a yes/no anyway, or lets the Masticore stay.

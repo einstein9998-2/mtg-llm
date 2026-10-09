@@ -1,0 +1,42 @@
+id: tron2-b-lattice-hydroblast-cannot-counter-a-red-spell-it-is-colorless
+title: "Under Mycosynth Lattice Hydroblast's counter mode does nothing to Lightning Bolt, because a spell on the stack is colorless"
+area: card
+cards: [Mycosynth Lattice, Hydroblast, Lightning Bolt, Mountain, Island]
+tags: [mycosynth-lattice, color-change, spells-are-colorless, hydroblast, counterspell, color-check, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All cards that aren't on the battlefield, spells, and permanents are colorless.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Hydroblast, text: "Counter target spell if it's red.", verified: true}
+  - {kind: cr, ref: "105.2c", text: "A colorless object has no color.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mycosynth Lattice @lat", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Hydroblast @hb"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@hb", modes: [1], targets: ["@bolt"], pay: {tap: ["@isl"]}}
+  - resolve_top: true
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}]
+      p1: {graveyard: [Hydroblast], life: 20}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1: {life: 17, graveyard: [Hydroblast]}
+notes: >
+  Lightning Bolt is a red card, but while it is a spell Lattice makes it colorless, so Hydroblast's "if it's red" check
+  fails: Hydroblast resolves, does nothing, and the Bolt then resolves and deals 3 (p1 at 17). Hydroblast can still be cast
+  with a target (the target is any spell) and its {U} is paid by the Island. A wrong engine counts the Bolt's printed color
+  on the stack.

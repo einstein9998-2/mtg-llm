@@ -1,0 +1,56 @@
+id: tron2-b-lattice-leaving-restores-colors-types-and-mana-restrictions
+title: "When Abrade destroys Mycosynth Lattice, lands stop being artifacts and colorless mana can no longer pay {W}{W}"
+area: card
+cards: [Mycosynth Lattice, Abrade, White Orchid Phantom, Grim Monolith, Mountain, "Dragon's Rage Channeler"]
+tags: [mycosynth-lattice, leaves-the-battlefield, types-restored, mana-restriction-restored, abrade, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All permanents are artifacts in addition to their other types.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Mycosynth Lattice, text: "Players may spend mana as though it were mana of any color.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Abrade, text: "Destroy target artifact.", verified: true}
+  - {kind: cr, ref: "613.1d", text: "Layer 4: Type-changing effects are applied.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Mycosynth Lattice @lat", "Dragon's Rage Channeler @drc"]
+    library_pad: 10
+  p1:
+    hand: ["Abrade @abrade", "White Orchid Phantom @wop"]
+    battlefield: ["Mountain @m1", "Mountain @m2", "Grim Monolith @gm"]
+    library_pad: 10
+script:
+  - check:
+      legal: {p1: {include: [{t: cast, card: "@wop"}]}}
+      p1: {battlefield_contains: [{card: Mountain, types: [Land, Artifact]}]}
+  - p1: {t: cast, card: "@abrade", modes: [2], targets: ["@lat"], pay: {tap: ["@m1", "@m2"]}}
+  - resolve_top: true
+  - check:
+      stack: []
+      p0: {graveyard: [Mycosynth Lattice], battlefield: [{card: "Dragon's Rage Channeler", colors: [R]}]}
+      p1: {battlefield_contains: [{card: Mountain, types: [Land]}, {card: Mountain, types: [Land]}]}
+  - expect_illegal: {p1: {t: cast, card: "@wop"}}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p0:
+      graveyard: [Mycosynth Lattice]
+      battlefield: [{card: "Dragon's Rage Channeler", colors: [R]}]
+    p1:
+      hand: [White Orchid Phantom]
+      graveyard: [Abrade]
+      battlefield:
+        - {card: Mountain, types: [Land], tapped: true}
+        - {card: Mountain, types: [Land], tapped: true}
+        - {card: Grim Monolith, types: [Artifact]}
+notes: >
+  With Lattice out, p1 can cast White Orchid Phantom from Grim Monolith's colorless mana and the Mountains are
+  Land + Artifact (so Abrade's "destroy target artifact" could even name one). p1 pays Abrade ({1}{R}) with the two
+  Mountains and destroys the Lattice. Once it is gone the effects end at once: the Mountains are plain Lands, Dragon's
+  Rage Channeler is red again, and the Phantom can no longer be cast with colorless mana alone (the Monolith's {C}{C}{C}
+  cannot pay {W}{W}; both Mountains are tapped anyway, so the cast is illegal for either reason, but the first legal check
+  proves it was castable before). The colors assertion `colors: [R]` is a subset check: it proves the channeler has
+  red back, and was not asserted colorless before. A wrong engine keeps the artifact type or the mana permission after
+  the Lattice leaves.

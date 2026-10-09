@@ -1,0 +1,63 @@
+id: tron2-a-bahamut-chapter-two-after-draw-step-destroys-then-flier-attacks-past-ground-blocker
+title: "Summon: Bahamut gets its second lore counter after p0's draw step, chapter II destroys a creature, and the 9/9 flier attacks for 9 past p1's ground creature"
+area: card
+cards: ["Summon: Bahamut", "Phelia, Exuberant Shepherd", Ocelot Pride]
+tags: [summon-bahamut, saga, saga-creature, lore-counter, turn-based-action, draw-step, chapter-ability, destroy, flying, combat, unblockable-by-ground]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Summon: Bahamut", text: "I, II — Destroy up to one target nonland permanent.", verified: true}
+  - {kind: oracle, card: "Summon: Bahamut", text: "Flying", verified: true}
+  - {kind: cr, ref: "714.3b", text: "As a player’s precombat main phase begins, that player puts a lore counter on each Saga they control with one or more chapter abilities. This turn-based action doesn’t use the stack.", verified: true}
+  - {kind: cr, ref: "702.9b", text: "A creature with flying can’t be blocked except by creatures with flying and/or reach. A creature with flying can block a creature with or without flying. (See rule 509, “Declare Blockers Step,” and rule 702.17, “Reach.”)", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: end
+  p0:
+    battlefield: [{card: "Summon: Bahamut", as: bah, counters: {lore: 1}, sick: false}]
+    library_pad: 10
+  p1:
+    battlefield: ["Phelia, Exuberant Shepherd @ph", "Ocelot Pride @op"]
+    library_pad: 10
+script:
+  - advance: {to: draw, of: p0}
+  - check:
+      turn: 5
+      phase: draw
+      stack: []
+      p0:
+        hand_count: 1
+        battlefield: [{card: "Summon: Bahamut", counters: {lore: 1}}]
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: "@ph", expect_options: {include: ["@ph", "@op", "@bah"]}}
+  - check:
+      phase: main1
+      stack: [{kind: triggered, source: "@bah", controller: p0}]
+      p0: {battlefield: [{card: "Summon: Bahamut", counters: {lore: 2}}]}
+  - resolve_top: true
+  - check:
+      p1: {graveyard: ["Phelia, Exuberant Shepherd"], battlefield: [{card: Ocelot Pride}]}
+  - advance: {to: begin_combat, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: declare_attackers, attacks: [{creature: "@bah", target: {player: p1}}]}
+  - advance: {to: main2, of: p0}
+expect:
+  - at: after_script
+    turn: 5
+    phase: main2
+    stack: []
+    p0:
+      battlefield: [{card: "Summon: Bahamut", counters: {lore: 2}, tapped: true}]
+    p1:
+      life: 11
+      graveyard: ["Phelia, Exuberant Shepherd"]
+      battlefield: [{card: Ocelot Pride}]
+notes: >
+  The lore counter is added as p0's precombat main phase begins (714.3b), not on p1's turn and not in p0's own draw step
+  (still 1 there, with the drawn card in hand); the chapter II trigger then goes on the stack and its target is chosen. Bahamut
+  can be targeted by its own chapter ability (nonland permanent) but p0 picks Phelia. It has been under p0's control since the
+  turn began (setup sick: false), so it attacks as a 9/9 with flying; Ocelot Pride has no flying or reach, so p1 has no
+  legal blocker and no block decision is raised: p1 20 -> 11. A wrong engine adds the counter in the wrong step, lets the
+  ground creature block, or treats the Saga creature as unable to attack.

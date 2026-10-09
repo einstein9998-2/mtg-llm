@@ -1,0 +1,46 @@
+id: tron2-b-lattice-force-of-will-hard-cast-with-colorless-mana
+title: "Under Mycosynth Lattice Force of Will ({3}{U}{U}) is hard-cast with five colorless mana from Ancient Tomb, City of Traitors and Wasteland"
+area: card
+cards: [Mycosynth Lattice, Force of Will, Lightning Bolt, Ancient Tomb, City of Traitors, Wasteland, Mountain]
+tags: [mycosynth-lattice, mana-as-any-color, colorless-mana, force-of-will, ancient-tomb, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "Players may spend mana as though it were mana of any color.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: cr, ref: "609.4b", text: "If an effect allows a player to spend mana “as though it were mana of any [type or color],” this affects only how the player may", verified: true}
+  - {kind: oracle, card: Ancient Tomb, text: "{T}: Add {C}{C}. This land deals 2 damage to you.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mycosynth Lattice @lat", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow"]
+    battlefield: ["Ancient Tomb @tomb", "City of Traitors @city", "Wasteland @w"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}]}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@fow", targets: ["@bolt"], pay: {tap: ["@tomb", "@city", "@w"]}}
+  - check:
+      stack: [{kind: spell, card: "@bolt", controller: p0}, {kind: spell, card: "@fow", controller: p1, targets: ["@bolt"]}]
+      p1: {life: 18}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1:
+      life: 18
+      hand: []
+      graveyard: [Force of Will]
+      battlefield: [{card: Ancient Tomb, tapped: true}, {card: City of Traitors, tapped: true}, {card: Wasteland, tapped: true}]
+notes: >
+  p1's only mana is five colorless ({C}{C} from Ancient Tomb, {C}{C} from City of Traitors, {C} from Wasteland). Lattice
+  lets any mana pay for {U}{U} (the two colored symbols) plus {3} generic, so Force of Will is cast for its full mana cost
+  and counters the Bolt (p1 life 18 = 20 - 2 from Ancient Tomb, the Bolt never resolves). Lattice affects the
+  opponent's mana as well as its controller's. A wrong engine insists on U mana, or applies the effect only to the
+  Lattice's controller.

@@ -1,0 +1,42 @@
+id: tron2-a-bahamut-chapter-one-up-to-one-allows-zero-targets-and-destroys-nothing
+title: "Summon: Bahamut chapter I may be put on the stack with no target even when legal targets exist: nothing is destroyed"
+area: card
+cards: ["Summon: Bahamut", Island, Trinisphere, "Phelia, Exuberant Shepherd"]
+tags: [summon-bahamut, saga, saga-creature, chapter-ability, up-to-one-target, zero-targets, decline]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Summon: Bahamut", text: "I, II — Destroy up to one target nonland permanent.", verified: true}
+  - {kind: cr, ref: "115.4", text: "Some spells and abilities that refer to damage require “any target,” “another target,” “two targets,” or similar rather than “target [something].” These targets may be creatures, players, planeswalkers, or battles. Other game objects, such as noncreature artifacts or spells, can’t be chosen.", verified: true}
+  - {kind: cr, ref: "714.2b", text: "“{rN}—[Effect]” means “When one or more lore counters are put onto this Saga, if the number of lore counters on it was less than N and became at least N, [effect].”", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Summon: Bahamut @bah"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4", "Island @i5", "Island @i6", "Island @i7", "Island @i8", "Island @i9"]
+    library_pad: 10
+  p1:
+    battlefield: ["Trinisphere @tri", "Phelia, Exuberant Shepherd @ph"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bah", pay: auto}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - p0: {decision: choose_target, slot: 0, answer: null, expect_options: {include: ["@tri", "@ph"]}}
+  - check:
+      stack: [{kind: triggered, source: "@bah", controller: p0, targets: []}]
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      battlefield_contains: [{card: "Summon: Bahamut", counters: {lore: 1}}]
+    p1:
+      graveyard: []
+      battlefield: [{card: Trinisphere}, {card: "Phelia, Exuberant Shepherd"}]
+notes: >
+  "Up to one" lets p0 choose zero targets even with legal targets available (115.4); the chapter ability still goes on the
+  stack (it has no required target) and does nothing when it resolves. The answer to the target decision is written as answer null
+   (no object); the adapter owns the exact empty-choice shape. A wrong engine forces a target.

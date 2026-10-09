@@ -1,0 +1,50 @@
+id: tron2-a-confluence-costs-two-generic-and-two-colorless-islands-alone-cannot-pay
+title: "Eldrazi Confluence costs {2}{C}{C}: four Islands cannot cast it, Ancient Tomb plus two Islands can"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Eldrazi Scion Token]
+tags: [eldrazi-confluence, colorless-mana-cost, mana-payment, mask-validity, modal, eldrazi-scion]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Choose three. You may choose the same mode more than once.", verified: true}
+  - {kind: cr, ref: "601.2f", text: "The player determines the total cost of the spell. Usually this is just the mana cost. Some spells have additional or alternative costs. Some effects may increase or reduce the cost to pay, or may provide other alternative costs. Costs may include paying mana, tapping permanents, sacrificing permanents, discarding cards, and so on. The total cost is the mana cost or alternative cost (as determined in rule 601.2b), plus all additional costs and cost increases, and minus all cost reductions. If multiple cost reductions apply, the player may apply them in any order. If the mana component of the total cost is reduced to nothing by cost reduction effects, it is considered to be {0}. It can’t be reduced to less than {0}. Once the total cost is determined, any effects that directly affect the total cost are applied. Then the resulting total cost becomes “locked in.” If effects would change the total cost after this time, they have no effect.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf", "Ancient Tomb @tomb"]
+    battlefield: ["Island @i1", "Island @i2", "Island @i3", "Island @i4"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - expect_illegal: {p0: {t: cast, card: "@conf", modes: [10], targets: [], pay: auto}}
+  - check:
+      legal: {p0: {exclude: [{t: cast, card: "@conf"}]}}
+  - p0: {t: play_land, card: "@tomb"}
+  - check:
+      legal: {p0: {include: [{t: cast, card: "@conf"}]}}
+  - p0: {t: cast, card: "@conf", modes: [10], targets: [], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      lands_played: 1
+      graveyard: [Eldrazi Confluence]
+      battlefield_contains:
+        - {card: Ancient Tomb, tapped: true}
+        - {card: Island, tapped: false}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: true}
+        - {card: Island, tapped: false}
+        - {token: Eldrazi Scion Token}
+        - {token: Eldrazi Scion Token}
+        - {token: Eldrazi Scion Token}
+notes: >
+  Four Islands make four mana but none of it colorless: the two {C} symbols cannot be paid (the same for Warping Wail's {C}), so
+  the cast is not offered at all. After Ancient Tomb ({T}: add {C}{C}) is played from hand the cast is offered, and Tomb plus two
+  Islands pays {2}{C}{C}. Scion x3 (modes 10) is used only because it needs no targets. The Tomb's land drop is the only reason it
+  is in hand: with it on the battlefield from the start the negative case would not be a negative.

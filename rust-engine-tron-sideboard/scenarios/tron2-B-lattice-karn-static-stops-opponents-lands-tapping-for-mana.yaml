@@ -1,0 +1,39 @@
+id: tron2-b-lattice-karn-static-stops-opponents-lands-tapping-for-mana
+title: "Under Mycosynth Lattice Karn's static ability makes the opponent's lands artifacts whose abilities (mana abilities too) can't be activated"
+area: card
+cards: [Mycosynth Lattice, "Karn, the Great Creator", Island, Brainstorm]
+tags: [mycosynth-lattice, karn-the-great-creator, artifacts, lands, mana-ability, cant-activate, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All permanents are artifacts in addition to their other types.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: "Karn, the Great Creator", text: "Activated abilities of artifacts your opponents control can't be activated.", verified: true}
+  - {kind: cr, ref: "605.1a", text: "An activated ability is a mana ability if it meets all of the following criteria", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main1
+  p0:
+    battlefield: ["Mycosynth Lattice @lat", {card: "Karn, the Great Creator", as: karn, counters: {loyalty: 5}}]
+    library_pad: 10
+  p1:
+    hand: ["Brainstorm @bs"]
+    battlefield: ["Island @isl"]
+    library_pad: 10
+script:
+  - expect_illegal: {p1: {t: activate, source: "@isl", ability: 0, choose_color: U}}
+  - expect_illegal: {p1: {t: cast, card: "@bs", targets: []}}
+expect:
+  - at: after_script
+    turn: 4
+    phase: main1
+    stack: []
+    pending: {actor: p1, kind: priority}
+    p1:
+      hand: [Brainstorm]
+      mana_pool: {}
+      battlefield: [{card: Island, tapped: false, types: [Land, Artifact]}]
+notes: >
+  Lattice makes p1's Island an artifact an opponent of Karn's controller controls. Karn's static ability stops activated
+  abilities of such artifacts, and a mana ability is an activated ability (605.1a), so p1 cannot tap the Island for {U}
+  and therefore cannot cast Brainstorm. A wrong engine exempts mana abilities or lands from the static ability, or does not
+  see the Island as an artifact when evaluating Karn's restriction.

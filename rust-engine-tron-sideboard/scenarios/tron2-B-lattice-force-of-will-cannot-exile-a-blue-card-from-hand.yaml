@@ -1,0 +1,38 @@
+id: tron2-b-lattice-force-of-will-cannot-exile-a-blue-card-from-hand
+title: "Under Mycosynth Lattice Force of Will's free alternative cost is unavailable: Brainstorm in hand is colorless, not a blue card"
+area: card
+cards: [Mycosynth Lattice, Force of Will, Brainstorm, Lightning Bolt, Mountain]
+tags: [mycosynth-lattice, color-change, cards-in-hand-are-colorless, force-of-will, alternative-cost, tron-sideboard]
+derived_from: oracle
+source:
+  - {kind: oracle, card: Mycosynth Lattice, text: "All cards that aren't on the battlefield, spells, and permanents are colorless.", verified: true, note: "entry in oracle-additions-B.json"}
+  - {kind: oracle, card: Force of Will, text: "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Lightning Bolt @bolt"]
+    battlefield: ["Mycosynth Lattice @lat", "Mountain @m1"]
+    library_pad: 10
+  p1:
+    hand: ["Force of Will @fow", "Brainstorm @bs"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@bolt", targets: [{player: p1}]}
+  - p0: {t: pass}
+  - expect_illegal: {p1: {t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}, targets: ["@bolt"]}}
+  - check:
+      legal: {p1: {exclude: [{t: cast, card: "@fow", alt_cost: {exile_blue_card: "@bs", pay_life: 1}}]}}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0: {graveyard: [Lightning Bolt]}
+    p1: {life: 17, hand: [Force of Will, Brainstorm], exile: []}
+notes: >
+  Brainstorm is a blue card, but cards that aren't on the battlefield are colorless under Lattice, so there is no blue card
+  to exile and the alternative cost cannot be paid; p1 has no lands, so Force of Will cannot be cast at all. The Bolt
+  resolves (p1 at 17), life and hand are unchanged. A wrong engine offers the pitch cost using the printed color of the
+  card in hand.

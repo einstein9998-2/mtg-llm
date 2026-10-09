@@ -1,0 +1,50 @@
+id: tron2-a-confluence-single-target-exiled-in-response-fizzles-and-the-two-scions-are-not-made
+title: "Swords to Plowshares exiles the only target of Confluence (pump x1 + Scion x2): all its targets are illegal, so it does not resolve and no Scion is made"
+area: card
+cards: [Eldrazi Confluence, Ancient Tomb, Island, Swords to Plowshares, Plains, Street Wraith, Eldrazi Scion Token]
+tags: [eldrazi-confluence, modal, fizzle, target-legality, swords-to-plowshares, response, eldrazi-scion, untargeted-mode]
+derived_from: cr
+source:
+  - {kind: oracle, card: Eldrazi Confluence, text: "Target creature gets +3/-3 until end of turn.", verified: true}
+  - {kind: oracle, card: Eldrazi Confluence, text: 'Create a 1/1 colorless Eldrazi Scion creature token with "Sacrifice this token: Add {C}."', verified: true}
+  - {kind: cr, ref: "608.2b", text: "If all its targets, for every instance of the word “target,” are now illegal, the spell or ability doesn’t resolve. It’s removed from the stack and, if it’s a spell, put into its owner’s graveyard.", verified: true}
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Eldrazi Confluence @conf"]
+    battlefield: ["Ancient Tomb @tomb", "Island @i1", "Island @i2"]
+    library_pad: 10
+  p1:
+    hand: ["Swords to Plowshares @stp"]
+    battlefield: ["Plains @pl", "Street Wraith @wr"]
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@conf", modes: [6], targets: ["@wr"], pay: {tap: ["@tomb", "@i1", "@i2"]}}
+  - p0: {t: pass}
+  - p1: {t: cast, card: "@stp", targets: ["@wr"], pay: auto}
+  - p1: {t: pass}
+  - p0: {t: pass}
+  - check:
+      stack: [{kind: spell, card: "@conf", controller: p0}]
+      p1: {life: 23, exile: [Street Wraith]}
+  - p0: {t: pass}
+  - p1: {t: pass}
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      life: 18
+      graveyard: [Eldrazi Confluence]
+      battlefield: [{card: Ancient Tomb, tapped: true}, {card: Island, tapped: true}, {card: Island, tapped: true}]
+    p1:
+      life: 23
+      exile: [Street Wraith]
+      graveyard: [Swords to Plowshares]
+notes: >
+  Multiset 5 (pump x1, Scion x2) is `modes: [6]`; its only target is the Wraith. With that target gone every target of the spell
+  is illegal, so Confluence is removed from the stack and put into the graveyard without resolving (608.2b): the two untargeted
+  Scion instances do NOT happen (contrast with the partial-fizzle scenario). The p0 battlefield list is exact: no tokens.
+  A wrong engine still makes the Scions because those instances never targeted anything.

@@ -1,0 +1,59 @@
+id: tron2-a-bahamut-chapter-four-damage-equals-total-mana-value-of-other-permanents-then-sacrificed
+title: "Summon: Bahamut chapter IV: Trinisphere (3) + Karn (4) + Voltaic Key (1) + lands and a token (0) = 8 damage, not 17; then the Saga is sacrificed"
+area: card
+cards: ["Summon: Bahamut", Trinisphere, "Karn, the Great Creator", Voltaic Key, Island, Eldrazi Scion Token, Grim Monolith]
+tags: [summon-bahamut, saga, saga-creature, lore-counter, chapter-ability, mana-value, damage-to-player, sacrifice-sba, tokens-mana-value-zero]
+derived_from: oracle
+source:
+  - {kind: oracle, card: "Summon: Bahamut", text: "IV — Mega Flare — This creature deals damage equal to the total mana value of other permanents you control to each opponent.", verified: true}
+  - {kind: cr, ref: "202.3", text: ". The mana value of an object is a number equal to the total amount of mana in its mana cost, regardless of color.", verified: true}
+  - {kind: cr, ref: "714.4", text: "If the number of lore counters on a Saga permanent with one or more chapter abilities is greater than or equal to its final chapter number, and it isn’t the source of a chapter ability that has triggered but not yet left the stack, that Saga’s controller sacrifices it. This state-based action doesn’t use the stack.", verified: true}
+  - {kind: cr, ref: "701.21a", text: "To sacrifice a permanent, its controller moves it from the battlefield directly to its owner’s graveyard. A player can’t sacrifice something that isn’t a permanent, or something that’s a permanent they don’t control. Sacrificing a permanent doesn’t destroy it, so regeneration or other effects that replace destruction can’t affect this action.", verified: true}
+setup:
+  turn: 4
+  active: p1
+  phase: main2
+  p0:
+    battlefield:
+      - {card: "Summon: Bahamut", as: bah, counters: {lore: 3}, sick: false}
+      - "Trinisphere @tri"
+      - {card: "Karn, the Great Creator", as: karn, counters: {loyalty: 4}}
+      - "Voltaic Key @key"
+      - "Island @isl"
+      - {token: Eldrazi Scion Token, as: tok}
+    library_pad: 10
+  p1:
+    battlefield: ["Grim Monolith @gm"]
+    library_pad: 10
+script:
+  - advance: {to: draw, of: p0}
+  - p0: {t: pass}
+  - p1: {t: pass}
+  - check:
+      phase: main1
+      stack: [{kind: triggered, source: "@bah", controller: p0}]
+      p0: {battlefield_contains: [{card: "Summon: Bahamut", counters: {lore: 4}}]}
+      p1: {life: 20}
+  - resolve_top: true
+expect:
+  - at: after_script
+    stack: []
+    pending: {actor: p0, kind: priority}
+    p0:
+      graveyard: ["Summon: Bahamut"]
+      battlefield:
+        - {card: Trinisphere}
+        - {card: "Karn, the Great Creator", counters: {loyalty: 4}}
+        - {card: Voltaic Key}
+        - {card: Island}
+        - {token: Eldrazi Scion Token}
+    p1:
+      life: 12
+      battlefield: [{card: Grim Monolith}]
+notes: >
+  When the fourth lore counter arrives the chapter IV trigger goes on the stack and the Saga stays on the battlefield while that
+  trigger is on the stack (714.4: it is the source of a chapter ability that has not left the stack). On resolution Bahamut
+  deals damage equal to the mana values of its controller's OTHER permanents: Trinisphere 3 + Karn 4 + Voltaic Key 1 + Island 0
+  + Scion token 0 = 8 (a token has no mana cost, 202.3; Bahamut's own {9} is excluded and so is p1's Grim Monolith): p1 20 -> 12.
+  Then the state-based action sacrifices the Saga (lore 4 equals the final chapter number). A wrong engine counts Bahamut
+  itself (17), the opponent's permanents, or fails to sacrifice it.

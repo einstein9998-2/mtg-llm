@@ -78,3 +78,7 @@ The Alurentell sideboard plan for this matchup (Brady's, in the thread root) bel
 ## Status 2026-10-06 (after implementation)
 
 RFC 0008 (`rust-engine-tron/0008-colorless-tron.md`) and the patch (`rust-engine-tron/tron-core.patch`) are done in a scratch copy and not applied to the live engine. Of the 27 missing cards, 20 are fully modeled (the 9 data cards and the 11 small core items; Planar Nexus only through automatic payment, Kozilek's Command player modes only target you). Not modeled: Urza's Saga and Summon: Bahamut (RFC 0007), Karn -2, Ugin -11, Argentum Masticore, Mycosynth Lattice, Eldrazi Confluence (distinct modes only), Extinguisher Battleship station, Mishra's Research Desk unearth/expiry. Results: 156 new scenarios pass, visible spec 838/838, workspace tests and goldens clean, 3000-game fuzz clean.
+
+## Status 2026-10-09 (sideboard completed)
+
+RFC 0014 (`rust-engine-tron-sideboard/`) adds the four missing sideboard cards: Eldrazi Confluence (as ten modes, one per multiset of three), Argentum Masticore (protection from multicolored, upkeep discard with a reflexive destroy), Mycosynth Lattice and Summon: Bahamut. With it `colorless-tron.txt` loads as 60 + 15 in the engine. Still not modeled: Karn -2, Ugin -11, Extinguisher Battleship station, Mishra's Research Desk unearth and expiry.
