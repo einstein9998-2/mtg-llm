@@ -1,0 +1,89 @@
+--- a/crates/mtg-core/src/ir.rs
++++ b/crates/mtg-core/src/ir.rs
+@@ -335,6 +335,8 @@
+     HasCounter(ORef, CounterKind),
+     /// The player has completed the named dungeon.
+     Completed { who: PRef, dungeon: String },
++    /// It is the precombat or postcombat main phase (any player's turn).
++    InMainPhase,
+ }
+ 
+ // ---------------------------------------------------------------------------------------------
+@@ -643,6 +645,9 @@
+     /// each (a creature chosen in k slots gets k points). Each distinct target that is still legal
+     /// is dealt `per` times its number of slots as a single damage event; illegal slots are lost.
+     DamageSlots { per: Expr, first: u8, n: u8 },
++    /// Fight (CR 701.12): the creatures in target slots `a` and `b` each deal damage equal to their
++    /// power to the other. Nothing happens unless both are still creatures on the battlefield.
++    Fight { a: u8, b: u8 },
+ }
+ 
+ fn pref_you() -> PRef {
+--- a/crates/mtg-core/src/eval.rs
++++ b/crates/mtg-core/src/eval.rs
+@@ -220,6 +220,7 @@
+                 op.test(x, y)
+             }
+             Cond::IsActive(p) => self.eval_p(env, *p) == Some(self.s.turn.active),
++            Cond::InMainPhase => matches!(self.s.turn.step, Step::Main1 | Step::Main2),
+             Cond::UsedThisTurn(i) => match env.source {
+                 Some(src) => self.s.used.contains(&(src, *i)),
+                 None => false,
+--- a/crates/mtg-core/src/lint.rs
++++ b/crates/mtg-core/src/lint.rs
+@@ -50,7 +50,7 @@
+         Cond::Cmp(a, _, b) => tmax(expr(a), expr(b)),
+         Cond::IsActive(r) | Cond::Delirium(r) | Cond::Revolt(r) | Cond::Blessing(r) => p(r),
+         Cond::Completed { who, .. } => p(who),
+-        Cond::UsedThisTurn(_) => -1,
++        Cond::UsedThisTurn(_) | Cond::InMainPhase => -1,
+         Cond::HasCounter(o, _) => o_(o),
+         Cond::Controls { who, .. } => p(who),
+         Cond::Matches(o, _) | Cond::ControlledBy(o, _) => o_(o),
+@@ -94,6 +94,7 @@
+         Effect::CounterSpellExile(i) => *i as i32,
+         Effect::MoveTo { objs: o, ctrl, .. } => tmax(objs(o), ctrl.as_ref().map(|c| p(c)).unwrap_or(-1)),
+         Effect::CounterAbility(i) => *i as i32,
++        Effect::Fight { a, b } => (*a).max(*b) as i32,
+         Effect::DiscardChoose { who, .. } | Effect::LookTop { who } | Effect::DiscardNamed { who } => p(who),
+         Effect::ChooseName { .. } => -1,
+         Effect::LookPutTop { look } => expr(look),
+--- a/crates/mtg-core/src/resolve.rs
++++ b/crates/mtg-core/src/resolve.rs
+@@ -1221,6 +1221,20 @@
+             cx.end_batch();
+             Flow::Next
+         }
++        Effect::Fight { a, b } => {
++            if let (Some(Target::Obj(x)), Some(Target::Obj(y))) = (env.target(*a), env.target(*b)) {
++                if cx.s.is_live(x) && cx.s.is_live(y) && x != y {
++                    cx.refresh();
++                    let creature = |cx: &mut Cx, r: ObjRef| cx.chars(r).types.contains(Types::CREATURE) && cx.s.obj(r).zone == ZoneKind::Battlefield;
++                    if creature(cx, x) && creature(cx, y) {
++                        let (px, py) = (cx.chars(x).power.max(0) as u32, cx.chars(y).power.max(0) as u32);
++                        cx.deal_damage(Some(x), Target::Obj(y), px, false);
++                        cx.deal_damage(Some(y), Target::Obj(x), py, false);
++                    }
++                }
++            }
++            Flow::Next
++        }
+         Effect::CounterAbility(i) => {
+             if let Some(Target::Obj(r)) = env.target(*i) {
+                 if cx.s.is_live(r) && cx.s.obj(r).zone == ZoneKind::Stack && cx.s.obj(r).kind == ObjKind::Ability {
+--- a/crates/mtg-cards/cards/legacy.cards.ron
++++ b/crates/mtg-cards/cards/legacy.cards.ron
+@@ -411,6 +411,13 @@
+     Spell(targets: [(objects: (types_any: "CREATURE"))],
+       effect: If(cond: Or([Matches(Target(0), (cmc: (Le, 2))), And([Revolt(You), Matches(Target(0), (cmc: (Le, 4)))])]), then: Destroy(One(Target(0))))),
+   ]),
++  (name: "Tail Swipe", cost: "{G}", types: "INSTANT", abilities: [
++    Spell(targets: [(objects: (types_any: "CREATURE", controller: You)), (objects: (types_any: "CREATURE", controller: Opp))],
++      effect: Seq([
++        If(cond: And([IsActive(You), InMainPhase]), then: Continuous(objs: One(Target(0)), layer: L7c, effect: ModifyPT(1, 1), until: EndOfTurn)),
++        Fight(a: 0, b: 1),
++      ])),
++  ]),
+   (name: "Veil of Summer", cost: "{G}", types: "INSTANT", abilities: [
+     Spell(effect: Seq([
+       If(cond: CastColor(who: Opp, colors: "U | B"), then: Draw(who: You, n: Const(1))),
