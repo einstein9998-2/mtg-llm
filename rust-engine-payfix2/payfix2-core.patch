@@ -1,0 +1,244 @@
+--- a/crates/mtg-core/src/legal.rs
++++ b/crates/mtg-core/src/legal.rs
+@@ -79,6 +79,7 @@
+             let mut sac = false;
+             let mut sac_ab: Option<u8> = None;
+             let mut filter = false;
++            let mut pain = false;
+             if c.types.contains(Types::LAND) {
+                 for (st, mc) in [(SUB_PLAINS, ManaColor::W), (SUB_ISLAND, ManaColor::U), (SUB_SWAMP, ManaColor::B), (SUB_MOUNTAIN, ManaColor::R), (SUB_FOREST, ManaColor::G)] {
+                     if c.subtypes.has(st) {
+@@ -117,6 +118,7 @@
+                                 ability = i as u8;
+                             }
+                             consumes |= m.consumes;
++                            pain |= matches!(&ad.effect, Some(Effect::Seq(v)) if v.iter().any(|e| matches!(e, Effect::Damage { .. } | Effect::LoseLife { .. })));
+                         } else if sac_left > 0 && sac_mana_ability(ad) {
+                             sac_ab = Some(i as u8);
+                         } else if filter_mana_ability(ad) {
+@@ -146,7 +148,7 @@
+             if c.types.contains(Types::CREATURE) && o_entered >= self.s.turn.own_turn[seat.idx()] && !c.keywords.contains(Keywords::HASTE) && !no_tap {
+                 continue;
+             }
+-            let mut pref = extra + if c.supertypes.contains(Supertypes::BASIC) { 0 } else { 1 } + if consumes { 8 } else { 0 };
++            let mut pref = extra + if c.supertypes.contains(Supertypes::BASIC) { 0 } else { 1 } + if consumes { 8 } else { 0 } + if pain { 6 } else { 0 };
+             if !self.s.pay_hint.is_empty() {
+                 pref = if self.s.pay_hint.contains(&r) { 0 } else { 100 + pref };
+             }
+@@ -263,19 +265,18 @@
+             pool.0[c] = pool.0[c].saturating_add(usable[c]);
+         }
+         // A named payment source (601.2h: the player chooses what to pay with) is honored before
+-        // floating mana: plan from the named sources alone, and fall back to the pool only if
+-        // they cannot pay. The unnamed sources stay out of the first attempt, so a named land that
+-        // cannot pay everything never pulls in an unnamed one (Ancient Tomb's 2 damage) while
+-        // floating mana could cover the rest; the fallback prefers named sources via `pref`.
++        // floating mana: plan from the named sources alone (restricted mana only), then from the
++        // named sources plus the whole pool, and only then from the pool plus every source (named
++        // ones first). Never tap an unnamed source while floating mana could pay instead.
+         let hinted = if self.s.pay_hint.is_empty() {
+             None
+         } else {
++            let named: SmallVec<[ManaSource; 16]> = ms.iter().copied().filter(|m| srcs[m.tag as usize].pref < 100).collect();
+             let mut bare = pool;
+             for c in 0..6 {
+                 bare.0[c] = usable[c];
+             }
+-            let named: SmallVec<[ManaSource; 16]> = ms.iter().filter(|m| self.s.pay_hint.contains(&srcs[m.tag as usize].obj)).copied().collect();
+-            self.pay_plan_lat(cost.pips, cost.hyb, generic, &bare, &named)
++            self.pay_plan_lat(cost.pips, cost.hyb, generic, &bare, &named).or_else(|| self.pay_plan_lat(cost.pips, cost.hyb, generic, &pool, &named))
+         };
+         let mut pay = match hinted {
+             Some(p) => p,
+--- a/crates/mtg-cards/cards/boros.cards.ron
++++ b/crates/mtg-cards/cards/boros.cards.ron
+@@ -19,8 +19,9 @@
+     Static(layer: L6, applies_to: (types_any: "CREATURE", controller: You), effect: GrantKeywords("HASTE")),
+   ]),
+   (name: "Sunbaked Canyon", types: "LAND", abilities: [
+-    Activated(text: "{T}, Pay 1 life: Add {R}.", cost: [TapSelf, PayLife(1)], is_mana: true, effect: AddMana(color: R, n: 1)),
+-    Activated(text: "{T}, Pay 1 life: Add {W}.", cost: [TapSelf, PayLife(1)], is_mana: true, effect: AddMana(color: W, n: 1)),
++    // The life payment is modelled as a mana-ability side effect (like Ancient Tomb's damage) so automatic payment can use the land.
++    Activated(text: "{T}, Pay 1 life: Add {R}.", cost: [TapSelf], is_mana: true, effect: Seq([AddMana(color: R, n: 1), LoseLife(who: You, n: Const(1))])),
++    Activated(text: "{T}, Pay 1 life: Add {W}.", cost: [TapSelf], is_mana: true, effect: Seq([AddMana(color: W, n: 1), LoseLife(who: You, n: Const(1))])),
+     Activated(text: "{1}, {T}, Sacrifice this land: Draw a card.", cost: [Mana("{1}"), TapSelf, SacrificeSelf], effect: Draw(who: You, n: Const(1))),
+   ]),
+   // "Exile any number of target spells" is modelled as up to four optional, distinct spell targets (RFC 0012). Exile, not counter:
+--- a/crates/mtg-spec/src/runner.rs
++++ b/crates/mtg-spec/src/runner.rs
+@@ -1724,10 +1724,11 @@
+ }
+ 
+ /// A mana ability written as several engine abilities of one cost ("{T}, Pay 1 life: Add {R} or {W}" is one
+-/// ability per color, RFC 0012) is one ability in Oracle order: this is whether `abs[i]` continues the one before it.
++/// ability per color, RFC 0012; Sunbaked Canyon since payfix2 has a bare {T} cost and the life loss as an effect, hence the
++/// `Seq` test) is one ability in Oracle order: this is whether `abs[i]` continues the one before it.
+ fn continues_mana_group(abs: &[AbilityDef], i: usize) -> bool {
+     match (i.checked_sub(1).and_then(|p| abs.get(p)), abs.get(i)) {
+-        (Some(AbilityDef::Activated(a)), Some(AbilityDef::Activated(b))) => a.is_mana && b.is_mana && a.cost == b.cost && a.cost.len() > 1,
++        (Some(AbilityDef::Activated(a)), Some(AbilityDef::Activated(b))) => a.is_mana && b.is_mana && a.cost == b.cost && (a.cost.len() > 1 || matches!(&a.effect, Some(Effect::Seq(_)))),
+         _ => false,
+     }
+ }
+--- a/own-scenarios/scenarios/own.yaml
++++ b/own-scenarios/scenarios/own.yaml
+@@ -1189,3 +1189,159 @@
+         - {token: "Cat Token (Ocelot Pride)"}
+         - {token: "Cat Token (Ocelot Pride)"}
+         - {token: "Cat Token (Ocelot Pride)"}
++---
++id: own-paytest-aluren-named-two-lands-and-floating-pool
++title: Aluren with two named green lands and two floating blue pays the rest from the pool, not Ancient Tomb
++area: card
++setup:
++  turn: 3
++  active: p0
++  phase: main1
++  p0:
++    hand: ["Aluren @al"]
++    battlefield: ["Savannah @sv", "Tropical Island @tr", "Ancient Tomb @tomb", "Island @is"]
++    mana_pool: {U: 2}
++    library_pad: 10
++  p1:
++    library_pad: 10
++script:
++  - p0: {t: cast, card: "@al", pay: {tap: ["@sv", "@tr"]}}
++expect:
++  - at: after_script
++    p0:
++      life: 20
++      mana_pool: {}
++      battlefield_contains: [{card: Savannah, tapped: true}, {card: Tropical Island, tapped: true}, {card: Ancient Tomb, tapped: false}, {card: Island, tapped: false}]
++---
++id: own-paytest-aluren-named-two-lands-auto-rest
++title: Aluren with two named green lands and no pool taps Island and another before Tomb
++area: card
++setup:
++  turn: 3
++  active: p0
++  phase: main1
++  p0:
++    hand: ["Aluren @al"]
++    battlefield: ["Savannah @sv", "Tropical Island @tr", "Ancient Tomb @tomb", "Island @is", "Plains @pl"]
++    library_pad: 10
++  p1:
++    library_pad: 10
++script:
++  - p0: {t: cast, card: "@al", pay: {tap: ["@sv", "@tr"]}}
++expect:
++  - at: after_script
++    p0:
++      life: 20
++      battlefield_contains: [{card: Savannah, tapped: true}, {card: Tropical Island, tapped: true}, {card: Ancient Tomb, tapped: false}]
++---
++id: own-paytest-aluren-no-hint-pool-first
++title: Aluren with no hint and floating blue spends the pool first
++area: card
++setup:
++  turn: 3
++  active: p0
++  phase: main1
++  p0:
++    hand: ["Aluren @al"]
++    battlefield: ["Savannah @sv", "Tropical Island @tr", "Ancient Tomb @tomb", "Island @is"]
++    mana_pool: {U: 2}
++    library_pad: 10
++  p1:
++    library_pad: 10
++script:
++  - p0: {t: cast, card: "@al", pay: auto}
++expect:
++  - at: after_script
++    p0:
++      life: 20
++      mana_pool: {}
++---
++id: own-paytest-aluren-one-named-land-and-floating-pool
++title: Aluren with one named green land and two floating blue taps one more green land, never Ancient Tomb
++area: card
++setup:
++  turn: 3
++  active: p0
++  phase: main1
++  p0:
++    hand: ["Aluren @al"]
++    battlefield: ["Savannah @sv", "Tropical Island @tr", "Ancient Tomb @tomb", "Island @is"]
++    mana_pool: {U: 2}
++    library_pad: 10
++  p1:
++    library_pad: 10
++script:
++  - p0: {t: cast, card: "@al", pay: {tap: ["@sv"]}}
++expect:
++  - at: after_script
++    p0:
++      life: 20
++      mana_pool: {}
++      battlefield_contains: [{card: Savannah, tapped: true}, {card: Tropical Island, tapped: true}, {card: Ancient Tomb, tapped: false}, {card: Island, tapped: false}]
++---
++id: own-canyon-canyon-casts-guide
++title: Sunbaked Canyon alone pays for a one-mana white creature
++area: card
++setup:
++  turn: 3
++  active: p0
++  phase: main1
++  p0:
++    hand: ["Guide of Souls @g"]
++    battlefield: ["Sunbaked Canyon @c"]
++    library_pad: 10
++  p1:
++    library_pad: 10
++script:
++  - p0: {t: cast, card: "@g", pay: auto}
++  - resolve_top: true
++expect:
++  - at: after_script
++    p0:
++      life: 19
++      battlefield_contains: [{card: Guide of Souls}]
++---
++id: own-canyon-karakas-casts-guide
++title: Karakas alone pays for a one-mana white creature
++area: card
++setup:
++  turn: 3
++  active: p0
++  phase: main1
++  p0:
++    hand: ["Guide of Souls @g"]
++    battlefield: ["Karakas @c"]
++    library_pad: 10
++  p1:
++    library_pad: 10
++script:
++  - p0: {t: cast, card: "@g", pay: auto}
++  - resolve_top: true
++expect:
++  - at: after_script
++    p0:
++      life: 20
++      battlefield_contains: [{card: Guide of Souls}]
++---
++id: own-canyon-canyon-and-plateau-cast-ocelot-and-guide
++title: Canyon plus Plateau pay for two one-mana creatures in the same main phase
++area: card
++setup:
++  turn: 3
++  active: p0
++  phase: main1
++  p0:
++    hand: ["Guide of Souls @g", "Ocelot Pride @o"]
++    battlefield: ["Sunbaked Canyon @c", "Plateau @p"]
++    library_pad: 10
++  p1:
++    library_pad: 10
++script:
++  - p0: {t: cast, card: "@g", pay: auto}
++  - resolve_top: true
++  - p0: {t: cast, card: "@o", pay: auto}
++  - resolve_top: true
++expect:
++  - at: after_script
++    p0:
++      battlefield_contains: [{card: Guide of Souls}, {card: Ocelot Pride}]

@@ -1,0 +1,88 @@
+id: paytest-aluren-named-two-lands-and-floating-pool
+title: Aluren with two named green lands and two floating blue pays the rest from the pool, not Ancient Tomb
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Aluren @al"]
+    battlefield: ["Savannah @sv", "Tropical Island @tr", "Ancient Tomb @tomb", "Island @is"]
+    mana_pool: {U: 2}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@al", pay: {tap: ["@sv", "@tr"]}}
+expect:
+  - at: after_script
+    p0:
+      life: 20
+      mana_pool: {}
+      battlefield_contains: [{card: Savannah, tapped: true}, {card: Tropical Island, tapped: true}, {card: Ancient Tomb, tapped: false}, {card: Island, tapped: false}]
+---
+id: paytest-aluren-named-two-lands-auto-rest
+title: Aluren with two named green lands and no pool taps Island and another before Tomb
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Aluren @al"]
+    battlefield: ["Savannah @sv", "Tropical Island @tr", "Ancient Tomb @tomb", "Island @is", "Plains @pl"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@al", pay: {tap: ["@sv", "@tr"]}}
+expect:
+  - at: after_script
+    p0:
+      life: 20
+      battlefield_contains: [{card: Savannah, tapped: true}, {card: Tropical Island, tapped: true}, {card: Ancient Tomb, tapped: false}]
+---
+id: paytest-aluren-no-hint-pool-first
+title: Aluren with no hint and floating blue spends the pool first
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Aluren @al"]
+    battlefield: ["Savannah @sv", "Tropical Island @tr", "Ancient Tomb @tomb", "Island @is"]
+    mana_pool: {U: 2}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@al", pay: auto}
+expect:
+  - at: after_script
+    p0:
+      life: 20
+      mana_pool: {}
+---
+id: paytest-aluren-one-named-land-and-floating-pool
+title: Aluren with one named green land and two floating blue taps one more green land, never Ancient Tomb
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Aluren @al"]
+    battlefield: ["Savannah @sv", "Tropical Island @tr", "Ancient Tomb @tomb", "Island @is"]
+    mana_pool: {U: 2}
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@al", pay: {tap: ["@sv"]}}
+expect:
+  - at: after_script
+    p0:
+      life: 20
+      mana_pool: {}
+      battlefield_contains: [{card: Savannah, tapped: true}, {card: Tropical Island, tapped: true}, {card: Ancient Tomb, tapped: false}, {card: Island, tapped: false}]
