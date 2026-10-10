@@ -1,0 +1,66 @@
+id: ctest-canyon-casts-guide
+title: Sunbaked Canyon alone pays for a one-mana white creature
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Guide of Souls @g"]
+    battlefield: ["Sunbaked Canyon @c"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@g", pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      life: 19
+      battlefield_contains: [{card: Guide of Souls}]
+---
+id: ctest-karakas-casts-guide
+title: Karakas alone pays for a one-mana white creature
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Guide of Souls @g"]
+    battlefield: ["Karakas @c"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@g", pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      life: 20
+      battlefield_contains: [{card: Guide of Souls}]
+---
+id: ctest-canyon-and-plateau-cast-ocelot-and-guide
+title: Canyon plus Plateau pay for two one-mana creatures in the same main phase
+area: card
+setup:
+  turn: 3
+  active: p0
+  phase: main1
+  p0:
+    hand: ["Guide of Souls @g", "Ocelot Pride @o"]
+    battlefield: ["Sunbaked Canyon @c", "Plateau @p"]
+    library_pad: 10
+  p1:
+    library_pad: 10
+script:
+  - p0: {t: cast, card: "@g", pay: auto}
+  - resolve_top: true
+  - p0: {t: cast, card: "@o", pay: auto}
+  - resolve_top: true
+expect:
+  - at: after_script
+    p0:
+      battlefield_contains: [{card: Guide of Souls}, {card: Ocelot Pride}]
