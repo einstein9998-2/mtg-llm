@@ -35,11 +35,17 @@ pub struct MatchConfig {
     /// Decision cap per game; a game that reaches it is a draw.
     pub max_decisions: u32,
     pub seed: u64,
+    /// The first game (0-based) in which a seat that has a plan boards. Match play boards from game
+    /// two (1); 0 boards in game one too, which makes a single postboard game (`max_games` 1).
+    pub board_from: u32,
+    /// Per seat: when this seat loses a game it chooses to draw (the winner then plays first).
+    /// Default false: the loser always plays first.
+    pub draw_choice: [bool; 2],
 }
 
 impl Default for MatchConfig {
     fn default() -> Self {
-        MatchConfig { board: [true, true], opp_view: OppView::Plan, first: Seat(0), max_games: 5, max_decisions: 6000, seed: 1 }
+        MatchConfig { board: [true, true], opp_view: OppView::Plan, first: Seat(0), max_games: 5, max_decisions: 6000, seed: 1, board_from: 1, draw_choice: [false, false] }
     }
 }
 
@@ -80,7 +86,7 @@ pub trait PlayerFactory {
 pub fn game_decks(db: &CardDb, names: [&str; 2], base: [&DeckList; 2], books: [Option<&PlanBook>; 2], cfg: &MatchConfig, game_no: u32, first: Seat) -> Result<([DeckList; 2], [bool; 2]), String> {
     let mut decks = [base[0].clone(), base[1].clone()];
     let mut boarded = [false; 2];
-    if game_no > 0 {
+    if game_no >= cfg.board_from {
         for s in 0..2 {
             let Some(book) = books[s] else { continue };
             if !cfg.board[s] {
@@ -102,12 +108,16 @@ pub fn beliefs(base: [&DeckList; 2], decks: &[DeckList; 2], pub_decks: &[DeckLis
     [0usize, 1].map(|s| {
         let opp = 1 - s;
         let mut d: [Vec<CardDefId>; 2] = [Vec::new(), Vec::new()];
+        let mut side: [Vec<CardDefId>; 2] = [Vec::new(), Vec::new()];
         d[s] = decks[s].main.clone();
-        d[opp] = match view {
-            OppView::Plan => pub_decks[opp].main.clone(),
-            OppView::Main => base[opp].main.clone(),
+        side[s] = decks[s].side.clone();
+        let o = match view {
+            OppView::Plan => &pub_decks[opp],
+            OppView::Main => base[opp],
         };
-        ExpectedModel { decks: d, exact: [s == 0, s == 1] }
+        d[opp] = o.main.clone();
+        side[opp] = o.side.clone();
+        ExpectedModel { decks: d, exact: [s == 0, s == 1], side }
     })
 }
 
@@ -160,7 +170,9 @@ pub fn play_match(db: &Arc<CardDb>, names: [&str; 2], base: [&DeckList; 2], book
         res.games.push(GameLog { first, boarded, seed, decks: decks.clone(), actions, winner, panicked });
         if let Some(w) = winner {
             res.wins[w.idx()] += 1;
-            first = w.other(); // the loser chooses to play first
+            // The loser chooses: play first unless this seat's `draw_choice` says to draw.
+            let loser = w.other();
+            first = if cfg.draw_choice[loser.idx()] { w } else { loser };
         }
         game_no += 1;
     }

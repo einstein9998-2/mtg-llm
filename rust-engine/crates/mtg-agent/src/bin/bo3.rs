@@ -3,6 +3,11 @@
 //! Usage: bo3 <decks dir> <plans dir> <deck A> <deck B> [matches] [iterations]
 //!        [--net w.bin] [--opp net|rollout] [--rollout N] [--board both|a|b|none] [--opp-view plan|main]
 //!        [--threads T] [--seed S] [--csv out.csv] [--trace games.jsonl] [--plans-b <dir>] [--public <dir>]
+//!        [--first a|b|alt] [--games N] [--board-g1] [--draw-a] [--draw-b]
+//! --first fixes who plays first in game one (default alt: alternates by match). --games caps the games per
+//! match (5 by default; 1 plays independent single games). --board-g1 lets the plans apply in game one as well
+//! (with --games 1: a postboard game on a fixed side). --draw-a / --draw-b make that deck's seat choose to
+//! draw after it loses a game (default: the loser plays first).
 //! --plans-b gives deck B its own plan directory (a mirror with two different plans).
 //! --public gives the standard plan directory both seats are assumed to know (default: each seat's own
 //! directory). Always pass it when testing a variant, else the opponent's belief reads the variant.
@@ -103,6 +108,10 @@ fn main() {
         Some("main") => OppView::Main,
         Some(x) => panic!("--opp-view {x}"),
     };
+    let first_flag = flag("--first").unwrap_or("alt".into());
+    let max_games: u32 = flag("--games").and_then(|s| s.parse().ok()).unwrap_or(cfg0.max_games);
+    let board_from: u32 = if a.iter().any(|x| x == "--board-g1") { 0 } else { cfg0.board_from };
+    let draw_choice = [a.iter().any(|x| x == "--draw-a"), a.iter().any(|x| x == "--draw-b")];
     let net = flag("--net").map(|p| Arc::new(Net::load(std::path::Path::new(&p)).unwrap()));
     let n_defs = db.defs.len();
     let rollout_seat = match flag("--opp").as_deref() { None | Some("net") => None, Some("rollout") => Some(1u8), Some(x) => panic!("--opp {x}") };
@@ -119,7 +128,7 @@ fn main() {
                     if i >= matches {
                         break;
                     }
-                    let cfg = MatchConfig { board: board_seats, opp_view, first: Seat((i % 2) as u8), seed: seed0 * 7919 + i, ..cfg0.clone() };
+                    let cfg = MatchConfig { board: board_seats, opp_view, first: match first_flag.as_str() { "a" => Seat(0), "b" => Seat(1), "alt" => Seat((i % 2) as u8), x => panic!("--first {x}") }, seed: seed0 * 7919 + i, max_games, board_from, draw_choice, ..cfg0.clone() };
                     let r = play_match(&db, [&na, &nb], [&decks[ia], &decks[ib]], [Some(&book), Some(book_b.as_ref().unwrap_or(&book))], [Some(public_book.as_ref().unwrap_or(&book)), Some(public_book.as_ref().or(book_b.as_ref()).unwrap_or(&book))], &cfg, &mut fac).unwrap_or_else(|e| panic!("{e}"));
                     results.lock().unwrap().push((i, r));
                 }
@@ -132,6 +141,8 @@ fn main() {
     let (mut mw, mut ml, mut md) = (0, 0, 0);
     let (mut g1w, mut g1n, mut gbw, mut gbn, mut gb_drawn, mut panics) = (0, 0, 0, 0, 0, 0);
     let (mut gb_a_boarded, mut gb_b_boarded) = (0, 0);
+    // Deck A's record by seat order in every game: [on the play, on the draw] -> (wins, games).
+    let mut by_side = [(0u32, 0u32); 2];
     let mut csv = String::from("match,game,first,a_boarded,b_boarded,winner\n");
     for (i, r) in &results {
         match r.winner() {
@@ -146,6 +157,8 @@ fn main() {
                 Some(_) => "B",
                 None => "draw",
             };
+            by_side[(g.first.0 != 0) as usize].1 += 1;
+            by_side[(g.first.0 != 0) as usize].0 += (w == "A") as u32;
             csv += &format!("{i},{},{},{},{},{w}\n", k + 1, if g.first.0 == 0 { "A" } else { "B" }, g.boarded[0] as u8, g.boarded[1] as u8);
             if k == 0 {
                 g1n += 1;
@@ -169,6 +182,7 @@ fn main() {
         pct(gbw, gbn),
         t0.elapsed().as_secs_f64()
     );
+    println!("A by seat, all games: on the play {}/{} ({:.1}%), on the draw {}/{} ({:.1}%)", by_side[0].0, by_side[0].1, pct(by_side[0].0, by_side[0].1), by_side[1].0, by_side[1].1, pct(by_side[1].0, by_side[1].1));
     // One JSON line per game with everything `sbtrace` needs to replay it.
     if let Some(p) = flag("--trace") {
         let nm = |v: &[mtg_core::ids::CardDefId]| -> Vec<String> { v.iter().map(|&c| db.def(c).name.clone()).collect() };
