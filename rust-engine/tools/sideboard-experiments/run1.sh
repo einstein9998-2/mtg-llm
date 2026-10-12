@@ -17,7 +17,7 @@ DECKS=decks; [ -d decks-$M-$C ] && DECKS=decks-$M-$C
 OUT=results/$MODE/$M; mkdir -p $OUT; TAG=$C-$SIDE.b$BATCH
 TRARG=(--trace $OUT/$TAG.jsonl)
 [ -s $OUT/$TAG.log ] && { echo "skip $M $C $SIDE (done)"; exit 0; }
-if [ "$C" = g1main ]; then
+if [ "$C" = g1main ] || [ "${C#emrg1-}" != "$C" ]; then
   ARGS=(plans/$M/base --board none --public plans/$M/base)
 else
   ARGS=(plans/$M/$C --board both --board-g1 --public plans/$M/base)
