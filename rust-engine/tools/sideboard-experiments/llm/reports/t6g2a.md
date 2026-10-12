@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 6
+SIDEBOARD: Boarded in 2 Consign to Memory and 2 Prismatic Ending (out: 2 Veil of Summer, 2 Omniscience). Drew one Prismatic Ending in the opening hand and never cast it (no useful target in Tron, discarded to hand size); saw both Consign to Memory in a Stock Up and bottomed them. Neither did anything. I would not keep them in this matchup: Tron has no Daze or Force for Veil to beat, but Consign/Ending are dead, so cantrips or the main-deck Veils/Omniscience would be better.
+- Mistake, turn 4: I passed priority with Lotus Petal on the stack and the engine ran through main phase 2 to cleanup, so the planned Ponder was never cast and I discarded 2 cards (Prismatic Ending, Savannah).
+- Mistake, turn 5: paid Ponder with a Tropical Island instead of Hedge Maze, which left only one green source and made Aluren and a cantrip together impossible that turn (it did not matter, no Acererak yet).
+- Opponent surprise: turn 4 Ugin, Eye of the Storms, whose cast trigger exiled my Show-and-Tell Atraxa; I Forced the Ugin spell (pitching a spare Atraxa) so the static never landed. I also Forced Disruptor Flute (a loop-breaker) and let The One Ring resolve. Opponent also put a land in with my Show and Tell.
+- Engine note: the Aluren Acererak Lost Mine loop took about 8 picks per point of life (7 drains in 60 picks, game ended in 95 auto picks), not 14. get_card says Ugin, Karn, Tezzeret, Kozilek's Command and Trinisphere are "not in the card pool" although Ugin and Karn appeared in the game.

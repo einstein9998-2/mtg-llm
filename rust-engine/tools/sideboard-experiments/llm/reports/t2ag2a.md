@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 4
+SIDEBOARD: Boarded in 1 Force of Negation and 2 Prismatic Ending (out: 2 Veil of Summer, 1 Island). Force of Negation was not drawn. Two Prismatic Endings were seen on top with Ponder and shuffled away, uncastable with no white source. Endings looked weak against Tron (Tezzeret robots and constructs are big, and I had no white mana). I would not keep them in this matchup, and would look for artifact or Trinisphere answers instead.
+- Mistake, turn 4: I took the full 4-mana turn (Ponder, Brainstorm, Show and Tell for Atraxa) and tapped out at 9 life with no blocker plan other than Atraxa. The opponent's Ugin cast trigger exiled Atraxa, and Tezzeret's emblem pumped the Construct by 3 counters, so I took 10 from Key and Construct and died from 8 (1 life paid for Force of Will on Ugin). Better: keep life higher earlier, or Boseiju the Construct on turn 3 or 4 before the Tezzeret ultimate.
+- Surprise: Tezzeret, Cruel Captain went from 4 to 6 loyalty and then used -7 on turn 3 (Key became a 3/3, emblem). The emblem then gave +3 counters at the next attack. Ugin was hard-cast on their turn 5 for the cast-trigger exile on Atraxa; Disruptor Flute never showed its chosen name.
+- Passing priority on turn 2 with Tezzeret on the stack instead of Force of Will was probably wrong; the walker killed me.
+- Menu notes: the Ponder prompt sets the top order and then asks for the shuffle, and Ponder was never "take one". A semicolon in my pick reason ran as a shell command twice (harmless).

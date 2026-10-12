@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 6 (my own turns; I died during the opponent's 6th turn)
+SIDEBOARD: Drew 1 of the 3 boarded-in Pyroblasts (no Hydroblast was in my game deck). It countered a tapped-out Stock Up for one mana, which was good. I would keep Pyroblast in this matchup (Stock Up, Show and Tell and Brainstorm are all blue). I drew nothing else from the sideboard plan.
+- Mistake, turns 3 to 6: I flooded (Island, Volcanic, Wasteland, Delta, plus a second Daze) and had no threat. On turn 3 I Brainstormed and put back Island and Polluted Delta, keeping Daze, Force of Will and Pyroblast. I never found DRC or Murktide, and I also let Stock Up number 2 resolve to save Force of Will. In hindsight, countering Veil of Summer or Stock Up with Force of Will would not have changed the outcome, but I should have fetched earlier to see more cards.
+- Mistake, turn 4: I did not use Wasteland on a green or blue source while the opponent was tapped out. Carpet of Flowers made land denial matter little, but I held it too long.
+- Surprise: Carpet of Flowers with my 3 Islands gave the opponent 3 mana in each main phase. Then Veil of Summer plus Orim's Chant in main phase 1 shut off Force of Will and Daze completely, and Aluren plus Acererak looped to death in one turn (me from 19 to 0, the opponent to 34+).
+- Bug note: none. Menu was fine. The auto macro with "stack:Pass priority" worked for the loop (462 auto picks).

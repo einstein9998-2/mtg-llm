@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 4
+SIDEBOARD: Drew and cast Carpet of Flowers (turn 3; from turn 4 it made 3 mana, the opponent's three Islands, which paid for Aluren plus a held Veil in one turn) and Veil of Summer (cast in response to their Acererak: it drew a card because Acererak is black, and it made my Force of Will uncounterable). Force of Will (main deck) countered their free Acererak. Orim's Chant, Consign, Force of Negation not drawn. I would keep Carpet and the extra Veil in this matchup.
+- Turn 4 sequence: Brainstorm in response to the Carpet trigger to find Acererak, then Maze, then Aluren with Veil held back (the opp tool showed no Daze). The opponent answered with a free Acererak. I cast Veil, then Force of Will (pitching Atraxa) on their Acererak, and looped Lost Mine with the auto macro: 200 picks from 17 life.
+- Possible mistake: none clear. I passed on casting Brainstorm on turn 3 with spare Carpet mana in main 2, which kept the put-backs for turn 4. That was fine because turn 4 found Acererak.
+- Surprise: the opponent held Acererak and cast it into my Aluren instead of leaving the mirror stack alone; they stayed tapped out for two turns (cantrips only), which made the window easy.
+- Engine note: Hedge Maze (opponent's) is Island-typed so it counted for Carpet; Carpet's "each main phase" trigger also fires in Main 2 on the turn it is cast. Auto macro cost about 8 picks per life point, less than the brief's estimate.

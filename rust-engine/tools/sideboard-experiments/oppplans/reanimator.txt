@@ -1,0 +1,9 @@
+# Reanimator sideboard plans.
+# Sideboard (15): Collective Brutality, Koma, Magus of the Moon, 2 Massacre, 4 Show and Tell,
+# 4 Stronghold Gambit, 2 Surgical Extraction.
+
+vs alurentell
+# Alurentell's lands are almost all nonbasic: Magus of the Moon turns off their blue and green
+# mana and Ancient Tomb. Cabal Therapy is the weakest card in this matchup.
+-1 Cabal Therapy
++1 Magus of the Moon

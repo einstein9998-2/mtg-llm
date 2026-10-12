@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 5
+SIDEBOARD: None drawn (the 60-card game deck was identical to the base 75; no boarded-in cards, and Karn's sideboard wish never appeared as a menu option). Colorless Tron main-deck cards that mattered: Ugin cast trigger exiled Atraxa; Disruptor Flute and Ugin were each hit by Force of Will.
+- Turn 5 mistake: I used Karn +1 with no target and passed the turn with Flute countered and the opponent holding Aluren plus 2 unknown cards, holding no answer. Earlier, casting Flute using Ancient Tombs cost me 2 life and lost the card to a second Force of Will; I never found Trinisphere or Kozilek's Command to stop Aluren. I was probably too slow (spent T3 Karn, T4 Ugin, T5 Ring + Flute) against a deck that cheats around counters with free spells.
+- Surprise: the opponent pitched Atraxa to Force of Will twice (Ugin and Flute) instead of keeping Atraxa/Show and Tell, then went off with Aluren plus Acererak the moment my turn ended (the loop ran in the engine inside my pass window; game ended before I got another prompt). I do not know exactly when Aluren was cast: it was not on their battlefield at my last full prompt.
+- Possible engine/menu oddity: Karn's minus ability (wish for a sideboard artifact) never appeared; only +1 was ever offered. The One Ring cast gave no visible protection option and the stack showed its trigger separately.
+- Possible engine oddity: I did not get a prompt between Aluren resolving and the Acererak loop starting, so I could not use Karakas.

@@ -36,6 +36,10 @@ fn main() {
         let mut entered: BTreeMap<String, Vec<u32>> = BTreeMap::new();
         let mut used: BTreeMap<String, Vec<u32>> = BTreeMap::new();
         let mut hand: BTreeMap<String, i32> = BTreeMap::new();
+        // Seat 0's permanents by name, and a snapshot of hand and permanents at the start of each of its first main phases.
+        let mut bf: BTreeMap<String, i32> = BTreeMap::new();
+        let mut active0 = false;
+        let mut snaps: Vec<Value> = Vec::new();
         let mut timeline: Vec<String> = Vec::new();
         let mut opp_cast: Vec<String> = Vec::new();
         let mut result = None;
@@ -48,11 +52,17 @@ fn main() {
                     E::TurnBegan { turn: t, active } => {
                         turn = t;
                         total_turns = t;
+                        active0 = active.0 == 0;
                         if active.0 == 0 {
                             aturn += 1;
                         }
                     }
+                    E::StepBegan { step: mtg_core::types::Step::Main1 } if active0 => {
+                        let pos = |m: &BTreeMap<String, i32>| -> BTreeMap<String, i32> { m.iter().filter(|(_, n)| **n > 0).map(|(k, n)| (k.clone(), *n)).collect() };
+                        snaps.push(json!({"t": aturn, "hand": pos(&hand), "bf": pos(&bf)}));
+                    }
                     E::Drew { player, def, .. } if player.0 == 0 => {
+                        *hand.entry(name(def)).or_default() += 1;
                         drawn.entry(name(def)).or_default().push(aturn);
                     }
                     E::SpellCast { def, controller, .. } => {
@@ -69,6 +79,12 @@ fn main() {
                         }
                         if owner.0 == 0 && from == ZoneKind::Hand && to != ZoneKind::Stack {
                             *hand.entry(name(def)).or_default() -= 1;
+                        }
+                        if controller.0 == 0 && to == ZoneKind::Battlefield {
+                            *bf.entry(name(def)).or_default() += 1;
+                        }
+                        if controller.0 == 0 && from == ZoneKind::Battlefield && to != ZoneKind::Battlefield {
+                            *bf.entry(name(def)).or_default() -= 1;
                         }
                         if controller.0 == 0 && to == ZoneKind::Battlefield && from != ZoneKind::Stack {
                             entered.entry(name(def)).or_default().push(aturn);
@@ -114,7 +130,7 @@ fn main() {
                 "match": v["match"], "game": v["game"], "first": v["first"], "winner": v["winner"], "boarded": v["boarded"],
                 "turns": total_turns, "a_turns": aturn,
                 "drawn": drawn, "cast": cast, "entered": entered, "used": used, "hand_end": hand_end,
-                "timeline": timeline, "opp_cast": opp_cast,
+                "timeline": timeline, "opp_cast": opp_cast, "snaps": snaps,
             })
         );
     }

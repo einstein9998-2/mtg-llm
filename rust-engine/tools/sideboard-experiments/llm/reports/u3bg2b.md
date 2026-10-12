@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 2 (my turn 2 was never finished: the opponent comboed on their turn 3 and killed me with the Acererak drain loop)
+SIDEBOARD: I drew none of the boarded-in cards (no Hydroblast, Meltdown, Null Rod, Pyroclasm, Surgical Extraction, Unholy Heat or Prismari Charm). The extra main-deck Pyroblasts were also not drawn. Pyroblast is the only card in the 60 that answers Atraxa. Nothing in it can remove Aluren, and the Aluren plus Acererak loop beat me. Nothing I drew was boarded in, so nothing to judge.
+- Mistake: I mulliganed twice, a 7 with only Wasteland and a 7 with only Wasteland, to a 5-card hand. On my turn 2 I used Wasteland on Tropical Island, but I could not stop Carpet of Flowers plus Ancient Tomb from powering Show and Tell into Aluren on their turn 3. Daze needed the opponent to forget to pay 1 with the untapped Hedge Maze, and they paid it. Maybe I should have kept Wasteland to hit Ancient Tomb on their turn 3 instead of using it on my turn 2.
+- Surprise: Show and Tell on their turn 3 (no Force of Will backup needed, I had no mana) with Aluren put in and then Acererak cast free. They drained me from 19 to 0 in one turn, resolving only the Dark Pool drain, and gained life as they went (up to 36).
+- Surprise: Carpet of Flowers turned my own Islands (Volcanic, fetched Islands) into mana for them. Polluted Delta that I put in with Show and Tell stayed unfetched so it gave no Island.
+- Engine: no bug noticed. The auto macro with "stack:Pass priority" worked fine for passing through the loop (331 auto picks).

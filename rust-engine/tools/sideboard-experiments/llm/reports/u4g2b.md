@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 4 (the game ended during the opponent's fifth turn, on their Aluren/Acererak loop)
+SIDEBOARD: Boarded in the 3rd Pyroblast, out Prismari Charm and 2 Unholy Heat. I never drew any Pyroblast, so it did nothing this game. I would keep the 3 main-deck Pyroblasts: they kill Atraxa and Omniscience, and they also counter Show and Tell, Veil of Summer or Force of Will. I would not go back to Unholy Heat, which can't kill Atraxa.
+- Possible mistake, opponent's turn 4: I pitched Daze to Force of Will on Show and Tell. They answered with Veil of Summer (free via Carpet mana or an open land), so the counter failed and I lost two cards for nothing. It was the only way to stop Show and Tell at that moment, but it left me with no blue card for the second Force of Will I drew later.
+- Mistake, turn 4: I spent equip plus Lightning Bolt to kill the Atraxa that blocked DRC, and they answered with a free Force of Will (pitching their second Atraxa). My DRC died to the block and Atraxa gained them 7. I had no backup for the counter.
+- Surprise: Show and Tell on turn 4 for them (Veil of Summer in response to my Force of Will), then Atraxa putting 5 cards in hand. Their next turn went straight into the Aluren/Acererak loop with no prompt for me. My hand was just a Force of Will with no blue card to pitch.
+- Opening: I mulliganed a seven with zero lands, then kept a one-lander with Brainstorm, Brainstorm and Ponder on the draw. That worked out (found lands by turn 2), and the DRC, Cutter and Bauble delirium line put them to 11 by turn 4.
+- No engine bug seen. One small menu issue: Mishra's Bauble's look result at the opponent's library was not printed in the log.

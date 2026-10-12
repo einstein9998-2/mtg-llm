@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 5
+SIDEBOARD: No sideboarding happened (my 60 were the base list), so nothing boarded in. Main-deck Hexing Squelcher (cast twice) and Runehorn Hellkite (its graveyard wheel ability, 5R) showed up. Squelcher can't be countered, so the opponent's Force of Will on it only cost them two cards.
+- Mistake, turn 5: I had a near-lethal Tendrils turn (storm 5, Tendrils tutored with Gamble, opponent at 14, two LED and a Mox still to cast). I had tapped Opal for Gamble and Taiga for Squelcher earlier, declined the Chrome Mox imprint, and the menu does not count LED mana when listing castable spells. Only Sea and Petal were left, so Tendrils (4 mana) was never offered and I could not cast it. I should have kept 4 non-LED mana untapped, or paid with floating mana and the BB pool first. Lesson: LED mana never makes a spell castable in the menu.
+- Mistake, turn 4: after Gamble resolved with BBB floating and only an uncastable Echo in hand, the engine auto-advanced to combat and the floating mana was lost. The engine skips my priority when nothing in hand is castable, even with LED or mana abilities available.
+- Surprise: the opponent sat on 7 cards for four turns, then used Boseiju's channel on my LED at my end step and Show and Tell on their turn 5. Aluren plus Acererak looped to a win (my life 18 to dead, one drain per lap) before I could use my next turn.
+- Possible menu issue: Chrome Mox imprint only offered Tendrils of Agony and not the LEDs, so I could not imprint a fodder card.

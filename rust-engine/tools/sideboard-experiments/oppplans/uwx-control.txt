@@ -1,0 +1,13 @@
+# Brady 2026-10-08: Consign, Erode, Lavinia, Pyroblast (max copies); keep Phelia (one out), Ending, Riddler, Tamiyo, 1-2 Murktide out.
+# Outs: the review page's list (2 Murktide, Snow-Covered Island, 1 Phelia, 2 Ponder, 1 Brainstorm, 1 Swords; the last three are the agent's fill).
+vs alurentell
+-2 Murktide Regent
+-1 Snow-Covered Island
+-1 Phelia, Exuberant Shepherd
+-2 Ponder
+-1 Brainstorm
+-1 Swords to Plowshares
++2 Consign to Memory
++2 Erode
++2 Lavinia, Azorius Renegade
++2 Pyroblast

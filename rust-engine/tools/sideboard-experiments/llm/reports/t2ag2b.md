@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 5
+SIDEBOARD: I drew and cast Disruptor Flute and named Acererak the Archlich so Aluren and Omniscience free casts would cost 3 extra. They never tried the loop, so it was never tested, but it was a cheap play on turn 4 and I would keep it in. I also drew Karakas through Expedition Map. I played it and held it as a backup to bounce the opponent's Atraxa, but never used it. Karakas is worth keeping against Atraxa. None of the other boarded-in cards were drawn.
+- Possible mistake, turn 2: I cast Tezzeret with Ancient Tomb and took 2 damage. I could instead have made a Construct from Urza's Saga that turn. It worked out fine because Tezzeret reached 7 loyalty by turn 4.
+- Surprise: the opponent mulliganed, spent turn 3 on Stock Up and turn 4 on Show and Tell for Atraxa, tapping out both times. Atraxa's reveal showed me Force of Will and Aluren in their hand. They used Force of Will on Ugin, but Ugin's cast trigger still exiled Atraxa, which set up lethal.
+- Surprise: Show and Tell let me put Planar Nexus onto the battlefield for free, and that turned on Tron (Tower, Workshop and Nexus gave 7 mana on turn 5).
+- Engine and menu: the card pool lookup (get_card) does not know most of my own cards (Tezzeret, Ugin, Urza's lands), so card text was only partly visible, and the ability text in menus is cut off. Manifold Key and the lands' mana abilities do not appear in the menus, so I could not tell how much mana a land gives without trying a cast.

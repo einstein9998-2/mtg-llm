@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 5
+SIDEBOARD: Boarded in Orim's Chant (x2), Prismatic Ending (x2) and Force of Negation (x1), out 2 Veil of Summer, 2 Stock Up and the Island. Drew and cast one Orim's Chant (paid with Lotus Petal) in response to their Gamble: it locked them out of spells for the turn and set up my Aluren + Acererak kill on my next turn. Drew Prismatic Ending but never cast it; Force of Negation not drawn. Keep Chant (it was the key card, cheap and uncounterable by Squelcher), Ending is fine but did nothing here.
+- Mulligan to 6 (first seven had zero lands). Kept two fetches, Boseiju, Brainstorm, Force, Aluren, Chant. Brainstorm at their end step, then Misty shuffled the put-backs; fetched Hedge Maze at their end step so it entered tapped for free.
+- Possible mistake, turn 3: I held up Chant and did not cast Stock Up with three lands, so the turn's mana went unused. It worked out (Stock Up on turn 4 found Ancient Tomb and Petal), but a Stock Up on turn 3 would have found the fourth land a turn earlier.
+- Surprise: Hexing Squelcher (uncounterable creature, likely makes their spells uncounterable) shut off Force of Will, so I held Force and relied on Chant instead. They also built a board (Urza's Saga constructs, two LEDs, Mox Opal) and dealt 6 damage in one attack instead of going off.
+- No bugs. The Lost Mine macro ran 510 auto picks cleanly; the opponent never responded and I ended at 26+ life.

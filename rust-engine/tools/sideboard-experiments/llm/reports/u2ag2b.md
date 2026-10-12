@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 5 (my turns; the opponent combo-killed me on their turn 6, game turn 12)
+SIDEBOARD: Boarded in 3 Pyroblast (out: 2 Unholy Heat, 1 Prismari Charm). Drew one Pyroblast: it countered nothing, since they Forced it (pitching Atraxa) to save their Stock Up, a fair 2-for-1 for me. Cori-Steel Cutter was cast but never had a creature to carry it. Pyroblast is fine to keep against their Brainstorm/Ponder/Stock Up/Show and Tell, but it is dead against Aluren, Veil and Carpet.
+- Mistake: turn 2 I used Daze on their tapped-out Brainstorm, which cost me a land tempo and left me with no soft counter later. More importantly, my hand was all lands and two Force of Will with zero blue cards, so FoW was dead the whole game. I also held back on land drops to starve Carpet of Flowers, which left me without mana for a hard-cast FoW (5) on the key turn (turn 5), when I had only 3 mana plus an uncracked Delta.
+- Surprise: the opponent cast Veil of Summer main phase 1 as bait/protection (everything uncounterable), then Orim's Chant on me (can't cast spells), then Aluren plus Acererak and ran the full Lost Mine loop for the kill in one turn (19 to 0). Carpet of Flowers also gave them mana equal to my Islands every turn.
+- I deliberately declined to FoW the Veil (it would have cost two FoW and I could not have stopped the follow-up anyway).
+- No engine or menu bugs seen. The auto macro with "stack:Pass priority" worked well to pass through the roughly 465-pick loop.

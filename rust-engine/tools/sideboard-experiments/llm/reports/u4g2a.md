@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 5
+SIDEBOARD: Carpet of Flowers (cast turn 2) gave 1 then 3 mana per turn off their Islands and paid for Stock Up and the Aluren turn, keep. Veil of Summer (drawn turn 3, cast turn 4 in response to their Force of Will, which pitched Daze) made Show and Tell resolve and drew a card, keep. Orim's Chant (taken with Atraxa's reveal) was cast first on the kill turn so they could not cast spells, keep. Prismatic Ending was drawn but never cast (no white source until Tundra, discarded to hand size); Force of Will x2 were useful (one countered their Bolt on my blocking Atraxa). Not drawn: Omniscience, Faerie Macabre, Consign (not in this game list).
+- Mistake: turn 1 Ponder, I declined the shuffle with Misty, Ponder, Ponder on top and forgot Ponder itself draws the top card, so the Misty was drawn anyway and the next Ponder sat on top. Turn 2 Carpet before Ponder worked out fine.
+- Surprise: they put a second Cori-Steel Cutter in with Show and Tell, and they attacked DRC into my untapped Atraxa and Bolted her mid-combat (I Forced the Bolt).
+- Surprise: they tapped out on their own turn twice (DRC, then Cutter plus Brainstorm), so my turns 3 and 4 were free of everything but Force and Daze; they used Force of Will pitching Daze on my Show and Tell and Veil beat it.
+- Engine: a semicolon in a pick reason splits the shell command (my pick still went through, with the rest run as a stray command). The Ponder order-top prompt does not say which card ends on top, and the known-library-top line stayed stale after Stock Up.

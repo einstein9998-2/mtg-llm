@@ -1,0 +1,8 @@
+RESULT: WON
+TURNS: 3
+SIDEBOARD: Carpet of Flowers drawn (one cast turn 2 off Hedge Maze/Tropical; on turn 3 it gave 1 blue from their single Volcanic Island, which with Ancient Tomb and Hedge Maze made the 4 mana for Show and Tell plus one spare for Daze). That spare paid for their Daze on the free Acererak. I would keep it. Veil of Summer was drawn in the first seven and bottomed after the mulligan; Prismatic Ending and Orim's Chant not drawn.
+- Mulliganed a one-land 7 (Ancient Tomb, no blue), then kept a one-land 6 with the full combo (Tropical Island, Ponder, Show and Tell, Aluren, Acererak, Carpet; bottomed Veil). Ponder found Hedge Maze and Ancient Tomb, so it worked, but it was a risky keep.
+- Turn 3 jam: they were tapped out (Volcanic Island tapped after Preordain, Wasteland already used on my Tropical), so only Daze or Force of Will could interfere. Show and Tell resolved, I put in Aluren, they put in Polluted Delta, Acererak was Dazed once and I paid, then the Lost Mine loop (331 auto picks) drained them from 19 to 0 the same turn.
+- Possible mistake: none clear. Bottoming Veil over Carpet was a judgment call and did not matter this game. I forgot a kept mulligan hand still has to bottom a card (London mulligan), so the 7-card keep became a 6-card keep.
+- Opponent surprise: they mulliganed to 5 and still Wastelanded my only Tropical Island on their turn 2, spending the Wasteland on turn 2 rather than holding it.
+- Engine: no bugs. Ponder's final "Do it?" is the shuffle prompt (No keeps the order); the order prompt put the first pick on top. Ponder's own draw gave me the card on top at once.

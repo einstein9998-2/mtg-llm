@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 2 (my own turns; the opponent killed me on its second turn, game turn 4)
+SIDEBOARD: Drew Consign to Memory (in hand, never castable: my only blue source, Hedge Maze, entered tapped, and Ancient Tomb makes colorless only). Did not draw Orim's Chant or Force of Negation; Prismatic Ending was seen with Stock Up and bottomed. Cannot judge the boarded cards from this game; it was decided by the opening hand and the opponent's speed.
+- Possible mistake, turn 1: I kept Ancient Tomb, Lotus Petal, Ponder, Stock Up, Omniscience, Consign, Acererak (one land plus Ponder, a keep against Storm per the playbook) and cast Stock Up with Tomb plus Petal, paying 2 life from Tomb. The opponent's Tendrils then dealt exactly 18 (9 drains of 2) and I was at exactly 18, so the 2 life decided the game, though I had no way to interact anyway. Against Storm, paying Tomb life for a cantrip is a real cost.
+- Surprise: Storm Gambled on its turn 1 (discarding Echo of Eons), then on its turn 2 chained Song of Creation, Chrome Mox, Beseech the Mirror (tutoring Tendrils of Agony) and killed me with a storm count of 8 on two lands. With Hedge Maze tapped and Tomb giving only colorless, I had no legal response (Consign needs U).
+- On turn 2 I played Hedge Maze tapped (surveil showed Force of Will on top; kept it). The alternative, a second Tomb, gave no blue either. Nothing in the hand could have stopped the kill; only a turn-1 Force of Will in hand or a blue source untapped would have.
+- No engine or menu bug seen.
