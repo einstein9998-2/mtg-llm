@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 3
+SIDEBOARD: none of the boarded-in cards were drawn or cast (no Boomerang Basics, Boseiju, Empty the Warrens, Haywire Mite, Peer, Thoughtseize, extra Beseech, Echo or Tendrils). Only main-deck cards won it: Echo of Eons (flashback twice), Gamble, Dark Ritual, Lotus Petal, LED and Tendrils with storm 10 (11 instances, 22 damage). The opponent was tapped out and never interacted, so the sideboard plan was not tested.
+- Turn 1 and turn 2 mistake: the engine hides Echo of Eons as castable while the cost would need LED mana, and it auto-passes when only mana abilities remain. I lost two turns doing nothing (turn 1 after casting Petal, turn 2 after playing Saga) before I found the working line: crack LED with Echo in hand (Echo goes to the graveyard), pay the flashback from the floating mana, keep Opal, Petal and Sea for the new hand.
+- Turn 3 mistake: I cast a second Mox Opal while one was already in play and lost one to the legend rule. It cost one mana source and did not matter.
+- Surprise: the opponent made no play at all before dying: only fetch, Ponder, Brainstorm into two tapped Tropical Islands. Mana floating from Dark Ritual and LED stays in the pool through Echo's resolution and later spells.
+- Engine and menu notes: after a Tendrils storm trigger, the "choose new targets for the copy?" prompt repeats once per copy (10 prompts). The Gamble tutor menu includes fetchlands not in my hand. The `pay=` option does not accept names with an apostrophe (use v-ids such as pay=v38).

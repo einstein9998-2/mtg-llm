@@ -1,0 +1,6 @@
+RESULT: LOST
+TURNS: 4
+SIDEBOARD: Drawn and cast Trinisphere (bait, Force of Will'd by the opponent on my turn 2) and Disruptor Flute (cast turn 3 naming Aluren, then Prismatic Ending'd on their turn 3, so Aluren was castable the next turn). Nothing else boarded in was drawn. I would keep Flute and Trinisphere, but Flute naming Aluren is too fragile against Prismatic Ending.
+- Mistake, my turn 3: I cast Flute naming Aluren while holding no other answer. Only a colorless spell on my own turn could trigger Ugin's exile, so once Aluren landed on their turn 4 (Acererak free-cast loop) I had no way to interact and was drained from 22 to 0 in that one turn. Better: keep up more redundancy, or race rather than rely on a single tax effect. Also on turn 2 I could have cast Ugin instead of Trinisphere bait, though that risked the Force of Will on Ugin.
+- Surprise: the opponent had Force of Will, Prismatic Ending and Aluren plus Acererak by turn 4 and executed the whole Lost Mine loop (about 380 auto passes) in one main phase, draining 22 life without any need for Show and Tell.
+- Menu/engine note: Tron mana lands (Urza's Workshop/Tower/Saga) tapped for only 1 each, and my attempt to chain a shell command with a semicolon in a pick reason ran the tail as a command (my fault, harmless). No engine bugs otherwise.

@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 6
+SIDEBOARD: The game deck matched my base 75 (no cards boarded in or out). From the sideboard plan only Karn's -1 was ever relevant: I dug Karn out with Mishra's Research Desk and meant to fetch Ensnaring Bridge from the sideboard to stop Atraxa attacking. Force of Negation exiled Karn. Everything else in the sideboard stayed unused.
+- Mistake (turn 3 and 5): I paid Ancient Tomb life twice (18, 16, then 14 after the Desk cast). At 7 life, Atraxa's 7 lifelink damage was exactly lethal. I also went all-in on Ugin into two Consign to Memory (one hit the Ugin spell, one the cast trigger) rather than holding up anything or baiting with a cheaper colorless spell first. Casting Tezzeret on turn 2 into an open Consign to Memory also cost me my early threat.
+- Surprise: Show and Tell in this engine offered me only lands (not Ugin, a planeswalker), so I just ramped. The opponent put in Atraxa, which found them 5 cards, then used Consign to Memory twice (with replicate) on Ugin's cast trigger and the spell, and Force of Negation hard-cast against Karn.
+- Engine note: Ugin's cast trigger is a targeted trigger (I had to target Atraxa), so it can be countered by Consign to Memory, unlike the real sweep. Force of Negation exiles the countered card, so Karn could not be replayed from Desk exile.
+- Disruptor Flute naming Acererak was never tested; the opponent never tried the Aluren/Omniscience combo, only Atraxa beats.

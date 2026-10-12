@@ -1,0 +1,6 @@
+RESULT: WON
+TURNS: 4 (own turns; the combo turn was my 4th turn, game turn 8)
+SIDEBOARD: Boarded in 2 Prismatic Ending and 2 Consign to Memory (out 2 Veil of Summer and 2 Omniscience). Prismatic Ending was drawn and cast with two colours (Savannah + Tropical) to exile Disruptor Flute, which named Aluren (Aluren became uncastable at 7 mana). That was the key play. Consign to Memory was not drawn. I would keep the Ending in this matchup (Flute, Monolith, Key, Trinisphere-adjacent artifacts); Consign is untested.
+- Mistake candidate: none big. I used Force of Will (pitching Atraxa) on Trinisphere while it was still on the stack, before it could tax every free Aluren cast. That worked, and it cost me the Atraxa. Playing City of Traitors instead of a fetch on turn 4 let me pay for Aluren without Ancient Tomb life.
+- Surprise: the Tron player went Tomb, two Grim Monoliths, Manifold Key, Trinisphere, Ugin, Disruptor Flute naming Aluren, Tezzeret, and emptied its own hand by turn 3, so it had no instant-speed answer in my window.
+- Engine note: the opponent's Disruptor Flute chosen name is not shown anywhere on the battlefield; I deduced it from Aluren missing from my castable list after playing the land. The `auto` macro ran 382 picks for the full Lost Mine drain from 22 life to 0 with no interruption. get_card does not know Ugin, Eye of the Storms.

@@ -1,0 +1,7 @@
+# Brady 2026-10-08: 3 Consign + 2 Force of Negation in, no Barrowgoyf; outs per the review page (3 Fatal Push, 1 Snuff Out, basic Island).
+vs alurentell
+-3 Fatal Push
+-1 Snuff Out
+-1 Island
++3 Consign to Memory
++2 Force of Negation

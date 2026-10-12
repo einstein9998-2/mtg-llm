@@ -1,0 +1,9 @@
+RESULT: LOST
+TURNS: 3
+
+SIDEBOARD: Drawn and used: Veil of Summer (held, never castable), Orim's Chant (put back with Brainstorm), Force of Will (drawn, used only as a threat). No Carpet, Consign or Force of Negation drawn. The opponent's boarded-in Veil of Summer was the card that beat me: it made their Force of Will and Acererak uncounterable. I would keep the sideboard plan; this loss came from sequencing, not from the cards.
+
+- Mistake, my turn 3: I tapped out (Brainstorm, fetch, Hedge Maze tapped, then Ponder with my last Tropical) on a turn when their Carpet of Flowers, Ancient Tomb and Tropical made an Aluren possible. With no mana left I had no Boseiju channel and could not use Veil. They cast Aluren (I let it resolve on purpose, planning to use it myself), then Acererak. I cast my own Acererak in response, but they answered with Veil of Summer (G from their last Tropical) and then Force of Will on my Acererak, which could not be countered back. Their Acererak then looped with Lost Mine until I was dead. Holding two lands (Boseiju channel) instead of Ponder, or Forcing the Aluren while they still had to pay the Veil, were the alternatives. I judged the chance that they held Aluren, Acererak, Veil and Force at about 3 percent, and that was too low.
+- Surprise: the opponent cast Aluren into my open Force of Will with one Tropical up, holding Veil of Summer to make their own Acererak and Force of Will uncounterable. Their Veil also protects a Force of Will cast in response to mine.
+- Engine and menu: Force of Will is still offered against spells made uncounterable by Veil (known, EF8). Hedge Maze surveil showed only 1 card (surveil 1, fine). Nothing else looked like a bug.
+- Note: in this deck (no Show and Tell, no Petal, no black source) Atraxa is a dead card except as Force of Will pitch, and a 2nd Aluren in hand is not worth keeping over an open Boseiju mana.

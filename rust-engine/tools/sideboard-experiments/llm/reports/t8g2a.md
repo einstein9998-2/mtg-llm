@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 2
+SIDEBOARD: Boarded in 3 Consign to Memory, Force of Negation and a second Prismatic Ending (out: Island, 2 Veil of Summer, 2 Omniscience). I drew one Consign to Memory and held it; I never needed or cast it (the opponent never put a colorless spell on the stack, and I had no spare blue mana on the combo turn anyway). It is live against all-colorless Tron (counters colorless spells and triggers), so I would keep the Consigns in. Force of Negation and Prismatic Ending: none drawn.
+- Line: kept 7 (Misty, Tomb, Brainstorm, Ponder, Consign, Show and Tell, Acererak) on the play. Turn 1 Misty for Tropical Island, Ponder (saw Ponder, Stock Up, Aluren; put Aluren on top, no shuffle). Turn 2 Ancient Tomb, Show and Tell (3 mana) putting in Aluren, then looped Acererak free with the Lost Mine macro (about 160 picks, 3 chunks) and drained them from 20 to 0 on turn 2.
+- Mistake: none I can see. The Ponder order prompt does not say which card ends up on top; I picked the card I wanted first and it was drawn, so first-chosen = top.
+- Surprise: the opponent put The One Ring into play with Show and Tell (no protection, since it was not cast), then tapped it in response to the loop to draw a card; nothing else. They had only a Workshop and Mishra's Research Desk, so no instant-speed interaction.
+- No engine or menu bug seen. The macro's 60-pick chunks drain about 7 life each (about 8 picks per lap).

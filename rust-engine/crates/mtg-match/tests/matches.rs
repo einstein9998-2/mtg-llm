@@ -100,7 +100,7 @@ fn expected_model_surprise_displaces_an_unseen_card() {
     let (db, _, _, _) = load();
     let id = |n: &str| db.id(n).unwrap();
     let (bolt, heat, pyro) = (id("Lightning Bolt"), id("Unholy Heat"), id("Pyroblast"));
-    let m = ExpectedModel { decks: [vec![bolt, bolt, heat], vec![bolt, bolt, heat]], exact: [true, false] };
+    let m = ExpectedModel { decks: [vec![bolt, bolt, heat], vec![bolt, bolt, heat]], exact: [true, false], side: [Vec::new(), Vec::new()] };
     let mut rng = Pcg64::from_seed(3);
     // Seat 1: a Pyroblast was seen but is not in the expected list: one of the three unseen
     // expected cards makes room for it, so two stay hidden.
@@ -200,7 +200,7 @@ fn forks_work_in_boarded_games_under_both_opponent_views() {
                         let mut dd = [Vec::new(), Vec::new()];
                         dd[seat.idx()] = mine.main.clone();
                         dd[seat.other().idx()] = believed;
-                        let model = ExpectedModel { decks: dd, exact: [seat.idx() == 0, seat.idx() == 1] };
+                        let model = ExpectedModel { decks: dd, exact: [seat.idx() == 0, seat.idx() == 1], side: [Vec::new(), Vec::new()] };
                         let sv = g.seat_view(seat);
                         let w = sv.fork(seed * 31 + forks, &model);
                         assert!(w.is_ok(), "fork failed ({pair}, {view:?}, seed {seed}): {:?}", w.err());

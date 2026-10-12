@@ -1,0 +1,29 @@
+// Emrakul, the Aeons Torn (Alurentell sideboard, put onto the battlefield with Show and Tell / cast free with Omniscience).
+// Kept in its own source, registered LAST in legacy.rs so that no existing CardDefId shifts.
+// Modeled: can't be countered (UNCOUNTERABLE), flying, protection from colored spells (PROT_COLORED_SPELLS: colored spells can't target it and
+// their damage to it is prevented; abilities and colorless spells are unaffected; it does not stop non-targeted effects such as Wrath),
+// the cast trigger (extra turn, Effect::ExtraTurn), annihilator 6 (six one-permanent sacrifice steps for the defending player; the defender is
+// the opponent, which is exact in a two-player game) and the graveyard shuffle from hand, battlefield and library. The shuffle trigger puts the whole
+// graveyard (including Emrakul itself) into the library of its CONTROLLER at the time (the owner except when Emrakul was stolen).
+// Not modeled: "from anywhere" for the stack (it cannot be countered and has no targets, so it never goes there) and from exile-to-graveyard edge cases.
+[
+  (name: "Emrakul, the Aeons Torn", cost: "{15}", types: "CREATURE", supertypes: "LEGENDARY", subtypes: ["Eldrazi"], pt: (15, 15), keywords: "FLYING | UNCOUNTERABLE | PROT_COLORED_SPELLS", abilities: [
+    Triggered(text: "When you cast this spell, take an extra turn after this one.", on: SpellCast(caster: You, filter: (self_only: true)), zone: Stack,
+      effect: ExtraTurn(You)),
+    Triggered(text: "Annihilator 6 (Whenever this creature attacks, defending player sacrifices six permanents.)", on: Attacks(filter: (self_only: true)),
+      effect: Seq([
+        SacrificeChosen(who: Opp, filter: (types_any: "CREATURE | ARTIFACT | ENCHANTMENT | LAND | PLANESWALKER")),
+        SacrificeChosen(who: Opp, filter: (types_any: "CREATURE | ARTIFACT | ENCHANTMENT | LAND | PLANESWALKER")),
+        SacrificeChosen(who: Opp, filter: (types_any: "CREATURE | ARTIFACT | ENCHANTMENT | LAND | PLANESWALKER")),
+        SacrificeChosen(who: Opp, filter: (types_any: "CREATURE | ARTIFACT | ENCHANTMENT | LAND | PLANESWALKER")),
+        SacrificeChosen(who: Opp, filter: (types_any: "CREATURE | ARTIFACT | ENCHANTMENT | LAND | PLANESWALKER")),
+        SacrificeChosen(who: Opp, filter: (types_any: "CREATURE | ARTIFACT | ENCHANTMENT | LAND | PLANESWALKER")),
+      ])),
+    Triggered(text: "When Emrakul is put into a graveyard from the battlefield, its owner shuffles their graveyard into their library.", on: ZoneChange(filter: (self_only: true), from: Some(Battlefield), to: Some(Graveyard)),
+      effect: Seq([MoveTo(objs: All(zone: Graveyard, owner: You), to: Library), Shuffle(You)])),
+    Triggered(text: "When Emrakul is put into a graveyard from your hand, its owner shuffles their graveyard into their library.", on: ZoneChange(filter: (self_only: true), from: Some(Hand), to: Some(Graveyard)), zone: Hand,
+      effect: Seq([MoveTo(objs: All(zone: Graveyard, owner: You), to: Library), Shuffle(You)])),
+    Triggered(text: "When Emrakul is put into a graveyard from your library, its owner shuffles their graveyard into their library.", on: ZoneChange(filter: (self_only: true), from: Some(Library), to: Some(Graveyard)), zone: Library,
+      effect: Seq([MoveTo(objs: All(zone: Graveyard, owner: You), to: Library), Shuffle(You)])),
+  ]),
+]

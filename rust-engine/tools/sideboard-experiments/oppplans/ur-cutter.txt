@@ -1,0 +1,6 @@
+# Opponent plan vs Alurentell used in the sideboard experiments. Brady 2026-10-08 13:22Z: 3 Pyroblast ("map is fine, can go to 3 blast");
+# outs per the review page's suggested outs (2 Unholy Heat, 1 Prismari Charm).
+vs alurentell
+-2 Unholy Heat
+-1 Prismari Charm
++3 Pyroblast

@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 4
+SIDEBOARD: Drew and cast Consign to Memory (3 in main for this matchup): it countered Karn, the Great Creator on their turn 4 while they were tapped out, and I found it with Stock Up off Atraxa's reveal. Drew a second and third Force of Will (not cast). Force of Negation, Prismatic Ending and Carpet were not drawn or cast (Carpet is a blank with no opposing Islands). I would keep Consign in this matchup: Tron's spells are all colorless.
+- Opening: Ancient Tomb plus Lotus Petal cast Show and Tell on my turn 1 (on the draw), and I put in Atraxa. They put in Trinisphere, which made Aluren and Acererak unusable (a free Aluren cast would cost 3). Atraxa's reveal took Misty, Force of Will, Stock Up and nothing else worth keeping. Atraxa then attacked three times (20 to 13 to 4, then lethal on turn 4) with lifelink.
+- Possible mistake: I discarded Acererak to hand size on turn 2 and kept the dead Aluren. Neither mattered, but Trinisphere would have needed Boseiju (not drawn) for the loop.
+- Surprise: the opponent never used Tezzeret or Karn and paid Ancient Tomb life (to 2) while racing a 7/7 lifelinker. No removal or Karakas showed up.
+- Menu quirks: Hedge Maze surveil 2 offered only one card (Misty), and Stock Up put the three unchosen cards on the bottom of the library, not into the graveyard. Shell semicolons in my pick reasons executed as commands (my own mistake, harmless).
