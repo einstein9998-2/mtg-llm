@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 7
+EMRAKUL: n/a
+- Game: mulligan to 6 (first 7 had zero lands). Opponent stuck on 2 lands; I Wastelanded Tropical Island and Hedge Maze, beat down with DRC + Cori-Steel Cutter, and landed Murktide on turn 7 (their 3rd Force of Will got countered by my FoW, opp at 9). I attacked with a hasty equipped 6/6 Murktide + DRC, expecting 7 damage (opp to 2) with Lightning Bolt known on top for lethal next turn. During my declare-attackers/combat the opponent went off with Aluren plus Acererak (cast over and over) and drained me from 16 to 0 before I drew again. I held no instant and no counter at that point (tapped out for Murktide + equip, my only FoW already spent on their FoW).
+- Mistake (turn 7): I tapped out and spent my last FoW on their FoW, so I had nothing to answer a sudden Aluren. Probably should have kept FoW for Aluren and let Murktide die, or attacked first / left Bolt mana.
+- Surprise: with only 2 lands and 7 cards they still had a combo line available at instant speed (exact mana source not visible to me, probably Aluren with Petals) and Acererak drain loop killed from 16 life in one combat; they also pitched Stock Up and FoW freely to stop Murktide twice.
+- Engine/menu: none seen; Ponder OrderTop prompt lists duplicate names once; the pitch cost of FoW is paid after target choice (hand still showed the pitched FoW until then). Final events log could not show how Aluren/mana was produced.

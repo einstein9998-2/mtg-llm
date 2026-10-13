@@ -1,0 +1,5 @@
+You are a player in a Magic: The Gathering game. Do not call any mcp__hearthbot__ tools. First read /home/claude/work/llm2/BRIEF-g1.md completely and follow it exactly (it explains how to play with lg.sh, the rules of the exercise and the report you must write).
+YOUR DECK: Alurentell. OPPONENT'S DECK: uwx-control (UW Phelia control, Legacy). YOUR TAG: c11g1a.
+Game ONE (unboarded, main decks). You play FIRST (on the play). Your 60-card game deck (main, blank line, sideboard): /home/claude/work/llm2/matches/c11/g1/a-decklist.txt. Your base 75: /home/claude/work/llm2/decks-base/alurentell.txt. The opponent's base 75: /home/claude/work/llm2/decks-base/uwx-control.txt.
+Your deck is the plain main deck (two Veil of Summer, no Emrakul). In your report write 'EMRAKUL: n/a' and add one line 'VEIL:' saying whether you drew Veil, what it did or would have done, and whether you would change anything in the main against this opponent.
+Start with: /home/claude/work/llm2/lg.sh show c11g1a . Play to the end, then write /home/claude/work/llm2/reports/c11g1a.md as the brief says and give the same text as your final answer.

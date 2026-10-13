@@ -1,0 +1,4 @@
+You are a player in a Magic: The Gathering game. Do not call any mcp__hearthbot__ tools. First read /home/claude/work/llm2/BRIEF-g1.md completely and follow it exactly (it explains how to play with lg.sh, the rules of the exercise and the report you must write).
+YOUR DECK: ur-cutter (UR Cutter, Legacy). OPPONENT'S DECK: Alurentell. YOUR TAG: v2g1b.
+Game ONE (unboarded, main decks). You play FIRST (on the play). Your 60-card game deck (main, blank line, sideboard): /home/claude/work/llm2/matches/v2/g1/b-decklist.txt. Your base 75: /home/claude/work/llm2/decks-base/ur-cutter.txt. The opponent's base 75 is unknown to you at game one.
+You have no playbook: use your own Legacy knowledge. Start with: /home/claude/work/llm2/lg.sh show v2g1b . Play to the end, then write /home/claude/work/llm2/reports/v2g1b.md as the brief says (EMRAKUL: n/a) and give the same text as your final answer.

@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 3
+EMRAKUL: n/a
+VEIL: I did not draw Veil of Summer. It would have beaten the Force of Will that countered my turn 3 Show and Tell and probably won the game; no change to the main from one game, and both Veils look important against this Force of Will and Daze deck.
+
+- Turn 3 (the loss): kept five lands (Tropical, Savannah, Strand, 2 Misty) with Petal and Stock Up. Stock Up on turn 2 into a tapped-out opponent resolved and I took Show and Tell and Acererak (Omniscience was already in hand, Atraxa drawn on turn 3). On turn 3 the opponent was tapped out after Murktide, so I cast Show and Tell with exactly 3 mana and no Daze spare, and it met Force of Will (pitching Ponder; pre-cast odds were about 29% for Force and 29% for Daze). Possible mistake: at Stock Up I took Acererak over Force of Will; Force would have given backup but my only pitch card was Omniscience, so it was not clearly better. I judged waiting a turn (for a Daze spare) worse because it gave them open mana for Charm and burn and a Murktide clock.
+- Surprise: the opponent went Murktide plus Monk token on turn 3, then on turn 4 cast Bauble and two Lightning Bolts at my face and swung with three attackers: 6 burn plus 12 combat = 18 in one turn against my 16 life (I had paid 3 life for two fetches earlier and took 2 from the first Monk). Lethal on turn 4 of theirs from 16, so the early fetch and Monk damage mattered.
+- Engine note: Stock Up's bottom-ordering prompts and the rest of my turn 2 passed quickly; no real bug seen. After my Show and Tell was countered I had no further prompt before the game ended (the opponent finished it on their turn with my having no legal responses).

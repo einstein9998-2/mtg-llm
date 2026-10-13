@@ -2,7 +2,7 @@
 # mk2.sh <game id> <matchup> <arm plan> <first A|B> <game 1|2>: like mk.sh for game 1 (unboarded) or game 2 (boarded), with Alurentell's base 75 from $BASE_A and the Emrakul engine build
 cd /home/claude/work/llm2
 ID=$1; M=$2; ARM=$3; FIRST=$4; G=$5
-case $M in storm) OPPD=storm;; ur) OPPD=ur-cutter;; mirror) OPPD=alurentell-b;; tron) OPPD=colorless-tron;; esac
+case $M in storm) OPPD=storm;; ur) OPPD=ur-cutter;; ub) OPPD=dimir-tempo;; uw) OPPD=uwx-control;; mirror) OPPD=alurentell-b;; tron) OPPD=colorless-tron;; esac
 export OPP=$OPPD
 export PLANS_A=/home/claude/sbexp/plans/$M/$ARM
 export PLANS_B=/home/claude/sbexp/oppplans

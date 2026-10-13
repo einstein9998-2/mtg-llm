@@ -1,0 +1,6 @@
+RESULT: LOST
+TURNS: 5
+EMRAKUL: n/a
+- Mistake (my turn 5): I tapped out for warp Quantum Riddler, Brainstorm and Stifle on my own warp trigger, so I had no mana or answer left when they cast the second Acererak the Archlich on their turn 6. I had no Swords or Stifle in hand, and Force of Negation cannot hit a creature spell. Keeping Stifle (or any untapped mana) for the Acererak enter trigger was worth more than a permanent 4/6 flier. My other misplay was turn 4: I cast Murktide Regent into 3 untapped lands, 6 cards in their hand and 4 Force of Will in their deck, and it was countered by Force of Will.
+- The opponent held Aluren and two copies of Acererak. Swords to Plowshares in response to the first Acererak's bounce trigger stopped the loop once. The second copy came down a turn later with Aluren already on board and looped Lost Mine / Dark Pool until I died (about 312 auto-passes). They also surveiled and fetched Aluren into their graveyard early, then still found another one.
+- The engine's Murktide delve prompt offered "Done" after only 3 of 5 cards were exiled, although I could not pay the rest. I kept exiling, so it did not matter. The menu also listed "Cast Tamiyo" on the opponent's turn with all my lands tapped, which is not castable.
