@@ -1,0 +1,9 @@
+RESULT: WON
+TURNS: 4
+EMRAKUL: n/a
+VEIL: Drew both Veils in the opening hand and never cast one. On the Aluren turn (turn 4) I had only two green sources (Tropical, Savannah) plus Tomb, so Veil + Aluren (three G) was not castable; the opponent was tapped out and I went for Aluren raw, and it resolved. Veil was a dead card in this game, and I put no Veil back with Brainstorm only because I wanted protection later. Against this UB deck I would keep the two Veils in the main (they beat Force/Daze and draw a card against blue/black spells), but a third green source in the build would make Veil + Aluren castable together. I would not change the main otherwise.
+
+- Game: kept 3 fetches + Tomb + Stock Up + 2 Veil. T2 Tomb + Stock Up (took Omniscience, Atraxa), T3 Ponder showed Brainstorm/Aluren/Acererak (kept order, no shuffle, held the fetch uncracked until after the draw), they Thoughtseized my Force of Will. On T4 the opponent was fully tapped out (Bauble, Flow State, Thoughtseize on their turn), so only free spells (Daze/Force) could stop me: Brainstorm into 2 Acererak, then both fetches, Aluren resolved (no Daze/Force), and the Lost Mine loop (macro, 232 picks) drained 15 to 0 in one turn.
+- Possible mistake: Aluren was cast with no spare mana for Daze (Island spent on Brainstorm to find the second Acererak). I estimated about 45% they had neither Daze nor Force and judged the tapped-out window better than waiting; it worked, but it was a gamble. Turn 3 I also let Thoughtseize resolve (it took Force of Will); fine, but it removed my backup.
+- Surprise: the opponent activated Mishra's Bauble in my upkeep targeting my library (they saw Aluren on top), and cast no counterspell at all across the Aluren turn.
+- Engine: no bugs. The Brainstorm put-back and Ponder order prompts worked as expected (first chosen card ends on top for the Ponder order).

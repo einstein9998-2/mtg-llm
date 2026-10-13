@@ -3,11 +3,12 @@
 cd /home/claude/work/llm2
 ID=$1; M=$2; ARM=$3; FIRST=$4; G=$5
 ./mk2.sh $ID $M $ARM $FIRST $G > /tmp/mkgame2-$ID.out || { cat /tmp/mkgame2-$ID.out; exit 1; }
-case $M in storm) ON="storm (Beseech Storm, Legacy)"; BD=storm;; ur) ON="ur-cutter (UR Cutter, Legacy)"; BD=ur-cutter;; tron) ON="colorless-tron (Colorless Tron, Legacy)"; BD=colorless-tron;; esac
+case $M in ub) ON="dimir-tempo (UB Dimir Tempo, Legacy)"; BD=dimir-tempo;; uw) ON="uwx-control (UW Phelia control, Legacy)"; BD=uwx-control;; storm) ON="storm (Beseech Storm, Legacy)"; BD=storm;; ur) ON="ur-cutter (UR Cutter, Legacy)"; BD=ur-cutter;; tron) ON="colorless-tron (Colorless Tron, Legacy)"; BD=colorless-tron;; esac
 if [ $FIRST = A ]; then FA="You play FIRST (on the play)."; FB="The opponent plays FIRST; you are on the draw."; else FA="The opponent plays FIRST; you are on the draw."; FB="You play FIRST (on the play)."; fi
-W=/home/claude/work/llm2; BA=$W/decks-base-emr
+W=/home/claude/work/llm2; BA=${BASE_A:-$W/decks-base-emr}
 if [ $G = 1 ]; then BR=$W/BRIEF-g1.md; KIND="Game ONE (unboarded, main decks)."; else BR=$W/BRIEF-post-emr.md; KIND="Post-sideboard game."; fi
-NOTE="Your deck has one Emrakul, the Aeons Torn, in the main deck in place of a Ponder: this is the thing being tested, so read its card text with get_card and decide for yourself how and when to use it. Brady's note: it does get cast for free when Omniscience is in play."
+DEFNOTE="Your deck has one Emrakul, the Aeons Torn, in the main deck in place of a Ponder: this is the thing being tested, so read its card text with get_card and decide for yourself how and when to use it. Brady's note: it does get cast for free when Omniscience is in play."
+NOTE=${NOTE-$DEFNOTE}
 cat > tasks/${ID}g${G}a.txt <<T
 You are a player in a Magic: The Gathering game. Do not call any mcp__hearthbot__ tools. First read $BR completely and follow it exactly (it explains how to play with lg.sh, the rules of the exercise and the report you must write).
 YOUR DECK: Alurentell. OPPONENT'S DECK: $ON. YOUR TAG: ${ID}g${G}a.
