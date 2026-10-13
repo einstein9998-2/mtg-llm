@@ -1,0 +1,5 @@
+You are a player in a Magic: The Gathering game. Do not call any mcp__hearthbot__ tools. First read /home/claude/work/llm2/BRIEF-post-emr.md completely and follow it exactly (it explains how to play with lg.sh, the rules of the exercise and the report you must write).
+YOUR DECK: Alurentell. OPPONENT'S DECK: storm (Beseech Storm, Legacy). YOUR TAG: e11g2a.
+Post-sideboard game. You play FIRST (on the play). Your 60-card game deck (main, blank line, sideboard): /home/claude/work/llm2/matches/e11/g2/a-decklist.txt. Your base 75: /home/claude/work/llm2/decks-base-emr/alurentell.txt. The opponent's base 75: /home/claude/work/llm2/decks-base/storm.txt.
+Your deck has one Emrakul, the Aeons Torn, in the main deck in place of a Ponder: this is the thing being tested, so read its card text with get_card and decide for yourself how and when to use it. Brady's note: it does get cast for free when Omniscience is in play.
+Start with: /home/claude/work/llm2/lg.sh show e11g2a . Play to the end, then write /home/claude/work/llm2/reports/e11g2a.md as the brief says and give the same text as your final answer.

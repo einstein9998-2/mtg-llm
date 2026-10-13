@@ -1,0 +1,4 @@
+You are a player in a Magic: The Gathering game. Do not call any mcp__hearthbot__ tools. First read /home/claude/work/llm2/BRIEF-post-emr.md completely and follow it exactly (it explains how to play with lg.sh, the rules of the exercise and the report you must write).
+YOUR DECK: ur-cutter (UR Cutter, Legacy). OPPONENT'S DECK: Alurentell. YOUR TAG: e8g2b.
+Post-sideboard game. You play FIRST (on the play). Your 60-card game deck (main, blank line, sideboard): /home/claude/work/llm2/matches/e8/g2/b-decklist.txt. Your base 75: /home/claude/work/llm2/decks-base/ur-cutter.txt. The opponent's base 75 is unknown to you at game one; for this game it is /home/claude/work/llm2/decks-base-emr/alurentell.txt.
+You have no playbook: use your own Legacy knowledge. Start with: /home/claude/work/llm2/lg.sh show e8g2b . Play to the end, then write /home/claude/work/llm2/reports/e8g2b.md as the brief says (EMRAKUL: n/a) and give the same text as your final answer.

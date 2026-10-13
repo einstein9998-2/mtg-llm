@@ -1,0 +1,35 @@
+# Alurentell (Aluren + Show and Tell + Omniscience) | Combo (Aluren / cheat big permanents)
+# Source: Brady's personal list, 2026-10-06 (not a tournament list). Replaces the Freqing list of 2026-09-27 (decks/superseded-v3/).
+# Needs Orim's Chant (sideboard) in the engine: RFC 0005. Savannah was already in the pool (Boros Aggro).
+# Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.
+
+4 Ancient Tomb
+1 Boseiju, Who Endures
+1 City of Traitors
+3 Flooded Strand
+2 Hedge Maze
+1 Island
+4 Misty Rainforest
+1 Savannah
+1 Tundra
+2 Tropical Island
+4 Acererak the Archlich
+4 Atraxa, Grand Unifier
+4 Brainstorm
+4 Force of Will
+3 Ponder
+1 Emrakul, the Aeons Torn
+4 Show and Tell
+4 Stock Up
+2 Veil of Summer
+4 Aluren
+4 Lotus Petal
+2 Omniscience
+
+4 Carpet of Flowers
+1 Force of Negation
+2 Consign to Memory
+2 Faerie Macabre
+2 Orim's Chant
+2 Prismatic Ending
+2 Veil of Summer
