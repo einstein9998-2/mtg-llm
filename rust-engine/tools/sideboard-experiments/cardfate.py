@@ -10,13 +10,13 @@ Buckets, for every game where the card was drawn by Alurentell:
 Win rates are Alurentell's in that bucket."""
 import sys, glob, os, json, subprocess, collections
 MODE,CFG,BT,CARD=sys.argv[1:5]; MS=sys.argv[5:] or ['ur','ub','uw','boros','mirror','storm','tron','reanimator']
-SB='/home/claude/target-live/release/sbtrace'; SBE='/home/claude/target-emr/release/sbtrace'
+SB='/home/claude/target-emr/release/sbtrace'; SBE='/home/claude/target-emr/release/sbtrace'
 W_BF={'Tundra','Savannah','Lotus Petal','Carpet of Flowers'}; W_HAND={'Tundra','Savannah'}
 names={'ur':'UR Cutter','ub':'UB (Dimir)','uw':'UW Phelia','mirror':'Mirror','boros':'Boros','storm':'Storm','tron':'Tron','reanimator':'Reanimator'}
 def feats(jf):
     out=jf[:-6]+'.features.jsonl'
     if not os.path.exists(out) or os.path.getmtime(out)<os.path.getmtime(jf):
-        with open(out,'w') as o: subprocess.run([SBE if '/emr' in jf else SB,jf],stdout=o,check=True)
+        with open(out,'w') as o: subprocess.run([SBE if '/emr' in jf else SB,jf],stdout=o,stderr=subprocess.DEVNULL)
     return [json.loads(l) for l in open(out)]
 def bucket(g):
     if CARD in g['cast']: return 'cast'

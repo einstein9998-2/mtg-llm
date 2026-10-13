@@ -39,9 +39,13 @@ fn main() {
         // Seat 0's permanents by name, and a snapshot of hand and permanents at the start of each of its first main phases.
         let mut bf: BTreeMap<String, i32> = BTreeMap::new();
         let mut active0 = false;
+        let mut life = [20i32, 20i32];
         let mut snaps: Vec<Value> = Vec::new();
         let mut timeline: Vec<String> = Vec::new();
         let mut opp_cast: Vec<String> = Vec::new();
+        // Every cast in order, to attribute a counterspell and its victim; and the counters seen: (turn, by, by seat, victim, victim seat).
+        let mut casts: Vec<(mtg_core::ids::ObjRef, String, u8)> = Vec::new();
+        let mut counters: Vec<Value> = Vec::new();
         let mut result = None;
         let mut ai = 0usize;
         let mut winner: Option<u8> = None;
@@ -59,18 +63,30 @@ fn main() {
                     }
                     E::StepBegan { step: mtg_core::types::Step::Main1 } if active0 => {
                         let pos = |m: &BTreeMap<String, i32>| -> BTreeMap<String, i32> { m.iter().filter(|(_, n)| **n > 0).map(|(k, n)| (k.clone(), *n)).collect() };
-                        snaps.push(json!({"t": aturn, "hand": pos(&hand), "bf": pos(&bf)}));
+                        snaps.push(json!({"t": aturn, "hand": pos(&hand), "bf": pos(&bf), "life": life[0], "olife": life[1]}));
                     }
                     E::Drew { player, def, .. } if player.0 == 0 => {
                         *hand.entry(name(def)).or_default() += 1;
                         drawn.entry(name(def)).or_default().push(aturn);
                     }
-                    E::SpellCast { def, controller, .. } => {
+                    E::SpellCast { obj, def, controller, .. } => {
+                        casts.push((obj, name(def), controller.0));
                         if controller.0 == 0 {
                             cast.entry(name(def)).or_default().push(aturn);
                             timeline.push(format!("T{aturn} cast {}", name(def)));
                         } else if opp_cast.len() < 200 {
                             opp_cast.push(format!("t{turn} {}", name(def)));
+                        }
+                    }
+                    E::LifeChange { player, delta } => {
+                        life[player.0 as usize] += delta;
+                    }
+                    E::SpellCountered { obj } => {
+                        // the countering spell is the latest cast by the other seat after the victim was cast
+                        if let Some(vi) = casts.iter().rposition(|c| c.0 == obj) {
+                            let (_, vname, vseat) = casts[vi].clone();
+                            let by = casts[vi + 1..].iter().rev().find(|c| c.2 != vseat).map(|c| c.1.clone()).unwrap_or_default();
+                            counters.push(json!({"t": aturn, "by": by, "victim": vname, "victim_seat": vseat}));
                         }
                     }
                     E::ZoneChange { def, from, to, owner, controller, .. } => {
@@ -130,7 +146,7 @@ fn main() {
                 "match": v["match"], "game": v["game"], "first": v["first"], "winner": v["winner"], "boarded": v["boarded"],
                 "turns": total_turns, "a_turns": aturn,
                 "drawn": drawn, "cast": cast, "entered": entered, "used": used, "hand_end": hand_end,
-                "timeline": timeline, "opp_cast": opp_cast, "snaps": snaps,
+                "timeline": timeline, "opp_cast": opp_cast, "snaps": snaps, "counters": counters, "life_end": life,
             })
         );
     }

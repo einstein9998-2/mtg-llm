@@ -7,7 +7,7 @@ def load(mode,m,c):
     for jf in sorted(x for x in glob.glob(f'results/{mode}/{m}/{c}-*.b1.jsonl') if not x.endswith('.features.jsonl')):
         out=jf[:-6]+'.features.jsonl'
         if not os.path.exists(out) or os.path.getmtime(out)<os.path.getmtime(jf):
-            with open(out,'w') as o: subprocess.run([SBE,jf],stdout=o,check=True)
+            with open(out,'w') as o: subprocess.run([SBE,jf],stdout=o,stderr=subprocess.DEVNULL)
         G+=[json.loads(l) for l in open(out)]
     return G
 pc=lambda L: f"{100*sum(g['winner']==0 for g in L)/len(L):.0f}% of {len(L)}" if L else '-'

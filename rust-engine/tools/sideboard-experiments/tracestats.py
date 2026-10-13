@@ -3,7 +3,7 @@
 Usage: tracestats.py <mode> [cfg=base] [batch=2]"""
 import sys, glob, os, subprocess, json, math, collections
 MODE=sys.argv[1]; CFG=sys.argv[2] if len(sys.argv)>2 else 'base'; BT=sys.argv[3] if len(sys.argv)>3 else '2'
-SB='/home/claude/target-live/release/sbtrace'; SBE='/home/claude/target-emr/release/sbtrace'
+SB='/home/claude/target-emr/release/sbtrace'; SBE='/home/claude/target-emr/release/sbtrace'
 CARDS=["Orim's Chant","Prismatic Ending","Consign to Memory","Force of Negation","Veil of Summer","Carpet of Flowers","Faerie Macabre","Force of Will","Lotus Petal","Omniscience","Aluren","Show and Tell"]
 names={'ur':'UR Cutter','ub':'UB (Dimir)','uw':'UW Phelia','mirror':'Mirror','boros':'Boros','storm':'Storm','tron':'Tron','reanimator':'Reanimator'}
 def ci(w,n):
@@ -16,7 +16,7 @@ for m in ['ur','ub','uw','boros','mirror','reanimator','storm','tron']:
     for f in fs:
         feat=f[:-6]+'.features.jsonl'
         if not os.path.exists(feat) or os.path.getmtime(feat)<os.path.getmtime(f):
-            with open(feat,'w') as o: subprocess.run([SBE if '/emr' in f else SB,f],stdout=o,check=True)
+            with open(feat,'w') as o: subprocess.run([SBE if '/emr' in f else SB,f],stdout=o,stderr=subprocess.DEVNULL)
         games+=[json.loads(l) for l in open(feat)]
     n=len(games); w=sum(g['winner']==0 for g in games)
     print(f'\n### {names[m]} ({CFG}, {n} games, Alurentell won {100*w/n:.1f}%)\n')
