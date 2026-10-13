@@ -2,6 +2,8 @@
 
 For Brady. Branch `claude/project-thread-k5zuj1`, scripts in `rust-engine/tools/sideboard-experiments/`.
 
+Round 2 (slower swaps for Petal/Force, Chant/Ending counts, land cuts, FoN counter tracking, Emrakul for each nonland card in game 1): see [REPORT-round2.md](REPORT-round2.md).
+
 ## Short version
 
 - **Do not trust a net win rate for sideboard cards.** The nets were trained on main decks only, so they play Chant, Ending, Consign, Force of Negation and Emrakul badly. Every "take the sideboard card out" test comes out positive for the unboarded list (`none`, nobody boards, is +1 to +10 against five of six opponents). The same goes for "add Petals or Force of Will": the nets say worse, monotonically with copies, in UR, UB and UW. I read those as "the net does not value the swap", not as proof the swap is bad. The metrics and the card-fate counts below are the part that does not depend on how the net plays.
