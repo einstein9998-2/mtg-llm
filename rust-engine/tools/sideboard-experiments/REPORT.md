@@ -3,6 +3,7 @@
 For Brady. Branch `claude/project-thread-k5zuj1`, scripts in `rust-engine/tools/sideboard-experiments/`.
 
 Round 2 (slower swaps for Petal/Force, Chant/Ending counts, land cuts, FoN counter tracking, Emrakul for each nonland card in game 1): see [REPORT-round2.md](REPORT-round2.md).
+LLM games with Emrakul in game 1 and post-board: see [REPORT-llm-emrakul.md](REPORT-llm-emrakul.md).
 
 ## Short version
 
