@@ -32,6 +32,6 @@ The Plains is free: no sign it hurts, it is a Wasteland-proof white source when 
 ## Caveats
 - No control arm; the baseline numbers come from earlier waves on other builds.
 - Opponents had no playbook. Dimir played as a pure aggro deck.
-- Engine items seen: Show and Tell offers lands as put-in choices (a1b, a2b, a12b, p9b), which the real card does not allow; Bauble's look result is not shown to the player; a bare land name in `pay=` can match the wrong land.
+- Engine items seen: Show and Tell offering lands as put-in choices (a1b, a2b, a12b, p9b) was first flagged as a bug but is correct: the real card lets each player put a land onto the battlefield (Brady's correction); Bauble's look result is not shown to the player; a bare land name in `pay=` can match the wrong land.
 
 Files: `plains-games/` (24 reports, `pNg2a.md` Alurentell and `pNg2b.md` opponent, the brief); launcher `archon-games/mkx.sh` (also runs this arm).

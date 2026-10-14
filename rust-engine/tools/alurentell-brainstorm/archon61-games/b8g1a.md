@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 5
+ARCHON: Not drawn. I never saw Archon of Cruelty (not in my opening 7, Stock Up's top 5, Atraxa's top-10 reveal, or my draws). It was a 61st dead card in a game that never needed it, so it did nothing. It can only come in via Show and Tell, where the opponent also gets a put-in, so it is slower and worse than Atraxa or Aluren plus Acererak. Against Dimir the opponent could answer it with Fatal Push, Snuff Out, Kaito's tap, Brazen Borrower, or Force of Will on the Show and Tell. Its sacrifice, discard and drain trigger is strong against a creature deck, but I would leave it out as a 61st card. If it must stay in, I would cut a spare Stock Up or the second Omniscience for it, not add it on top.
+- Mistake (turn 5): I assumed Veil of Summer's hexproof covered the Acererak I cast afterwards. It only covers permanents already on the battlefield when Veil resolves, so their Fatal Push (revolt from a cracked Delta) could target the new Acererak. I had to Force of Will the Push, which took me to 1 life. The line still won, but the loop did not have the full protection I planned.
+- Surprise: Kaito (ninjutsu) with -2 on Atraxa tapped her down with two stun counters, and Dimir used both Wastelands on Tropical and Savannah on their own turn. I took 7 (12 to 5) with no blocker.
+- Surprise: the Lost Mine loop dealt much more than the briefed 1 point per 14 picks. 60 auto picks took them from 15 to 8, and the next ~119 picks ended the game.
+- No engine or menu bugs seen.

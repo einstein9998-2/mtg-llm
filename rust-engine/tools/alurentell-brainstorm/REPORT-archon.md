@@ -35,6 +35,6 @@ Nothing here shows Archon is better than the Ponder it replaced, and the one gam
 ## Caveats
 - Game a10: two Alurentell agents were started by mistake on the same seat (I launched it twice). Both made the same plays and reported the same win; counted, but do not lean on it.
 - Opponents had no playbook. Dimir played as a pure aggro deck (Moonshadow, Goyf, Kaito), which is not how the earlier nets or waves played it.
-- Engine oddities the opponents noticed, not caused by Archon: Show and Tell offers lands (Wasteland, Volcanic Island) as put-in choices, which the real card does not allow (a1b, a2b, a12b); Mishra's Bauble does not show the card it looks at; `pay=` with a name shared by several lands matches the wrong land (a9b).
+- Engine oddities the opponents noticed, not caused by Archon: Show and Tell offering lands (Wasteland, Volcanic Island) as put-in choices was first flagged here as a bug (a1b, a2b, a12b), but it is correct: the real card lets each player put a land onto the battlefield (Brady's correction), and it matters because a tapped-out opponent gets an untapped land; Mishra's Bauble does not show the card it looks at; `pay=` with a name shared by several lands matches the wrong land (a9b).
 
 Files: `archon-games/` (24 reports `aNg1a.md` Alurentell, `aNg1b.md` opponent, the brief, launcher `mkx.sh`).
