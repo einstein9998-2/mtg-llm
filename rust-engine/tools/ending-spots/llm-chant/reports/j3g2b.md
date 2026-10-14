@@ -1,0 +1,9 @@
+RESULT: WON
+TURNS: 6 (my own turns; the opponent was on the play)
+SIDEBOARD: No boarded-in card (Fatal Push, Snuff Out, Massacre, Nihil Spellbomb, Null Rod, Hydroblast, Barrowgoyf) was drawn or cast. What mattered were maindeck cards: Nethergoyf, 2 Moonshadow, 2 Daze, Consign to Memory, Wasteland and the fetchlands. Consign countered the Acererak enter trigger so Acererak stayed put and the Aluren loop never started.
+CHANT_ENDING: n/a
+- Mulligan: the first 7 had one colorless land (Wasteland), so I mulliganed to 6, kept 3 lands (two fetches) with Bauble, Daze and 2 Nethergoyf, and bottomed a Nethergoyf.
+- Game flow: T1 fetched a Swamp (to avoid giving their Carpet of Flowers an Island), Bauble and Nethergoyf. T2 Moonshadow and Wasteland on their Ancient Tomb while they were tapped out. They never recovered: I attacked every turn (20 to 16 to 12 to 8 to 2 to dead). I Dazed their Show and Tell while they were tapped out, Dazed Orim's Chant (they did not pay, so they were left unable to stop me from responding), and countered the Acererak ETB with Consign. Lethal came from two menace Moonshadows (Acererak alone cannot block menace).
+- Possible mistake: casting Daze on Show and Tell gave them a card from Veil of Summer (they cast it afterwards because I had cast a blue spell). Minor. I kept fetchlands uncracked on their turns to avoid giving Carpet of Flowers mana, which worked well.
+- Surprise: the opponent cast Orim's Chant unkicked on their own turn (to stop my counters) while tapped for Aluren mana, and they lost it to Daze; they also wasted Veil of Summer and a second Carpet of Flowers.
+- Engine: no bugs seen. Note Flooded Strand only fetches Island/Plains types (so only Underground Sea or Undercity Sewers) and Bloodstained Mire can fetch Underground Sea (Swamp type); this is correct.
