@@ -33,9 +33,9 @@ What happened with Emrakul itself:
 - 61st card arm: drawn in 4 of 12. s6 won (Show and Tell put-in, annihilator), s12 won (free cast under Omniscience, though Stifle hit the extra-turn trigger), s2 lost (dead in the opening seven, UR player's Murktide plus burn won), s11 lost (put in with Show and Tell, then Phelia exiled it and Stifle on the delayed return trigger kept it away for good).
 - Phelia plus Stifle is a real answer to a resolved Emrakul (s11, and the UW player in s12 used Stifle on its cast trigger).
 
-Mana in the City arm (Alurentell players' own reading): 6 of 12 said the 19th land was fine. l1, l5 and l12 said they would rather have City back: l5 and l12 lost Hedge Maze or Tomb to Wasteland and were short of coloured sources, l1 stumbled on an early land. l10 (mulligan to six) did not miss it. City of Traitors was also called a trap in several control games last round (a later land drop sacrifices it).
+Mana in the City arm (Alurentell players' own reading): 7 of 12 said the 19th land was fine. l1, l5 and l12 said they would rather have City back: l5 and l12 lost Hedge Maze or Tomb to Wasteland and were short of coloured sources, l1 stumbled on an early land. l10 (mulligan to six) did not miss it. City of Traitors was also called a trap in several control games last round (a later land drop sacrifices it).
 
-The 61st-card arm lost 7 of 12, mostly to fast Moonshadow/Bowmasters/Murktide clocks (s1, s2, s3, s4, s7, s8, s10) rather than the extra card; the players mostly noticed it only when it was a dead draw (s2). The sims do not show a cost for the 61st card (+0.6 on blue), so the LLM result is most likely noise.
+The 61st-card arm lost 7 of 12, to fast clocks (Cutter, Murktide, Moonshadow, Bowmasters in s1, s2, s3, s4, s10), a grindy Wasteland game (s7) and Phelia plus Stifle (s11), rather than to the extra card; the players mostly noticed it only when it was a dead draw (s2). The sims do not show a cost for the 61st card (+0.6 on blue), so the LLM result is most likely noise.
 
 ## Read
 - Taking City of Traitors out for Emrakul looks as good as any other swap: sims +1.3 on blue decks, LLM games 9/12 against 7/12. The players' complaint about City is that it sacrifices to the next land.
