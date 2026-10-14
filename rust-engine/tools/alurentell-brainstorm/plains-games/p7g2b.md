@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 6
+SIDEBOARD: Drew and cast Force of Negation (3 in, 2 FoN and 3 Consign in; out 3 Fatal Push, Snuff Out, Island). Kaito's surveil put it on top; I pitched Brainstorm to counter their Show and Tell on their turn, but they answered with Veil of Summer (uncounterable plus hexproof from blue/black), so it did nothing except cost me a card. Consign to Memory: none drawn. Keep FoN in the matchup but it needs a free blue pitch card and is weak against Veil (they ran 2 Veils this game plus Orim's Chant); Consign unseen.
+WHITE: n/a
+- Mistake candidate (turn 6, my last): I used Kaito -2 on Atraxa into two open Tropicals and a known-in-hand Veil (Veil resolved, ability fizzled, Kaito stuck at 2); with the opponent at 4 I should have sequenced around it or kept Kaito at 4 and dug with the 0 ability. More broadly I could not stop Atraxa (lifelink block/attack swung 7+) and no answer was in the 60 after boarding out all removal.
+- Surprise: the opponent kept Tropicals untapped and paid only with Carpet mana (my Islands feed Carpet), so Veil was always live; then Orim's Chant on their own turn and Aluren plus the Lost Mine loop: 3 laps in about 30 picks, I went from 10 to dead with no window to act (stack never emptied, no turn for me).
+- Engine/menu: Mishra's Bauble targeting the opponent's library showed no revealed card anywhere in the prompt (no look result). Also Bowmasters' ping target list omitted the opponent after Veil (correct hexproof behavior, just noting).
