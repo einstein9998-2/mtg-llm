@@ -1,0 +1,6 @@
+RESULT: LOST
+TURNS: 5
+EMRAKUL: n/a (I played UR Cutter). The opponent put Atraxa and then Emrakul onto the battlefield for free off Omniscience on their turn 5. On turn 6 Emrakul attacked and annihilator 6 took all 6 of my permanents (4 lands, DRC, Murktide), then Emrakul and Atraxa hit for 22.
+- Mistake (my turn 5): I tapped out for Murktide into an Omniscience board with nothing else in hand. Nothing I held could have stopped the free Atraxa and Emrakul anyway. The real gap was having no Force of Will or Daze in hand once Omniscience resolved. After Show and Tell I used Bolt and Heat (exactly 5 damage) on Acererak in response to its bounce trigger, which stopped the Acererak loop. But Omniscience stayed, and Wasteland or other pressure could not touch it.
+- Surprise: the opponent did not loop Acererak. They stopped after the first Acererak died, then used Stock Up and Ponder to dig up Atraxa and Emrakul and cast both free. Their Show and Tell on turn 4 (Omniscience) beat my early Wasteland on Tropical Island plus the Force of Will on my first Murktide.
+- Bug and menu notes: none serious. The Delve prompt shows "remaining: 1" throughout and the graveyard listing does not update while choosing. Ponder's top-card ordering picks the first card chosen as the top.

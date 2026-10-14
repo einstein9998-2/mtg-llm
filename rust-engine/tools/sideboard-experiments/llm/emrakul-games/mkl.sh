@@ -1,0 +1,6 @@
+#!/bin/bash
+# mkl.sh <id> <matchup> <first A|B> <l|s>   arm l: Emrakul in place of City of Traitors (19 lands); arm s: Emrakul as a 61st main-deck card
+cd /home/claude/work/llm2
+LN="Your main deck has one Emrakul, the Aeons Torn, in place of City of Traitors, so it plays 19 lands instead of 20. This is the thing being tested: read Emrakul's card text with get_card and decide for yourself how and when to use it. Brady's note: it does get cast for free when Omniscience is in play. In your report add one line 'MANA:' saying whether you felt short of lands or sources (and which), and whether you would rather have had City of Traitors back."
+SN="Your main deck has 61 cards: the usual 60 plus one Emrakul, the Aeons Torn (20 lands, no card was cut). This is the thing being tested: read Emrakul's card text with get_card and decide for yourself how and when to use it. Brady's note: it does get cast for free when Omniscience is in play. In your report add one line 'MANA:' saying whether the extra card hurt or helped (clogged hand, dead draw, or not noticed)."
+if [ $4 = l ]; then BASE_A=$PWD/decks-base-emrl NOTE="$LN" ./mkgame2.sh $1 $2 base $3 1; else BASE_A=$PWD/decks-base-emrs NOTE="$SN" ./mkgame2.sh $1 $2 base $3 1; fi

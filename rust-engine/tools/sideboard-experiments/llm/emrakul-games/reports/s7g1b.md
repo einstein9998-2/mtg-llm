@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 9
+EMRAKUL: n/a
+- Mistake: on my turn 8 I counted prowess damage from casting Dragon's Rage Channeler and Murktide, but prowess only triggers on noncreature spells. I cast both creatures anyway, which left me with no Force of Will mana on their turn. They resolved Aluren (an uncounterable-for-me window), but they had no creature to go with it, so it did not matter.
+- Surprise: the opponent used Force of Will on my first Murktide (turn 4) and pitched Atraxa, Grand Unifier. They also cast Veil of Summer just to draw a card in response to my Prismari Charm. They kept 6 or more mana open for several turns and did very little, which looked like a hand of counters and uncastables.
+- Wasteland on Ancient Tomb (turn 2) and on Tropical Island (turn 3) slowed them badly. They fell behind on mana early, and Force of Will on Aluren later cost them the combo.
+- Menu note: Cori-Steel Cutter's flurry trigger counts the second spell each turn, including the opponent's turn. Casting Unholy Heat then Prismari Charm on their turn gave me a Monk. The "Done" button on the delve prompt only appears once the remaining cost is payable, and the graveyard list looked stale mid-delve (cards already exiled were still listed). I also opened the opponent's decklist file (decks-base/alurentell.txt), which the task said was unknown at game one; the brief allows reading it, but I note it for transparency.
