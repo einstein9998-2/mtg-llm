@@ -1,0 +1,8 @@
+vs uwx-control
+-4 Lotus Petal
+-2 Omniscience
+-2 Force of Will
+-2 Aluren
++4 Carpet of Flowers
++4 Orim's Chant
++2 Veil of Summer

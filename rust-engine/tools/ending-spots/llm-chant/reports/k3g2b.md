@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 7
+SIDEBOARD: Drew and cast Consign to Memory twice (plus a third copy sat in hand): the first one countered Atraxa's enter trigger after Show and Tell, and they answered with Veil of Summer, which drew them a card. The second one, on a replicated Consign, countered both of their Carpet of Flowers mana triggers, which did nothing for the game. Force of Negation was not drawn. Consign was fine, but it could not stop the Atraxa body, and Fatal Push and Snuff Out were all boarded out, which hurt because Atraxa (MV 7) and the lifelink swings were what beat me. Keep Consign at 2 at most and bring back Snuff Out and a removal or bounce answer for Atraxa.
+CHANT_ENDING: n/a
+- Mistake: turn 10. After Brainstorm I paid for a second Goyf instead of holding mana, and I never had a plan for Atraxa. The real error was the deck build: no way to remove a lone 7/7 lifelink flier. I raced with Moonshadow (menace, unblockable by a single blocker), which got them from 20 to 3, but Atraxa swung back for 7 with lifelink every turn.
+- Surprise: they used Ancient Tomb damage to pay for Daze (twice), and a second Carpet of Flowers fed on my Islands. The early Wasteland on their only land (turn 2), and Daze on Stock Up and on Show and Tell, worked well and put them to 3 life, but Show and Tell still resolved because they paid.
+- Surprise: they cast Veil of Summer in response to my Consign (blue spell) purely to draw a card.
+- Engine: no bug seen. Undercity Sewers entered tapped when I controlled only 2 other lands, which differs from its printed text, and the Consign replicate prompt came after casting.

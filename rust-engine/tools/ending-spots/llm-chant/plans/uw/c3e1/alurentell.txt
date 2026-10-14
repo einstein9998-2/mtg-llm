@@ -1,0 +1,9 @@
+vs uwx-control
+-4 Lotus Petal
+-2 Omniscience
+-2 Force of Will
+-2 Aluren
++4 Carpet of Flowers
++3 Orim's Chant
++1 Prismatic Ending
++2 Veil of Summer
