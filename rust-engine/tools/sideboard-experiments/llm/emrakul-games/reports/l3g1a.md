@@ -1,0 +1,8 @@
+RESULT: WON
+TURNS: 4 (won on my 4th turn, game turn 7, on the play)
+EMRAKUL: Never drawn. It was not among Atraxa's ten revealed cards and never turned up in the 13 cards I saw. I could not call get_card on it ("not in the card pool"), so I judged it by its printed text, which I know. Against this opponent I would keep it only as a one-of. It is dead in hand (15 mana) except under Omniscience, and this game never needed it. I would cut it for the 20th land (City of Traitors) rather than for a spell.
+MANA: Not short of lands or sources at any point (19 lands). Turn 2 was Hedge Maze (fetched at their end step) plus Ancient Tomb for Stock Up, and turn 3 had 5 mana for Veil plus Show and Tell with a Petal spare. I would not have wanted City of Traitors back in this game. The sixth to eighth mana never mattered because their taps and Veil made the turn safe.
+- Line: kept 4 lands (3 fetches + Tomb), Stock Up and 2 Veil. Turn 2 Stock Up took Aluren and Petal. Turn 3 Veil, then Show and Tell put in Atraxa, and the reveal found Acererak, Force of Will, Show and Tell, Petal and Savannah. Turn 4 Savannah, Veil, Aluren, then the Lost Mine loop with the auto macro (about 215 picks) killed from 18.
+- Judgment calls: I did not Force Kaito or Veil its -2 on Atraxa, to save Veil and Force for the combo turn. They were tapped out on my turn anyway (only free spells possible), so this was fine.
+- Surprise: the opponent put Underground Sea in with Show and Tell and then tapped out for Kaito on their own turn, giving a clean window.
+- Menu/engine: no bugs seen. The Atraxa pick menu offers Done each time, which is easy to misread. Prompts at 28 life were flagged "DECISIVE (life total is low)", which looks like a label glitch.
