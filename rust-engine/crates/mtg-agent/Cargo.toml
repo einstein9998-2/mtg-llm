@@ -37,3 +37,7 @@ path = "src/bin/bo3.rs"
 [[bin]]
 name = "netremap"
 path = "src/bin/netremap.rs"
+
+[[bin]]
+name = "endingspot"
+path = "src/bin/endingspot.rs"
