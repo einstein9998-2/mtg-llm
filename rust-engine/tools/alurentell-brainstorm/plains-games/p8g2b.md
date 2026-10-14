@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 6
+SIDEBOARD: Boarded in 3 Consign to Memory and 2 Force of Negation (out: 3 Fatal Push, 1 Snuff Out, 1 Island). I drew one Consign to Memory (turn 3 Flow State); I held it as a pitch card or for an Atraxa or Acererak trigger and never cast it. I never saw Force of Negation. Nothing mattered here because the game was a fast beatdown. I would keep Consign to Memory (it answers the Acererak and Atraxa triggers and Lotus Petal) and the 2 Force of Negation (they hit Show and Tell and Aluren on their turn) as the cuts for the dead Push and Snuff Out.
+WHITE: n/a
+- Mistake: none big. Turn 4 Thoughtseize: I took Acererak over Show and Tell, because Acererak is the piece shared by the Aluren and Omniscience lines. It was right (they never got a payload), but Show and Tell was the stronger long-term take.
+- Surprise: the opponent sat on Show and Tell, two Ancient Tomb and Aluren and never cast Aluren or a payload; they played Veil of Summer at my end step for a free card instead, and they ran themselves to 2 life with Ancient Tomb, Stock Up and fetches. At 1-2 life they were locked out of Tomb, fetches and cantrips.
+- Engine and menu notes: Flow State and Ponder menus list only distinct card names, so duplicates are hidden. The Thoughtseize prompt does not show that the cost is 2 life, but it is only a cosmetic issue. I put a semicolon in a pick reason and the shell ran the rest as a command (the pick still went through).

@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 5
+SIDEBOARD: Boarded in Consign to Memory (x3 total, +2 over base) and Force of Negation (x2) over Fatal Push/Snuff Out/Island. Drew Consign (held it all game, never cast it: Carpet triggers were not worth it and Orim's Chant/Aluren are not colorless) and one Force of Negation (pitched Flow State to exile their first Aluren, good). Would keep FoN, would keep Consign only as a 1-2 of (it was dead against Chant, Aluren, Carpet as a spell; it only answers Acererak/Atraxa triggers, Omniscience and Petal).
+WHITE: n/a
+- Mistake candidate (opp turn 5): I was holding Daze, Consign and three lands and let Orim's Chant resolve on their own turn (Daze would have been paid for with their spare mana), then they cast a second Aluren plus Acererak with me locked out of spells and looped to death from 7 life facing my lethal board. I also chose not to play lands (to keep my Island count low vs the two Carpets) so I had only Sea open and could not Consign a Carpet trigger and Daze at once. In hindsight I should probably have Consigned a Carpet trigger earlier or kept a second blue source so the Chant could be answered by a real counter.
+- Surprise: Orim's Chant cast main phase 1 on their own turn targeting me, a "no counterspells" lock to push Aluren/Acererak through. Also they Boseiju-ed up (kept Boseiju untapped) so Daze never worked.
+- Engine: Bauble shows no top-card info in the log when targeting the opponent; I learned their top card only through the "cards you know in hand" line. Not a real bug.
+- Good: Wasteland on Ancient Tomb while they were tapped out plus Bilbo recasting Bauble from the graveyard made a very fast clock (opponent went 20 to 7 by my turn 5).
