@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 5 (my own turns; lost during the opponent's 5th turn)
+EUREKA: n/a. I played Dimir Tempo, so I had no Eureka. The opponent never cast Eureka against me. They won with Show and Tell instead. Show and Tell put Aluren onto the battlefield, I had nothing to put in, then Acererak was cast free through Aluren and looped.
+
+- Game summary: I mulliganed a zero-land seven, kept six (4 lands, Bilbo, Flow State, Snuff Out) and bottomed a Delta. I got a fast clock: Bilbo turn 2, Wasteland on their Hedge Maze, two Nethergoyfs, and Flow State twice via Bilbo. They went from 20 to 6 life by my turn 5. They Forced my Moonshadow, pitching Stock Up, then cast Stock Up. On their turn 5 they cast Show and Tell with one Tropical Island open.
+- Mistake: my turn 4. I cast Flow State and then Moonshadow, which left only Force of Will, Snuff Out and Fatal Push in hand and no blue card to pitch, so their Show and Tell could not be Forced. I should have kept a blue card (for example Bilbo's Flow State recast skipped, or the Moonshadow held) as Force fuel. Realistically, once Aluren and Acererak were in play I had no answer: Fatal Push cannot hit mana value 3 without revolt, and Snuff Out cannot hit black Acererak.
+- Surprise: they played Aluren via Show and Tell and then ran the Lost Mine loop with Acererak (about 10 picks per lap, Dark Pool drain each lap) and killed me from 18 life in a single turn. I never got another turn. The race (they were at 6, I had exactly 6 power) was lost to the drain-and-gain loop.
+- Engine/menu notes: no bugs seen. The `auto` macro with "stack:Pass priority" worked for passing through the loop (440 picks). The tapped/untapped display of my lands on their turn is just the untap step not having happened, not a bug.

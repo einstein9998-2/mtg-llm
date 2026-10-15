@@ -1,0 +1,8 @@
+RESULT: WON
+TURNS: 10
+SIDEBOARD: Boarded in 3 Pyroblast (the base main had none) for 2 Unholy Heat and Prismari Charm. I drew 2 of the 3 Pyroblast. None countered anything: the opponent stalled on lands and never cast a blue spell I needed to stop. I cast one on my own Mishra's Bauble as a free second spell, which triggered both Cori-Steel Cutters (two hasty Monk tokens) plus prowess for the lethal swing. Pyroblast is fine as a cheap spell here, but the sideboard Surgical Extractions and Hydroblasts were never tested. I would keep 3.
+EUREKA: n/a (I am UR Cutter; no Eureka was cast against me).
+- Wasteland (drew 4 of them) destroyed 4 of their nonbasic lands (Tropical x2, Ancient Tomb x2) on consecutive turns, which left them on 1 to 2 lands for the whole game. Combined with Daze on Carpet of Flowers (tapped out) and Force of Will on Show and Tell, it was a mana lock. They discarded Acererak and Atraxa to hand size.
+- Possible mistake, turn 3 to 4: playing Wasteland every turn left me with almost no board development until turn 7. It worked only because they could not recover. Daze on Carpet of Flowers cost me a land drop (bounced my only land).
+- Surprise: the opponent held 6 to 7 cards and passed with Tundra/Tomb up for several turns without casting anything, then cast an unkicked Orim's Chant on my main phase in response to my second spell. It only stops further spells, so it did nothing against triggers already on the stack.
+- Menu note, not a bug: Pyroblast can be cast targeting my own spell on the stack, which is a way to get the second spell for Flurry. My reasons (with semicolons) once ran as shell commands: a failed Daze command was printed, with no game effect.

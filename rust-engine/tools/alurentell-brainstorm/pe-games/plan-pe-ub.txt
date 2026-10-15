@@ -1,0 +1,8 @@
+vs dimir-tempo
+-2 Lotus Petal
+-2 Omniscience
+-4 Force of Will
+-1 Aluren
++4 Carpet of Flowers
++3 Orim's Chant
++2 Veil of Summer
