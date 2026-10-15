@@ -1,0 +1,10 @@
+vs uwx-control
+-2 Lotus Petal
+-2 Omniscience
+-2 Force of Will
+-1 Aluren
+-1 Boseiju, Who Endures
+-1 Ponder
++4 Carpet of Flowers
++3 Orim's Chant
++2 Veil of Summer

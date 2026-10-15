@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 6
+EUREKA: n/a (I played Dimir Tempo; the opponent never cast Eureka. They did Show and Tell on their turn 3, which I countered, then got Acererak out with Aluren, which I killed.)
+- Game flow: fetch + Nethergoyf on turn 1, Bowmasters flashed in at their end step, Wasteland on Ancient Tomb and later City of Traitors left them on one Island. Opp turn 3: Show and Tell. I pitched one Force of Will to counter it, they Forced my Force with Ponder pitched, so it resolved. I put Wasteland in (the menu offered it). They put in Aluren and cast Acererak free. In response to its enter trigger I cracked Delta for revolt and Fatal Push killed Acererak (MV 3), so the Aluren loop never started. Later Petty Theft bounced Aluren. They died to the Goyf/Bowmasters/Orc Army beats on my turn 6.
+- Possible mistake: none clear. Spending two Forces (one pitched) on Show and Tell was a 2-for-2 that the opponent undid by Forcing my Force, so the counter attempt achieved nothing and cost me a card and 2 life. Holding Push for the Acererak followup was what mattered.
+- Surprise: opp discarded Aluren to hand size on turn 2, then later replayed it from Show and Tell; a second Aluren was in the deck. Opp also paid Force of Will to protect Show and Tell at 11 life.
+- Engine note: Show and Tell menu offered a Wasteland (a land) for my put, which it should not. Battlefield display shows opponent lands as tapped during my turn (stale untap state).
