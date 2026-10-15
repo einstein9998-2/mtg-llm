@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 5
+SIDEBOARD: Drew one Force of Negation on turn 2 (Brainstorm) and held it the whole game; a second FoN was on top of my library when the game ended. No Consign to Memory drawn. FoN never got to act: the opponent led with Orim's Chant before Show and Tell (turn 5) and again on turn 6, and countering the Chant would have cost FoN plus a pitched blue card without stopping the spell behind it (I had no second counter). I would keep 2 FoN, but this list has no answer to a resolved Atraxa except Kaito's stun counters; Snuff Out/Fatal Push in my sideboard do not kill a 7/7 either.
+LIST: n/a
+- Possible mistake (my turn 4): I hard-cast Daze on Stock Up and made them burn a Lotus Petal; that left me with FoN as the only counter, so I could not beat the Chant followed by Show and Tell. Keeping Daze or Ponder as extra fuel was not enough anyway since Daze is weak once they have 5+ mana (two Carpets plus Tomb).
+- Surprise: Chant then Show and Tell for Atraxa on their turn 5 with Island, Ancient Tomb and two Carpets of Flowers (Carpets count my Island-typed lands, so Underground Sea and later Undercity Sewers fed them). Atraxa's reveal found City of Traitors, a second Show and Tell, Acererak and a second Chant; on turn 6 they cast Chant again and then looped Acererak (apparently with Aluren) and drained me out from 15 life inside one prompt, with me locked out of casting spells.
+- I took Show and Tell with Thoughtseize (they had Atraxa, 2 Brainstorm, Chant, Carpet too and drew another Show and Tell). Taking Atraxa might have been better.
+- No engine or menu bug seen. Mire could only fetch Island-typed duals (my only Swamp was already out), so I declined that fetch once.

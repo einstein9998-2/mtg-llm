@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 5 (my fifth turn was the last full one; the game ended on the opponent's 5th turn, game turn 10)
+SIDEBOARD: Nothing was really boarded in (my game deck only swapped 1 Pyroblast out of the main for the sideboard slot, so no new cards). Pyroblast (main) was drawn once and countered a Stock Up that was paid for with Carpet of Flowers mana, which was good. Nothing to change.
+EUREKA: n/a (not cast by the opponent; I have no Eureka). Opponent's line was Carpet of Flowers, then Aluren (T4), then hard Acererak the Archlich on T5 into the Lost Mine loop.
+- Mistake, turn 3 (my 3rd turn, game turn 6): I Dazed Carpet of Flowers by returning Thundering Falls. It was paid for (they had an untapped Island), so I lost Daze and tempo for nothing. It also left Force of Will with no blue card to pitch until I drew Ponder, so I could not counter Aluren on their turn 4 (I had FoW but no pitch card). Keep Daze/blue cards as FoW fodder when the opponent has an untapped Island.
+- On their turn 5 Acererak was cast with Aluren out; I cast Force of Will (pitching Ponder, 1 life) on the Acererak spell and the game then ended in an Acererak/Lost Mine loop anyway. I could not see what answered the Force (their possible Force/Chant), the engine ran the loop with no further window for me. Ended on loss from 18 life.
+- The opponent surprised me with Carpet of Flowers + Stock Up on turn 3 off my Islands (I run 4+ Islands, which feeds Carpet), and with Aluren already on turn 4 on 3 lands plus Carpet.
+- No engine bugs seen. Note: Bauble crack ({T}, sac, no mana) draws at the next upkeep, which let me see Ponder for FoW fodder one turn early.

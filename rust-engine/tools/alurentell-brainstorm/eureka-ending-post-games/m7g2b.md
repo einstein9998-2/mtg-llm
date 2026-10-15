@@ -1,0 +1,8 @@
+RESULT: WON
+TURNS: 5
+SIDEBOARD: Boarded in 3 Consign to Memory and 2 Force of Negation (out: Fatal Push x3, Snuff Out, Island, Hydroblast-type slots). None drawn, so no counter was needed; I would keep them in this matchup (the opponent holds Show and Tell, Eureka and Aluren, and counters are the only answer to a resolved Show and Tell).
+EUREKA: n/a (I never cast it). The opponent held Eureka (seen via Thoughtseize on my turn 1, along with Show and Tell, Atraxa, Carpet of Flowers and two Brainstorm) but was stuck on 1-2 lands and never cast it. Note for the matchup: Carpet of Flowers makes mana equal to the Islands I control, so Underground Sea, Undercity Sewers and fetches that find them can power Eureka or Show and Tell. I kept my Island count at one and cracked fetches only at their end step.
+- Good line: turn 1 Thoughtseize took Atraxa (the only payload in their hand), then turn 2 Wasteland on Tropical Island kept them on one land. Moonshadow grows with every permanent card that goes to my graveyard, and I used that (Wasteland, Mishra's Bauble, fetches, surveil Wasteland into the graveyard). Three attackers went from 2 to 14 power in three turns.
+- Possible mistake: I did not cast Bowmasters before combat or hold Kaito mana for ninjutsu. It did not matter, since they had no blockers and no interaction.
+- Surprise: the opponent never played a third land in five turns and cast a second Carpet of Flowers instead of Stock Up. It cast no Force of Will despite leaving Island up.
+- Engine: Mishra's Bauble look-at-top showed no revealed card in RECENT EVENTS. My own permanents and the opponent's lands sometimes show as tapped during the other player's turn (stale display, no effect on play).
