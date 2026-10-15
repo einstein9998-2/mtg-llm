@@ -1,0 +1,9 @@
+RESULT: LOST
+TURNS: 6
+SIDEBOARD: Drew and used Carpet of Flowers (two, cast together on my turn 4 for G each), Orim's Chant (cast unkicked on my turn 5 to stop Force and Stifle so a hardcast Atraxa resolved), Veil of Summer (one drawn, cast to save my Force from Pyroblast, which was wasted). Carpet was excellent: with four Islands on their side two Carpets made 8 mana and a hardcast Atraxa. Chant did its job. Would keep all of them. Prismatic Ending was not drawn (Tamiyo never needed it).
+PETAL: not drawn (the single Petal never showed up in 12ish cards seen). With Carpet making huge mana it would not have mattered here. For white it would only help if no Tundra or Savannah is out. One is fine, but I would not want more than one.
+CHANT_ENDING: Orim's Chant cast and resolved (used as a counterspell-proofer on my own turn). White was not a problem because Carpet could make white mana and Tundra was in play. Prismatic Ending not drawn.
+- Mistake (turn 5, their turn 10): I spent Force of Will (pitching the spare Atraxa) plus Veil of Summer to save Atraxa from Erode and Pyroblast, forgetting Tamiyo Seasoned Scholar was on the table with loyalty 4. She minus-3'd to return Erode to hand and recast it, so I lost Atraxa anyway and burned three cards. Also took 1 from Force. I fell to 2 life and could not stabilize.
+- Mistake (turn 5 earlier): I did not hold back to bait. Better would have been to keep Veil and Force for the Aluren turn and let Atraxa die, but the life total was already low (Phelia and Riddler hit for 7 a turn).
+- Surprise: their Consign to Memory countered Acererak's own enter trigger under Aluren, so he stayed as a 5/5 with no bounce and no venture. Phelia also exiled Aluren on attack.
+- No engine bugs seen. Minor: after I declined the Erode land search the library seemed shuffled anyway (my known top cards changed).

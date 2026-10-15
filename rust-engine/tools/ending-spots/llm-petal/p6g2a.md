@@ -1,0 +1,9 @@
+RESULT: LOST
+TURNS: 5
+SIDEBOARD: Drew and cast Carpet of Flowers (turn 2 of mine) and it was countered by Force of Negation (they pitched Daze) so it never made mana. Drew no Veil, Orim's Chant or Prismatic Ending. Carpet did its job as bait (two of their cards for one) but I would keep it. No Force of Will in my 60 was felt: I had no backup when my only Show and Tell met their Force of Will.
+PETAL: Did not draw the single Lotus Petal. With one Petal it was never going to be a factor in a game that turned on whether the one Show and Tell resolved. One Petal on turn 4 would have been the Daze payment or a fourth mana a turn earlier, so I cannot say exactly one is right or wrong from this game. Would keep exactly one.
+CHANT_ENDING: Did not draw Orim's Chant or Prismatic Ending. White was a real problem on paper: my hand and board never had a white source (I fetched Hedge Maze and Island, not Tundra or Savannah), so neither could have been cast without a deliberate Tundra or Savannah fetch.
+- Mistake, turn 4 (my second turn): I played Boseiju as my land instead of Ancient Tomb. Carpet triggers in each of my main phases, so Tomb + Carpet mana (2 Islands) would have given S&T plus a spare for Daze in main 2 while they were tapped out. I forgot Carpet adds mana in main 2 the turn it lands. Also keeping a 7 with no blue source cost me early tempo.
+- Mistake, turn 8: S&T with exactly one spare mana into five unknown cards. It met Force of Will (pitching Consign to Memory). I think it was forced by the clock (Goyf 4/5 and Bilbo), and the Tomb payment cost 2 life for nothing.
+- Surprise: they used Force of Negation (pitching Daze) on a one-mana Carpet, and Wasteland on my Hedge Maze the turn after I fetched it. Bilbo and Nethergoyf pressure killed me from 14 life in about two attacks.
+- No engine bug seen. The engine ended the game with no prompt for me on their turn 11 (lethal damage from Goyf and Bilbo at 7 life).
