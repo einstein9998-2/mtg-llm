@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 5 (my turn 5 was the last one I played. They won on their turn 5 with Show and Tell, then an Acererak/Aluren drain loop)
+SIDEBOARD: Boarded in 3 Pyroblast for Prismari Charm and 2 Unholy Heat. I drew one Pyroblast and cast it on my turn 4 (their turn) to counter their first Show and Tell, right after Force of Will (pitching Daze) had countered their Orim's Chant. It worked. I would keep Pyroblast in this matchup (Show and Tell, Brainstorm, Ponder and Stock Up are all blue). The other boarded cards (none) were not drawn.
+LIST: n/a
+- Mistake candidate (my turn 5): I tapped out for second Cutter + equip to push 6 damage (11 to 5) while holding no counter in hand, so I had no way to answer the second Show and Tell. Probably fine since I had no instants anyway, but holding back would not have helped either, as the hand was just Volcanic Island.
+- Surprise: Carpet of Flowers counts MY Islands (Thundering Falls and Volcanic Islands), so each dual I fetched or played gave them extra mana. They had huge mana by their turn 3 and cast Orim's Chant (to stop my Force/Pyroblast) in the same turn as Show and Tell. I answered Chant with Force of Will (pitching Daze), then Pyroblast on Show and Tell. They had a second Show and Tell next turn (with Lotus Petal) and I had nothing left.
+- Daze was dead the whole game because of Carpet mana and Island-untapped. Wasteland on Hedge Maze on turn 3 slowed them but Carpet and Ancient Tomb replaced it.

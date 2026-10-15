@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 4
+SIDEBOARD: Boarded in 3 Pyroblast (out: 1 Prismari Charm, 2 Unholy Heat). None drawn, so I cannot judge them; Pyroblast would have been live against Force of Will or Show and Tell. Keep them in this matchup.
+EUREKA: n/a (not cast by either side; I saw no Eureka).
+- Mistake (turn 4): I tapped two of three lands for Murktide while the opponent was tapped out and at 13, leaving only one Volcanic Island up for Bolt. It was not lethal either way (opponent at 7 after the DRC attack, two Bolts only 6), but with one open mana I could answer their turn-4 Aluren only with Force of Will, which they beat with their own Force of Will (pitching Show and Tell). A line that kept Daze or a Pyroblast backup, or Bolting them to 4 on my own turn so Force of Will and Ancient Tomb became unusable earlier, might have won a turn sooner. Bolting to 1 after Aluren was already forced was too late: they had Acererak in hand and looped Aluren/Acererak with Dark Pool lifegain/drain.
+- Surprise: the opponent paid 1 life for Force of Will at 5 life, then 1 more life to counter my Force of Will, and still was alive at 1 with Acererak ready. Also they cast only Brainstorm, Stock Up and Aluren in the first three turns and never touched my board.
+- Engine/menu: the DRC surveil triggers and Force of Will stack were fine; the delve prompt said remaining: 1 throughout, which is misleading. My lands showed as tapped on the opponent's turn in the display even after my untap, which only reflects spent mana from my own turn. No real bug found.
+- Result detail: I killed their life total from 20 to 1 by turn 4 (DRC x2, Murktide on board, two Bolts) but could not close because I had no second burn spell castable on their turn.

@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 3 (I lost during the opponent's 4th turn, before my 4th turn)
+EUREKA: n/a (I did not play Alurentell; the opponent never cast Eureka against me. They used Show and Tell for Atraxa, Grand Unifier on their turn 3, and then Aluren plus Acererak the Archlich on turn 4.)
+
+- Sequence: I led with Nethergoyf and Moonshadow and Wastelanded their Ancient Tomb on my turn 2. Their Show and Tell on their turn 3 put in Atraxa. I put in Flooded Strand (a land, since Show and Tell here allows artifact, creature, enchantment or land, not planeswalker). Atraxa hit me for 7 lifelink on their turn 4. They then cast Aluren. I answered with Force of Will, pitching Kaito, my only other blue card. Aluren still resolved and Acererak looped. I took 1 per lap and was dead that turn with no further interaction possible. The game-over text did not show what stopped Force of Will. It could have been a counter or Daze, and I was fully tapped, so I could not pay for Daze.
+- Mistake: on my turn 3 I tapped all my lands (Ponder, Brainstorm, Goyf) and kept Kaito as my only Force of Will pitch card. I knew Aluren, Acererak and Show and Tell were in their hand. I should have kept one mana up to pay for Daze, and kept a second blue card (a Brainstorm or Ponder) in hand as Force of Will fodder. Playing around Daze with an Island-typed land open matters here.
+- Surprise: they cast two Lotus Petals and Stock Up on turn 2, Show and Tell on turn 3 for Atraxa, and still had Aluren plus Acererak ready on turn 4, after I had already used Wasteland on Tomb. Atraxa's reveal also filled their hand with 6 cards.
+- No engine or menu bug seen. Show and Tell's offer list excluded Kaito (correct per its card text).

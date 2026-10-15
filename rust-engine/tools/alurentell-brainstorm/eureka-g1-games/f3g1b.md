@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 3 (my own turns; I died on the opponent's 4th turn, game turn 7)
+EUREKA: n/a. Eureka was not cast. The opponent won with Show and Tell instead. On its turn 4 it played Boseiju, cast Lotus Petal, then a Veil of Summer, then Show and Tell (paying 2 life from Ancient Tomb). I was tapped out. The opponent put Aluren onto the battlefield and I put Murktide Regent in (a 3/3 flier with no counters). It then cast Acererak free through Aluren and ran the Lost Mine loop with the Dark Pool drain. It went from 11 to 27 life and took me from 19 to 0 in that one turn.
+- Show and Tell in this engine allows lands as well as artifacts, creatures and enchantments.
+- Doubt: my 3rd turn plays. I used Wasteland on Tropical Island (their only green at the time) and did not leave myself any mana or counter for their next turn. I was tapped out and the first Veil of Summer had let them leave only a Petal open. Holding Daze was right. I could not have stopped the loop anyway because the second Veil of Summer made my Daze dead that turn.
+- Surprise: the opponent cast two Veils of Summer in the game (one in response to my Ponder, one right before Show and Tell). The second was a pure shield for the combo. Show and Tell into Aluren, then about 40 free Acererak casts with no mana, drained me from 19 in one turn.
+- No clear engine bug. I did not see whether Veil stopped my last-ditch Daze, because the game ended first.

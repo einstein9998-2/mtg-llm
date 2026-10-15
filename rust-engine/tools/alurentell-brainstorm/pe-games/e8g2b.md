@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 3
+SIDEBOARD: Drawn and cast: Consign to Memory (in hand, never castable: all my lands were tapped when the loop started), Daze (cast on turn 2 to counter their Stock Up while they were tapped out). Boarded-in Consign to Memory is the right card in theory (it counters the Acererak return trigger and stops the loop), but I tapped out on my own turn 3 and never had U open. Keep it, and keep 1 mana open on their turn 3 when they have Ancient Tomb, Carpet and Aluren/Acererak.
+LIST: n/a
+- Mistake (turn 3): I played Sewers (entered tapped) and cast Thoughtseize, which left me with zero untapped mana. The opponent drew and cast Aluren plus Acererak on their turn 3 and ran the full Lost Mine loop in one main phase; I got about 280 priority windows but no mana for Consign to Memory (it would have countered the first Acererak ETB trigger and stopped the loop). Better turn 3: Thoughtseize was fine, but I should have kept a land untapped (play Delta instead of Sewers, or skip Thoughtseize) once I saw Ancient Tomb x2 and Acererak in their hand. I also took Atraxa with Thoughtseize instead of Acererak; Acererak was the actual combo piece (they topdecked Aluren).
+- Daze on turn 2 cost me a land drop (bounced Sewers, replayed it tapped on turn 3), which is what left me with only one usable mana on turn 3.
+- Surprise: Aluren is symmetric, so I could free-cast Borrower at instant speed, but it was irrelevant. The opponent resolved all 15+ room triggers on the stack and only Dark Pool drains; I lost 1 life per lap, with no draw.
+- Engine note: Undercity Sewers entered tapped on my second land (should enter untapped with two or fewer other lands: I had one other land).
