@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 4
+MANA: n/a
+Opponent Wasteland: not seen on their side. I used my own Wasteland on turn 3 to kill their tapped Hedge Maze while they sat on 2 lands (Hedge Maze plus an uncracked Prismatic Vista); they then fetched basic Forest and played Tropical Island and Ancient Tomb, so it only cost them one turn of development.
+- Mulligan to 6 (first 7 had one colorless land and three Cori-Steel Cutters). Kept Island, Wasteland, Daze, Bolt, DRC, Bauble and bottomed a Bauble. Bauble, Preordain surveil and Bolt face got DRC to a 3/3 flyer, opponent from 20 to 9 by game turn 8.
+- Likely mistake: on opponent's turn 4 I Dazed a fully tapped-out Aluren, but it still resolved (probably a Force of Will in response, hand had 4 cards left). My own Force of Will was dead in hand (Island, FoW, Bolt: no second blue card to pitch), so I had no answer and the opponent looped Acererak (Lost Mine drain) for the win on their turn 4 while I sat at 19. Holding Daze for a later window or keeping a second blue card would not obviously have helped; the real problem was no free blue card to back up FoW.
+- Surprise: opponent cast Veil of Summer main phase on turn 4 with no blue/black spell cast by me (looked like bait or just a pre-protection play), then Lotus Petal into Aluren with Ancient Tomb. Aluren on turn 4 with an Acererak loop already available is very fast.
+- Engine: pay=Island on a Dragon's Rage Channeler cast tapped Volcanic Island instead of the basic Island (name probably matched Volcanic Island); using the v-id (pay=v17) worked the next time. Also the game ended during a surveil prompt with no stop for me while the loop ran (no blue card to pitch, so nothing castable anyway).

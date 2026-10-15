@@ -1,0 +1,11 @@
+RESULT: WON
+TURNS: 7
+MANA:
+(1) Blue source: turn 2 (Island fetched with Polluted Delta; the Delta played turn 1 was only a fetch). Two green sources: turn 3 (Forest fetched turn 2 plus Tropical Island played turn 3). Mulliganed to 6 (first seven had no cantrip or creature), kept Tropical, Delta, Stock Up, Show and Tell, Atraxa, Acererak.
+(2) I saw the opponent's Wasteland on their turn 2 (cast). Turn 2: I played Misty, cracked Delta (Island) and Misty (Forest) and held Tropical in hand, so nothing was exposed (cost 2 life; I had also misread Stock Up as {1}{U}, it is {2}{U}, so the mana was unused anyway). Turn 3: Wasteland was tapped, so I played Tropical safely and cast Show and Tell (Daze paid with the Petal, then it was Forced away). Turn 5: I played Ancient Tomb as the spare for Daze and cast Aluren with the other four lands; they used Wasteland on Tomb in response, then Dazed Aluren with no spare left. That was the Wasteland cost: Aluren lost, 4 life of damage while stalled.
+(3) No colour problem: Acererak is never castable by hand (I never had a black source), only via Aluren. Show and Tell and Aluren were stopped by Daze/Force, not by colours.
+(4) Land mix was fine for green and blue; this deck has no black source, which only matters for hardcasting Acererak. A spare basic or fetch for the Daze payment instead of Tomb would have been better against an untapped Wasteland.
+- Mistake: turn 5, using Tomb (Wasteland-able) as the Daze spare into an untapped Wasteland; also turn 6 Ponder with Bowmasters on board cost 1 life plus a counter on the Army (it also dug to the Show and Tell I needed). Misread Stock Up cost on turn 2.
+- Surprise: they cast Daze, then Force on my turn-3 Show and Tell, Wastelanded my Daze spare on turn 5, and then did not attack into untapped vigilance Atraxa. On my turn-6 Show and Tell they put in a land and flashed a second Bowmasters; they later Forced Aluren pitching Kaito.
+- Won on turn 7: Ponder dug the Show and Tell at 5 life, Atraxa stabilised and lifelinked, my Force of Will (pitching Show and Tell) beat their Force, then the Lost Mine Aluren loop drained them from 9 (three macro chunks).
+- No engine bug seen. Odd: the menu gave no Daze payment choice after Wasteland removed my only spare (auto-failed).
