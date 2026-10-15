@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 5
+SIDEBOARD: Drew Force of Will and Force of Negation in the opening hand (Consign to Memory never drawn, Hydroblast and others not boarded). I never cast either one. The opponent had Veil of Summer (twice, cast in main 1 before Show and Tell and again before Aluren), so every counter was dead on the turns that mattered, and on the one turn without Veil I only faced Brainstorm and Ponder (not worth a two-for-one). Counters were not good here, and the missing Fatal Push/Snuff Out left me no answer to Atraxa. I would keep Force of Will, but Force of Negation looked weak (only 3 mana or a two-for-one).
+PETAL: n/a
+CHANT_ENDING: n/a
+- Mistake candidate, turn 4 (my second turn): Thoughtseize took Aluren but left Show and Tell plus Atraxa to come back via Brainstorm, Ponder and Stock Up, and I should have kept Wasteland pressure on their lands earlier and not saved it as mana. Also I did not fire a counter at Carpet of Flowers or Orim's Chant, which let a main 2 Show and Tell resolve into Atraxa (Chant stopped my reply). Hard to know if a counter on Chant would have changed anything.
+- The opponent put Atraxa back with Brainstorm (then reshuffled with a fetch), recast Show and Tell for a second Atraxa to refill its hand, and played Veil of Summer main phase 1 to blank my counters. Atraxa (7/7 lifelink flier) outraced my board and I had no removal, no Kaito or Borrower drawn. It then cast Aluren with Veil up and looped Acererak while I was at 3.
+- No engine or menu bug seen. Minor: Flooded Strand only fetches Plains or Island (Underground Sea ok). Auto macro with "Pass priority" worked fine to finish the Acererak loop.
