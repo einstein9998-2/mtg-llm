@@ -1,0 +1,9 @@
+RESULT: LOST
+TURNS: 10
+PROTECT: My main deck had two Orim's Chant (no Veil). I never drew one in 10 turns, so it protected nothing. Against this opponent it would have been live: they held up Force of Negation, Force of Will, Consign to Memory and Stifle on every key spell (Show and Tell, Atraxa, Atraxa's trigger, Aluren) and I had no way to stop those besides Force of Will.
+Chant on the Show and Tell or Atraxa turn would likely have won the game. A second Chant would have been better than nothing; I would not swap it for Veil here, since Veil also does nothing against Swords/Stifle on the trigger. (Veil would stop Force of Will and Force of Negation just as well; no strong preference, both are good vs blue.)
+
+- Mistake, my turn 6 (game turn 11): their Force of Negation was on my Show and Tell and I had meant to Force it back (I held two Force of Will and the opponent was almost tapped out). I sent pick index 0 (Pass) instead of 1 (Force of Will) because the menu only listed Force as [1] and I mis-keyed. Show and Tell was exiled and I never recovered. This was entirely my error.
+- Earlier decision I would redo: on turn 5 I let Swords resolve on Atraxa (gain 7) instead of Forcing it; fine in itself, but I then ran out of Force of Will when it mattered (Atraxa cast on turn 7 was Forced, I countered it, they then Consign'd the trigger and Swords'd the body).
+- Opponent surprises: they Wastelanded my Ancient Tomb on their turn 2, Stifled my fetchland activation (Flooded Strand) at their end step, hard-cast Force of Negation on my turn, and used Consign to Memory on Atraxa's enter trigger, then Tamiyo returned Swords/Force of Will. Quantum Riddler hit for 4 each turn and Murktide finished.
+- No engine bugs noticed. Stock Up, Brainstorm and Atraxa gave me 4 copies of Aluren in hand and never an Acererak (0 of 4 seen in about 25 cards), so the loop never had a payoff.

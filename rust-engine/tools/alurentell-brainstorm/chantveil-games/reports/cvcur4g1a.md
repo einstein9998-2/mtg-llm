@@ -1,0 +1,9 @@
+RESULT: LOST
+TURNS: 4
+
+PROTECT: I did not draw Veil of Summer or Orim's Chant (the main deck has 2 Veil of Summer, no Chant); I saw only 11 cards, so there was nothing to cast and nothing to protect. Even if drawn, Veil would have been awkward here: my only green sources were fetched Tropical/Savannah (Hedge Maze was Wastelanded on their turn 3), and the real problem was a 3-DRC flying clock, which Veil does not touch.
+Would I rather have had Chant than Veil? Not in this game: Chant (kicked, on my turn) would only have stopped combat damage for one turn, and the game was lost on mana and life, not on counters. Against UR Cutter's Force/Daze Veil is still the better card for the combo turn; Chant would matter only to buy a turn against this DRC rush.
+
+- Mistake (turn 2 to 3): I kept an Aluren + 2 Acererak hand with only one real green source (Hedge Maze) and no cantrips. After Wasteland hit the Maze, Aluren needed two life-costing fetches, and by the time I had the mana (my turn 4) the three DRCs (two 3/3 fliers, third equipped by Cori-Steel Cutter to 4/4 haste) had me at 1 life, so I could not crack a single fetch. A mulligan or at least playing a fetch early (turn 2, paying life while still healthy) would not have saved the clock either; the keep was too slow against turn-1 DRC with delirium by turn 2.
+- Surprise: the opponent had Daze, Bauble and Ponder fill the graveyard so DRC was a 3/3 flier on turn 2; two DRCs on turn 2/3 and a third equipped DRC on turn 4 gave 10 damage a turn, faster than any Alurentell hand without Show and Tell mana. Wasteland on Hedge Maze (my turn-1 land) came on their turn 3.
+- No engine or menu bug seen. The Hedge Maze surveil showed Misty Rainforest on top and I kept it; draws were Strand, Misty, Misty, Aluren (no cantrip, Petal, Ponder or Brainstorm in 5 draws).

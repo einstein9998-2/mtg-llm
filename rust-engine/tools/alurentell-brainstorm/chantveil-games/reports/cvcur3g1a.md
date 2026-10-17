@@ -1,0 +1,8 @@
+RESULT: WON
+TURNS: 7
+PROTECT: My main deck has 2 Veil of Summer (no Orim's Chant main). I never drew or saw one, so it was never cast. Protection came from Force of Will found with Stock Up (taken with Atraxa as the pitch card): on my turn-7 free Acererak cast they Forced it (pitching Daze), I Forced back (pitching Atraxa) and the loop ran to the win with them tapped low and on one card.
+Would I rather have Chant here? No. Veil is the better card against UR Cutter in game 1 (beats Force and Daze before the combo spell, and Pyroblast is not in the main deck); Chant would only have been a one-turn tool.
+- Mulligan: first seven had zero lands, mulled to 6 (kept a one-lander with Ponder, Petal, Show and Tell, Aluren, Acererak, bottomed Stock Up). Turn 2 Show and Tell for Aluren resolved (they had just Wastelanded my Tropical and had no Island, so no Daze). Their put-in was Polluted Delta, which then fetched Volcanic and Dazed my first free Acererak (no mana to pay, my only land tapped); that cost me five turns of digging.
+- Possible mistake: turn 2 I spent all my mana on Show and Tell with no Daze spare, relying on them having no Island. The put-in Delta then gave them an Island for Daze, which I did not foresee (Show and Tell hands them a land, ST17).
+- Surprise: they did nothing on their own turns for a long time except cantrips (Ponder, Preordain, Brainstorm), holding Daze and Force; Wastelanded my Ancient Tomb on turn 5; their Force was pitched Daze for the final stand.
+- No engine bug. Notes: Ponder draws a card after the look (shows 3 but the order menu listed duplicates once); the macro finished the 17-life drain in about 300 picks.

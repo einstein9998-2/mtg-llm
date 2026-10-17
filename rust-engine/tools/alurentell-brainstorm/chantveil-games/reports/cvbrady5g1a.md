@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 5
+PROTECT: I did not draw Orim's Chant or Veil of Summer (this deck has 2 Orim's Chant). Nothing to cast, so nothing protected and it was never dead. I had Force of Will in the opening hand (they Thoughtseized it on their turn 3) and drew a second one on my turn 5, but it had no blue pitch card once Show and Tell was cast, so I did not rely on it.
+Would rather have had the other: no strong view. Against this Dimir deck (Thoughtseize, Daze, Force, Wasteland, Fatal Push) a Chant on my own combo turn is good, but Veil also beats Force/Daze and draws a card from their counter, and their removal is black or blue, so Veil's hexproof covers it; Veil probably slightly better.
+- Mistake candidate: turn 4 I cast Stock Up into their open Sea instead of Show and Tell, and they Forced it (Brazen Borrower pitched). That cost me nothing real (it spent their Force plus a card), and the following turn they were tapped out, so the line worked. Also Hedge Maze (my turn 1 land) was Wastelanded on their turn 2, leaving me on two lands until the Strand.
+- Surprise: after Show and Tell for Aluren they put in Orcish Bowmasters, which did not matter. They tapped out on their own turn (Flow State, Brainstorm), leaving only free Force/Daze/Snuff Out as outs, and held nothing.
+- Engine: no bugs. The loop macro ran 124 picks; opponent never responded. Opp went from 15 to 0 in one turn (my turn 5) via Lost Mine/Dark Pool.

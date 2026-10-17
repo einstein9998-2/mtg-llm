@@ -1,0 +1,9 @@
+RESULT: LOST
+TURNS: 9
+PROTECT:
+- Drew Veil of Summer in my opening 7 (kept it in the 6-card hand) and never cast it. I had at most one green source on the battlefield for one turn (Boseiju, Wastelanded at once), and no combo spell was ever castable. Veil never had a blue spell of theirs to draw from on a turn I could use it. It was dead because of land screw (no lands), not because of the matchup. The other Veil or Chant copy was never seen.
+- Would I rather have had Orim's Chant in those two slots against this opponent? Veil is fine against Daze, FoW and Charm for a Show and Tell turn, but it needs G and does nothing against Bolt, Heat or Pyroblast; Chant (U or W kicker) is castable off an Island, but costs more than I could ever afford here. Roughly equal; I would not change the slots on this game.
+Bullets:
+- Mistakes: (1) At the turn-6 cleanup I discarded Atraxa instead of the spare Show and Tell by misreading the menu index (the list had shifted by one after drawing Ponder). (2) Keeping a one-land 6-card hand (Misty, Ponder, FoW, Veil, S&T, Atraxa) after a first mulligan was a real risk: sim said 57 percent for three lands by turn 3. Ponder found Tomb, Brainstorm, S&T, no basic land, then Wasteland hit Tropical and Tomb and Boseiju (three Wastelands) so I never had a second blue source.
+- Surprise: UR cast no early threat and spent three Wastelands on my lands, then dropped two Cori-Steel Cutters and two DRCs; Daze on my Force of Will (I could not pay) and again on a lone Lotus Petal.
+- Engine/menu: with no castable spells the engine auto-passed 48 windows including whole turns, and discarding to hand size happened without any way to see the next menu index change; also the OrderTop prompts do not say which end is top (first chosen = top, confirmed by the library-top line).
