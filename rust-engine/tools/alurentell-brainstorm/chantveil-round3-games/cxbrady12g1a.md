@@ -1,0 +1,9 @@
+RESULT: WON
+TURNS: 2 (my own turns; the Aluren and Acererak loop killed from 20 on my turn 2, game turn 4)
+PROTECT: Main deck has Orim's Chant x2, no Veil. I drew neither Chant, so it never mattered. Protection was Force of Will x2 (one drawn off Ponder/draw, one in the opening hand).
+PROTECT: On turn 2 I cast Show and Tell (Island + Ancient Tomb) into their open Planar Nexus and Urza's Mine. They cast Force of Negation by pitching Consign to Memory. I answered with Force of Will (pitching my second Force of Will, keeping Brainstorm), Show and Tell resolved, I put in Aluren, and Acererak looped on Lost Mine to 0. They never found a second counter; they had 3 cards left and put in Urza's Tower.
+PROTECT: Would I rather have had Veil here? Veil would have been better than Chant: it beats Force of Negation and Force of Will outright (they only had free counters, no Daze), while Chant needs W and G mana I did not have (no green or white source all game). Chant was effectively dead in this deck on this game (no Daze or tapping-out decisions on their side), so Veil would be the better pair against blue-tron.
+
+- Mistake: none significant. Keep was fine (Island, 2 Ancient Tomb, Brainstorm, Ponder, Force of Will, Acererak). Ponder found Show and Tell and Force of Will; I ordered Show and Tell on top (first chosen card ends up on top, confirmed).
+- Surprise: their Force of Negation on my turn-2 Show and Tell with only 2 lands (pitching Consign to Memory), and Planar Nexus being a blue source, so Consign on Acererak's triggers was possible but never happened.
+- Engine/menu: none seen. Ponder draws a card on resolution (hand showed Show and Tell before my draw step). The Force of Will pitch prompt came after target choice. The loop macro ran about 164 picks in 3 chunks without a hitch.

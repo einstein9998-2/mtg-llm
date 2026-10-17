@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 5
+PROTECT: n/a
+
+- Mistake, my turn 5 (opponent's turn 6 response window): I tapped 4 lands for Ugin, the Ring and a land on my own turn and left only Island plus one Tower up. When they cast Veil of Summer, Aluren and Acererak I had four mana, so Giant's Boulder (7) could not hit Aluren. A second misplay: when Eldrazi Confluence asked for a third target I chose Done, not knowing that was Ugin's "whenever you cast a colorless spell, exile up to one target colored permanent" trigger. I could have exiled Aluren (or Acererak). Their Force of Will (made uncounterable by Veil) then countered the Confluence anyway.
+- Surprise: opponent Show and Telled Atraxa on their turn 3 (I answered the Atraxa trigger with Consign to Memory, but they Forced it), then played three Stock Ups and three Lotus Petals, Veil of Summer main phase, Aluren, and ran the Acererak Lost Mine loop in a single turn (turn 6) from 14 life to dead. Veil made their Force of Will and all Acererak casts uncounterable, so my two Forces of Will were dead cards. A third Atraxa and a second Show and Tell were also in their deck.
+- Cards: The One Ring recast from hand (legend rule resets burden counters, protection from everything stopped one Atraxa attack) and Ugin's cast trigger exiling Atraxa worked well. Planar Nexus appears to count as a Tron piece (Tower made 3 with Mine and Nexus).
+- Possible menu issue: the Legend Rule prompt listed both The One Ring copies with identical labels (no id), and the Confluence mode and Ugin trigger targets were unlabeled, so the Ugin trigger looked like a third Confluence target.

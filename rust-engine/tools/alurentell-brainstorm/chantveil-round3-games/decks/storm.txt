@@ -1,0 +1,40 @@
+# Storm (Beseech Storm: Beseech the Mirror / Burning Wish / Gamble / Echo of Eons) | Combo (LED / Wish storm)
+# Source: Brady's own list, posted in the project chat 2026-10-06 01:40Z (not a tournament list). It matches, in the main deck, the Beseech Storm lists
+# Otazz, 9th, MTGO Challenge 32, 2026-10-02 (https://mtgtop8.com/event?e=91634&d=895876&f=LE) and yonthan910, 1st, MTGO League, 2026-09-23 (https://mtgtop8.com/event?e=91187&d=892595&f=LE); only the sideboard differs (2 Veil of Summer here, 2 Carpet of Flowers there).
+# Replaces the TES list of 2026-10-06 (kept as decks/storm-tes-alt.txt). Banlist as of 2026-08-10. Format: N Card Name; blank line, then sideboard.
+
+1 Badlands
+1 Bloodstained Mire
+1 Raucous Theater
+1 Scalding Tarn
+1 Taiga
+1 Underground Sea
+4 Urza's Saga
+2 Verdant Catacombs
+4 Hexing Squelcher
+1 Runehorn Hellkite
+3 Beseech the Mirror
+4 Burning Wish
+4 Dark Ritual
+3 Echo of Eons
+1 Gaea's Will
+4 Gamble
+1 Tendrils of Agony
+2 Veil of Summer
+4 Chrome Mox
+4 Giant's Boulder
+4 Lion's Eye Diamond
+4 Lotus Petal
+4 Mox Opal
+1 Song of Creation
+
+1 Beseech the Mirror
+4 Boomerang Basics
+2 Boseiju, Who Endures
+1 Echo of Eons
+1 Empty the Warrens
+1 Haywire Mite
+1 Peer into the Abyss
+1 Thoughtseize
+1 Tendrils of Agony
+2 Veil of Summer
