@@ -1,0 +1,9 @@
+RESULT: LOST
+TURNS: 7
+PROTECT: I never drew Orim's Chant (2 in the main deck) or Veil (not in the main deck). Never cast, never dead, because never seen. In practice neither slot would have helped much as built: the opponent's answers were Force of Will (x2 on Show and Tell), Stifle on my fetch and Wasteland on Tropical Island; Chant needs W (I had only Island and Tropical Island, no white source all game) so it was close to uncastable, and kicked Chant costs WW on top of the 3 for Show and Tell.
+I would rather have had Veil of Summer in those two slots against this opponent: one green mana (Tropical Island) makes Show and Tell uncounterable by Force of Will and Force of Negation, and it draws a card if they Force.
+
+- Mistake, my turn 4 (prompt 70): the opponent's Force of Will was on the stack targeting Show and Tell, I held Force of Will plus Brainstorm to pitch, and I picked index 0 (Pass priority) instead of index 1 (Cast Force of Will). My written reason said I was forcing back, so this was a menu misread. It cost the game: Show and Tell was countered, and on my turn 6 the second Show and Tell was Forced again with no backup left (I spent my Force on Murktide Regent).
+- Other mistakes: turn 2 I took Stock Up instead of jamming Show and Tell into a tapped-out opponent (Stock Up found Acererak and a Petal, not protection); turn 3 I cracked Misty Rainforest into one open Tundra and it was Stifled (the Savannah never came), then Wasteland took my Tropical Island.
+- Surprise: the opponent used Stifle on a fetchland ability and still had two Forces of Will for my two Show and Tells; they also turned Phelia plus Tamiyo into a growing 5/5 clock that Phelia reuses by flickering Tamiyo each attack.
+- Engine/menu: no bug. The Ponder order prompt is confusing: the first card chosen was the top card. "No" to the Ponder shuffle still drew a card, as expected.

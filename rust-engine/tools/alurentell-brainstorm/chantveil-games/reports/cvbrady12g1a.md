@@ -1,0 +1,11 @@
+RESULT: LOST
+TURNS: 8
+PROTECT:
+- I mulliganed a zero-land seven, kept a six (Misty, Tomb, Petal, Brainstorm, Stock Up, Acererak). I drew Orim's Chant on turn 6 (my sixth turn), but it was never castable: it needs W, and my only lands were Island, Hedge Maze and Tropical Island (Tundra and Savannah were gone or never found). The second copy and Veil were not in play. Chant was dead in hand the whole game, and there was nothing to protect until my last turn.
+- My last turn (life 2, three lands) I cast Show and Tell (putting Aluren) into open Tundra, Snow Island and Volcanic; they paid with Force of Will (pitching a blue card, 1 life) and I had no backup (no Force, no W for Chant). Chant (kicked, WW) would have stopped Force of Will and their attack, but only with white mana I did not have.
+- Would I rather have had Veil in these slots? Against this deck (Wasteland, Force of Will, Stifle, Swords, no Daze) Veil of Summer (G) would have beaten Force of Will and Force of Negation on a green-capable manabase, and costs one coloured mana I can actually produce; Chant needs W, which my duals and fetches struggle to provide. Yes, Veil.
+- Mistakes and notes:
+  - Turn 2: I played Ancient Tomb and then cracked Misty with the Tomb untapped. They Wastelanded the Tomb in response, since the menu has no way to tap lands for mana first. I lost the land drop and my Stock Up turn. Should have cracked the fetch first, or cast Stock Up using Tomb mana before cracking.
+  - They Wastelanded a land on nearly every turn (four Wastelands total, used right when I played a nonbasic: Tomb, Hedge Maze, Tundra). I fell to two lands and drew almost no lands afterwards (Aluren on top twice), so I could not cast anything until turn 8. The deck of four-mana-plus combo cards cannot survive that Wasteland pressure on a mulligan to six.
+  - The opponent kept up almost nothing on its own turns, cast Phelia at my end step, warped Quantum Riddler, then Murktide Regent. Phelia plus Murktide killed me in four hits. I had no way to block or race.
+  - Engine/menu: auto-passed windows skipped my turns 5 and 6 (nothing castable), which was correct. No bugs seen. Land mana is not tappable in the menu, so a land can be Wastelanded in response to a fetch before its mana is used.

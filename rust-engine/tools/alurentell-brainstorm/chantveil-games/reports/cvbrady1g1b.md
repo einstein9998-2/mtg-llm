@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 7
+PROTECT: n/a
+
+- Mistake (my turn 7, post-combat): I tapped out for Murktide Regent with the opponent at 6 and a board of 3/3 DRC plus 4/4 Murktide, and only Force of Will (pitching my last blue card, Daze) as backup. On their turn 8 they cast Aluren off Tropical Island, Island, Hedge Maze and a Lotus Petal. I Forced it and they Forced back by pitching Atraxa. Aluren resolved with my lands tapped, so I could not cast Unholy Heat on a looping Acererak, and the Acererak loop gained them a life per lap and drained me. Holding up Heat mana and not casting Murktide might have let me Heat the first Acererak (or the Daze plus Force pair could have stayed up). I was one attack from winning (7 flying power against 6 life).
+- Surprise: the opponent had a second Force of Will, pitching Atraxa, in response to my Force. They also kept Lotus Petals and a Brainstorm chain open instead of casting Show and Tell. I Wastelanded Ancient Tomb, Savannah, Tropical Island and City of Traitors on turns 2 to 5 and kept them on one land for several turns, but they recovered with Hedge Maze, a fetch into Tropical Island and two Petals.
+- Engine/menu note: during Murktide's delve choice the graveyard display did not update between picks (four Wasteland picks showed the same list, remaining always 1). It was fine in the end, but it was confusing to count. The tapped/untapped display of the opponent's lands on my own turn also looked stale.
+- The game ended while I was still answering my Dragon's Rage Channeler surveil prompt (Cori-Steel Cutter on top). The opponent's whole Acererak loop ran inside that window, with no chance to respond because I had no untapped mana and no free spell.

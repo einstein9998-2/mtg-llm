@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 2
+PROTECT: I drew Veil of Summer twice (one from the Stock Up on turn 2, one from a Brainstorm) and cast one of them, free through Omniscience, before Aluren, so Force of Will could not counter it. It was never tested: the opponent never cast a counterspell. The second Veil stayed in hand. Veil was not dead, but I only had it because Omniscience made the digging free.
+Orim's Chant is not in this main deck (the main has 2 Veil), so no choice was made. Against this opponent (Force of Will, Force of Negation, Stifle, Swords, Wasteland), I would not swap Veil for Chant: Chant would also have stopped Swords and Stifle for a turn, but costs mana and was not needed here. The one real interaction was Swords on Acererak, which Veil does not stop and which free Force of Will beat.
+- Line: keep (two fetches, Petal, Stock Up, Force of Will, Show and Tell, Atraxa), Strand turn 1 left uncracked then fetched Hedge Maze at their end step (surveil kept Acererak on top). Turn 2: Misty for Island, Petal plus two lands, Show and Tell for Omniscience, free Stock Up/Ponder/Brainstorm found Aluren, Veil and a second Acererak, then the Lost Mine loop killed from 19 in about 460 auto picks.
+- Opponent surprise: they put in Arid Mesa from Show and Tell and answered the loop's first Acererak trigger with Swords to Plowshares; free Force of Will countered it. They had 2 cards left and never used Stifle.
+- No mistake of note; no engine bug seen. Reason text containing a colon and some words broke the shell once on the keep pick (harmless).

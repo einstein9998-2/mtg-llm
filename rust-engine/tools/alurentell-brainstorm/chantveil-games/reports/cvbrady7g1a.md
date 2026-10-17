@@ -1,0 +1,9 @@
+RESULT: WON
+TURNS: 3
+PROTECT: My deck had two Orim's Chant (no Veil of Summer). I drew one Chant, but only during the Acererak loop (a free draw off the Temple of Dumathoin), after the game was already decided. I never cast it, and nothing needed it. No white mana was needed.
+The opponent was tapped out and never cast a counterspell, Daze or Force. Force of Will was my backup: I drew two more in the loop but never pitched or cast them.
+Before the combo, Chant would have been awkward: no white source in play (Tundra went back into the library) and nothing to protect. I would not rather have had Veil of Summer here. UB Tempo's interaction is Force, Daze, Push and Bowmasters, so Veil might have been better in principle, but its green mana was not available either.
+- Line: turn 1 Hedge Maze (binned Atraxa) and Petal. They Thoughtseized my Aluren. Turn 2 Brainstorm, Misty for an Island, Brainstorm again. Turn 3 (they were tapped out) Tomb, Show and Tell for Omniscience with a Petal spare for Daze, then free Acererak and the Lost Mine loop. Their Show and Tell put-in was Orcish Bowmasters. Its draw pings were offset by Dark Pool lifegain. I won on my third turn from 17 life. Their life ran 17 to 0 in a single turn at about 300 auto picks.
+- Possible mistake: putting back Tropical Island and a second Petal on the second Brainstorm. I kept Force of Will over Petal because I had no blue card to pitch to it, so Force was only good once Omniscience was in play. It worked out here. A second Daze spare would have been safer if they had held Force.
+- Surprise: they put in Bowmasters, and it did not matter. The macro had to stop and pass priority each lap on its trigger. I added a rule `stack:top[Bowmasters]:Pass priority`, which worked.
+- No engine or menu bugs. My keep prompt picked the right option, but the shell ran my reason text after the semicolon as commands (harmless, "T2: command not found").
