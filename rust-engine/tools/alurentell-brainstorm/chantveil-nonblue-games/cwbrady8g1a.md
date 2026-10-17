@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 2
+PROTECT: I did not draw Orim's Chant (neither copy; no Veil in this main deck). Nothing was cast and nothing was needed: the opponent (Storm) held one card, never responded to Show and Tell, to Aluren or to any of the free Acererak casts, and put nothing in with Show and Tell. Chant was never dead or awkward because it never appeared. The deck has no Veil in the main (two Chant). Against this opponent I would rather have Veil only if it protects against their Veil of Summer or discard, which it does not, so Chant is fine: it stops a Tendrils or Wish chain on their turn or in response to a ritual, and it also lets me kick through a combo turn. Veil would do little here (they have no blue counters and no blue or black targeted removal).
+- Line: kept Misty, Hedge Maze, Petal, Brainstorm, Ponder, Aluren, Acererak. T1 Tropical Island, Ponder (found Show and Tell, Stock Up, Island), Petal. T2 Misty for Savannah, Show and Tell putting in Aluren, free Acererak, then the Lost Mine loop with the macro (about 156 auto picks) drained from 19 to 0 in my second turn.
+- Mistake: none of note. Opponent did Gamble, Petal, Mox Opal, LED on turn 1 and only a land on turn 2 with one card in hand, so they never got going.
+- Surprise: opponent put nothing in with Show and Tell and did nothing at all in response to a 150-cast loop.
+- No engine bugs seen. Ponder's order prompt put the first card chosen on top.

@@ -1,0 +1,8 @@
+RESULT: WON
+TURNS: 3
+PROTECT: I never drew Veil of Summer or Orim's Chant in hand (one Orim's Chant showed up in an Atraxa reveal and I skipped it). Nothing to cast, nothing to protect, so neither was ever dead or awkward. The opponent never cast a spell that needed an answer. They had 3 cards and one untapped Badlands when I went off, and there was no counterspell on their side.
+Would I rather have had the other one in these two slots: Chant over Veil against Storm. Storm has no blue spells, so Veil's counter and hexproof-from-blue-and-black does little against its combo. Chant (kicked) on their turn stops the one spell that kills me, and my free Force of Will under Omniscience does the same job.
+- Line: kept Tropical, 3 Ancient Tomb, Stock Up, 2 Omniscience. T1 Tropical. T2 Tomb and Stock Up, took Show and Tell and Atraxa. T3 Show and Tell put in Omniscience (they put in Hexing Squelcher). Then free Atraxa, Aluren, Stock Up, a second Atraxa for a second reveal that found Acererak, and the Lost Mine loop with Aluren killed them from 19 in one turn. Opponent never got a turn after T2.
+- Mistake: none big. A pick command with a semicolon in the reason text ran as a shell command. The land play went through, nothing was lost. Avoid semicolons in reasons.
+- Surprise: the opponent spent turn 2 casting Gamble twice and binning Chrome Mox and Mox Opal, and cast nothing else before I won.
+- Bug note: Atraxa's reveal listed the library "top" in an order that did not match the next Stock Up (Stock Up showed cards that were on the bottom). I could not tell whether that was bottomed-card shuffling or a display issue.

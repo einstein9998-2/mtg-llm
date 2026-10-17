@@ -1,0 +1,8 @@
+RESULT: WON
+TURNS: 3
+PROTECT: My main deck has Veil of Summer x2 (no Orim's Chant). I never drew a Veil, so none was cast. The only protection I held was Force of Will (drawn in the opening hand, never cast): the opponent tapped out on its own turns 2 and 3 (Ajani, then Wasteland plus Voice of Victory), so no Swords was possible on my turn and nothing needed countering. I chose not to pitch Stock Up or Show and Tell to Force Ajani or Voice. Under Omniscience the Force would have been free anyway.
+Would I rather have had Chant than Veil here? Neither mattered. Veil is a blank against Boros in game 1 (no blue or black spells to stop), and Chant would only be a spare turn-of-combo card against a tapped-out deck, so no strong preference.
+- Line: T1 Strand to Island, Ponder (kept Show and Tell and Acererak on top), 2 Petals. T2 Ancient Tomb and Stock Up, took Omniscience and a second Acererak. T3 (after Wasteland on my first Tomb) Tomb, Show and Tell paid with Island and 2 Petals for Omniscience, then looped Lost Mine without casting Aluren (AL8). They put in Goblin Bombardment, which did nothing. Dark Pool took them from 20 to 0 in one turn.
+- Mistakes: none big. I considered Aluren on T3 but it would have given them free creatures, so Omniscience was right.
+- Opponent: Wasteland on my Tomb on its turn 3, then tapped out for Voice of Victory; it never held up Swords, which made my Show and Tell turn safe.
+- Engine: Ponder draws one card as part of the cast (the top-order prompt came before the draw). The auto macro ran about 600 picks in one turn with no problems. Nothing looked like a bug.

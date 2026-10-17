@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 3
+PROTECT: n/a
+- Game flow: kept 7 (Plains, Arid Mesa, Karakas, Guide, Raptor, Ajani, Bombardment). T1 Plains + Guide of Souls, T2 Mesa to Plateau + Ajani, T3 Karakas + Voice of Victory, Karakas bounced Atraxa, attacked with Guide, Ajani, Cat and Raptor (Guide put 2 counters and flying on Raptor) for 8, leaving the opponent at about 9. The opponent (on the play) Brainstormed twice, cast Show and Tell on their turn 3 (I put in Amped Raptor, they put in Atraxa and dug 5 cards), Forced something, then on their turn 4 ran an Aluren plus Acererak loop and drained me out from 23 life in a single turn.
+- Possible mistake (my turn 3): I tapped Karakas on my own turn to bounce Atraxa and attack, so it was tapped on their turn. It could not have stopped the Acererak loop anyway, but I had no instant-speed or reach plan at all; the opponent was one turn from dead if they had not combo'd. A faster clock (cast Raptor or Ajani #9 instead of Voice for more attackers) would not have been lethal either.
+- Surprise: Show and Tell on their turn 3 (3 lands, 17 life) into Atraxa, then Aluren plus Acererak the very next turn with 8 cards in hand from the Atraxa dig. Voice of Victory (no spells on my turn) was good but irrelevant, as the combo went off on their turn.
+- Engine/menu: no bugs seen. My lands showed as tapped on the opponent's turn display, harmless. The pick reason text with a semicolon was run by the shell (harmless, the pick still went through).

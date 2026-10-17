@@ -1,0 +1,7 @@
+RESULT: LOST
+TURNS: 2 (I never got a third turn; died on the opponent's second turn)
+PROTECT: n/a
+- Mistake: T1 I kept a 2-land hand with five cheap spells, played Elegant Parlor tapped, then Plateau + Ajani on T2. Nothing there could have beaten the opponent's turn-2 line (Misty Rainforest, City of Traitors, Show and Tell). I put Spider-Woman in with Show and Tell, and the opponent put Aluren in (not a fatty). Acererak then entered tapped because of Spider-Woman, which did not matter.
+- The opponent looped Acererak with Aluren (Lost Mine laps, triggers left on the stack, drain only) and killed me from 20 on their second turn before I could attack. I had no counterspell, no mana (tapped out for Ajani) and no way to interrupt. My one try: I cast Amped Raptor for free under Aluren while Acererak was on the battlefield, hoping to exile-cast Swords or Erode off the top (about 17 percent); it hit Voice of Victory instead. Voice only stops spells on my turn, so it was useless against this.
+- Possible mistake: keep-or-mulligan and sequencing were fine, but I could not have won the race since the combo is turn-two lethal with no interaction. Holding a Wasteland-type or Swords-ready mana up was not possible on the play.
+- Bug/oddity: Aluren is symmetric, so the menu offers my creatures at instant speed on their turn for free; this worked as designed (the menu listed castable creatures with tapped lands). No bugs noticed.
