@@ -1,0 +1,10 @@
+RESULT: WON
+TURNS: 6
+PROTECT: My main deck had two Veil of Summer and no Orim's Chant. I drew one Veil, by turn 5 (a Brainstorm and a Stock Up got me there). I cast it as a cantrip on turn 5, in response to their Stifle on my Flooded Strand. Stifle is a blue spell, so Veil drew a card (it found the second Acererak). It protected nothing.
+Veil was awkward on the turns I held it, not dead. On turn 4 it was in hand with 3 lands and I needed 4 mana for Veil plus Show and Tell, so I jammed Show and Tell with Force of Will backup instead. They Forced it, I Forced back, and they Forced my Force, so Show and Tell died. Their four Force of Will were all gone after that. On turn 6 Aluren resolved without needing Veil, and Veil does not stop Stifle or Swords, the cards that actually threatened the loop.
+Would I rather have had Orim's Chant in those slots? No. UW is blue, so Chant would have been a combo-turn tool, but a Chant (kicked, 3 mana) was more mana than I could spare on turns 4 and 6, and Veil's draw on a Stifle was worth more. Both were weak here: what mattered was Stifle bait and holding two Acererak.
+
+Game: they Forced Show and Tell on turn 4 and then Forced my Force, leaving them at 2 cards. On turn 5 they Stifled my fetch, a free bait that cost them Stifle. On turn 6 I cast Aluren with two Acererak in hand and cracked a Misty as bait first. They had one card left, Swords to Plowshares on the first Acererak. I let it exile him for +5 life, then looped the second Acererak with the Lost Mine macro against an empty hand. They went from 16 to 0 in about 130 picks.
+- Mistake or doubt: turn 4 raw Show and Tell into two open blue mana. It worked out as a 2-for-3 trade for me, but the jam was risky; waiting for Veil mana (4 lands) was the alternative.
+- Surprise: the opponent spent both Forces on a single Show and Tell and held Swords to answer the loop trigger instead of the earlier plays; they never cast a threat in 6 turns.
+- Engine notes: the Force of Will pitch menu appeared only after the target prompt (fine). The macro finished the whole loop faster than expected (about 8 picks per point of life, not 14).

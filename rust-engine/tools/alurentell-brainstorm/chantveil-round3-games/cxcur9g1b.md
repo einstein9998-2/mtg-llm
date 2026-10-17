@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 3 (my own turns; the game ended during the opponent's 4th turn)
+PROTECT: n/a (my deck is the storm list with 2 Veil of Summer, no Orim's Chant). I opened with one Veil in hand after the mulligan; it was never cast. I never had green mana open at a useful moment and never had anything worth protecting from a counterspell. The opponent was tapped out or only used Show and Tell, so Veil would have done nothing against it.
+
+- Mulligan: first 7 had zero lands (LED, Dark Ritual, Burning Wish, Gamble, Beseech the Mirror, Mox Opal, Song of Creation), so I mulliganed. The 6-card hand was Urza's Saga, Verdant Catacombs, Giant's Boulder, 2 Hexing Squelcher, Veil of Summer (Beseech bottomed).
+- Mistake (turn 2): I tapped Urza's Saga for mana to cast Hexing Squelcher. On turn 3 the chapter III trigger came with Saga already used, so I could never make a Construct. I also could not cast Chrome Mox with the trigger on the stack, so the Saga was sacrificed for nothing but a Mox Opal. I should have saved Saga's tap for the Construct.
+- Opponent: it was Alurentell (Aluren/Acererak). On its turn 4 it cast Show and Tell off Tropical Island, Savannah, Island and Hedge Maze. I put Runehorn Hellkite onto the battlefield, and the Acererak/Aluren loop killed me in that same turn. I had no counterspell, no pressure beyond two 2/2s, and the game ended before I could do anything.
+- Menu note: cards in this deck (Hexing Squelcher, Giant's Boulder, Runehorn Hellkite, Song of Creation, Beseech the Mirror) are not in get_card, so I could not read their text. The tool reported "not in the card pool".

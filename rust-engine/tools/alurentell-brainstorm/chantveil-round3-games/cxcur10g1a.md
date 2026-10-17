@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 4
+PROTECT: My game deck has 2 Veil of Summer (no Chant). I held a Veil in the six-card keep and bottomed it (near-blank against Storm: no green source early, they have no blue/black interaction). A second Veil showed in Atraxa's reveal and I did not take it. I never cast Veil or Force of Will: I passed on Giant's Boulder, Mox Opal, Petal, Dark Ritual and Gamble, because Hexing Squelcher made their spells uncounterable and none of them was worth two cards. Show and Tell and Aluren resolved with nothing to stop them. Veil was dead or awkward all game.
+Would I rather have had Chant in those slots: yes, against Storm; a kicked Chant on their turn (in response to Dark Ritual or the Gamble/Wish turn) is a time walk and Squelcher does not matter to it.
+- Possible mistake: kept a one-land six (Flooded Strand, Force x2, Veil, Show and Tell, Atraxa, no cantrip) instead of going to five. It worked (Strand fetched Hedge Maze, then drew City of Traitors and Petal) but was lucky.
+- Surprise: the opponent stalled on one land with 1 card in hand after Hexing Squelcher/Gamble, and put in only Runehorn Hellkite for my turn-3 Show and Tell (Atraxa); nothing for the second one (Aluren). Atraxa's reveal plus Stock Up gave me Aluren and a second Show and Tell.
+- Engine: Hexing Squelcher, Giant's Boulder and Runehorn Hellkite are not in get_card (not in the card pool), so I guessed Squelcher's text. The Acererak macro drained 12 life in about 140 auto picks.

@@ -63,7 +63,7 @@ Post-board games are omitted for the reason given in the first report: both list
 - The Veil and Chant players both saw their own deck and the opponent's main deck by design. One Storm opponent report (b6) says it opened the base-deck folder while checking cards and saw the Alurentell list; the game was a Chant-list win by turn 3, so it is not material.
 - Engine and menu items worth a look, each from a single report unless noted:
   - **Lion's Eye Diamond turns** (c6 and b8, both Storm): after casting LED or a 0-cost artifact the engine gave no prompt, so the LED/Echo of Eons line could not be run, and the turn and the opponent's turn were auto-passed. b7's Storm player reports the same thing after a pick. Hold mana abilities for the first prompt.
-  - **Karn, the Great Creator and Lotus Petal** (c11, c12 and b10): two reports say Petal could not make mana while Karn was out. Karn's static stops non-mana activated abilities only, so Petal should work; this looks like an engine bug.
+  - **Karn, the Great Creator and Lotus Petal** (c11, c12 and b10): three reports say Petal could not make mana while Karn was out. Brady ruled this is correct (Karn stops mana abilities too), so it is not an engine bug.
   - **Trinisphere** (c12): after Show and Tell put in Aluren, no more prompts for turns 3 and 4 (the free casts cost 3). Probably correct.
   - A `;` in a pick reason runs as shell text; the pick still goes through (seen in several reports).
   - `get_card` does not know the Tron cards (Karn, Tezzeret, Saga, Ring, Trinisphere), so the Tron players played from memory.

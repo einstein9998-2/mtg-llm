@@ -1,0 +1,6 @@
+RESULT: LOST
+TURNS: 3
+PROTECT: n/a (my deck ran Veil of Summer x2 and none was drawn; I never saw one)
+- Opponent mulliganed to 5 and still won: on my turn 3 (game turn 5), at my declare-attackers step, they ran the Aluren plus Acererak loop at instant speed and drained me out of the game before any damage. I had a 5/5 Construct, a 2/2 uncounterable Hexing Squelcher and a Giant's Boulder board, no cards in hand except Runehorn Hellkite, and no interaction. Their Boseiju, Hedge Maze and the earlier Lotus Petal and Brainstorm were all I saw them cast.
+- My possible mistake: turn 3 I cast Giant's Boulder and attacked instead of anything else, but I had no real alternative (1 land, hand of Hellkite only). Mulligan decision was a keep of 2 lands, Ritual, Saga, Gamble, Boulder, Hellkite, Squelcher: a fine hand, but the deck is too slow vs a combo that goes off on turn 2 or 3 with no way to disrupt it.
+- Menu note: card text is not shown in prompts and get_card says my cards (Giant's Boulder, Hexing Squelcher, Runehorn Hellkite, Urza's Saga, Mox Opal, etc.) are not in the card pool, so I played them without oracle text. Giant's Boulder bottom-selection prompt showed odd 'remaining' counts (2 left but only one card listed).

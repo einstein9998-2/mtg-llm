@@ -1,0 +1,7 @@
+RESULT: WON
+TURNS: 2
+PROTECT: My game deck file had 2 Veil of Summer main (Orim's Chant was in the sideboard only). I drew neither Veil nor Chant, so no protect card was cast and none was dead in hand.
+PROTECT: Veil vs Chant against blue-tron: Veil is the better of the two here. Cast first, it makes Show and Tell uncounterable by their blue Force of Will and Force of Negation, and Tron has no Daze, Wasteland or burn. Chant needs white mana that this hand and many draws lack, and it is a tempo spell with no card draw. I would not swap Veil for Chant against this opponent. Neither was castable in this hand anyway (no green or white source, only Island plus Tombs).
+- Turn 1 Island, Ponder (kept order Show and Tell, Force of Will, Acererak, no shuffle; Ponder's own draw gave me Show and Tell). Turn 2 Ancient Tomb, Show and Tell. Mistake candidate: none big; pitching the second Force of Will rather than Brainstorm left me with no counter backup for the free Acererak, but they had no answer.
+- Surprise: the opponent did nothing on turns 1 and 2 except land drops, then held Force of Negation (pitching Consign to Memory) and used it on my own turn, as expected for this deck.
+- Engine note: the Force of Will cast showed the pitch prompt only after targeting (normal). Lost Mine loop took 158 auto picks in 3 macro chunks (about 1300 seconds wall); the stack of unresolved room triggers was long but harmless.

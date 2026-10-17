@@ -1,0 +1,8 @@
+RESULT: WON
+TURNS: 4
+PROTECT: I did draw Veil of Summer (one at the bottom of a Stock Up, then two more later in the Acererak loop), but never cast it. The opponent (Storm) showed no blue spell, discard or counter, so nothing needed protecting: Show and Tell on turn 4 resolved into an empty blue board and the loop ran unopposed.
+PROTECT: It was a blank in this matchup (a fine hold, but no target). Veil only matters against Storm's own Veil or their sorcery-speed Tendrils (hexproof from black); neither came up on my turn.
+PROTECT: Would I rather have had Orim's Chant? Probably yes: Chant on their turn (before their go-off, or in response to a Ritual) is a time walk against a combo deck faster than me, and Veil's hexproof from black on me (vs Tendrils) is the only upside it has here.
+- Notes: Turn 1 Misty (Tropical), Ponder kept Strand, Stock Up, Force. Turn 2 Strand (Savannah), Petal, Stock Up took Acererak and Brainstorm. Turn 3 Brainstorm into Misty (Island) and Ponder, drew a second Show and Tell. Turn 4 Hedge Maze, then Show and Tell (paid by three untapped lands) put in Omniscience. The opponent put in Runehorn Hellkite. Then Acererak looped with Lost Mine under Omniscience (auto macro, 374 picks) to drain them from 19 to 0 while the library went 41 to about 20.
+- Possible mistake: spending Tropical's blue on turn-3 Brainstorm (my only untapped blue source) meant no Show and Tell that turn, though the turn would not have reached 3 mana anyway.
+- Opponent surprise: Storm did almost nothing (Saga, Boulder, LED, Mox Opal, two Squelchers) and never went off before turn 4. No engine bugs seen apart from an odd "DECISIVE (life total is low)" label at 30 life.
