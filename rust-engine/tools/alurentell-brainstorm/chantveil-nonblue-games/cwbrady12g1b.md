@@ -1,0 +1,6 @@
+RESULT: LOST
+TURNS: 3
+PROTECT: n/a
+- Mistake (my turn 3): I spent my mana on Trinisphere (countered by a second Force of Will) plus Saga/Map/Construct instead of casting Ugin (7 mana was available if I skipped Trinisphere). Ugin's cast trigger could have exiled a colored permanent on my turn, but more importantly I tapped everything and kept no instant-speed answer, so when the opponent cast Show and Tell into Omniscience, then Aluren and the Acererak loop on their turn 3, I had no way to interact. Also drew with The One Ring down to 3 burden counters, so I was at 16 life with no way to stop a drain loop.
+- Surprise: the opponent went Show and Tell (turn 3, on their turn after two Force of Will on my first Ring and my Trinisphere) into Omniscience, then Stock Up x3, Ponder, Aluren, and a full Acererak Lost Mine loop in a single turn, draining me from 16 to 0 with all triggers left on the stack. Show and Tell could not even let me put in Ugin or Tezzeret (only artifact/creature/enchantment/land are legal), so I put Boseiju.
+- Engine notes: no bug seen. Passing priority with an ability on the stack sometimes jumped me from Main 1 to Main 2 when nothing else was castable. The auto macro with the rule "stack:Pass priority" worked for passing through the loop (about 390 auto picks).

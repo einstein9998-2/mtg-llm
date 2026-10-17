@@ -1,0 +1,8 @@
+RESULT: LOST
+TURNS: 3
+PROTECT: n/a
+
+- Game: kept a 7 (Raucous Theater, Scalding Tarn, Dark Ritual, 2 Gamble, Beseech the Mirror, Chrome Mox). T1 Theater (surveil kept Burning Wish), T2 Tarn for Taiga and no spells, T3 (no land drop): Mox Opal, Chrome Mox (imprint Gamble), Ritual, Beseech (no bargain) for Lion's Eye Diamond, cast LED, then Gamble (paid with Taiga) naming Echo of Eons, planning LED for UUU to flash Echo back and refill. The opponent was tapped out on my T3 (Stock Up on its T2, then discarded Ancient Tomb to hand size).
+- After I picked Echo for Gamble (prompt 34) I got no further prompt: the game ran through the rest of my turn and the opponent's turn, and the opponent won with an Acererak loop (it drained me out). I never got to activate LED / flash back Echo, so I do not know whether Gamble resolved, what I discarded, or whether I was countered. Looks like an engine/menu issue (windows skipped, possibly because the engine judged Echo flashback unaffordable with LED, Opal, ...), or the opponent responded and my windows were auto-passed.
+- Possible mistakes: T2 I passed with Taiga/Theater/two Moxen in hand doing nothing (could have deployed Chrome Mox + Opal and a Thoughtseize/Gamble line to be a turn faster). Sequencing with plain-pay on Beseech tapped Chrome Mox as well as using the pool (Ritual BBB then Beseech 1BB left Chrome tapped, so Chrome's mana was wasted); I should have used the "keep floating mana" variants/pay= more carefully. Also I never had a U source before LED and no Veil of Summer in hand against a Force of Will deck.
+- The opponent never interacted before its combo turn (no counterspell seen); its only plays were Ancient Tomb, Tropical Island, Stock Up, then a fast Aluren/Acererak loop on its turn 3.
